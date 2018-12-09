@@ -115,7 +115,7 @@ If the last expression of a branch is one of the following, it is interpreted th
 fn foo(x: i32) -> impl Iterator<Item = i32> {
     match x {
         0 => 1..10,
-        _ if x < 0 => panic!(), // variant assignment is skipped
+        1 => panic!(), // variant assignment is skipped
         _ => vec![5, 10].into_iter(),
     }
 }
@@ -129,7 +129,7 @@ fn foo(x: i32) -> impl Iterator<Item = i32> {
     match x {
         0 => 1..10,
         #[never]
-        _ if x < 0 => loop {
+        1 => loop {
             panic!()
         },
         _ => vec![5, 10].into_iter(),
