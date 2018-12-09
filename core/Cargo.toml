@@ -9,7 +9,6 @@ repository = "https://github.com/taiki-e/auto_enumerate"
 documentation = "https://docs.rs/auto_enumerate_core/"
 keywords = ["enum", "macros", "derive", "attribute"]
 include = ["Cargo.toml", "src/**/*.rs", "LICENSE-APACHE", "LICENSE-MIT"]
-publish = false
 
 [badges]
 travis-ci = { repository = "taiki-e/auto_enumerate" }

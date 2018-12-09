@@ -10,7 +10,6 @@ documentation = "https://docs.rs/auto_enumerate/"
 readme = "README.md"
 keywords = ["enum", "macros", "derive", "attribute"]
 exclude = ["/.travis.yml"]
-publish = false
 
 [workspace]
 members = [
