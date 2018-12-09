@@ -36,6 +36,8 @@ extern crate auto_enumerate;
 
 `#[auto_enum]`'s basic feature is to wrap the value returned by the last if or match expression by an enum that implemented the specified traits.
 
+[Generated code](generated_codes/examples-1.md)
+
 ```rust
 #[auto_enum(Iterator)] // generats an enum with two variants
 fn foo(x: i32) -> impl Iterator<Item = i32> {
@@ -47,6 +49,8 @@ fn foo(x: i32) -> impl Iterator<Item = i32> {
 ```
 
 You can also use `#[auto_enum]` for expressions and statements.
+
+[Generated code](generated_codes/examples-2.md)
 
 ```rust
 use std::{fs, io, path::Path};
@@ -66,6 +70,8 @@ fn output_stream(file: Option<&Path>) -> io::Result<impl io::Write> {
 ### `marker!` macro
 
 `#[auto_enum]` replaces `marker!` macros with variants.
+
+[Generated code](generated_codes/examples-3.md)
 
 ```rust
 #[auto_enum(Iterator)] // generats an enum with three variants
