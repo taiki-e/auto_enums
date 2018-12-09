@@ -1,0 +1,27 @@
+language: rust
+sudo: false
+
+matrix:
+  include:
+    - rust: 1.30.0
+    - rust: stable
+    - rust: beta
+    - rust: nightly
+      script:
+        - cargo test -p auto_enumerate -p auto_enumerate_test_suite
+        - cargo test --no-default-features -p auto_enumerate -p auto_enumerate_test_suite
+        - cargo test --all-features -p auto_enumerate -p auto_enumerate_test_suite
+        - cargo doc --all-features --no-deps -p auto_enumerate -p auto_enumerate_core -p auto_enumerate_derive
+        - cd "${TRAVIS_BUILD_DIR}/test_suite"
+        - cargo test
+        - cargo test --all-features
+
+before_script:
+  - set -o errexit
+
+script:
+  - cargo test -p auto_enumerate -p auto_enumerate_test_suite
+  - cargo test --no-default-features -p auto_enumerate -p auto_enumerate_test_suite
+
+notifications:
+  email: false

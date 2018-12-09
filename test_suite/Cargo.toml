@@ -1,0 +1,46 @@
+[package]
+name = "auto_enumerate_test_suite"
+version = "0.0.0"
+authors = ["Taiki Endo <te316e89@gmail.com>"]
+publish = false
+
+[dependencies]
+futures = { version = "0.1", optional = true }
+quote = { version = "0.6", optional = true }
+rayon = { version = "1.0", optional = true }
+serde = { version = "1.0", optional = true }
+
+[dev-dependencies]
+rand = "^0.6.1"
+
+[dev-dependencies.auto_enumerate]
+path = ".."
+default-features = false
+features = ["transpose_methods"]
+
+[features]
+default = ["external_libraries"]
+
+type_analysis = ["auto_enumerate/type_analysis"]
+
+std = ["auto_enumerate/std"]
+
+external_libraries = [
+    "std",
+    "futures",
+    "quote",
+    "rayon",
+    "serde",
+    "auto_enumerate/futures01",
+    "auto_enumerate/proc_macro",
+    "auto_enumerate/rayon",
+    "auto_enumerate/serde",
+]
+
+unstable = [
+    "auto_enumerate/unstable",
+    "auto_enumerate/read_initializer",
+    "auto_enumerate/exact_size_is_empty",
+    "auto_enumerate/try_trait",
+    "auto_enumerate/unsized_locals",
+]

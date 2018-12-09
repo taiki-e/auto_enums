@@ -1,0 +1,70 @@
+[package]
+name = "auto_enumerate_derive"
+# NB: When modifying, also modify html_root_url in lib.rs
+version = "0.1.0"
+authors = ["Taiki Endo <te316e89@gmail.com>"]
+license = "Apache-2.0/MIT"
+description = "An attribute macro like a wrapper of `#[derive]`, implementing the supported traits and passing unsupported traits to `#[derive]`."
+repository = "https://github.com/taiki-e/auto_enumerate"
+documentation = "https://docs.rs/auto_enumerate_derive/"
+keywords = ["enum", "macros", "derive", "attribute"]
+include = ["Cargo.toml", "src/**/*.rs", "LICENSE-APACHE", "LICENSE-MIT"]
+publish = false
+
+[badges]
+travis-ci = { repository = "taiki-e/auto_enumerate" }
+
+[lib]
+proc-macro = true
+
+[dependencies]
+lazy_static = "1.2"
+proc-macro2 = "^0.4.13"
+quote = "^0.6.8"
+smallvec = "^0.6.7"
+syn = { version = "^0.15.19", features = ["full", "extra-traits"] }
+
+[features]
+# Default features.
+default = ["std"]
+
+# Use conversion methods.
+transpose_methods = []
+
+# Use unstable features to make attribute macro more effective.
+unstable = ["smallvec/union", "smallvec/may_dangle"]
+
+# =============================================================================
+# [std|core] libraries
+
+# Use `std` library.
+std = []
+
+# Enable unstable features of [std|core] libraries.
+
+# ExactSizeIterator::is_empty
+exact_size_is_empty = []
+# io::Read::read_initializer
+read_initializer = []
+# Make iterator implementation more effective.
+try_trait = []
+# Index<Idx: ?Sized> and IndexMut<Idx: ?Sized>
+unsized_locals = []
+
+# =============================================================================
+# external libraries
+
+# futures(v0.3+)
+futures = []
+
+# futures(v0.1)
+futures01 = []
+
+# proc_macro, proc-macro2, quote, syn
+proc_macro = []
+
+# rayon
+rayon = []
+
+# serde
+serde = []

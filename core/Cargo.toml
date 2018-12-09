@@ -1,0 +1,35 @@
+[package]
+name = "auto_enumerate_core"
+# NB: When modifying, also modify html_root_url in lib.rs
+version = "0.1.0"
+authors = ["Taiki Endo <te316e89@gmail.com>"]
+license = "Apache-2.0/MIT"
+description = "An attribute macro for to allow multiple return types by automatically generated enum."
+repository = "https://github.com/taiki-e/auto_enumerate"
+documentation = "https://docs.rs/auto_enumerate_core/"
+keywords = ["enum", "macros", "derive", "attribute"]
+include = ["Cargo.toml", "src/**/*.rs", "LICENSE-APACHE", "LICENSE-MIT"]
+publish = false
+
+[badges]
+travis-ci = { repository = "taiki-e/auto_enumerate" }
+
+[lib]
+proc-macro = true
+
+[dependencies]
+proc-macro2 = "^0.4.13"
+quote = "^0.6.8"
+rand = "^0.6.1"
+smallvec = "^0.6.7"
+syn = { version = "^0.15.19", features = ["full", "visit", "fold", "extra-traits"] }
+
+[features]
+# Default features.
+default = []
+
+# Analyze return type of function and `let` binding.
+type_analysis = []
+
+# Use unstable features to make attribute macro more effective.
+unstable = ["smallvec/union", "smallvec/may_dangle"]
