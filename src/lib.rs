@@ -10,6 +10,8 @@
 //!
 //! `#[auto_enum]`'s basic feature is to wrap the value returned by the last if or match expression by an enum that implemented the specified traits.
 //!
+//! [Generated code](https://github.com/taiki-e/auto_enumerate/blob/master/generated_codes/example-1.md)
+//!
 //! ```rust
 //! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //! # #[macro_use]
@@ -25,6 +27,8 @@
 //! ```
 //!
 //! You can also use `#[auto_enum]` for expressions and statements.
+//!
+//! [Generated code](https://github.com/taiki-e/auto_enumerate/blob/master/generated_codes/example-2.md)
 //!
 //! ```rust
 //! # #[macro_use]
@@ -47,6 +51,8 @@
 //! ## Expression level marker (`marker!` macro)
 //!
 //! `#[auto_enum]` replaces `marker!` macros with variants.
+//!
+//! [Generated code](https://github.com/taiki-e/auto_enumerate/blob/master/generated_codes/example-3.md)
 //!
 //! ```rust
 //! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
