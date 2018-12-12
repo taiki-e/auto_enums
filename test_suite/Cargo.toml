@@ -1,5 +1,5 @@
 [package]
-name = "auto_enumerate_test_suite"
+name = "auto_enums_test_suite"
 version = "0.0.0"
 authors = ["Taiki Endo <te316e89@gmail.com>"]
 publish = false
@@ -13,7 +13,7 @@ serde = { version = "1.0", optional = true }
 [dev-dependencies]
 rand = "^0.6.1"
 
-[dev-dependencies.auto_enumerate]
+[dev-dependencies.auto_enums]
 path = ".."
 default-features = false
 features = ["transpose_methods"]
@@ -21,9 +21,9 @@ features = ["transpose_methods"]
 [features]
 default = ["external_libraries"]
 
-type_analysis = ["auto_enumerate/type_analysis"]
+type_analysis = ["auto_enums/type_analysis"]
 
-std = ["auto_enumerate/std"]
+std = ["auto_enums/std"]
 
 external_libraries = [
     "std",
@@ -31,16 +31,16 @@ external_libraries = [
     "quote",
     "rayon",
     "serde",
-    "auto_enumerate/futures01",
-    "auto_enumerate/proc_macro",
-    "auto_enumerate/rayon",
-    "auto_enumerate/serde",
+    "auto_enums/futures01",
+    "auto_enums/proc_macro",
+    "auto_enums/rayon",
+    "auto_enums/serde",
 ]
 
 unstable = [
-    "auto_enumerate/unstable",
-    "auto_enumerate/read_initializer",
-    "auto_enumerate/exact_size_is_empty",
-    "auto_enumerate/try_trait",
-    "auto_enumerate/unsized_locals",
+    "auto_enums/unstable",
+    "auto_enums/read_initializer",
+    "auto_enums/exact_size_is_empty",
+    "auto_enums/try_trait",
+    "auto_enums/unsized_locals",
 ]

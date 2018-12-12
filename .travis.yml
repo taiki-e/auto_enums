@@ -10,7 +10,7 @@ matrix:
       script:
         - cargo test
         - cargo test --all-features
-        - cargo doc --all-features --no-deps -p auto_enumerate -p auto_enumerate_core -p auto_enumerate_derive
+        - cargo doc --all-features --no-deps -p auto_enums -p auto_enums_core -p auto_enums_derive
         - cd "${TRAVIS_BUILD_DIR}/test_suite"
         - cargo test
         - cargo test --no-default-features

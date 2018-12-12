@@ -28,7 +28,7 @@ extern crate rayon;
 extern crate serde;
 
 #[macro_use]
-extern crate auto_enumerate;
+extern crate auto_enums;
 
 #[test]
 fn stable_1_30() {

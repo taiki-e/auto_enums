@@ -1,12 +1,12 @@
-# auto_enumerate
+# auto_enums
 
-[![Build Status](http://img.shields.io/travis/taiki-e/auto_enumerate.svg)](https://travis-ci.org/taiki-e/auto_enumerate)
-[![version](https://img.shields.io/crates/v/auto_enumerate.svg)](https://crates.io/crates/auto_enumerate/)
-[![documentation](https://docs.rs/auto_enumerate/badge.svg)](https://docs.rs/auto_enumerate/)
-[![license](https://img.shields.io/crates/l/auto_enumerate.svg)](https://crates.io/crates/auto_enumerate/)
+[![Build Status](http://img.shields.io/travis/taiki-e/auto_enums.svg)](https://travis-ci.org/taiki-e/auto_enums)
+[![version](https://img.shields.io/crates/v/auto_enums.svg)](https://crates.io/crates/auto_enums/)
+[![documentation](https://docs.rs/auto_enums/badge.svg)](https://docs.rs/auto_enums/)
+[![license](https://img.shields.io/crates/l/auto_enums.svg)](https://crates.io/crates/auto_enums/)
 [![Rustc Version](https://img.shields.io/badge/rustc-1.30+-lightgray.svg)](https://blog.rust-lang.org/2018/10/25/Rust-1.30.0.html)
 
-[API Documentation](https://docs.rs/auto_enumerate/)
+[API Documentation](https://docs.rs/auto_enums/)
 
 A library for to allow multiple return types by automatically generated enum.
 
@@ -26,14 +26,14 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-auto_enumerate = "0.1"
+auto_enums = "0.1"
 ```
 
 and this to your crate root:
 
 ```rust
 #[macro_use]
-extern crate auto_enumerate;
+extern crate auto_enums;
 ```
 
 ## Examples
@@ -308,7 +308,7 @@ These don't derive traits, but derive static methods instead.
 
     ```toml
     [dependencies]
-    auto_enumerate = { version = "0.1", features = ["type_analysis"] }
+    auto_enums = { version = "0.1", features = ["type_analysis"] }
     ```
 
     Examples:

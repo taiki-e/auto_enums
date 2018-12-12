@@ -11,7 +11,7 @@
 #![cfg(test)]
 
 #[macro_use]
-extern crate auto_enumerate;
+extern crate auto_enums;
 
 #[cfg(feature = "unstable")]
 mod test_futures {

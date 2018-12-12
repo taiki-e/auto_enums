@@ -1,5 +1,5 @@
 [package]
-name = "auto_enumerate_tests_2018"
+name = "auto_enums_tests_2018"
 version = "0.0.0"
 authors = ["Taiki Endo <te316e89@gmail.com>"]
 edition = "2018"
@@ -10,7 +10,7 @@ publish = false
 [dependencies]
 futures-preview = { version = "0.3.0-alpha.10", optional = true }
 
-[dev-dependencies.auto_enumerate]
+[dev-dependencies.auto_enums]
 path = "../.."
 default-features = false
 features = ["std"]
@@ -18,10 +18,10 @@ features = ["std"]
 [features]
 unstable = [
     "futures-preview",
-    "auto_enumerate/unstable",
-    "auto_enumerate/futures",
-    "auto_enumerate/read_initializer",
-    "auto_enumerate/exact_size_is_empty",
-    "auto_enumerate/try_trait",
-    "auto_enumerate/unsized_locals",
+    "auto_enums/unstable",
+    "auto_enums/futures",
+    "auto_enums/read_initializer",
+    "auto_enums/exact_size_is_empty",
+    "auto_enums/try_trait",
+    "auto_enums/unsized_locals",
 ]

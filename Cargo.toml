@@ -1,12 +1,12 @@
 [package]
-name = "auto_enumerate"
+name = "auto_enums"
 # NB: When modifying, also modify html_root_url in lib.rs
 version = "0.1.0"
 authors = ["Taiki Endo <te316e89@gmail.com>"]
 license = "Apache-2.0/MIT"
 description = "A library for to allow multiple return types by automatically generated enum."
-repository = "https://github.com/taiki-e/auto_enumerate"
-documentation = "https://docs.rs/auto_enumerate/"
+repository = "https://github.com/taiki-e/auto_enums"
+documentation = "https://docs.rs/auto_enums/"
 readme = "README.md"
 keywords = ["enum", "macros", "derive", "attribute"]
 exclude = ["/.travis.yml"]
@@ -19,14 +19,14 @@ members = [
 ]
 
 [badges]
-travis-ci = { repository = "taiki-e/auto_enumerate" }
+travis-ci = { repository = "taiki-e/auto_enums" }
 
-[dependencies.auto_enumerate_core]
+[dependencies.auto_enums_core]
 version = "0.1"
 path = "core"
 default-features = false
 
-[dependencies.auto_enumerate_derive]
+[dependencies.auto_enums_derive]
 version = "0.1"
 path = "derive"
 default-features = false
@@ -36,45 +36,45 @@ default-features = false
 default = ["std"]
 
 # Analyze return type of function and `let` binding.
-type_analysis = ["auto_enumerate_core/type_analysis"]
+type_analysis = ["auto_enums_core/type_analysis"]
 
 # Use `transpose*` methods.
-transpose_methods = ["auto_enumerate_derive/transpose_methods"]
+transpose_methods = ["auto_enums_derive/transpose_methods"]
 
 # Use unstable features to make attribute macro more effective.
-unstable = ["auto_enumerate_core/unstable", "auto_enumerate_derive/unstable"]
+unstable = ["auto_enums_core/unstable", "auto_enums_derive/unstable"]
 
 # =============================================================================
 # [std|core] libraries
 
 # Use `std` library.
-std = ["auto_enumerate_derive/std"]
+std = ["auto_enums_derive/std"]
 
 # Enable unstable features of [std|core] libraries.
 
 # Implements `ExactSizeIterator::is_empty`.
-exact_size_is_empty = ["auto_enumerate_derive/exact_size_is_empty"]
+exact_size_is_empty = ["auto_enums_derive/exact_size_is_empty"]
 # Implements `io::Read::read_initializer`.
-read_initializer = ["auto_enumerate_derive/read_initializer"]
+read_initializer = ["auto_enums_derive/read_initializer"]
 # Make iterator implementation more effective.
-try_trait = ["auto_enumerate_derive/try_trait"]
+try_trait = ["auto_enums_derive/try_trait"]
 # Allow `Index<Idx: ?Sized>` and `IndexMut<Idx: ?Sized>`.
-unsized_locals = ["auto_enumerate_derive/unsized_locals"]
+unsized_locals = ["auto_enums_derive/unsized_locals"]
 
 # =============================================================================
 # external libraries
 
 # futures(v0.3+)
-futures = ["auto_enumerate_derive/futures"]
+futures = ["auto_enums_derive/futures"]
 
 # futures(v0.1)
-futures01 = ["auto_enumerate_derive/futures01"]
+futures01 = ["auto_enums_derive/futures01"]
 
 # proc_macro, proc-macro2, quote, syn
-proc_macro = ["auto_enumerate_derive/proc_macro"]
+proc_macro = ["auto_enums_derive/proc_macro"]
 
 # rayon
-rayon = ["auto_enumerate_derive/rayon"]
+rayon = ["auto_enums_derive/rayon"]
 
 # serde
-serde = ["auto_enumerate_derive/serde"]
+serde = ["auto_enums_derive/serde"]

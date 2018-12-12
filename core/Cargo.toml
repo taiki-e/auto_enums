@@ -1,17 +1,17 @@
 [package]
-name = "auto_enumerate_core"
+name = "auto_enums_core"
 # NB: When modifying, also modify html_root_url in lib.rs
 version = "0.1.0"
 authors = ["Taiki Endo <te316e89@gmail.com>"]
 license = "Apache-2.0/MIT"
 description = "An attribute macro for to allow multiple return types by automatically generated enum."
-repository = "https://github.com/taiki-e/auto_enumerate"
-documentation = "https://docs.rs/auto_enumerate_core/"
+repository = "https://github.com/taiki-e/auto_enums"
+documentation = "https://docs.rs/auto_enums_core/"
 keywords = ["enum", "macros", "derive", "attribute"]
 include = ["Cargo.toml", "src/**/*.rs", "LICENSE-APACHE", "LICENSE-MIT"]
 
 [badges]
-travis-ci = { repository = "taiki-e/auto_enumerate" }
+travis-ci = { repository = "taiki-e/auto_enums" }
 
 [lib]
 proc-macro = true

@@ -19,7 +19,7 @@ extern crate alloc;
 extern crate core;
 
 #[macro_use]
-extern crate auto_enumerate;
+extern crate auto_enums;
 
 #[test]
 fn stable_1_30() {

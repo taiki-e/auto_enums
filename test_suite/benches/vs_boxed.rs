@@ -6,7 +6,7 @@ extern crate rand;
 extern crate test;
 
 #[macro_use]
-extern crate auto_enumerate;
+extern crate auto_enums;
 
 use rand::Rng;
 use test::Bencher;
