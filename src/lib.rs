@@ -2,9 +2,13 @@
 //!
 //! This library provides the following attribute macros:
 //!
-//!   * `#[auto_enum]` - parsing, creates the enum, assigns variants
+//! * `#[auto_enum]`
 //!
-//!   * `#[enum_derive]` - implements the specified traits
+//!   Parses syntax, creates the enum, inserts variants, and passes specified traits to `#[enum_derive]`.
+//!
+//! * `#[enum_derive]`
+//!
+//!   Implements traits received from `#[auto_enum]`.
 //!
 //! ## Examples
 //!
@@ -287,9 +291,8 @@
 //!
 //! ## Supported traits
 //!
-//! `auto_enum` uses `#[enum_derive]` attribute macro for trait implementations.
+//! `#[enum_derive]` implements the supported traits and passes unsupported traits to `#[derive]`.
 //!
-//! `#[enum_derive]` is an attribute macro like a wrapper of `#[derive]`, implementing the supported traits and passing unsupported traits to `#[derive]`.
 //! If you want to use traits that are not supported by `#[enum_derive]`, you can use another crate that provides `proc_macro_derive`, or you can define `proc_macro_derive` yourself.
 //!
 //! Basic usage of `#[enum_derive]`
