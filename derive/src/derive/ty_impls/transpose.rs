@@ -1,174 +1,137 @@
-use proc_macro2::{Ident, Span, TokenStream};
-use quote::quote;
-use syn::Generics;
+use proc_macro2::TokenStream;
+use quote::{quote, ToTokens};
 
 use crate::utils::*;
 
 pub(crate) const NAME: &[&str] = &["Transpose"];
 
 // Implementing this with `Into` requires many type annotations.
-
-pub(crate) fn enum_derive(data: &syn::ItemEnum) -> Result<TokenStream> {
-    let root = &std_root();
-    let generics = &data.generics;
-    let mut ts = TokenStream::new();
-
-    ts.extend(transpose_option(
-        &EnumData::parse(data, false, false)?,
-        generics,
-        root,
-    )?);
-    EnumData::parse(data, true, false).map(|data| {
-        ts.extend(transpose_result(&data, root));
-        ts.extend(transpose_ok(&data, root));
-        ts.extend(transpose_err(&data, root));
-        ts
-    })
-}
-
-fn ident_call_site(s: &str) -> Ident {
-    Ident::new(s, Span::call_site())
-}
-
-fn transpose_option(
-    data: &EnumData<'_>,
-    generics: &Generics,
-    root: &TokenStream,
-) -> Result<TokenStream> {
-    let EnumData {
-        name,
-        impl_generics,
-        ty_generics,
-        where_clause,
-        variants,
-        fields,
-    } = data;
-
-    let comma = if !generics.params.empty_or_trailing() {
-        TokenStream::new()
-    } else {
-        quote!(,)
-    };
-    if quote!(#ty_generics).to_string() != quote!(<#(#fields),*#comma>).to_string() {
-        Err("all fields need to be generics")?;
+pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+    {
+        let generics = data.generics();
+        let fields = data.fields();
+        let comma = if !generics.params.empty_or_trailing() {
+            TokenStream::new()
+        } else {
+            quote!(,)
+        };
+        if quote!(#generics).to_string() != quote!(<#(#fields),*#comma>).to_string() {
+            Err("all fields need to be generics")?;
+        }
     }
 
-    let option = quote!(#root::option::Option);
-    let ty_generics = fields.iter().fold(TokenStream::new(), |t, f| {
-        t.extend_and_return(quote!(#option<#f>,))
-    });
+    let root = &std_root();
+    let mut ts = TokenStream::new();
 
-    // method
-    let transpose = variants.iter().fold(TokenStream::new(), |t, v| {
-        t.extend_and_return(quote!(#v(x) => x.map(#v),))
-    });
-
-    Ok(quote! {
-        impl #impl_generics #name<#ty_generics> #where_clause {
-            #[inline]
-            fn transpose(self) -> #option<#name<#(#fields),*>> {
-                match self { #transpose }
-            }
-        }
-    })
+    ts.extend(transpose_option(data, root)?);
+    ts.extend(transpose_result(data, root)?);
+    ts.extend(transpose_ok(data, root)?);
+    ts.extend(transpose_err(data, root)?);
+    Ok(ts)
 }
 
-fn transpose_result(data: &EnumData<'_>, root: &TokenStream) -> TokenStream {
-    let EnumData {
-        name,
-        impl_generics,
-        where_clause,
-        variants,
-        fields,
-        ..
-    } = data;
+fn transpose_option(data: &Data, root: &TokenStream) -> Result<TokenStream> {
+    let ident = data.ident();
+    let variants = data.variants();
+    let fields = data.fields();
+    let option = quote!(#root::option::Option);
 
+    let mut impls = data.impl_with_capacity(1, root.clone())?;
+
+    let ty_generics = fields.iter().map(|f| quote!(#option<#f>));
+    *impls.self_ty() = syn::parse2(quote!(#ident<#(#ty_generics),*>))?;
+
+    let transpose = variants.iter().map(|v| quote!(#ident::#v(x) => x.map(#ident::#v)));
+    impls.push_item(syn::parse2(quote! {
+        #[inline]
+        fn transpose(self) -> #option<#ident<#(#fields),*>> {
+            match self { #(#transpose,)* }
+        }
+    })?);
+
+    Ok(impls.build().into_token_stream())
+}
+
+fn transpose_result(data: &Data, root: &TokenStream) -> Result<TokenStream> {
+    let ident = data.ident();
+    let variants = data.variants();
+    let fields = data.fields();
     let result = quote!(#root::result::Result);
+
+    let mut impls = data.impl_with_capacity(1, root.clone())?;
+
     let err_fields: &Stack<_> = &(0..fields.len())
-        .map(|i| ident_call_site(&format!("__E{}", i)))
+        .map(|i| {
+            let id = &format!("__E{}", i);
+            impls.push_generic_param(param_ident(id));
+            ident_call_site(id)
+        })
         .collect();
 
-    let impl_generics = quote!(#impl_generics #(#err_fields),*>);
     let ty_generics = fields
         .iter()
         .zip(err_fields.iter())
-        .fold(TokenStream::new(), |t, (f, ef)| {
-            t.extend_and_return(quote!(#result<#f, #ef>,))
-        });
+        .map(|(f, ef)| quote!(#result<#f, #ef>));
+    *impls.self_ty() = syn::parse2(quote!(#ident<#(#ty_generics),*>))?;
 
-    // method
-    let transpose = variants.iter().fold(TokenStream::new(), |t, v| {
-        t.extend_and_return(quote!(#v(x) => x.map(#v).map_err(#v),))
-    });
+    let transpose = variants
+        .iter()
+        .map(|v| quote!(#ident::#v(x) => x.map(#ident::#v).map_err(#ident::#v)));
 
-    quote! {
-        impl #impl_generics #name<#ty_generics> #where_clause {
-            #[inline]
-            fn transpose(self) -> #result<#name<#(#fields),*>, #name<#(#err_fields),*>> {
-                match self { #transpose }
-            }
+    impls.push_item(syn::parse2(quote! {
+        #[inline]
+        fn transpose(self) -> #result<#ident<#(#fields),*>, #ident<#(#err_fields),*>> {
+            match self { #(#transpose,)* }
         }
-    }
+    })?);
+
+    Ok(impls.build().into_token_stream())
 }
 
-fn transpose_ok(data: &EnumData<'_>, root: &TokenStream) -> TokenStream {
-    let EnumData {
-        name,
-        impl_generics,
-        where_clause,
-        variants,
-        fields,
-        ..
-    } = data;
-
+fn transpose_ok(data: &Data, root: &TokenStream) -> Result<TokenStream> {
+    let ident = data.ident();
+    let variants = data.variants();
+    let fields = data.fields();
     let result = quote!(#root::result::Result);
-    let impl_generics = quote!(#impl_generics __E>);
-    let ty_generics = fields.iter().fold(TokenStream::new(), |t, f| {
-        t.extend_and_return(quote!(#result<#f, __E>,))
-    });
 
-    // method
-    let transpose = variants.iter().fold(TokenStream::new(), |t, v| {
-        t.extend_and_return(quote!(#v(x) => x.map(#v),))
-    });
+    let mut impls = data.impl_with_capacity(1, root.clone())?;
 
-    quote! {
-        impl #impl_generics #name<#ty_generics> #where_clause {
-            #[inline]
-            fn transpose_ok(self) -> #result<#name<#(#fields),*>, __E> {
-                match self { #transpose }
-            }
+    impls.push_generic_param(param_ident("__E"));
+
+    let ty_generics = fields.iter().map(|f| quote!(#result<#f, __E>));
+    *impls.self_ty() = syn::parse2(quote!(#ident<#(#ty_generics),*>))?;
+
+    let transpose = variants.iter().map(|v| quote!(#ident::#v(x) => x.map(#ident::#v)));
+    impls.push_item(syn::parse2(quote! {
+        #[inline]
+        fn transpose_ok(self) -> #result<#ident<#(#fields),*>, __E> {
+            match self { #(#transpose,)* }
         }
-    }
+    })?);
+
+    Ok(impls.build().into_token_stream())
 }
 
-fn transpose_err(data: &EnumData<'_>, root: &TokenStream) -> TokenStream {
-    let EnumData {
-        name,
-        impl_generics,
-        where_clause,
-        variants,
-        fields,
-        ..
-    } = data;
-
+fn transpose_err(data: &Data, root: &TokenStream) -> Result<TokenStream> {
+    let ident = data.ident();
+    let variants = data.variants();
+    let fields = data.fields();
     let result = quote!(#root::result::Result);
-    let impl_generics = quote!(#impl_generics __T>);
-    let ty_generics = fields.iter().fold(TokenStream::new(), |t, f| {
-        t.extend_and_return(quote!(#result<__T, #f>,))
-    });
 
-    // method
-    let transpose = variants.iter().fold(TokenStream::new(), |t, v| {
-        t.extend_and_return(quote!(#v(x) => x.map_err(#v),))
-    });
+    let mut impls = data.impl_with_capacity(1, root.clone())?;
 
-    quote! {
-        impl #impl_generics #name<#ty_generics> #where_clause {
-            #[inline]
-            fn transpose_err(self) -> #result<__T, #name<#(#fields),*>> {
-                match self { #transpose }
-            }
+    impls.push_generic_param(param_ident("__T"));
+
+    let ty_generics = fields.iter().map(|f| quote!(#result<__T, #f>));
+    *impls.self_ty() = syn::parse2(quote!(#ident<#(#ty_generics),*>))?;
+
+    let transpose = variants.iter().map(|v| quote!(#ident::#v(x) => x.map_err(#ident::#v)));
+    impls.push_item(syn::parse2(quote! {
+        #[inline]
+        fn transpose_err(self) -> #result<__T, #ident<#(#fields),*>> {
+            match self { #(#transpose,)* }
         }
-    }
+    })?);
+
+    Ok(impls.build().into_token_stream())
 }
