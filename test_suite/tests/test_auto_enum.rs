@@ -177,7 +177,7 @@ fn stable_1_30() {
         let iter = match x {
             0 => 2..8,
             _ if y < 0 => return marker_a!(y..=0),
-            _ => vec![2, 0].into_iter(),
+            _ => 2..=10,
         };
 
         match y {
@@ -185,7 +185,7 @@ fn stable_1_30() {
             _ => iter.map(|x| x + 1),
         }
     }
-    assert_eq!(marker2(10, 10).fold(0, |sum, x| sum + x), 4);
+    assert_eq!(marker2(10, 10).fold(0, |sum, x| sum + x), 63);
 
     #[auto_enum(Iterator)]
     fn marker3(x: i32, y: i32) -> impl Iterator<Item = i32> {
@@ -193,7 +193,7 @@ fn stable_1_30() {
         #[auto_enum(Iterator)]
         match x {
             0 => iter = marker!(2..8),
-            _ => iter = marker!(vec![2, 0].into_iter()),
+            _ => iter = marker!(2..=10),
         };
 
         if y < 0 {
@@ -204,7 +204,7 @@ fn stable_1_30() {
             _ => iter.map(|x| x + 1),
         }
     }
-    assert_eq!(marker3(10, 10).fold(0, |sum, x| sum + x), 4);
+    assert_eq!(marker3(10, 10).fold(0, |sum, x| sum + x), 63);
 
     #[auto_enum(marker(marker_a), Iterator)]
     fn marker4(x: i32, y: i32) -> impl Iterator<Item = i32> {
@@ -213,7 +213,7 @@ fn stable_1_30() {
         match x {
             0 => iter = marker!(2..8),
             _ if y < 0 => return marker_a!(y..=0),
-            _ => iter = marker!(vec![2, 0].into_iter()),
+            _ => iter = marker!(2..=10),
         };
 
         match y {
@@ -221,7 +221,7 @@ fn stable_1_30() {
             _ => iter.map(|x| x + 1),
         }
     }
-    assert_eq!(marker4(10, 10).fold(0, |sum, x| sum + x), 4);
+    assert_eq!(marker4(10, 10).fold(0, |sum, x| sum + x), 63);
 
     #[auto_enum(Iterator)]
     fn rec_match_in_match(x: usize) -> impl Iterator<Item = i32> {
