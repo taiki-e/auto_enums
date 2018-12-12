@@ -422,10 +422,13 @@
 //!     Examples:
 //!
 //!     ```rust
+//!     # #[cfg(feature = "transpose_methods")]
 //!     # #[macro_use]
 //!     # extern crate auto_enumerate;
+//!     # #[cfg(feature = "transpose_methods")]
 //!     use std::{fs, io, path::Path};
 //!
+//!     # #[cfg(feature = "transpose_methods")]
 //!     #[auto_enum(Transpose, Write)]
 //!     fn output_stream(file: Option<&Path>) -> io::Result<impl io::Write> {
 //!         match file {
@@ -433,7 +436,10 @@
 //!             None => Ok(io::stdout()),
 //!         }.transpose_ok()
 //!     }
+//!     # #[cfg(feature = "transpose_methods")]
 //!     # fn main() { let _ = output_stream(None); }
+//!     # #[cfg(not(feature = "transpose_methods"))]
+//!     # fn main() {}
 //!     ```
 //!
 //!   * `transpose_err` - convert from `enum<Result<T, E1>,..>` to `Result<T, enum<E1,..>>`
