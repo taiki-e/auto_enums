@@ -3,7 +3,7 @@ use std::{borrow::Cow, collections::HashMap};
 use lazy_static::lazy_static;
 use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
-use quote::quote;
+use quote::{quote, ToTokens};
 
 use crate::utils::*;
 
@@ -84,13 +84,13 @@ lazy_static! {
     };
 }
 
-type DeriveFn = Box<dyn Fn(&'_ syn::ItemEnum) -> Result<TokenStream2> + Send + Sync>;
+type DeriveFn = Box<dyn Fn(&'_ Data) -> Result<TokenStream2> + Send + Sync>;
 
 macro_rules! derive_map {
     ($map:expr, $($(#[$meta:meta])* $($arm:ident)::*,)*) => {$(
         $(#[$meta])*
         crate::derive::$($arm)::*::NAME.iter().for_each(|name| {
-            if $map.insert(*name, Box::new(crate::derive::$($arm)::*::enum_derive) as DeriveFn).is_some() {
+            if $map.insert(*name, Box::new(crate::derive::$($arm)::*::derive) as DeriveFn).is_some() {
                 panic!("`#[{}]` internal error: there are multiple `{}`", NAME, name);
             }
         });
@@ -178,7 +178,8 @@ fn expand(args: TokenStream2, input: TokenStream) -> Result<TokenStream2> {
             .map_or(false, |x| stack.iter().any(|(s, _)| s == x))
     }
 
-    let data = syn::parse(input).map_err(|_| format!("`#[{}]` can only be used on enums", NAME))?;
+    let item = syn::parse(input).map_err(|_| format!("`#[{}]` can only be used on enums", NAME))?;
+    let data = Data::parse(&item).map_err(|e| format!("`#[{}]` {}", NAME, e))?;
     let args = parse_args(args).map_err(|e| format!("`#[{}]` {}", NAME, e))?;
     let mut stack = Stack::new();
     args.iter().cloned().for_each(|(s, x)| {
@@ -200,24 +201,19 @@ fn expand(args: TokenStream2, input: TokenStream) -> Result<TokenStream2> {
     drop(args);
 
     let mut derive = Stack::new();
-    stack
-        .into_iter()
-        .try_fold(TokenStream2::new(), |ts, (s, x)| {
-            match DERIVE_MAP.get(&&*s) {
-                Some(f) => f(&data)
-                    .map_err(|e| format!("`#[{}({})]` {}", NAME, s, e).into())
-                    .map(|x| ts.extend_and_return(x)),
-                None => {
-                    derive.push(x.unwrap());
-                    Ok(ts)
-                }
-            }
-        })
-        .map(|ts| {
-            if derive.is_empty() {
-                quote!(#data #ts)
-            } else {
-                quote!(#[derive(#(#derive),*)] #data #ts)
-            }
-        })
+    let mut ts = TokenStream2::new();
+    for (s, x) in stack {
+        match DERIVE_MAP.get(&&*s) {
+            Some(f) => (&**f)(&data)
+                .map_err(|e| format!("`#[{}({})]` {}", NAME, s, e))
+                .map(|x| ts.extend(x.into_token_stream()))?,
+            None => derive.push(x.unwrap()),
+        }
+    }
+
+    if derive.is_empty() {
+        Ok(quote!(#item #ts))
+    } else {
+        Ok(quote!(#[derive(#(#derive),*)] #item #ts))
+    }
 }

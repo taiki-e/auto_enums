@@ -26,9 +26,19 @@ impl fmt::Display for Error {
     }
 }
 
-impl<S: Into<String>> From<S> for Error {
-    fn from(s: S) -> Self {
+impl From<String> for Error {
+    fn from(s: String) -> Self {
+        Error::Other(s)
+    }
+}
+impl<'a> From<&'a str> for Error {
+    fn from(s: &'a str) -> Self {
         Error::Other(s.into())
+    }
+}
+impl From<syn::Error> for Error {
+    fn from(e: syn::Error) -> Self {
+        Error::Other(e.to_string())
     }
 }
 
