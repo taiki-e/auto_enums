@@ -5,33 +5,30 @@ use crate::utils::*;
 
 pub(crate) const NAME: &[&str] = &["Fn"];
 
-pub(crate) fn enum_derive(data: &syn::ItemEnum) -> Result<TokenStream> {
-    EnumData::parse(data, true, true).map(|data| fn_(&data, &std_root()))
-}
+pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+    let root = std_root();
+    let trait_path = quote!(#root::ops::Fn);
+    let trait_ = quote!(#trait_path(__T) -> __U);
+    let fst = data.fields().iter().next();
 
-fn fn_(data: &EnumData<'_>, root: &TokenStream) -> TokenStream {
-    let EnumData {
-        name,
-        impl_generics,
-        ty_generics,
-        where_clause,
-        variants,
-        fields,
-    } = data;
+    let mut impls = data.impl_with_capacity(1, root)?;
 
-    let trait_ = quote!(#root::ops::Fn);
-    let impl_generics = quote!(#impl_generics __T, __U>);
+    *impls.trait_() = Some(Trait::new(
+        syn::parse2(trait_path.clone())?,
+        syn::parse2(quote!(#trait_path<(__T,)>))?,
+    ));
+    impls.push_generic_param(param_ident("__T"));
+    impls.push_generic_param(param_ident("__U"));
 
-    let where_clause = fields.iter().fold(quote!(#where_clause), |t, f| {
-        t.extend_and_return(quote!(#f: #trait_(__T) -> __U,))
-    });
+    impls.push_where_predicate(syn::parse2(quote!(#fst: #trait_))?);
+    data.fields().iter().skip(1).try_for_each(|f| {
+        syn::parse2(quote!(#f: #trait_)).map(|f| impls.push_where_predicate(f))
+    })?;
 
-    quote! {
-        impl #impl_generics #trait_<(__T,)> for #name #ty_generics #where_clause {
-            #[inline]
-            extern "rust-call" fn call(&self, args: (__T,)) -> Self::Output {
-                match self { #(#variants(f) => f.call(args),)* }
-            }
-        }
-    }
+    impls.push_method(syn::parse2(quote! {
+        #[inline]
+        extern "rust-call" fn call(&self, args: (__T,)) -> Self::Output;
+    })?)?;
+
+    Ok(impls.build())
 }

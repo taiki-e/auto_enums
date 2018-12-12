@@ -3,45 +3,29 @@ macro_rules! fmt_impl {
         pub(crate) mod $trait {
             use proc_macro2::TokenStream;
             use quote::quote;
+            use smallvec::SmallVec;
 
             use crate::utils::*;
 
             pub(crate) const NAME: &[&str] = &[$($name),*];
 
-            pub(crate) fn enum_derive(data: &syn::ItemEnum) -> Result<TokenStream> {
-                EnumData::parse(data, false, true).map(|data| fmt(&data, &std_root()))
-            }
-
-            fn fmt(data: &EnumData<'_>, root: &TokenStream) -> TokenStream {
-                let EnumData {
-                    name,
-                    impl_generics,
-                    ty_generics,
-                    where_clause,
-                    variants,
-                    fields,
-                } = data;
-
+            pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+                let root = std_root();
                 let fmt = quote!(#root::fmt);
-                let trait_ = quote!(#fmt::$Trait);
 
-                let where_clause = fields.iter().fold(where_clause.clone(), |t, f| {
-                    t.extend_and_return(quote!(#f: #trait_,))
-                });
-
-                // method
-                let f = variants.iter().fold(TokenStream::new(), |t, v| {
-                    t.extend_and_return(quote!(#v(x) => #trait_::fmt(x, f),))
-                });
-
-                quote! {
-                    impl #impl_generics #trait_ for #name #ty_generics #where_clause {
-                        #[inline]
-                        fn fmt(&self, f: &mut #fmt::Formatter<'_>) -> #fmt::Result {
-                            match self { #f }
+                data.impl_trait_with_capacity(
+                    1,
+                    root.clone(),
+                    syn::parse2(quote!(#fmt::$Trait))?,
+                    SmallVec::new(),
+                    syn::parse2(quote! {
+                        trait $Trait {
+                            #[inline]
+                            fn fmt(&self, f: &mut #fmt::Formatter<'_>) -> #fmt::Result;
                         }
-                    }
-                }
+                    })?,
+                )
+                .map(build)
             }
         }
     };
