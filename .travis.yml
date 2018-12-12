@@ -8,20 +8,24 @@ matrix:
     - rust: beta
     - rust: nightly
       script:
-        - cargo test -p auto_enumerate -p auto_enumerate_test_suite
-        - cargo test --no-default-features -p auto_enumerate -p auto_enumerate_test_suite
-        - cargo test --all-features -p auto_enumerate -p auto_enumerate_test_suite
+        - cargo test
+        - cargo test --all-features
         - cargo doc --all-features --no-deps -p auto_enumerate -p auto_enumerate_core -p auto_enumerate_derive
         - cd "${TRAVIS_BUILD_DIR}/test_suite"
         - cargo test
+        - cargo test --no-default-features
+        - cargo test --all-features
+        - cd "${TRAVIS_BUILD_DIR}/test_suite/tests_2018"
         - cargo test --all-features
 
 before_script:
   - set -o errexit
 
 script:
-  - cargo test -p auto_enumerate -p auto_enumerate_test_suite
-  - cargo test --no-default-features -p auto_enumerate -p auto_enumerate_test_suite
+  - cargo test
+  - cd "${TRAVIS_BUILD_DIR}/test_suite"
+  - cargo test
+  - cargo test --no-default-features
 
 notifications:
   email: false
