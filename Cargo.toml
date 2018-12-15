@@ -50,6 +50,9 @@ unstable = ["auto_enums_core/unstable", "auto_enums_derive/unstable"]
 # Use `std` library.
 std = ["auto_enums_derive/std"]
 
+# Even Rust 1.33 or later, implements `Error::cause`.
+error_cause = ["auto_enums_derive/error_cause"]
+
 # Enable unstable features of [std|core] libraries.
 
 # Implements `ExactSizeIterator::is_empty`.

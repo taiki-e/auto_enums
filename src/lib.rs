@@ -484,6 +484,10 @@
 //!   * Disabled by default.
 //!   * Use `transpose*` methods.
 //!
+//! * `error_cause`
+//!   * Disabled by default.
+//!   * Even Rust 1.33 or later, implements `Error::cause`.
+//!
 //! * `unstable`
 //!   * Disabled by default.
 //!   * Use unstable features to make attribute macros more effective.
