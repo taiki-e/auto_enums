@@ -616,7 +616,7 @@
 //!
 
 #![recursion_limit = "256"]
-#![doc(html_root_url = "https://docs.rs/auto_enums/0.1.0")]
+#![doc(html_root_url = "https://docs.rs/auto_enums/0.1.2")]
 #![no_std]
 
 extern crate auto_enums_core;
