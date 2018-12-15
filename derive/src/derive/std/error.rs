@@ -17,7 +17,8 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
             trait Error {
                 fn description(&self) -> &str;
                 #[allow(deprecated)]
-                fn cause(&self) -> Option<&dyn (#trait_)>;
+                fn cause(&self) -> #root::option::Option<&dyn (#trait_)>;
+                fn source(&self) -> #root::option::Option<&(dyn (#trait_) + 'static)>;
             }
         })?,
     )
