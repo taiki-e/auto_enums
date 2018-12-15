@@ -385,6 +385,8 @@
 //!
 //! ### External libraries
 //!
+//! You can add support for external library by activating the each crate feature.
+//!
 //! [`futures(v0.3)`](https://github.com/rust-lang-nursery/futures-rs) (*requires `"futures"` crate feature*)
 //!
 //! * [`futures::Stream`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.10/futures/stream/trait.Stream.html)

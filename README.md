@@ -149,6 +149,8 @@ Note that some traits have aliases.
 
 ### External libraries
 
+You can add support for external library by activating the each crate feature.
+
 [`futures(v0.3)`](https://github.com/rust-lang-nursery/futures-rs) (*requires `"futures"` crate feature*)
 
 * [`futures::Stream`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.10/futures/stream/trait.Stream.html)
@@ -201,53 +203,6 @@ These don't derive traits, but derive static methods instead.
     ```
 
   * `transpose_err` - convert from `enum<Result<T, E1>,..>` to `Result<T, enum<E1,..>>`
-
-## Crate Features
-
-* `std`
-  * Enabled by default.
-  * Disable to use `no_std` instead.
-
-* `type_analysis`
-  * Disabled by default.
-  * Analyze return type of function and `let` binding.
-
-    Add this to your `Cargo.toml` instead:
-
-    ```toml
-    [dependencies]
-    auto_enums = { version = "0.1", features = ["type_analysis"] }
-    ```
-
-    Examples:
-
-    ```rust
-    #[auto_enum] // there is no need to specify std library's traits
-    fn foo(x: i32) -> impl Iterator<Item = i32> {
-        match x {
-            0 => 1..10,
-            _ => vec![5, 10].into_iter(),
-        }
-    }
-    ```
-
-    Please be careful if you return another traits with the same name.
-
-* `transpose_methods`
-  * Disabled by default.
-  * Use `transpose*` methods.
-
-### Using external libraries (disabled by default)
-
-* `futures` - [futures(v0.3)](https://github.com/rust-lang-nursery/futures-rs)
-
-* `futures01` - [futures(v0.1)](https://github.com/rust-lang-nursery/futures-rs)
-
-* `proc_macro` - [quote](https://github.com/dtolnay/quote)
-
-* `rayon` - [rayon](https://github.com/rayon-rs/rayon)
-
-* `serde` - [serde](https://github.com/serde-rs/serde)
 
 ## Known limitations
 
