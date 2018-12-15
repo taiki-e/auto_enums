@@ -7,6 +7,7 @@
 #![cfg_attr(feature = "unstable", feature(exact_size_is_empty))]
 #![cfg_attr(feature = "unstable", feature(try_trait))]
 #![cfg_attr(feature = "unstable", feature(unsized_locals))]
+#![deny(warnings)]
 #![allow(unused_imports)]
 #![cfg(test)]
 
