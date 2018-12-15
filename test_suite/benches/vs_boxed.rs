@@ -1,5 +1,6 @@
 #![feature(test)]
 #![feature(box_syntax)]
+#![cfg_attr(feature = "unstable", feature(try_trait))]
 #![cfg(test)]
 
 extern crate rand;
