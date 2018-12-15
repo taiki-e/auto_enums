@@ -17,6 +17,7 @@ travis-ci = { repository = "taiki-e/auto_enums" }
 proc-macro = true
 
 [dependencies]
+derive_utils = { version = "0.1", default-features = false }
 lazy_static = "1.2"
 proc-macro2 = "^0.4.13"
 quote = "^0.6.8"
@@ -37,7 +38,7 @@ unstable = ["smallvec/union", "smallvec/may_dangle"]
 # [std|core] libraries
 
 # Use `std` library.
-std = []
+std = ["derive_utils/std"]
 
 # Enable unstable features of [std|core] libraries.
 

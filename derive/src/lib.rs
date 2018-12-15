@@ -2,6 +2,7 @@
 #![recursion_limit = "256"]
 #![doc(html_root_url = "https://docs.rs/auto_enums_derive/0.1.0")]
 
+extern crate derive_utils;
 extern crate lazy_static;
 extern crate proc_macro;
 extern crate proc_macro2;

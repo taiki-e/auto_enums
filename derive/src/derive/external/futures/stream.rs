@@ -1,6 +1,5 @@
 use proc_macro2::TokenStream;
 use quote::quote;
-use smallvec::SmallVec;
 
 use crate::utils::*;
 
@@ -12,9 +11,8 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
 
     let mut impls = data.impl_trait_with_capacity(
         2,
-        root.clone(),
         syn::parse2(quote!(::futures::stream::Stream))?,
-        SmallVec::new(),
+        None,
         syn::parse2(quote! {
             trait Stream {
                 type Item;

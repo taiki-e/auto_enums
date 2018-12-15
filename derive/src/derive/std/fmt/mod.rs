@@ -3,7 +3,6 @@ macro_rules! fmt_impl {
         pub(crate) mod $trait {
             use proc_macro2::TokenStream;
             use quote::quote;
-            use smallvec::SmallVec;
 
             use crate::utils::*;
 
@@ -15,9 +14,8 @@ macro_rules! fmt_impl {
 
                 data.impl_trait_with_capacity(
                     1,
-                    root.clone(),
                     syn::parse2(quote!(#fmt::$Trait))?,
-                    SmallVec::new(),
+                    None,
                     syn::parse2(quote! {
                         trait $Trait {
                             #[inline]

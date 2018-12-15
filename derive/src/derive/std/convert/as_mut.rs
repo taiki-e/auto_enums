@@ -1,6 +1,5 @@
 use proc_macro2::TokenStream;
 use quote::quote;
-use smallvec::SmallVec;
 
 use crate::utils::*;
 
@@ -12,9 +11,8 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
 
     data.impl_trait_with_capacity(
         1,
-        root,
         syn::parse2(trait_)?,
-        SmallVec::new(),
+        None,
         syn::parse2(quote! {
             trait AsMut<__T: ?Sized> {
                 #[inline]

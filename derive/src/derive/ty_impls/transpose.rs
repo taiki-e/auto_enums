@@ -36,7 +36,7 @@ fn transpose_option(data: &Data, root: &TokenStream) -> Result<TokenStream> {
     let fields = data.fields();
     let option = quote!(#root::option::Option);
 
-    let mut impls = data.impl_with_capacity(1, root.clone())?;
+    let mut impls = data.impl_with_capacity(1)?;
 
     let ty_generics = fields.iter().map(|f| quote!(#option<#f>));
     *impls.self_ty() = syn::parse2(quote!(#ident<#(#ty_generics),*>))?;
@@ -58,7 +58,7 @@ fn transpose_result(data: &Data, root: &TokenStream) -> Result<TokenStream> {
     let fields = data.fields();
     let result = quote!(#root::result::Result);
 
-    let mut impls = data.impl_with_capacity(1, root.clone())?;
+    let mut impls = data.impl_with_capacity(1)?;
 
     let err_fields: &Stack<_> = &(0..fields.len())
         .map(|i| {
@@ -94,7 +94,7 @@ fn transpose_ok(data: &Data, root: &TokenStream) -> Result<TokenStream> {
     let fields = data.fields();
     let result = quote!(#root::result::Result);
 
-    let mut impls = data.impl_with_capacity(1, root.clone())?;
+    let mut impls = data.impl_with_capacity(1)?;
 
     impls.push_generic_param(param_ident("__E"));
 
@@ -118,7 +118,7 @@ fn transpose_err(data: &Data, root: &TokenStream) -> Result<TokenStream> {
     let fields = data.fields();
     let result = quote!(#root::result::Result);
 
-    let mut impls = data.impl_with_capacity(1, root.clone())?;
+    let mut impls = data.impl_with_capacity(1)?;
 
     impls.push_generic_param(param_ident("__T"));
 

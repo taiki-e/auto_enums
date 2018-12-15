@@ -1,6 +1,5 @@
 use proc_macro2::TokenStream;
 use quote::quote;
-use smallvec::smallvec;
 
 use crate::utils::*;
 
@@ -12,9 +11,8 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
 
     data.impl_trait_with_capacity(
         0,
-        root,
         syn::parse2(quote!(#iter::FusedIterator))?,
-        smallvec![ident_call_site("Item")],
+        Some(ident_call_site("Item")),
         syn::parse2(quote! {
             trait FusedIterator: #iter::Iterator {}
         })?,

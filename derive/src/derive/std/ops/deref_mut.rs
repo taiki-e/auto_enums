@@ -1,6 +1,5 @@
 use proc_macro2::TokenStream;
 use quote::quote;
-use smallvec::smallvec;
 
 use crate::utils::*;
 
@@ -12,9 +11,8 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
 
     data.impl_trait_with_capacity(
         1,
-        root,
         syn::parse2(quote!(#ops::DerefMut))?,
-        smallvec![ident_call_site("Target")],
+        Some(ident_call_site("Target")),
         syn::parse2(quote! {
             trait DerefMut: #ops::Deref {
                 #[inline]

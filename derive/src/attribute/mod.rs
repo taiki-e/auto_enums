@@ -179,7 +179,7 @@ fn expand(args: TokenStream2, input: TokenStream) -> Result<TokenStream2> {
     }
 
     let item = syn::parse(input).map_err(|_| format!("`#[{}]` can only be used on enums", NAME))?;
-    let data = Data::parse(&item).map_err(|e| format!("`#[{}]` {}", NAME, e))?;
+    let data = Data::from_item(&item).map_err(|e| format!("`#[{}]` {}", NAME, e))?;
     let args = parse_args(args).map_err(|e| format!("`#[{}]` {}", NAME, e))?;
     let mut stack = Stack::new();
     args.iter().cloned().for_each(|(s, x)| {

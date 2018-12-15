@@ -11,7 +11,7 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
     let trait_ = quote!(#trait_path(__T) -> __U);
     let fst = data.fields().iter().next();
 
-    let mut impls = data.impl_with_capacity(1, root)?;
+    let mut impls = data.impl_with_capacity(1)?;
 
     *impls.trait_() = Some(Trait::new(
         syn::parse2(trait_path.clone())?,
