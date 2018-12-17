@@ -12,7 +12,10 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
     #[cfg(all(stable_1_33, not(feature = "error_cause")))]
     let cause = TokenStream::new();
     #[cfg(any(not(stable_1_33), feature = "error_cause"))]
-    let cause = quote!(#[allow(deprecated)] fn cause(&self) -> #root::option::Option<&dyn (#trait_)>;);
+    let cause = quote! {
+        #[allow(deprecated)]
+        fn cause(&self) -> #root::option::Option<&dyn (#trait_)>;
+    };
 
     data.impl_trait_with_capacity(
         2,
