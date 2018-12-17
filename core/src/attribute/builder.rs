@@ -10,8 +10,6 @@ use crate::utils::{Result, *};
 
 use super::*;
 
-const DERIVE_ATTR: &str = "enum_derive";
-
 thread_local! {
     static RNG: RefCell<ThreadRng> = RefCell::new(rand::thread_rng());
 }
@@ -41,15 +39,24 @@ impl EnumVariant {
         path(segments.into_iter())
     }
 
-    fn expr_call(&self, ident: &str, attrs: Vec<Attribute>, expr: Expr) -> Expr {
-        expr_call(attrs, self.path(ident), expr)
+    fn expr(&self, ident: &str, attrs: Vec<Attribute>, expr: Expr) -> Expr {
+        Expr::Call(ExprCall {
+            attrs,
+            func: Box::new(Expr::Path(ExprPath {
+                attrs: Vec::with_capacity(0),
+                qself: None,
+                path: self.path(ident),
+            })),
+            paren_token: default(),
+            args: Some(expr).into_iter().collect(),
+        })
     }
 }
 
 impl EnumBuilder {
     pub(super) fn new() -> Self {
         EnumBuilder {
-            ident: format!("__E{}", RNG.with(|rng| rng.borrow_mut().gen::<u32>())),
+            ident: format!("__Enum{}", RNG.with(|rng| rng.borrow_mut().gen::<u32>())),
             variants: Stack::new(),
             next: 0,
         }
@@ -76,20 +83,20 @@ impl EnumBuilder {
         (0..additional).for_each(|_| self.push_variant());
     }
 
-    fn get_expr_call(&self, index: usize, attrs: Vec<Attribute>, expr: Expr) -> Expr {
-        self.variants[index].expr_call(&self.ident, attrs, expr)
+    fn get_expr(&self, index: usize, attrs: Vec<Attribute>, expr: Expr) -> Expr {
+        self.variants[index].expr(&self.ident, attrs, expr)
     }
 
-    pub(super) fn next_expr_call(&mut self, attrs: Vec<Attribute>, expr: Expr) -> Expr {
+    pub(super) fn next_expr(&mut self, attrs: Vec<Attribute>, expr: Expr) -> Expr {
         assert!(self.next <= self.len());
 
         if self.next == self.len() {
             self.push_variant();
         }
 
-        let expr_call = self.get_expr_call(self.next, attrs, expr);
+        let expr = self.get_expr(self.next, attrs, expr);
         self.next += 1;
-        expr_call
+        expr
     }
 
     pub(super) fn build(&self, args: &[Arg]) -> Result<ItemEnum> {
@@ -97,14 +104,13 @@ impl EnumBuilder {
             Err("macro is required two or more branches or marker macros in total")?;
         }
 
-        let attr = ident_call_site(DERIVE_ATTR);
         let ident = ident_call_site(&self.ident);
         let ty_generics = self.iter();
         let variants = self.iter();
         let fields = self.iter();
 
         syn::parse2(quote! {
-            #[#attr(#(#args),*)]
+            #[enum_derive(#(#args),*)]
             enum #ident<#(#ty_generics),*> {
                 #(#variants(#fields),)*
             }

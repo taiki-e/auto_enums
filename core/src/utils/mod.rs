@@ -1,6 +1,6 @@
 use proc_macro2::{Ident, Span};
 use smallvec::SmallVec;
-use syn::{Attribute, Block, Expr, ExprBlock, ExprCall, ExprPath, Path, PathSegment, Stmt};
+use syn::{Block, Expr, ExprBlock, Path, PathSegment, Stmt};
 
 #[macro_use]
 mod error;
@@ -59,18 +59,5 @@ pub(crate) fn expr_block(block: Block) -> Expr {
         attrs: Vec::with_capacity(0),
         label: None,
         block,
-    })
-}
-
-pub(crate) fn expr_call(attrs: Vec<Attribute>, path: Path, args: Expr) -> Expr {
-    Expr::Call(ExprCall {
-        attrs,
-        func: Box::new(Expr::Path(ExprPath {
-            attrs: Vec::with_capacity(0),
-            qself: None,
-            path,
-        })),
-        paren_token: default(),
-        args: Some(args).into_iter().collect(),
     })
 }

@@ -32,39 +32,37 @@ impl<'a> From<&'a super::Params> for Params<'a> {
     }
 }
 
-fn last_stmt<T, F, OP>(expr: &Expr, stmt: Option<&Stmt>, success: T, mut filter: F, op: OP) -> T
-where
-    F: FnMut(&Expr) -> bool,
-    OP: FnOnce(&Expr) -> T,
-{
-    match stmt {
-        Some(Stmt::Expr(expr)) => return last_expr(expr, success, filter, op),
-        Some(Stmt::Semi(expr, _)) => {
-            if !filter(expr) {
-                return success;
-            }
-        }
-        Some(_) => return success,
-        None => {}
-    }
-
-    op(expr)
-}
-
 fn last_expr<T, F, OP>(expr: &Expr, success: T, mut filter: F, op: OP) -> T
 where
     F: FnMut(&Expr) -> bool,
     OP: FnOnce(&Expr) -> T,
 {
+    macro_rules! last_stmt {
+        ($expr:expr) => {
+            match $expr {
+                Some(Stmt::Expr(expr)) => return last_expr(expr, success, filter, op),
+                Some(Stmt::Semi(expr, _)) => {
+                    if !filter(expr) {
+                        return success;
+                    }
+                }
+                Some(_) => return success,
+                None => {}
+            }
+        };
+    }
+
     if !filter(expr) {
         return success;
     }
 
     match expr {
-        Expr::Block(e) => last_stmt(expr, e.block.stmts.last(), success, filter, op),
-        Expr::Unsafe(e) => last_stmt(expr, e.block.stmts.last(), success, filter, op),
-        _ => op(expr),
+        Expr::Block(e) => last_stmt!(e.block.stmts.last()),
+        Expr::Unsafe(e) => last_stmt!(e.block.stmts.last()),
+        _ => {}
     }
+
+    op(expr)
 }
 
 fn last_expr_mut<T, F, OP>(expr: &mut Expr, success: T, mut filter: F, op: OP) -> T
@@ -72,31 +70,28 @@ where
     F: FnMut(&Expr) -> bool,
     OP: FnOnce(&mut Expr) -> T,
 {
+    macro_rules! last_stmt {
+        ($expr:expr) => {
+            match $expr {
+                Some(Stmt::Expr(expr)) => return last_expr_mut(expr, success, filter, op),
+                Some(Stmt::Semi(expr, _)) => {
+                    if !filter(expr) {
+                        return success;
+                    }
+                }
+                Some(_) => return success,
+                None => {}
+            }
+        };
+    }
+
     if !filter(expr) {
         return success;
     }
 
     match expr {
-        Expr::Block(expr) => match expr.block.stmts.last_mut() {
-            Some(Stmt::Expr(expr)) => return last_expr_mut(expr, success, filter, op),
-            Some(Stmt::Semi(expr, _)) => {
-                if !filter(expr) {
-                    return success;
-                }
-            }
-            Some(_) => return success,
-            None => {}
-        },
-        Expr::Unsafe(expr) => match expr.block.stmts.last_mut() {
-            Some(Stmt::Expr(expr)) => return last_expr_mut(expr, success, filter, op),
-            Some(Stmt::Semi(expr, _)) => {
-                if !filter(expr) {
-                    return success;
-                }
-            }
-            Some(_) => return success,
-            None => {}
-        },
+        Expr::Block(expr) => last_stmt!(expr.block.stmts.last_mut()),
+        Expr::Unsafe(expr) => last_stmt!(expr.block.stmts.last_mut()),
         _ => {}
     }
 
@@ -199,7 +194,7 @@ fn expr_match(expr: &mut ExprMatch, builder: &mut Builder, params: &Params) -> R
     expr.arms.iter_mut().try_for_each(|arm| {
         if !skip(arm, builder, params)? {
             arm.comma = Some(default());
-            *arm.body = builder.next_expr_call(
+            *arm.body = builder.next_expr(
                 Vec::with_capacity(0),
                 mem::replace(&mut *arm.body, expr_continue()),
             );
@@ -224,7 +219,7 @@ fn expr_if(expr: &mut ExprIf, builder: &mut Builder, params: &Params) -> Result<
     }
 
     fn replace_block(branch: &mut Block, builder: &mut Builder) {
-        *branch = block(vec![Stmt::Expr(builder.next_expr_call(
+        *branch = block(vec![Stmt::Expr(builder.next_expr(
             Vec::with_capacity(0),
             expr_block(mem::replace(branch, block(Vec::with_capacity(0)))),
         ))]);

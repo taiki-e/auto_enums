@@ -1,5 +1,4 @@
 use smallvec::SmallVec;
-
 use syn::{
     visit::{self, Visit},
     *,
