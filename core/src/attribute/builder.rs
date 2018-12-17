@@ -62,16 +62,12 @@ impl EnumBuilder {
         }
     }
 
-    fn len(&self) -> usize {
+    pub(super) fn len(&self) -> usize {
         self.variants.len()
     }
 
-    pub(super) fn is_empty(&self) -> bool {
-        self.variants.is_empty()
-    }
-
     fn iter(&self) -> impl Iterator<Item = Ident> + '_ {
-        self.variants.iter().map(|f| f.ident())
+        self.variants.iter().map(|v| v.ident())
     }
 
     fn push_variant(&mut self) {

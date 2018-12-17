@@ -6,8 +6,9 @@ use crate::utils::{Result, *};
 
 use super::*;
 
-const NEVER_ATTR: &str = "never";
 const REC_ATTR: &str = "rec";
+
+pub(super) const NEVER_ATTR: &str = "never";
 
 pub(super) const EMPTY_ATTRS: &[&str] = &[NEVER_ATTR, REC_ATTR];
 
@@ -24,7 +25,7 @@ impl<'a> From<&'a super::Params> for Params<'a> {
     fn from(params: &'a super::Params) -> Self {
         Params {
             marker_ident: params.marker_ident(),
-            marker: params.marker(),
+            marker: params.count() >= 2,
             #[cfg(feature = "type_analysis")]
             attr: params.attr(),
             rec: Cell::new(false),

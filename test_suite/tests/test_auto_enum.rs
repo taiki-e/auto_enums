@@ -144,7 +144,7 @@ fn stable_1_30() {
     #[auto_enum(Iterator)]
     fn marker1(x: usize) -> impl Iterator<Item = i32> {
         if x > 10 {
-            return marker!((0..x as _).map(|x| x - 1));
+            return (0..x as _).map(|x| x - 1);
         }
         if x == 0 {
             1..8
@@ -172,12 +172,26 @@ fn stable_1_30() {
     assert_eq!(marker_in_loop(14).fold(0, |sum, x| sum + x), 55);
     assert_eq!(marker_in_loop(-5).fold(0, |sum, x| sum + x), -15);
 
-    #[auto_enum(marker(marker_a), Iterator)]
+    #[auto_enum(Iterator)]
+    fn return_in_loop(mut x: i32) -> impl Iterator<Item = i32> {
+        loop {
+            if x < 0 {
+                return x..0;
+            } else if x % 5 == 0 {
+                return 0..=x;
+            }
+            x -= 1;
+        }
+    }
+    assert_eq!(return_in_loop(14).fold(0, |sum, x| sum + x), 55);
+    assert_eq!(return_in_loop(-5).fold(0, |sum, x| sum + x), -15);
+
+    #[auto_enum(Iterator)]
     fn marker2(x: i32, y: i32) -> impl Iterator<Item = i32> {
         #[auto_enum(Iterator)]
         let iter = match x {
             0 => 2..8,
-            _ if y < 0 => return marker_a!(y..=0),
+            _ if y < 0 => return y..=0,
             _ => 2..=10,
         };
 
@@ -198,11 +212,16 @@ fn stable_1_30() {
         };
 
         if y < 0 {
-            return marker!(y..=0);
+            return y..=0;
         }
         match y {
             0 => iter.flat_map(|x| 0..x),
-            _ => iter.map(|x| x + 1),
+            _ => iter.map(|x| {
+                if x < 0 {
+                    return x - 1;
+                }
+                x + 1
+            }),
         }
     }
     assert_eq!(marker3(10, 10).fold(0, |sum, x| sum + x), 63);
@@ -213,7 +232,7 @@ fn stable_1_30() {
         #[auto_enum(Iterator)]
         match x {
             0 => iter = marker!(2..8),
-            _ if y < 0 => return marker_a!(y..=0),
+            _ if y < 0 => return y..=0,
             _ => iter = marker!(2..=10),
         };
 
@@ -223,6 +242,48 @@ fn stable_1_30() {
         }
     }
     assert_eq!(marker4(10, 10).fold(0, |sum, x| sum + x), 63);
+
+    #[auto_enum]
+    fn closure() {
+        #[auto_enum(Iterator)]
+        let f = |x| {
+            if x > 10 {
+                return (0..x as _).map(|x| x - 1);
+            }
+            if x == 0 {
+                1..8
+            } else if x > 3 {
+                2..=10
+            } else {
+                (0..2).map(|x| x + 1)
+            }
+        };
+
+        for i in 0..2 {
+            assert_eq!(f(i).fold(0, |sum, x| sum + x), ANS[i]);
+        }
+
+        let f = {
+            #[auto_enum(Iterator)]
+            |x| {
+                if x > 10 {
+                    return (0..x as _).map(|x| x - 1);
+                }
+                if x == 0 {
+                    1..8
+                } else if x > 3 {
+                    2..=10
+                } else {
+                    (0..2).map(|x| x + 1)
+                }
+            }
+        };
+
+        for i in 0..2 {
+            assert_eq!(f(i).fold(0, |sum, x| sum + x), ANS[i]);
+        }
+    }
+    closure();
 
     #[auto_enum(Iterator)]
     fn rec_match_in_match(x: usize) -> impl Iterator<Item = i32> {
@@ -551,11 +612,11 @@ fn nightly() {
         assert_eq!(iter.fold(0, |sum, x| sum + x), ANS[i]);
     }
 
+    #[auto_enum(Iterator, Clone)]
     fn manual_4(x: usize) -> impl Iterator<Item = i32> + Clone {
-        #[auto_enum(Iterator, Clone)]
         {
             if x == 0 {
-                return marker!(2..8);
+                return 2..8;
             }
             match x {
                 _ if x < 2 => vec![2, 0].into_iter(),

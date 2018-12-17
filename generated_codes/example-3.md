@@ -4,7 +4,7 @@
 #[auto_enum(Iterator)]
 fn foo(x: i32) -> impl Iterator<Item = i32> {
     if x < 0 {
-        return marker!(x..=0);
+        return x..=0;
     }
     match x {
         0 => 1..10,

@@ -65,7 +65,7 @@
 //! #[auto_enum(Iterator)] // generats an enum with three variants
 //! fn foo(x: i32) -> impl Iterator<Item = i32> {
 //!     if x < 0 {
-//!         return marker!(x..=0);
+//!         return x..=0;
 //!     }
 //!     match x {
 //!         0 => 1..10,
@@ -104,7 +104,7 @@
 //! #[auto_enum(marker(bar), Iterator)]
 //! fn foo(x: i32) -> impl Iterator<Item = i32> {
 //!     if x < 0 {
-//!         return bar!(x..=0);
+//!         return x..=0;
 //!     }
 //!     bar!(1..10)
 //! }

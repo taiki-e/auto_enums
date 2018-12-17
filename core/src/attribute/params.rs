@@ -68,9 +68,10 @@ pub(super) struct Params {
     args: Stack<Arg>,
     marker: Cow<'static, str>,
     marker_count: usize,
-    marker_exists: bool,
+    return_count: usize,
     attr_exists: bool,
     never: bool,
+    closure: bool,
 }
 
 impl Params {
@@ -79,17 +80,18 @@ impl Params {
             args,
             marker: marker.map_or_else(|| Cow::Borrowed(DEFAULT_MARKER), Cow::Owned),
             marker_count: 0,
-            marker_exists: false,
+            return_count: 0,
             attr_exists: false,
             never,
+            closure: false,
         }
     }
 
     pub(super) fn args(&self) -> &[Arg] {
         &self.args
     }
-    pub(super) fn marker(&self) -> bool {
-        self.marker_exists
+    pub(super) fn count(&self) -> usize {
+        self.marker_count + self.return_count
     }
     pub(super) fn marker_ident(&self) -> &str {
         &self.marker
@@ -103,28 +105,43 @@ impl Params {
 
     pub(super) fn count_marker<F>(&mut self, f: F)
     where
-        F: FnOnce(&mut Visitor<'_>),
+        F: FnOnce(&mut MarkerCounter<'_>),
     {
         assert_eq!(self.marker_count, 0);
 
-        f(&mut Visitor::new(
+        f(&mut MarkerCounter::new(
             &self.marker,
             &mut self.marker_count,
             &mut self.attr_exists,
         ));
+    }
 
-        self.marker_exists |= self.marker_count != 0;
+    pub(super) fn count_return<F>(&mut self, closure: bool, f: F)
+    where
+        F: FnOnce(&mut ReturnCounter<'_>),
+    {
+        assert_eq!(self.return_count, 0);
+        self.closure = closure;
+
+        f(&mut ReturnCounter::new(
+            &self.marker,
+            &mut self.return_count,
+        ));
     }
 
     pub(super) fn build(&self, builder: &mut Builder) -> Result<ItemEnum> {
-        builder.reserve(self.marker_count);
+        builder.reserve(self.count());
         builder.build(&self.args)
     }
 
     pub(super) fn replacer<'a>(&'a mut self, builder: &'a mut Builder) -> Replacer<'a> {
-        let replacer = Replacer::new(&self.marker, self.marker_count, builder);
-        self.marker_count = 0;
-        replacer
+        Replacer::new(
+            &self.marker,
+            self.marker_count,
+            self.return_count,
+            self.closure,
+            builder,
+        )
     }
 
     #[cfg(feature = "type_analysis")]

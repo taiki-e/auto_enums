@@ -63,10 +63,16 @@ fn parent_expr(mut expr: Expr, mut params: Params) -> Result<Expr> {
     params.count_marker(|c| c.visit_expr(&expr));
 
     if !params.never() {
-        child_expr(&mut expr, &mut builder, &params)?;
+        match &mut expr {
+            Expr::Closure(expr) => {
+                params.count_return(true, |c| c.visit_expr(&*expr.body));
+                child_expr(&mut *expr.body, &mut builder, &params)?;
+            }
+            expr => child_expr(expr, &mut builder, &params)?,
+        }
     }
 
-    if builder.is_empty() && !params.marker() && params.attr() {
+    if builder.len() + params.count() < 2 && params.attr() {
         return Ok(Replacer::dummy(&mut builder).fold_expr(expr));
     }
 
@@ -85,14 +91,12 @@ fn stmt_semi(expr: Expr, mut params: Params) -> Result<Expr> {
 
     params.count_marker(|c| c.visit_expr(&expr));
 
-    if !params.marker() {
-        if !params.attr() {
-            Err(unsupported_stmt(
-                "expression with trailing semicolon is required two or more marker macros",
-            ))?;
-        }
-
-        return Ok(Replacer::dummy(&mut builder).fold_expr(expr));
+    match params.count() {
+        0 | 1 if !params.attr() => Err(unsupported_stmt(
+            "expression with trailing semicolon is required two or more marker macros",
+        ))?,
+        0 => return Ok(Replacer::dummy(&mut builder).fold_expr(expr)),
+        _ => {}
     }
 
     params
@@ -123,10 +127,16 @@ fn stmt_let(mut local: Local, mut params: Params) -> Result<Local> {
         .ok_or_else(|| unsupported_stmt("uninitialized let statement"))?;
 
     if !params.never() {
-        child_expr(&mut *expr, &mut builder, &params)?;
+        match &mut *expr {
+            Expr::Closure(expr) => {
+                params.count_return(true, |c| c.visit_expr(&*expr.body));
+                child_expr(&mut *expr.body, &mut builder, &params)?;
+            }
+            expr => child_expr(expr, &mut builder, &params)?,
+        }
     }
 
-    if builder.is_empty() && !params.marker() && params.attr() {
+    if builder.len() + params.count() < 2 && params.attr() {
         local.init = Some((default(), expr));
         return Ok(Replacer::dummy(&mut builder).fold_local(local));
     }
@@ -142,11 +152,15 @@ fn stmt_let(mut local: Local, mut params: Params) -> Result<Local> {
 fn item_fn(mut item: ItemFn, mut params: Params) -> Result<ItemFn> {
     let mut builder = Builder::new();
 
-    #[cfg(feature = "type_analysis")]
-    {
-        if let ReturnType::Type(_, ty) = &item.decl.output {
-            params.impl_traits(&*ty);
+    if let ReturnType::Type(_, ty) = &item.decl.output {
+        if !params.never() {
+            if let Type::ImplTrait(_) = &**ty {
+                params.count_return(false, |c| c.visit_item_fn(&item));
+            }
         }
+
+        #[cfg(feature = "type_analysis")]
+        params.impl_traits(&*ty);
     }
 
     if params.args().is_empty() {
@@ -161,9 +175,9 @@ fn item_fn(mut item: ItemFn, mut params: Params) -> Result<ItemFn> {
         None => Err(unsupported_item("empty function"))?,
     }
 
-    if builder.is_empty() && !params.marker() {
+    if builder.len() + params.count() < 2 {
         if !params.attr() {
-            Err(unsupported_item("for function that returns a non-expression statement, you need to specify `manual` option"))?;
+            Err(unsupported_item("for function that returns a non-expression statement, you need to specify `marker` macros"))?;
         }
 
         return Ok(Replacer::dummy(&mut builder).fold_item_fn(item));
