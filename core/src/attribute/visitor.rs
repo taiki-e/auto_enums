@@ -115,7 +115,7 @@ impl<'a> Fold for Replacer<'a> {
                             });
 
                             self.marker_count -= 1;
-                            self.builder.next_expr_call(expr.attrs, args)
+                            self.builder.next_expr(expr.attrs, args)
                         } else {
                             Expr::Macro(expr)
                         }
