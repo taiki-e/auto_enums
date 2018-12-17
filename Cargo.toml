@@ -50,6 +50,9 @@ unstable = ["auto_enums_core/unstable", "auto_enums_derive/unstable"]
 # Use `std` library.
 std = ["auto_enums_derive/std"]
 
+# Use `[std|core]::fmt`'s traits other than `Debug`, `Display` and `Write`
+fmt = ["auto_enums_derive/fmt"]
+
 # Even Rust 1.33 or later, implements `Error::cause`.
 error_cause = ["auto_enums_derive/error_cause"]
 

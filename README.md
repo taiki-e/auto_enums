@@ -123,13 +123,13 @@ Note that some traits have aliases.
 
 * [`Debug`](https://doc.rust-lang.org/std/fmt/trait.Debug.html) (alias: `fmt::Debug`) - note that it is a different implementation from `#[derive(Debug)]`.
 * [`Display`](https://doc.rust-lang.org/std/fmt/trait.Display.html) (alias: `fmt::Display`)
-* [`fmt::Binary`](https://doc.rust-lang.org/std/fmt/trait.Binary.html)
-* [`fmt::LowerExp`](https://doc.rust-lang.org/std/fmt/trait.LowerExp.html)
-* [`fmt::LowerHex`](https://doc.rust-lang.org/std/fmt/trait.LowerHex.html)
-* [`fmt::Octal`](https://doc.rust-lang.org/std/fmt/trait.Octal.html)
-* [`fmt::Pointer`](https://doc.rust-lang.org/std/fmt/trait.Pointer.html)
-* [`fmt::UpperExp`](https://doc.rust-lang.org/std/fmt/trait.UpperExp.html)
-* [`fmt::UpperHex`](https://doc.rust-lang.org/std/fmt/trait.UpperHex.html)
+* [`fmt::Binary`](https://doc.rust-lang.org/std/fmt/trait.Binary.html) (*requires `"fmt"` crate feature*)
+* [`fmt::LowerExp`](https://doc.rust-lang.org/std/fmt/trait.LowerExp.html) (*requires `"fmt"` crate feature*)
+* [`fmt::LowerHex`](https://doc.rust-lang.org/std/fmt/trait.LowerHex.html) (*requires `"fmt"` crate feature*)
+* [`fmt::Octal`](https://doc.rust-lang.org/std/fmt/trait.Octal.html) (*requires `"fmt"` crate feature*)
+* [`fmt::Pointer`](https://doc.rust-lang.org/std/fmt/trait.Pointer.html) (*requires `"fmt"` crate feature*)
+* [`fmt::UpperExp`](https://doc.rust-lang.org/std/fmt/trait.UpperExp.html) (*requires `"fmt"` crate feature*)
+* [`fmt::UpperHex`](https://doc.rust-lang.org/std/fmt/trait.UpperHex.html) (*requires `"fmt"` crate feature*)
 * [`fmt::Write`](https://doc.rust-lang.org/std/fmt/trait.Write.html)
 
 `[std|core]::future`

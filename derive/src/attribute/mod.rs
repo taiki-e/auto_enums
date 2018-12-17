@@ -120,12 +120,19 @@ lazy_static! {
             std::convert::as_ref,
             std::fmt::debug,
             std::fmt::display,
+            #[cfg(feature = "fmt")]
             std::fmt::pointer,
+            #[cfg(feature = "fmt")]
             std::fmt::binary,
+            #[cfg(feature = "fmt")]
             std::fmt::octal,
+            #[cfg(feature = "fmt")]
             std::fmt::upper_hex,
+            #[cfg(feature = "fmt")]
             std::fmt::lower_hex,
+            #[cfg(feature = "fmt")]
             std::fmt::upper_exp,
+            #[cfg(feature = "fmt")]
             std::fmt::lower_exp,
             std::fmt::write,
             std::future,

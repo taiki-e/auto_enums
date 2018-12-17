@@ -40,6 +40,9 @@ unstable = ["smallvec/union", "smallvec/may_dangle"]
 # Use `std` library.
 std = ["derive_utils/std"]
 
+# Use `[std|core]::fmt`'s traits other than `Debug`, `Display` and `Write`
+fmt = []
+
 # Even Rust 1.33 or later, implements `Error::cause`.
 error_cause = []
 

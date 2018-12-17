@@ -1,5 +1,7 @@
 # Unreleased
 
+* Make `[std|core]::fmt`'s traits other than `Debug`, `Display` and `Write` optional
+
 # 0.1.3 - 2018-12-15
 
 * Change `#[enum_derive(Error)]` implementation

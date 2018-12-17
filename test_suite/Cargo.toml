@@ -10,13 +10,13 @@ quote = { version = "0.6", optional = true }
 rayon = { version = "1.0", optional = true }
 serde = { version = "1.0", optional = true }
 
-[dev-dependencies]
-rand = "0.6"
-
-[dev-dependencies.auto_enums]
+[dependencies.auto_enums]
 path = ".."
 default-features = false
-features = ["transpose_methods"]
+features = ["fmt", "transpose_methods"]
+
+[dev-dependencies]
+rand = "0.6"
 
 [features]
 default = ["external_libraries"]

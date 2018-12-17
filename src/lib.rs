@@ -486,6 +486,10 @@
 //!   * Disabled by default.
 //!   * Use `transpose*` methods.
 //!
+//! * `fmt`
+//!   * Disabled by default.
+//!   * Use `[std|core]::fmt`'s traits other than `Debug`, `Display` and `Write`.
+//!
 //! * `error_cause`
 //!   * Disabled by default.
 //!   * Even Rust 1.33 or later, implements `Error::cause`.
