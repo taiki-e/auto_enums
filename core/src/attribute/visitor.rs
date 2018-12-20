@@ -78,7 +78,6 @@ impl<'a, 'ast> Visit<'ast> for ReturnCounter<'a> {
             match expr {
                 Expr::Return(expr) => {
                     match expr.expr.as_ref().map(|e| &**e) {
-                        None => {}
                         Some(Expr::Macro(expr)) if expr.mac.path.is_ident(self.marker) => {}
                         _ => *self.count += 1,
                     }
@@ -143,9 +142,8 @@ impl<'a> Fold for Replacer<'a> {
         if self.in_closure > 0 && self.return_count != 0 && !expr.any_empty_attr(NEVER_ATTR) {
             expr = match expr {
                 Expr::Return(mut ret) => {
-                    match ret.expr.take().map(|e| *e) {
-                        None => {}
-                        Some(Expr::Macro(expr)) => {
+                    match ret.expr.take().map_or_else(|| Expr::Tuple(unit()), |e| *e) {
+                        Expr::Macro(expr) => {
                             if expr.mac.path.is_ident(self.marker) {
                                 ret.expr = Some(Box::new(Expr::Macro(expr)));
                             } else {
@@ -156,7 +154,7 @@ impl<'a> Fold for Replacer<'a> {
                                 ));
                             }
                         }
-                        Some(expr) => {
+                        expr => {
                             self.return_count -= 1;
                             ret.expr = Some(Box::new(
                                 self.builder.next_expr(Vec::with_capacity(0), expr),

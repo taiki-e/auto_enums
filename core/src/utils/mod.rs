@@ -1,6 +1,6 @@
 use proc_macro2::{Ident, Span};
 use smallvec::SmallVec;
-use syn::{Block, Expr, ExprBlock, Path, PathSegment, Stmt};
+use syn::{punctuated::Punctuated, Block, Expr, ExprBlock, ExprTuple, Path, PathSegment, Stmt};
 
 #[macro_use]
 mod error;
@@ -60,4 +60,12 @@ pub(crate) fn expr_block(block: Block) -> Expr {
         label: None,
         block,
     })
+}
+
+pub(crate) fn unit() -> ExprTuple {
+    ExprTuple {
+        attrs: Vec::with_capacity(0),
+        paren_token: default(),
+        elems: Punctuated::new(),
+    }
 }
