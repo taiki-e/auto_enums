@@ -1,5 +1,7 @@
 # Unreleased
 
+# 0.2.0 - 2018-12-20
+
 * Make `[std|core]::fmt`'s traits other than `Debug`, `Display` and `Write` optional
 * Support `return` in function and closure
 

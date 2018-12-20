@@ -1,6 +1,6 @@
 #![crate_type = "proc-macro"]
 #![recursion_limit = "256"]
-#![doc(html_root_url = "https://docs.rs/auto_enums_derive/0.1.3")]
+#![doc(html_root_url = "https://docs.rs/auto_enums_derive/0.2.0")]
 
 extern crate derive_utils;
 extern crate lazy_static;
