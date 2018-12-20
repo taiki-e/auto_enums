@@ -6,8 +6,6 @@
 [![license](https://img.shields.io/crates/l/auto_enums.svg)](https://crates.io/crates/auto_enums/)
 [![Rustc Version](https://img.shields.io/badge/rustc-1.30+-lightgray.svg)](https://blog.rust-lang.org/2018/10/25/Rust-1.30.0.html)
 
-[API Documentation](https://docs.rs/auto_enums/)
-
 A library for to allow multiple return types by automatically generated enum.
 
 This library provides the following attribute macros:
@@ -18,7 +16,7 @@ This library provides the following attribute macros:
 
 * `#[enum_derive]`
 
-  Implements traits received from `#[auto_enum]`.
+  Implements specified traits to the enum.
 
 ## Usage
 
@@ -52,26 +50,7 @@ fn foo(x: i32) -> impl Iterator<Item = i32> {
 }
 ```
 
-You can also use `#[auto_enum]` for expressions and statements.
-
-[Generated code](generated_codes/example-2.md)
-
-```rust
-use std::{fs, io, path::Path};
-
-#[auto_enum]
-fn output_stream(file: Option<&Path>) -> io::Result<impl io::Write> {
-    #[auto_enum(io::Write)]
-    let writer = match file {
-        Some(f) => fs::File::create(f)?,
-        None => io::stdout(),
-    };
-
-    Ok(writer)
-}
-```
-
-`#[auto_enum]` has several other features. See [API Documentation](https://docs.rs/auto_enums/) for more details.
+See [API Documentation](https://docs.rs/auto_enums/) for more details.
 
 ## Supported traits
 

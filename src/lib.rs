@@ -8,13 +8,11 @@
 //!
 //! * `#[enum_derive]`
 //!
-//!   Implements traits received from `#[auto_enum]`.
+//!   Implements specified traits to the enum.
 //!
 //! ## Examples
 //!
 //! `#[auto_enum]`'s basic feature is to wrap the value returned by the last if or match expression by an enum that implemented the specified traits.
-//!
-//! [Generated code](https://github.com/taiki-e/auto_enums/blob/master/generated_codes/example-1.md)
 //!
 //! ```rust
 //! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
@@ -30,88 +28,103 @@
 //! # fn main() { let _ = foo(0); }
 //! ```
 //!
-//! You can also use `#[auto_enum]` for expressions and statements.
-//!
-//! [Generated code](https://github.com/taiki-e/auto_enums/blob/master/generated_codes/example-2.md)
+//! Code like this will be generated:
 //!
 //! ```rust
-//! # #[macro_use]
-//! # extern crate auto_enums;
-//! use std::{fs, io, path::Path};
-//!
-//! #[auto_enum]
-//! fn output_stream(file: Option<&Path>) -> io::Result<impl io::Write> {
-//!     #[auto_enum(io::Write)]
-//!     let writer = match file {
-//!         Some(f) => fs::File::create(f)?,
-//!         None => io::stdout(),
-//!     };
-//!
-//!     Ok(writer)
-//! }
-//! # fn main() { let _ = output_stream(None); }
-//! ```
-//!
-//! ## Expression level marker (`marker!` macro)
-//!
-//! `#[auto_enum]` replaces `marker!` macros with variants.
-//!
-//! [Generated code](https://github.com/taiki-e/auto_enums/blob/master/generated_codes/example-3.md)
-//!
-//! ```rust
-//! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
-//! # #[macro_use]
-//! # extern crate auto_enums;
-//! #[auto_enum(Iterator)] // generats an enum with three variants
 //! fn foo(x: i32) -> impl Iterator<Item = i32> {
-//!     if x < 0 {
-//!         return x..=0;
+//!     enum __Enum1<__T1, __T2> {
+//!         __T1(__T1),
+//!         __T2(__T2),
 //!     }
+//!
+//!     impl<__T1, __T2> ::std::iter::Iterator for __Enum1<__T1, __T2>
+//!     where
+//!         __T1: ::std::iter::Iterator,
+//!         __T2: ::std::iter::Iterator<Item = <__T1 as ::std::iter::Iterator>::Item>,
+//!     {
+//!         type Item = <__T1 as ::std::iter::Iterator>::Item;
+//!         #[inline]
+//!         fn next(&mut self) -> ::std::option::Option<Self::Item> {
+//!             match self {
+//!                 __Enum1::__T1(x) => x.next(),
+//!                 __Enum1::__T2(x) => x.next(),
+//!             }
+//!         }
+//!         #[inline]
+//!         fn size_hint(&self) -> (usize, ::std::option::Option<usize>) {
+//!             match self {
+//!                 __Enum1::__T1(x) => x.size_hint(),
+//!                 __Enum1::__T2(x) => x.size_hint(),
+//!             }
+//!         }
+//!     }
+//!
 //!     match x {
-//!         0 => 1..10,
-//!         _ => vec![5, 10].into_iter(),
+//!         0 => __Enum1::__T1(1..10),
+//!         _ => __Enum1::__T2(vec![5, 10].into_iter()),
 //!     }
 //! }
-//! # fn main() { let _ = foo(0); }
 //! ```
 //!
-//! Also, if values of two or more are specified by `marker!` macros, `#[auto_enum]` can be used for a expression or statement that does not end with a if or match expression.
+//! ## `#[auto_enum]`
+//!
+//! ### Positions where `#[auto_enum]` can be used.
+//!
+//! `#[auto_enum]` can be used in the following three places. However, since [stmt_expr_attributes](https://github.com/rust-lang/rust/issues/15701) and [proc_macro_hygiene](https://github.com/rust-lang/rust/issues/54727) are not stabilized, you need to use empty `#[auto_enum]` for functions except nightly.
+//!
+//! * functions
 //!
 //! ```rust
 //! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //! # #[macro_use]
 //! # extern crate auto_enums;
 //! #[auto_enum(Iterator)]
-//! fn foo(mut x: i32) -> impl Iterator<Item = i32> {
-//!     loop {
-//!         if x < 0 {
-//!             break marker!(x..0);
-//!         } else if x % 5 == 0 {
-//!             break marker!(0..=x);
-//!         }
-//!         x -= 1;
+//! fn func(x: i32) -> impl Iterator<Item=i32> {
+//!     if x == 0 {
+//!         Some(0).into_iter()
+//!     } else {
+//!         0..x
 //!     }
 //! }
-//! # fn main() { let _ = foo(0); }
+//! # fn main() { let _ = func(0); }
 //! ```
 //!
-//! The default name of the macro is `"marker"`, but you can change it by `marker` option.
+//! * expressions
 //!
 //! ```rust
 //! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //! # #[macro_use]
 //! # extern crate auto_enums;
-//! #[auto_enum(marker(bar), Iterator)]
-//! fn foo(x: i32) -> impl Iterator<Item = i32> {
-//!     if x < 0 {
-//!         return x..=0;
+//! #[auto_enum] // Nightly does not need an empty attribute to the function.
+//! fn expr(x: i32) -> impl Iterator<Item=i32> {
+//!     #[auto_enum(Iterator)]
+//!     match x {
+//!         0 => Some(0).into_iter(),
+//!         _ => 0..x,
 //!     }
-//!     bar!(1..10)
 //! }
-//! # fn main() { let _ = foo(0); }
+//! # fn main() { let _ = expr(0); }
 //! ```
 //!
-//! ## Expression that no value will be returned
+//! * let binding
+//!
+//! ```rust
+//! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
+//! # #[macro_use]
+//! # extern crate auto_enums;
+//! #[auto_enum] // Nightly does not need an empty attribute to the function.
+//! fn let_binding(x: i32) -> impl Iterator<Item=i32> {
+//!     #[auto_enum(Iterator)]
+//!     let iter = match x {
+//!         0 => Some(0).into_iter(),
+//!         _ => 0..x,
+//!     };
+//!     iter
+//! }
+//! # fn main() { let _ = let_binding(0); }
+//! ```
+//!
+//! ### Expression that no value will be returned
 //!
 //! If the last expression of a branch is one of the following, it is interpreted that no value will be returned (variant assignment is skipped).
 //!
@@ -183,29 +196,7 @@
 //! # fn main() { let _ = foo(0); }
 //! ```
 //!
-//! ## Blocks and unsafe blocks
-//!
-//! Blocks and unsafe blocks are parsed recursively. However, empty blocks are handled in the same as other expressions.
-//!
-//! ```rust
-//! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
-//! # #[macro_use]
-//! # extern crate auto_enums;
-//! #[auto_enum(Iterator)]
-//! fn foo(x: i32) -> impl Iterator<Item = i32> {
-//!     {
-//!         // The last expression in the block is interpreted as
-//!         // the last expression in the function.
-//!         match x {
-//!             0 => 1..10,
-//!             _ => vec![5, 10].into_iter(),
-//!         }
-//!     }
-//! }
-//! # fn main() { let _ = foo(0); }
-//! ```
-//!
-//! ## Parse nested branches
+//! ### Parse nested branches
 //!
 //! You can parse nested branches by `#[rec]` attribute.
 //!
@@ -223,6 +214,45 @@
 //!             _ => 0..=x,
 //!         },
 //!     }
+//! }
+//! # fn main() { let _ = foo(0); }
+//! ```
+//!
+//! ### Expression level marker (`marker!` macro)
+//!
+//! `#[auto_enum]` replaces `marker!` macros with variants.
+//! If values of two or more are specified by `marker!` macros, `#[auto_enum]` can be used for a expression or statement that does not end with a if or match expression.
+//!
+//! ```rust
+//! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
+//! # #[macro_use]
+//! # extern crate auto_enums;
+//! #[auto_enum(Iterator)]
+//! fn foo(mut x: i32) -> impl Iterator<Item = i32> {
+//!     loop {
+//!         if x < 0 {
+//!             break marker!(x..0);
+//!         } else if x % 5 == 0 {
+//!             break marker!(0..=x);
+//!         }
+//!         x -= 1;
+//!     }
+//! }
+//! # fn main() { let _ = foo(0); }
+//! ```
+//!
+//! The default name of the macro is `"marker"`, but you can change it by `marker` option.
+//!
+//! ```rust
+//! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
+//! # #[macro_use]
+//! # extern crate auto_enums;
+//! #[auto_enum(marker(bar), Iterator)]
+//! fn foo(x: i32) -> impl Iterator<Item = i32> {
+//!     if x < 0 {
+//!         return x..=0;
+//!     }
+//!     bar!(1..10)
 //! }
 //! # fn main() { let _ = foo(0); }
 //! ```
