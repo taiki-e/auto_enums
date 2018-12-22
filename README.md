@@ -92,7 +92,7 @@ See [API Documentation](https://docs.rs/auto_enums/) for more details.
 
 `#[enum_derive]` implements the supported traits and passes unsupported traits to `#[derive]`.
 
-If you want to use traits that are not supported by `#[enum_derive]`, you can use another crate that provides `proc_macro_derive`, or you can define `proc_macro_derive` yourself.
+If you want to use traits that are not supported by `#[enum_derive]`, you can use another crate that provides `proc_macro_derive`, or you can define `proc_macro_derive` yourself([derive_utils] probably can help it).
 
 Basic usage of `#[enum_derive]`
 
@@ -104,6 +104,8 @@ enum Foo<A, B> {
     B(B),
 }
 ```
+
+[derive_utils]: https://crates.io/crates/derive_utils
 
 ### [std|core] libraries
 
