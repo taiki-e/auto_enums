@@ -12,18 +12,17 @@ macro_rules! fmt_impl {
                 let root = std_root();
                 let fmt = quote!(#root::fmt);
 
-                data.impl_trait_with_capacity(
+                derive_trait_with_capacity!(
+                    data,
                     1,
                     syn::parse2(quote!(#fmt::$Trait))?,
-                    None,
                     syn::parse2(quote! {
                         trait $Trait {
                             #[inline]
                             fn fmt(&self, f: &mut #fmt::Formatter<'_>) -> #fmt::Result;
                         }
-                    })?,
+                    })?
                 )
-                .map(build)
             }
         }
     };

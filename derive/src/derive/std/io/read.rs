@@ -14,11 +14,18 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
     let root = std_root();
     let io = quote!(#root::io);
 
-    #[allow(unused_mut)]
-    let mut impls = data.impl_trait_with_capacity(
+    #[cfg(not(feature = "read_initializer"))]
+    let initializer = TokenStream::new();
+    #[cfg(feature = "read_initializer")]
+    let initializer = quote! {
+        #[inline]
+        unsafe fn initializer(&self) -> #io::Initializer;
+    };
+
+    derive_trait_with_capacity!(
+        data,
         CAPACITY,
         syn::parse2(quote!(#io::Read))?,
-        None,
         syn::parse2(quote! {
             trait Iterator {
                 #[inline]
@@ -29,15 +36,8 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
                 fn read_to_string(&mut self, buf: &mut #root::string::String) -> #io::Result<usize>;
                 #[inline]
                 fn read_exact(&mut self, buf: &mut [u8]) -> #io::Result<()>;
+                #initializer
             }
-        })?,
-    )?;
-
-    #[cfg(feature = "read_initializer")]
-    impls.push_method(syn::parse2(quote! {
-        #[inline]
-        unsafe fn initializer(&self) -> #io::Initializer;
-    })?)?;
-
-    Ok(impls.build())
+        })?
+    )
 }

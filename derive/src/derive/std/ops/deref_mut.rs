@@ -9,16 +9,16 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
     let root = std_root();
     let ops = quote!(#root::ops);
 
-    data.impl_trait_with_capacity(
+    derive_trait_with_capacity!(
+        data,
         1,
-        syn::parse2(quote!(#ops::DerefMut))?,
         Some(ident_call_site("Target")),
+        syn::parse2(quote!(#ops::DerefMut))?,
         syn::parse2(quote! {
             trait DerefMut: #ops::Deref {
                 #[inline]
                 fn deref_mut(&mut self) -> &mut Self::Target;
             }
-        })?,
+        })?
     )
-    .map(build)
 }

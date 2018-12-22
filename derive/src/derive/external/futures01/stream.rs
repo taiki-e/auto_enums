@@ -9,10 +9,10 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
     let root = std_root();
     let crate_ = quote!(::futures);
 
-    data.impl_trait_with_capacity(
+    derive_trait_with_capacity!(
+        data,
         3,
         syn::parse2(quote!(#crate_::stream::Stream))?,
-        None,
         syn::parse2(quote! {
             trait Stream {
                 type Item;
@@ -20,7 +20,6 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
                 #[inline]
                 fn poll(&mut self) -> #crate_::Poll<#root::option::Option<Self::Item>, Self::Error>;
             }
-        })?,
+        })?
     )
-    .map(build)
 }

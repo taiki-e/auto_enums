@@ -9,10 +9,10 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
     let root = std_root();
     let ser = quote!(::serde::ser);
 
-    data.impl_trait_with_capacity(
+    derive_trait_with_capacity!(
+        data,
         1,
         syn::parse2(quote!(#ser::Serialize))?,
-        None,
         syn::parse2(quote! {
             trait Serialize {
                 #[inline]
@@ -20,7 +20,6 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
                 where
                     __S: #ser::Serializer;
             }
-        })?,
+        })?
     )
-    .map(build)
 }

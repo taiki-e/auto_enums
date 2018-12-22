@@ -9,34 +9,23 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
     let root = std_root();
     let pin = quote!(#root::pin::Pin);
 
-    let mut impls = data.impl_trait_with_capacity(
+    derive_trait_with_capacity!(
+        data,
         6,
         syn::parse2(quote!(::futures::sink::Sink))?,
-        None,
         syn::parse2(quote! {
             trait Sink {
                 type SinkItem;
                 type SinkError;
+                #[inline]
+                fn poll_ready(self: #pin<&mut Self>, lw: &#root::task::LocalWaker) -> #root::task::Poll<#root::result::Result<(), Self::SinkError>>;
+                #[inline]
+                fn start_send(self: #pin<&mut Self>, item: Self::SinkItem) -> #root::result::Result<(), Self::SinkError>;
+                #[inline]
+                fn poll_flush(self: #pin<&mut Self>, lw: &#root::task::LocalWaker) -> #root::task::Poll<#root::result::Result<(), Self::SinkError>>;
+                #[inline]
+                fn poll_close(self: #pin<&mut Self>, lw: &#root::task::LocalWaker) -> #root::task::Poll<#root::result::Result<(), Self::SinkError>>;
             }
-        })?,
-    )?;
-
-    impls.push_method_pin_mut(syn::parse2(quote! {
-        #[inline]
-        fn poll_ready(self: #pin<&mut Self>, lw: &#root::task::LocalWaker) -> #root::task::Poll<#root::result::Result<(), Self::SinkError>>;
-    })?)?;
-    impls.push_method_pin_mut(syn::parse2(quote! {
-        #[inline]
-        fn start_send(self: #pin<&mut Self>, item: Self::SinkItem) -> #root::result::Result<(), Self::SinkError>;
-    })?)?;
-    impls.push_method_pin_mut(syn::parse2(quote! {
-        #[inline]
-        fn poll_flush(self: #pin<&mut Self>, lw: &#root::task::LocalWaker) -> #root::task::Poll<#root::result::Result<(), Self::SinkError>>;
-    })?)?;
-    impls.push_method_pin_mut(syn::parse2(quote! {
-        #[inline]
-        fn poll_close(self: #pin<&mut Self>, lw: &#root::task::LocalWaker) -> #root::task::Poll<#root::result::Result<(), Self::SinkError>>;
-    })?)?;
-
-    Ok(impls.build())
+        })?
+    )
 }

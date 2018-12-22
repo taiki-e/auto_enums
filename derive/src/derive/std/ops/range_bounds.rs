@@ -9,10 +9,10 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
     let root = std_root();
     let ops = quote!(#root::ops);
 
-    data.impl_trait_with_capacity(
+    derive_trait_with_capacity!(
+        data,
         2,
         syn::parse2(quote!(#ops::RangeBounds))?,
-        None,
         syn::parse2(quote! {
             trait RangeBounds<__T: ?Sized> {
                 #[inline]
@@ -20,7 +20,6 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
                 #[inline]
                 fn end_bound(&self) -> #ops::Bound<&__T>;
             }
-        })?,
+        })?
     )
-    .map(build)
 }

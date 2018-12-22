@@ -14,17 +14,16 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
     #[cfg(not(feature = "unsized_locals"))]
     let bounds = quote!();
 
-    data.impl_trait_with_capacity(
+    derive_trait_with_capacity!(
+        data,
         2,
         syn::parse2(quote!(#ops::Index))?,
-        None,
         syn::parse2(quote! {
             trait Index<__Idx #bounds> {
                 type Output;
                 #[inline]
                 fn index(&self, index: __Idx) -> &Self::Output;
             }
-        })?,
+        })?
     )
-    .map(build)
 }

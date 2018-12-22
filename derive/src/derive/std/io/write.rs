@@ -9,10 +9,10 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
     let root = std_root();
     let io = quote!(#root::io);
 
-    data.impl_trait_with_capacity(
+    derive_trait_with_capacity!(
+        data,
         4,
         syn::parse2(quote!(#io::Write))?,
-        None,
         syn::parse2(quote! {
             trait Write {
                 #[inline]
@@ -24,7 +24,6 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
                 #[inline]
                 fn write_fmt(&mut self, fmt: #root::fmt::Arguments) -> #io::Result<()>;
             }
-        })?,
+        })?
     )
-    .map(build)
 }

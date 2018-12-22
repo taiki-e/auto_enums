@@ -14,24 +14,25 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
     let root = std_root();
     let iter = quote!(#root::iter);
 
-    #[allow(unused_mut)]
-    let mut impls = data.impl_trait_with_capacity(
+    #[cfg(not(feature = "exact_size_is_empty"))]
+    let is_empty = TokenStream::new();
+    #[cfg(feature = "exact_size_is_empty")]
+    let is_empty = quote! {
+        #[inline]
+        fn is_empty(&self) -> bool;
+    };
+
+    derive_trait_with_capacity!(
+        data,
         CAPACITY,
-        syn::parse2(quote!(#iter::ExactSizeIterator))?,
         Some(ident_call_site("Item")),
+        syn::parse2(quote!(#iter::ExactSizeIterator))?,
         syn::parse2(quote! {
             trait ExactSizeIterator: #iter::Iterator {
                 #[inline]
                 fn len(&self) -> usize;
+                #is_empty
             }
-        })?,
-    )?;
-
-    #[cfg(feature = "exact_size_is_empty")]
-    impls.push_method(syn::parse2(quote! {
-        #[inline]
-        fn is_empty(&self) -> bool;
-    })?)?;
-
-    Ok(impls.build())
+        })?
+    )
 }

@@ -9,10 +9,10 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
     let root = std_root();
     let iter = quote!(::rayon::iter);
 
-    data.impl_trait_with_capacity(
+    derive_trait_with_capacity!(
+        data,
         0,
         syn::parse2(quote!(#iter::ParallelIterator))?,
-        None,
         syn::parse2(quote! {
             trait ParallelIterator {
                 type Item;
@@ -23,7 +23,6 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
                 #[inline]
                 fn opt_len(&self) -> #root::option::Option<usize>;
             }
-        })?,
+        })?
     )
-    .map(build)
 }
