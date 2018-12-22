@@ -10,9 +10,9 @@
 //!
 //!   Implements specified traits to the enum.
 //!
-//! ## Examples
+//! ## `#[auto_enum]`
 //!
-//! `#[auto_enum]`'s basic feature is to wrap the value returned by the last if or match expression by an enum that implemented the specified traits.
+//! `#[auto_enum]`'s most basic feature is to wrap the value returned by the last if or match expression by an enum that implemented the specified traits.
 //!
 //! ```rust
 //! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
@@ -65,8 +65,6 @@
 //!     }
 //! }
 //! ```
-//!
-//! ## `#[auto_enum]`
 //!
 //! ### Positions where `#[auto_enum]` can be used.
 //!
@@ -319,11 +317,11 @@
 //! # fn main() {}
 //! ```
 //!
-//! ## Supported traits
+//! ## `#[enum_derive]`
 //!
 //! `#[enum_derive]` implements the supported traits and passes unsupported traits to `#[derive]`.
 //!
-//! If you want to use traits that are not supported by `#[enum_derive]`, you can use another crate that provides `proc_macro_derive`, or you can define `proc_macro_derive` yourself.
+//! If you want to use traits that are not supported by `#[enum_derive]`, you can use another crate that provides `proc_macro_derive`, or you can define `proc_macro_derive` yourself([derive_utils] probably can help it).
 //!
 //! Basic usage of `#[enum_derive]`
 //!
@@ -355,6 +353,10 @@
 //! }
 //! # fn main() { let _: Foo<i32, i32> = Foo::A(0); }
 //! ```
+//!
+//! [derive_utils]: https://crates.io/crates/derive_utils
+//!
+//! ## Supported traits
 //!
 //! ### [std|core] libraries
 //!
