@@ -7,7 +7,7 @@
 
 # 0.1.3 - 2018-12-15
 
-* Change `#[enum_derive(Error)]` implementation
+* Change `#[enum_derive(Error)]` implementation<br>
   In Rust 1.33, `Error::cause` is deprecated. In the new implementation, `Error::cause` is optional for Rust 1.33 and later. In versions less than 1.33, `Error::cause` is always implemented.
 
 # 0.1.2 - 2018-12-15
