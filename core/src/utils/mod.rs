@@ -40,10 +40,10 @@ pub(crate) fn ident_call_site<S: AsRef<str>>(s: S) -> Ident {
     Ident::new(s.as_ref(), Span::call_site())
 }
 
-pub(crate) fn path<I: Iterator<Item = PathSegment>>(segments: I) -> Path {
+pub(crate) fn path<I: IntoIterator<Item = PathSegment>>(segments: I) -> Path {
     Path {
         leading_colon: None,
-        segments: segments.collect(),
+        segments: segments.into_iter().collect(),
     }
 }
 

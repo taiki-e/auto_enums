@@ -36,7 +36,7 @@ impl EnumVariant {
     fn path(&self, ident: &str) -> Path {
         let segments: SmallVec<[_; 2]> =
             smallvec![ident_call_site(ident).into(), self.ident().into()];
-        path(segments.into_iter())
+        path(segments)
     }
 
     fn expr(&self, ident: &str, attrs: Vec<Attribute>, expr: Expr) -> Expr {
