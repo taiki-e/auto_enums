@@ -18,7 +18,7 @@ pub(super) const EMPTY_ATTRS: &[&str] = &[NEVER_ATTR, REC_ATTR];
 #[derive(Debug)]
 struct Params<'a> {
     marker_ident: &'a str,
-    marker: bool,
+    count: usize,
     #[cfg(feature = "type_analysis")]
     attr: bool,
     rec: Cell<bool>,
@@ -26,9 +26,9 @@ struct Params<'a> {
 
 impl<'a> From<&'a super::Params> for Params<'a> {
     fn from(params: &'a super::Params) -> Self {
-        Params {
+        Self {
             marker_ident: params.marker_ident(),
-            marker: params.count() >= 2,
+            count: params.count(),
             #[cfg(feature = "type_analysis")]
             attr: params.attr(),
             rec: Cell::new(false),
@@ -155,7 +155,7 @@ pub(super) fn child_expr(
                 Expr::If(expr) => expr_if(expr, builder, params),
                 Expr::Loop(expr) => expr_loop(expr, builder, params),
                 Expr::MethodCall(expr) => _child_expr(&mut *expr.receiver, builder, params),
-                _ if params.marker => Ok(()),
+                _ if builder.len() + params.count >= 2 => Ok(()),
                 #[cfg(feature = "type_analysis")]
                 _ if params.attr => Ok(()),
                 _ => Err(unsupported_expr(ERR)),
@@ -200,10 +200,7 @@ fn expr_match(expr: &mut ExprMatch, builder: &mut Builder, params: &Params) -> R
     expr.arms.iter_mut().try_for_each(|arm| {
         if !skip(arm, builder, params)? {
             arm.comma = Some(default());
-            *arm.body = builder.next_expr(
-                Vec::with_capacity(0),
-                mem::replace(&mut *arm.body, expr_continue()),
-            );
+            *arm.body = builder.next_expr(mem::replace(&mut *arm.body, expr_continue()));
         }
 
         Ok(())
@@ -225,10 +222,9 @@ fn expr_if(expr: &mut ExprIf, builder: &mut Builder, params: &Params) -> Result<
     }
 
     fn replace_block(branch: &mut Block, builder: &mut Builder) {
-        *branch = block(vec![Stmt::Expr(builder.next_expr(
-            Vec::with_capacity(0),
-            expr_block(mem::replace(branch, block(Vec::with_capacity(0)))),
-        ))]);
+        *branch = block(vec![Stmt::Expr(builder.next_expr(expr_block(
+            mem::replace(branch, block(Vec::with_capacity(0))),
+        )))]);
     }
 
     if !skip(expr.then_branch.stmts.last_mut(), builder, params)? {
@@ -257,18 +253,18 @@ fn expr_loop(expr: &mut ExprLoop, builder: &mut Builder, params: &Params) -> Res
 
 struct LoopVisitor<'a> {
     marker: &'a str,
-    label: Option<Lifetime>,
     builder: &'a mut Builder,
     depth: usize,
+    label: Option<Lifetime>,
 }
 
 impl<'a> LoopVisitor<'a> {
     fn new(marker: &'a str, expr: &ExprLoop, builder: &'a mut Builder) -> Self {
-        LoopVisitor {
+        Self {
             marker,
-            label: expr.label.as_ref().map(|l| l.name.clone()),
             builder,
             depth: 0,
+            label: expr.label.as_ref().map(|l| l.name.clone()),
         }
     }
 
@@ -309,23 +305,18 @@ impl<'a> VisitMut for LoopVisitor<'a> {
 
                 Expr::Break(br) => {
                     if (self.depth == 0 && br.label.is_none()) || self.label_eq(br.label.as_ref()) {
-                        match br.expr.take().map_or_else(|| Expr::Tuple(unit()), |e| *e) {
+                        let expr = match br.expr.take().map_or_else(|| Expr::Tuple(unit()), |e| *e)
+                        {
                             Expr::Macro(expr) => {
                                 if expr.mac.path.is_ident(self.marker) {
-                                    br.expr = Some(Box::new(Expr::Macro(expr)));
+                                    Expr::Macro(expr)
                                 } else {
-                                    br.expr = Some(Box::new(
-                                        self.builder
-                                            .next_expr(Vec::with_capacity(0), Expr::Macro(expr)),
-                                    ));
+                                    self.builder.next_expr(Expr::Macro(expr))
                                 }
                             }
-                            expr => {
-                                br.expr = Some(Box::new(
-                                    self.builder.next_expr(Vec::with_capacity(0), expr),
-                                ));
-                            }
-                        }
+                            expr => self.builder.next_expr(expr),
+                        };
+                        br.expr = Some(Box::new(expr));
                     }
 
                     visit_mut::visit_expr_break_mut(self, br);

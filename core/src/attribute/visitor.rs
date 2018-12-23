@@ -2,6 +2,7 @@ use proc_macro2::{Group, TokenStream as TokenStream2};
 use syn::{
     fold::{self, Fold},
     visit::{self, Visit},
+    visit_mut::{self, VisitMut},
     *,
 };
 
@@ -20,7 +21,7 @@ pub(super) struct MarkerCounter<'a> {
 
 impl<'a> MarkerCounter<'a> {
     pub(super) fn new(marker: &'a str, count: &'a mut usize, attr: &'a mut bool) -> Self {
-        MarkerCounter {
+        Self {
             marker,
             count,
             attr,
@@ -58,71 +59,78 @@ impl<'a, 'ast> Visit<'ast> for MarkerCounter<'a> {
         }
     }
 
+    // Stop at item bounds
     fn visit_item(&mut self, _item: &'ast Item) {}
 }
 
-pub(super) struct ReturnCounter<'a> {
+pub(super) struct FnVisitor<'a> {
     marker: &'a str,
-    count: &'a mut usize,
+    builder: &'a mut Builder,
+    in_closure: isize,
 }
 
-impl<'a> ReturnCounter<'a> {
-    pub(super) fn new(marker: &'a str, count: &'a mut usize) -> Self {
-        ReturnCounter { marker, count }
-    }
-}
-
-impl<'a, 'ast> Visit<'ast> for ReturnCounter<'a> {
-    fn visit_expr(&mut self, expr: &'ast Expr) {
-        if !expr.any_empty_attr(NEVER_ATTR) {
-            match expr {
-                Expr::Return(expr) => {
-                    match expr.expr.as_ref().map(|e| &**e) {
-                        Some(Expr::Macro(expr)) if expr.mac.path.is_ident(self.marker) => {}
-                        _ => *self.count += 1,
-                    }
-                    visit::visit_expr_return(self, expr);
-                }
-                Expr::Closure(_) => {}
-                expr => visit::visit_expr(self, expr),
-            }
+impl<'a> FnVisitor<'a> {
+    pub(super) fn new(marker: &'a str, is_closure: bool, builder: &'a mut Builder) -> Self {
+        Self {
+            marker,
+            builder,
+            in_closure: if is_closure { 2 } else { 1 },
         }
     }
+}
 
-    fn visit_item(&mut self, _item: &'ast Item) {}
+impl<'a> VisitMut for FnVisitor<'a> {
+    fn visit_expr_mut(&mut self, expr: &mut Expr) {
+        let tmp = self.in_closure;
+        if let Expr::Closure(_) = &expr {
+            self.in_closure -= 1;
+        }
+
+        if self.in_closure > 0 && !expr.any_empty_attr(NEVER_ATTR) {
+            if let Expr::Return(ret) = expr {
+                let expr = match ret.expr.take().map_or_else(|| Expr::Tuple(unit()), |e| *e) {
+                    Expr::Macro(expr) => {
+                        if expr.mac.path.is_ident(self.marker) {
+                            Expr::Macro(expr)
+                        } else {
+                            self.builder.next_expr(Expr::Macro(expr))
+                        }
+                    }
+                    expr => self.builder.next_expr(expr),
+                };
+                ret.expr = Some(Box::new(expr));
+            }
+        }
+
+        visit_mut::visit_expr_mut(self, expr);
+        self.in_closure = tmp;
+    }
+
+    // Stop at item bounds
+    fn visit_item_mut(&mut self, _item: &mut Item) {}
 }
 
 pub(super) struct Replacer<'a> {
     marker: &'a str,
     marker_count: usize,
-    return_count: usize,
     builder: &'a mut Builder,
     empty_attrs: &'static [&'static str],
     foreign: bool,
-    in_closure: i32,
 }
 
 impl<'a> Replacer<'a> {
-    pub(super) fn new(
-        marker: &'a str,
-        marker_count: usize,
-        return_count: usize,
-        is_closure: bool,
-        builder: &'a mut Builder,
-    ) -> Self {
-        Replacer {
+    pub(super) fn new(marker: &'a str, marker_count: usize, builder: &'a mut Builder) -> Self {
+        Self {
             marker,
             marker_count,
-            return_count,
             builder,
             empty_attrs: EMPTY_ATTRS,
             foreign: false,
-            in_closure: if is_closure { 2 } else { 1 },
         }
     }
 
     pub(super) fn dummy(builder: &'a mut Builder) -> Self {
-        Replacer::new(DEFAULT_MARKER, 0, 0, false, builder)
+        Self::new(DEFAULT_MARKER, 0, builder)
     }
 
     fn find_remove_empty_attrs(&self, attrs: &mut Vec<Attribute>) {
@@ -134,40 +142,6 @@ impl<'a> Replacer<'a> {
 
 impl<'a> Fold for Replacer<'a> {
     fn fold_expr(&mut self, mut expr: Expr) -> Expr {
-        let tmp = self.in_closure;
-        if let Expr::Closure(_) = &expr {
-            self.in_closure -= 1;
-        }
-
-        if self.in_closure > 0 && self.return_count != 0 && !expr.any_empty_attr(NEVER_ATTR) {
-            expr = match expr {
-                Expr::Return(mut ret) => {
-                    match ret.expr.take().map_or_else(|| Expr::Tuple(unit()), |e| *e) {
-                        Expr::Macro(expr) => {
-                            if expr.mac.path.is_ident(self.marker) {
-                                ret.expr = Some(Box::new(Expr::Macro(expr)));
-                            } else {
-                                self.return_count -= 1;
-                                ret.expr = Some(Box::new(
-                                    self.builder
-                                        .next_expr(Vec::with_capacity(0), Expr::Macro(expr)),
-                                ));
-                            }
-                        }
-                        expr => {
-                            self.return_count -= 1;
-                            ret.expr = Some(Box::new(
-                                self.builder.next_expr(Vec::with_capacity(0), expr),
-                            ));
-                        }
-                    }
-
-                    Expr::Return(ret)
-                }
-                expr => expr,
-            };
-        }
-
         if !expr.any_attr(NAME) || (self.foreign && self.marker_count != 0) {
             expr = fold::fold_expr(self, expr);
 
@@ -184,7 +158,7 @@ impl<'a> Fold for Replacer<'a> {
                             });
 
                             self.marker_count -= 1;
-                            self.builder.next_expr(expr.attrs, args)
+                            self.builder.next_expr_with_attrs(expr.attrs, args)
                         } else {
                             Expr::Macro(expr)
                         }
@@ -199,7 +173,6 @@ impl<'a> Fold for Replacer<'a> {
             self.foreign = tmp;
         }
 
-        self.in_closure = tmp;
         expr
     }
 
@@ -225,6 +198,7 @@ impl<'a> Fold for Replacer<'a> {
         }
     }
 
+    // Stop at item bounds
     fn fold_item(&mut self, item: Item) -> Item {
         item
     }

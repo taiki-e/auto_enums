@@ -1,7 +1,7 @@
 use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
 use quote::ToTokens;
-use syn::{fold::Fold, visit::Visit, *};
+use syn::{fold::Fold, visit::Visit, visit_mut::VisitMut, *};
 
 use crate::utils::{Result, *};
 
@@ -65,7 +65,7 @@ fn parent_expr(mut expr: Expr, mut params: Params) -> Result<Expr> {
     if !params.never() {
         match &mut expr {
             Expr::Closure(expr) => {
-                params.count_return(true, |c| c.visit_expr(&*expr.body));
+                params.fn_visitor(true, &mut builder, |v| v.visit_expr_mut(&mut *expr.body));
                 child_expr(&mut *expr.body, &mut builder, &params)?;
             }
             expr => child_expr(expr, &mut builder, &params)?,
@@ -129,7 +129,7 @@ fn stmt_let(mut local: Local, mut params: Params) -> Result<Local> {
     if !params.never() {
         match &mut *expr {
             Expr::Closure(expr) => {
-                params.count_return(true, |c| c.visit_expr(&*expr.body));
+                params.fn_visitor(true, &mut builder, |v| v.visit_expr_mut(&mut *expr.body));
                 child_expr(&mut *expr.body, &mut builder, &params)?;
             }
             expr => child_expr(expr, &mut builder, &params)?,
@@ -151,12 +151,11 @@ fn stmt_let(mut local: Local, mut params: Params) -> Result<Local> {
 
 fn item_fn(mut item: ItemFn, mut params: Params) -> Result<ItemFn> {
     let mut builder = Builder::new();
+    let mut return_impl_trait = false;
 
     if let ReturnType::Type(_, ty) = &item.decl.output {
-        if !params.never() {
-            if let Type::ImplTrait(_) = &**ty {
-                params.count_return(false, |c| c.visit_item_fn(&item));
-            }
+        if let Type::ImplTrait(_) = &**ty {
+            return_impl_trait = true;
         }
 
         #[cfg(feature = "type_analysis")]
@@ -168,6 +167,10 @@ fn item_fn(mut item: ItemFn, mut params: Params) -> Result<ItemFn> {
     }
 
     params.count_marker(|c| c.visit_item_fn(&item));
+
+    if !params.never() && return_impl_trait {
+        params.fn_visitor(false, &mut builder, |v| v.visit_item_fn_mut(&mut item));
+    }
 
     match (*item.block).stmts.last_mut() {
         Some(Stmt::Expr(expr)) if !params.never() => child_expr(expr, &mut builder, &params)?,

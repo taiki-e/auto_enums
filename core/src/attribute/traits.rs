@@ -25,7 +25,7 @@ struct ImplTraits<'a> {
 
 impl<'a> ImplTraits<'a> {
     fn new(traits: &'a mut SmallVec<[Path; 4]>) -> Self {
-        ImplTraits { traits }
+        Self { traits }
     }
 }
 

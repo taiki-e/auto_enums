@@ -55,7 +55,7 @@ impl EnumVariant {
 
 impl EnumBuilder {
     pub(super) fn new() -> Self {
-        EnumBuilder {
+        Self {
             ident: format!("__Enum{}", RNG.with(|rng| rng.borrow_mut().gen::<u32>())),
             variants: Stack::new(),
             next: 0,
@@ -83,7 +83,11 @@ impl EnumBuilder {
         self.variants[index].expr(&self.ident, attrs, expr)
     }
 
-    pub(super) fn next_expr(&mut self, attrs: Vec<Attribute>, expr: Expr) -> Expr {
+    pub(super) fn next_expr(&mut self, expr: Expr) -> Expr {
+        self.next_expr_with_attrs(Vec::with_capacity(0), expr)
+    }
+
+    pub(super) fn next_expr_with_attrs(&mut self, attrs: Vec<Attribute>, expr: Expr) -> Expr {
         assert!(self.next <= self.len());
 
         if self.next == self.len() {
