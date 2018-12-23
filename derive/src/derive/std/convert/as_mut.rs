@@ -8,9 +8,8 @@ pub(crate) const NAME: &[&str] = &["AsMut"];
 pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
     let root = std_root();
 
-    derive_trait_with_capacity!(
+    derive_trait!(
         data,
-        1,
         syn::parse2(quote!(#root::convert::AsMut))?,
         syn::parse2(quote! {
             trait AsMut<__T: ?Sized> {

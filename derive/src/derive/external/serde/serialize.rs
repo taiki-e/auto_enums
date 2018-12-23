@@ -9,9 +9,8 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
     let root = std_root();
     let ser = quote!(::serde::ser);
 
-    derive_trait_with_capacity!(
+    derive_trait!(
         data,
-        1,
         syn::parse2(quote!(#ser::Serialize))?,
         syn::parse2(quote! {
             trait Serialize {

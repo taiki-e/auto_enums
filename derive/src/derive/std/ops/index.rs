@@ -14,9 +14,8 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
     #[cfg(not(feature = "unsized_locals"))]
     let bounds = quote!();
 
-    derive_trait_with_capacity!(
+    derive_trait!(
         data,
-        2,
         syn::parse2(quote!(#ops::Index))?,
         syn::parse2(quote! {
             trait Index<__Idx #bounds> {

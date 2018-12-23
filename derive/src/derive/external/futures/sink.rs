@@ -9,9 +9,8 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
     let root = std_root();
     let pin = quote!(#root::pin::Pin);
 
-    derive_trait_with_capacity!(
+    derive_trait!(
         data,
-        6,
         syn::parse2(quote!(::futures::sink::Sink))?,
         syn::parse2(quote! {
             trait Sink {

@@ -6,11 +6,6 @@ use crate::utils::*;
 pub(crate) const NAME: &[&str] = &["Read", "io::Read"];
 
 pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
-    #[cfg(feature = "read_initializer")]
-    const CAPACITY: usize = 5;
-    #[cfg(not(feature = "read_initializer"))]
-    const CAPACITY: usize = 4;
-
     let root = std_root();
     let io = quote!(#root::io);
 
@@ -22,9 +17,8 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
         unsafe fn initializer(&self) -> #io::Initializer;
     };
 
-    derive_trait_with_capacity!(
+    derive_trait!(
         data,
-        CAPACITY,
         syn::parse2(quote!(#io::Read))?,
         syn::parse2(quote! {
             trait Iterator {

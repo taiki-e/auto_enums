@@ -6,11 +6,6 @@ use crate::utils::*;
 pub(crate) const NAME: &[&str] = &["ExactSizeIterator"];
 
 pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
-    #[cfg(feature = "exact_size_is_empty")]
-    const CAPACITY: usize = 2;
-    #[cfg(not(feature = "exact_size_is_empty"))]
-    const CAPACITY: usize = 1;
-
     let root = std_root();
     let iter = quote!(#root::iter);
 
@@ -22,9 +17,8 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
         fn is_empty(&self) -> bool;
     };
 
-    derive_trait_with_capacity!(
+    derive_trait!(
         data,
-        CAPACITY,
         Some(ident_call_site("Item")),
         syn::parse2(quote!(#iter::ExactSizeIterator))?,
         syn::parse2(quote! {

@@ -9,9 +9,8 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
     let root = std_root();
     let ops = quote!(#root::ops);
 
-    derive_trait_with_capacity!(
+    derive_trait!(
         data,
-        1,
         Some(ident_call_site("Target")),
         syn::parse2(quote!(#ops::DerefMut))?,
         syn::parse2(quote! {

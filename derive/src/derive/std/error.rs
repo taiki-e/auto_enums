@@ -17,9 +17,8 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
         fn cause(&self) -> #root::option::Option<&dyn (#trait_)>;
     };
 
-    derive_trait_with_capacity!(
+    derive_trait!(
         data,
-        2,
         syn::parse2(trait_.clone())?,
         syn::parse2(quote! {
             trait Error {

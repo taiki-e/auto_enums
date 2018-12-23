@@ -8,9 +8,8 @@ pub(crate) const NAME: &[&str] = &["futures01::Sink"];
 pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
     let crate_ = quote!(::futures);
 
-    derive_trait_with_capacity!(
+    derive_trait!(
         data,
-        5,
         syn::parse2(quote!(#crate_::sink::Sink))?,
         syn::parse2(quote! {
             trait Sink {

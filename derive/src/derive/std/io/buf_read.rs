@@ -9,9 +9,8 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
     let root = std_root();
     let io = quote!(#root::io);
 
-    derive_trait_with_capacity!(
+    derive_trait!(
         data,
-        4,
         syn::parse2(quote!(#io::BufRead))?,
         syn::parse2(quote! {
             trait BufRead {

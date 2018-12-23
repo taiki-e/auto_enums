@@ -1,5 +1,7 @@
 # Unreleased
 
+* Update minimum derive_utils version to 0.5.0
+
 # 0.2.1 - 2018-12-22
 
 * Update minimum derive_utils version to 0.4.0

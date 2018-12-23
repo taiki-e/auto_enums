@@ -8,9 +8,8 @@ pub(crate) const NAME: &[&str] = &["quote::ToTokens"];
 pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
     let crate_ = quote!(::quote);
 
-    derive_trait_with_capacity!(
+    derive_trait!(
         data,
-        2,
         syn::parse2(quote!(#crate_::ToTokens))?,
         syn::parse2(quote! {
             trait ToTokens {

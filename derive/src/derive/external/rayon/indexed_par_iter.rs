@@ -8,9 +8,8 @@ pub(crate) const NAME: &[&str] = &["rayon::IndexedParallelIterator"];
 pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
     let iter = quote!(::rayon::iter);
 
-    derive_trait_with_capacity!(
+    derive_trait!(
         data,
-        0,
         Some(ident_call_site("Item")),
         syn::parse2(quote!(#iter::IndexedParallelIterator))?,
         syn::parse2(quote! {
