@@ -159,18 +159,51 @@ fn stable_1_30() {
     }
 
     #[auto_enum(Iterator)]
-    fn marker_in_loop(mut x: i32) -> impl Iterator<Item = i32> {
+    fn break_in_loop(mut x: i32) -> impl Iterator<Item = i32> {
         loop {
             if x < 0 {
-                break marker!(x..0);
+                break x..0;
             } else if x % 5 == 0 {
-                break marker!(0..=x);
+                break 0..=x;
             }
             x -= 1;
         }
     }
-    assert_eq!(marker_in_loop(14).fold(0, |sum, x| sum + x), 55);
-    assert_eq!(marker_in_loop(-5).fold(0, |sum, x| sum + x), -15);
+    assert_eq!(break_in_loop(14).fold(0, |sum, x| sum + x), 55);
+    assert_eq!(break_in_loop(-5).fold(0, |sum, x| sum + x), -15);
+
+    #[auto_enum(Iterator)]
+    fn break2(mut x: i32) -> impl Iterator<Item = i32> {
+        'a: loop {
+            if x < 0 {
+                break 'a x..0;
+            } else if x % 5 == 0 {
+                break 0..=x;
+            }
+            x -= 1;
+        }
+    }
+    assert_eq!(break2(14).fold(0, |sum, x| sum + x), 55);
+    assert_eq!(break2(-5).fold(0, |sum, x| sum + x), -15);
+
+    #[auto_enum(Iterator)]
+    fn break3(mut x: i32) -> impl Iterator<Item = i32> {
+        'a: loop {
+            if x < 0 {
+                loop {
+                    break 'a x..0;
+                }
+            } else if x % 5 == 0 {
+                return loop {
+                    break 0..=x;
+                };
+            }
+            x -= 1;
+        }
+    }
+    assert_eq!(break3(14).fold(0, |sum, x| sum + x), 55);
+    assert_eq!(break3(-5).fold(0, |sum, x| sum + x), -15);
+
 
     #[auto_enum(Iterator)]
     fn return_in_loop(mut x: i32) -> impl Iterator<Item = i32> {

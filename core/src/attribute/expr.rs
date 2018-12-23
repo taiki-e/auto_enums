@@ -1,6 +1,9 @@
 use std::{cell::Cell, mem};
 
-use syn::*;
+use syn::{
+    visit_mut::{self, VisitMut},
+    *,
+};
 
 use crate::utils::{Result, *};
 
@@ -150,6 +153,7 @@ pub(super) fn child_expr(
             |expr| match expr {
                 Expr::Match(expr) => expr_match(expr, builder, params),
                 Expr::If(expr) => expr_if(expr, builder, params),
+                Expr::Loop(expr) => expr_loop(expr, builder, params),
                 Expr::MethodCall(expr) => _child_expr(&mut *expr.receiver, builder, params),
                 _ if params.marker => Ok(()),
                 #[cfg(feature = "type_analysis")]
@@ -170,6 +174,7 @@ fn rec_attr(expr: &mut Expr, builder: &mut Builder, params: &Params) -> Result<b
         |expr| match expr {
             Expr::Match(expr) => expr_match(expr, builder, params).map(|_| true),
             Expr::If(expr) => expr_if(expr, builder, params).map(|_| true),
+            Expr::Loop(expr) => expr_loop(expr, builder, params).map(|_| true),
             _ => Ok(false),
         },
     )
@@ -242,4 +247,95 @@ fn expr_if(expr: &mut ExprIf, builder: &mut Builder, params: &Params) -> Result<
         Some(_) => Err(invalid_expr("after of `else` required `{` or `if`"))?,
         None => Err(invalid_expr("`if` expression missing an else clause"))?,
     }
+}
+
+fn expr_loop(expr: &mut ExprLoop, builder: &mut Builder, params: &Params) -> Result<()> {
+    LoopVisitor::new(params.marker_ident, &expr, builder).visit_block_mut(&mut expr.body);
+
+    Ok(())
+}
+
+struct LoopVisitor<'a> {
+    marker: &'a str,
+    label: Option<Lifetime>,
+    builder: &'a mut Builder,
+    depth: usize,
+}
+
+impl<'a> LoopVisitor<'a> {
+    fn new(marker: &'a str, expr: &ExprLoop, builder: &'a mut Builder) -> Self {
+        LoopVisitor {
+            marker,
+            label: expr.label.as_ref().map(|l| l.name.clone()),
+            builder,
+            depth: 0,
+        }
+    }
+
+    fn label_eq(&self, other: Option<&Lifetime>) -> bool {
+        match (&self.label, other) {
+            (None, None) => true,
+            (Some(x), Some(y)) => x == y,
+            _ => false,
+        }
+    }
+
+    fn loop_bounds<F: FnOnce(&mut Self)>(&mut self, f: F) {
+        if self.label.is_some() {
+            self.depth += 1;
+            f(self);
+            self.depth -= 1;
+        }
+    }
+}
+
+impl<'a> VisitMut for LoopVisitor<'a> {
+    fn visit_expr_mut(&mut self, expr: &mut Expr) {
+        if !expr.any_empty_attr(NEVER_ATTR) {
+            match expr {
+                // Stop at closure bounds
+                Expr::Closure(_) => {}
+
+                // Other loop bounds
+                Expr::Loop(expr) => {
+                    self.loop_bounds(|v| visit_mut::visit_expr_loop_mut(v, expr));
+                }
+                Expr::ForLoop(expr) => {
+                    self.loop_bounds(|v| visit_mut::visit_expr_for_loop_mut(v, expr));
+                }
+                Expr::While(expr) => {
+                    self.loop_bounds(|v| visit_mut::visit_expr_while_mut(v, expr));
+                }
+
+                Expr::Break(br) => {
+                    if (self.depth == 0 && br.label.is_none()) || self.label_eq(br.label.as_ref()) {
+                        match br.expr.take().map_or_else(|| Expr::Tuple(unit()), |e| *e) {
+                            Expr::Macro(expr) => {
+                                if expr.mac.path.is_ident(self.marker) {
+                                    br.expr = Some(Box::new(Expr::Macro(expr)));
+                                } else {
+                                    br.expr = Some(Box::new(
+                                        self.builder
+                                            .next_expr(Vec::with_capacity(0), Expr::Macro(expr)),
+                                    ));
+                                }
+                            }
+                            expr => {
+                                br.expr = Some(Box::new(
+                                    self.builder.next_expr(Vec::with_capacity(0), expr),
+                                ));
+                            }
+                        }
+                    }
+
+                    visit_mut::visit_expr_break_mut(self, br);
+                }
+
+                expr => visit_mut::visit_expr_mut(self, expr),
+            }
+        }
+    }
+
+    // Stop at item bounds
+    fn visit_item_mut(&mut self, _item: &mut Item) {}
 }

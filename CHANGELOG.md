@@ -1,5 +1,6 @@
 # Unreleased
 
+* Add support for `break` in loop. This includes support for nested loops and labeled `break`.
 * Update minimum derive_utils version to 0.5.0
 
 # 0.2.1 - 2018-12-22
