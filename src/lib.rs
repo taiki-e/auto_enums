@@ -18,7 +18,7 @@
 //! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //! # #[macro_use]
 //! # extern crate auto_enums;
-//! #[auto_enum(Iterator)] // generats an enum with two variants
+//! #[auto_enum(Iterator)]
 //! fn foo(x: i32) -> impl Iterator<Item = i32> {
 //!     match x {
 //!         0 => 1..10,
@@ -28,9 +28,43 @@
 //! # fn main() { let _ = foo(0); }
 //! ```
 //!
+//! `#[auto_enum]` generates code in two stages.
+//!
+//! First, `#[auto_enum]` will do the following.
+//!
+//! * parses syntax
+//! * creates the enum
+//! * inserts variants
+//!
 //! Code like this will be generated:
 //!
 //! ```rust
+//! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
+//! # #[macro_use]
+//! # extern crate auto_enums;
+//! fn foo(x: i32) -> impl Iterator<Item = i32> {
+//!     #[enum_derive(Iterator)]
+//!     enum __Enum1<__T1, __T2> {
+//!         __T1(__T1),
+//!         __T2(__T2),
+//!     }
+//!
+//!     match x {
+//!         0 => __Enum1::__T1(1..10),
+//!         _ => __Enum1::__T2(vec![5, 10].into_iter()),
+//!     }
+//! }
+//! # fn main() { let _ = foo(0); }
+//! ```
+//!
+//! Next, `#[enum_derive]` implements the specified traits.
+//!
+//! <details>
+//! <summary>Code like this will be generated:</summary>
+//!
+//! ```rust
+//! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
+//! # extern crate auto_enums;
 //! fn foo(x: i32) -> impl Iterator<Item = i32> {
 //!     enum __Enum1<__T1, __T2> {
 //!         __T1(__T1),
@@ -64,7 +98,10 @@
 //!         _ => __Enum1::__T2(vec![5, 10].into_iter()),
 //!     }
 //! }
+//! # fn main() { let _ = foo(0); }
 //! ```
+//!
+//! </details>
 //!
 //! ### Positions where `#[auto_enum]` can be used.
 //!
@@ -72,54 +109,220 @@
 //!
 //! * functions
 //!
+//!   ```rust
+//!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]
+//!   # #[macro_use]
+//!   # extern crate auto_enums;
+//!   #[auto_enum(Iterator)]
+//!   fn func(x: i32) -> impl Iterator<Item=i32> {
+//!       if x == 0 {
+//!           Some(0).into_iter()
+//!       } else {
+//!           0..x
+//!       }
+//!   }
+//!   # fn main() { let _ = func(0); }
+//!   ```
+//!
+//! * expressions
+//!
+//!   ```rust
+//!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]
+//!   # #[macro_use]
+//!   # extern crate auto_enums;
+//!   #[auto_enum] // Nightly does not need an empty attribute to the function.
+//!   fn expr(x: i32) -> impl Iterator<Item=i32> {
+//!       #[auto_enum(Iterator)]
+//!       match x {
+//!           0 => Some(0).into_iter(),
+//!           _ => 0..x,
+//!       }
+//!   }
+//!   # fn main() { let _ = expr(0); }
+//!   ```
+//!
+//! * let binding
+//!
+//!   ```rust
+//!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]
+//!   # #[macro_use]
+//!   # extern crate auto_enums;
+//!   #[auto_enum] // Nightly does not need an empty attribute to the function.
+//!   fn let_binding(x: i32) -> impl Iterator<Item=i32> {
+//!       #[auto_enum(Iterator)]
+//!       let iter = match x {
+//!           0 => Some(0).into_iter(),
+//!           _ => 0..x,
+//!       };
+//!       iter
+//!   }
+//!   # fn main() { let _ = let_binding(0); }
+//!   ```
+//!
+//! ### Supported syntax
+//!
+//! * `if` and `match`
+//!
+//!   Wrap each branch with a variant.
+//!
+//!   ```rust
+//!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]
+//!   # #[macro_use]
+//!   # extern crate auto_enums;
+//!   // if
+//!   #[auto_enum(Iterator)]
+//!   fn expr_if(x: i32) -> impl Iterator<Item=i32> {
+//!       if x == 0 {
+//!           Some(0).into_iter()
+//!       } else {
+//!           0..x
+//!       }
+//!   }
+//!
+//!   // match
+//!   #[auto_enum]
+//!   fn expr_match(x: i32) -> impl Iterator<Item=i32> {
+//!       #[auto_enum(Iterator)]
+//!       let iter = match x {
+//!           0 => Some(0).into_iter(),
+//!           _ => 0..x,
+//!       };
+//!       iter
+//!   }
+//!   # fn main() { let _ = expr_if(0); let _ = expr_match(0); }
+//!   ```
+//!
+//! * `loop`
+//!
+//!   Wrap each `break` with a variant. Nested loops and labeled `break` are also supported.
+//!
+//!   ```rust
+//!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]
+//!   # #[macro_use]
+//!   # extern crate auto_enums;
+//!   #[auto_enum(Iterator)]
+//!   fn expr_loop(mut x: i32) -> impl Iterator<Item = i32> {
+//!       loop {
+//!           if x < 0 {
+//!               break x..0;
+//!           } else if x % 5 == 0 {
+//!               break 0..=x;
+//!           }
+//!           x -= 1;
+//!       }
+//!   }
+//!   # fn main() { let _ = expr_loop(0); }
+//!   ```
+//!
+//! * Block, unsafe block and method call
+//!
+//!   Blocks, unsafe blocks, and method calls are recursively searched until an `if`, `match`, `loop` or unsupported expression is found.
+//!
+//!   ```rust
+//!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]
+//!   # #[macro_use]
+//!   # extern crate auto_enums;
+//!   // block
+//!   #[auto_enum]
+//!   fn expr_block(x: i32) -> impl Iterator<Item=i32> {
+//!       #[auto_enum(Iterator)]
+//!       {
+//!           if x == 0 {
+//!               Some(0).into_iter()
+//!           } else {
+//!               0..x
+//!           }
+//!       }
+//!   }
+//!
+//!   // method call
+//!   #[auto_enum]
+//!   fn expr_method(x: i32) -> impl Iterator<Item=i32> {
+//!      #[auto_enum(Iterator)]
+//!       match x {
+//!           0 => Some(0).into_iter(),
+//!           _ => 0..x,
+//!       }.map(|y| y + 1)
+//!   }
+//!   # fn main() { let _ = expr_block(0); let _ = expr_method(0); }
+//!   ```
+//!
+//! * `return` (in functions)
+//!
+//!   `#[auto_enum]` can parse the `return` in the scope.
+//!
+//!   This analysis is valid only when the return type is `impl Trait`.
+//!
+//!   ```rust
+//!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]
+//!   # #[macro_use]
+//!   # extern crate auto_enums;
+//!   // return (in functions)
+//!   #[auto_enum(Iterator)]
+//!   fn func(x: i32) -> impl Iterator<Item=i32> {
+//!       if x == 0 {
+//!           return Some(0).into_iter();
+//!       }
+//!
+//!       if x > 0 {
+//!           0..x
+//!       } else {
+//!           x..=0
+//!       }
+//!   }
+//!   # fn main() { let _ = func(1); }
+//!   ```
+//!
+//! * `return` (in closures)
+//!
+//!   `#[auto_enum]` can parse the `return` in the scope.
+//!
+//!   However, `#[auto_enum]` must be used directly for that closure (or the let binding of the closure).
+//!
+//!   ```rust
+//!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]
+//!   # #[macro_use]
+//!   # extern crate auto_enums;
+//!   // return (in closures)
+//!   #[auto_enum]
+//!   fn closure() -> impl Iterator<Item=i32> {
+//!       #[auto_enum(Iterator)]
+//!       let f = |x| {
+//!           if x == 0 {
+//!               return Some(0).into_iter();
+//!           }
+//!
+//!           if x > 0 {
+//!               0..x
+//!           } else {
+//!               x..=0
+//!           }
+//!       };
+//!       f(1)
+//!   }
+//!   # fn main() { let _ = closure(); }
+//!   ```
+//!
+//! ### Parse nested branches
+//!
+//! You can parse nested branches by `#[rec]` attribute.
+//!
 //! ```rust
 //! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //! # #[macro_use]
 //! # extern crate auto_enums;
 //! #[auto_enum(Iterator)]
-//! fn func(x: i32) -> impl Iterator<Item=i32> {
-//!     if x == 0 {
-//!         Some(0).into_iter()
-//!     } else {
-//!         0..x
-//!     }
-//! }
-//! # fn main() { let _ = func(0); }
-//! ```
-//!
-//! * expressions
-//!
-//! ```rust
-//! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
-//! # #[macro_use]
-//! # extern crate auto_enums;
-//! #[auto_enum] // Nightly does not need an empty attribute to the function.
-//! fn expr(x: i32) -> impl Iterator<Item=i32> {
-//!     #[auto_enum(Iterator)]
+//! fn foo(x: i32) -> impl Iterator<Item = i32> {
 //!     match x {
-//!         0 => Some(0).into_iter(),
-//!         _ => 0..x,
+//!         0 => 1..10,
+//!         #[rec]
+//!         _ => match x {
+//!             1 => vec![5, 10].into_iter(),
+//!             _ => 0..=x,
+//!         },
 //!     }
 //! }
-//! # fn main() { let _ = expr(0); }
-//! ```
-//!
-//! * let binding
-//!
-//! ```rust
-//! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
-//! # #[macro_use]
-//! # extern crate auto_enums;
-//! #[auto_enum] // Nightly does not need an empty attribute to the function.
-//! fn let_binding(x: i32) -> impl Iterator<Item=i32> {
-//!     #[auto_enum(Iterator)]
-//!     let iter = match x {
-//!         0 => Some(0).into_iter(),
-//!         _ => 0..x,
-//!     };
-//!     iter
-//! }
-//! # fn main() { let _ = let_binding(0); }
+//! # fn main() { let _ = foo(0); }
 //! ```
 //!
 //! ### Expression that no value will be returned
@@ -194,9 +397,10 @@
 //! # fn main() { let _ = foo(0); }
 //! ```
 //!
-//! ### Parse nested branches
+//! ### Expression level marker (`marker!` macro)
 //!
-//! You can parse nested branches by `#[rec]` attribute.
+//! `#[auto_enum]` replaces `marker!` macros with variants.
+//! If values of two or more are specified by `marker!` macros, `#[auto_enum]` can be used for unsupported expressions and statements.
 //!
 //! ```rust
 //! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
@@ -204,37 +408,10 @@
 //! # extern crate auto_enums;
 //! #[auto_enum(Iterator)]
 //! fn foo(x: i32) -> impl Iterator<Item = i32> {
-//!     match x {
-//!         0 => 1..10,
-//!         #[rec]
-//!         _ => match x {
-//!             1 => vec![5, 10].into_iter(),
-//!             _ => 0..=x,
-//!         },
+//!     if x < 0 {
+//!         return x..=0;
 //!     }
-//! }
-//! # fn main() { let _ = foo(0); }
-//! ```
-//!
-//! ### Expression level marker (`marker!` macro)
-//!
-//! `#[auto_enum]` replaces `marker!` macros with variants.
-//! If values of two or more are specified by `marker!` macros, `#[auto_enum]` can be used for a expression or statement that does not end with a if or match expression.
-//!
-//! ```rust
-//! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
-//! # #[macro_use]
-//! # extern crate auto_enums;
-//! #[auto_enum(Iterator)]
-//! fn foo(mut x: i32) -> impl Iterator<Item = i32> {
-//!     loop {
-//!         if x < 0 {
-//!             break marker!(x..0);
-//!         } else if x % 5 == 0 {
-//!             break marker!(0..=x);
-//!         }
-//!         x -= 1;
-//!     }
+//!     marker!(1..10)
 //! }
 //! # fn main() { let _ = foo(0); }
 //! ```
@@ -389,7 +566,7 @@
 //!
 //! `[std|core]::fmt`
 //!
-//! * [`Debug`](https://doc.rust-lang.org/std/fmt/trait.Debug.html) (alias: `fmt::Debug`) - note that it is a different implementation from `#[derive(Debug)]`.
+//! * [`Debug`](https://doc.rust-lang.org/std/fmt/trait.Debug.html) (alias: `fmt::Debug`) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/debug.md)
 //! * [`Display`](https://doc.rust-lang.org/std/fmt/trait.Display.html) (alias: `fmt::Display`)
 //! * [`fmt::Binary`](https://doc.rust-lang.org/std/fmt/trait.Binary.html)
 //! * [`fmt::LowerExp`](https://doc.rust-lang.org/std/fmt/trait.LowerExp.html)
@@ -442,7 +619,7 @@
 //!
 //! [`serde`](https://github.com/serde-rs/serde) (*requires `"serde"` crate feature*)
 //!
-//! * [`serde::Serialize`](https://docs.serde.rs/serde/trait.Serialize.html) - note that it is a different implementation from `#[derive(Serialize)]`.
+//! * [`serde::Serialize`](https://docs.serde.rs/serde/trait.Serialize.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/serde/serialize.md)
 //!
 //! ### Static methods
 //!
@@ -485,7 +662,12 @@
 //!
 //! * `std`
 //!   * Enabled by default.
-//!   * Disable to use `no_std` instead.
+//!   * Generate code for `std` library.
+//!   * Disable this feature to generate code for `no_std`.
+//!
+//! * `fmt`
+//!   * Disabled by default.
+//!   * Use `[std|core]::fmt`'s traits other than `Debug`, `Display` and `Write`.
 //!
 //! * `type_analysis`
 //!   * Disabled by default.
@@ -517,10 +699,6 @@
 //! * `transpose_methods`
 //!   * Disabled by default.
 //!   * Use `transpose*` methods.
-//!
-//! * `fmt`
-//!   * Disabled by default.
-//!   * Use `[std|core]::fmt`'s traits other than `Debug`, `Display` and `Write`.
 //!
 //! * `error_cause`
 //!   * Disabled by default.
@@ -556,101 +734,11 @@
 //!
 //! * [`unsized_locals`](https://github.com/rust-lang/rust/issues/48055) - Allow `Index<Idx: ?Sized>` and `IndexMut<Idx: ?Sized>`.
 //!
-//! ## Generated code
-//!
-//! There are two steps to generating code.
-//!
-//! When using `#[auto_enum]` for function like the following:
-//!
-//! ```rust
-//! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
-//! # #[macro_use]
-//! # extern crate auto_enums;
-//! #[auto_enum(Iterator, Clone)]
-//! fn foo(x: i32) -> impl Iterator<Item = i32> + Clone {
-//!     match x {
-//!         0 => 1..10,
-//!         _ => vec![5, 10].into_iter(),
-//!     }
-//! }
-//! # fn main() { let _ = foo(0); }
-//! ```
-//!
-//! First, `#[auto_enum]` will do the following.
-//!
-//! * parses syntax
-//! * creates the enum
-//! * inserts variants
-//!
-//! Code like this will be generated:
-//!
-//! ```rust
-//! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
-//! # #[macro_use]
-//! # extern crate auto_enums;
-//! fn foo(x: i32) -> impl Iterator<Item = i32> + Clone {
-//!     #[enum_derive(Iterator, Clone)]
-//!     enum __Enum1<__T1, __T2> {
-//!         __T1(__T1),
-//!         __T2(__T2),
-//!     }
-//!
-//!     match x {
-//!         0 => __Enum1::__T1(1..10),
-//!         _ => __Enum1::__T2(vec![5, 10].into_iter()),
-//!     }
-//! }
-//! # fn main() { let _ = foo(0); }
-//! ```
-//!
-//! Next, `#[enum_derive]` implements the specified traits. `Clone` is not directly supported by `#[enum_derive]`, so it passing to `#[derive]`.
-//!
-//! Code like this will be generated:
-//!
-//! ```rust
-//! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
-//! # #[macro_use]
-//! # extern crate auto_enums;
-//! fn foo(x: i32) -> impl Iterator<Item = i32> + Clone {
-//!     #[derive(Clone)]
-//!     enum __Enum1<__T1, __T2> {
-//!         __T1(__T1),
-//!         __T2(__T2),
-//!     }
-//!
-//!     impl<__T1, __T2> ::std::iter::Iterator for __Enum1<__T1, __T2>
-//!     where
-//!         __T1: ::std::iter::Iterator,
-//!         __T2: ::std::iter::Iterator<Item = <__T1 as ::std::iter::Iterator>::Item>,
-//!     {
-//!         type Item = <__T1 as ::std::iter::Iterator>::Item;
-//!         fn next(&mut self) -> ::std::option::Option<Self::Item> {
-//!             match self {
-//!                 __Enum1::__T1(x) => x.next(),
-//!                 __Enum1::__T2(x) => x.next(),
-//!             }
-//!         }
-//!         fn size_hint(&self) -> (usize, ::std::option::Option<usize>) {
-//!             match self {
-//!                 __Enum1::__T1(x) => x.size_hint(),
-//!                 __Enum1::__T2(x) => x.size_hint(),
-//!             }
-//!         }
-//!     }
-//!
-//!     match x {
-//!         0 => __Enum1::__T1(1..10),
-//!         _ => __Enum1::__T2(vec![5, 10].into_iter()),
-//!     }
-//! }
-//! # fn main() { let _ = foo(0); }
-//! ```
-//!
 //! ## Known limitations
 //!
 //! * There needs to explicitly specify the trait to be implemented (`type_analysis` crate feature reduces this limitation).
 //!
-//! * There needs to be marker macros for expressions other than `match` and `if`.
+//! * There needs to be marker macros for unsupported expressions.
 //!
 //! ## Rust Version
 //!

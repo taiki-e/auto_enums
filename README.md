@@ -39,7 +39,7 @@ extern crate auto_enums;
 `#[auto_enum]`'s basic feature is to wrap the value returned by the last if or match expression by an enum that implemented the specified traits.
 
 ```rust
-#[auto_enum(Iterator)] // generats an enum with two variants
+#[auto_enum(Iterator)]
 fn foo(x: i32) -> impl Iterator<Item = i32> {
     match x {
         0 => 1..10,
@@ -48,35 +48,22 @@ fn foo(x: i32) -> impl Iterator<Item = i32> {
 }
 ```
 
+`#[auto_enum]` generates code in two stages.
+
+First, `#[auto_enum]` will do the following.
+
+* parses syntax
+* creates the enum
+* inserts variants
+
 Code like this will be generated:
 
 ```rust
 fn foo(x: i32) -> impl Iterator<Item = i32> {
+    #[enum_derive(Iterator)]
     enum __Enum1<__T1, __T2> {
         __T1(__T1),
         __T2(__T2),
-    }
-
-    impl<__T1, __T2> ::std::iter::Iterator for __Enum1<__T1, __T2>
-    where
-        __T1: ::std::iter::Iterator,
-        __T2: ::std::iter::Iterator<Item = <__T1 as ::std::iter::Iterator>::Item>,
-    {
-        type Item = <__T1 as ::std::iter::Iterator>::Item;
-        #[inline]
-        fn next(&mut self) -> ::std::option::Option<Self::Item> {
-            match self {
-                __Enum1::__T1(x) => x.next(),
-                __Enum1::__T2(x) => x.next(),
-            }
-        }
-        #[inline]
-        fn size_hint(&self) -> (usize, ::std::option::Option<usize>) {
-            match self {
-                __Enum1::__T1(x) => x.size_hint(),
-                __Enum1::__T2(x) => x.size_hint(),
-            }
-        }
     }
 
     match x {
@@ -86,13 +73,17 @@ fn foo(x: i32) -> impl Iterator<Item = i32> {
 }
 ```
 
+Next, `#[enum_derive]` implements the specified traits.
+
+[Code like this will be generated](docs/example-1.md)
+
 See [API Documentation](https://docs.rs/auto_enums/) for more details.
 
 ## Supported traits
 
 `#[enum_derive]` implements the supported traits and passes unsupported traits to `#[derive]`.
 
-If you want to use traits that are not supported by `#[enum_derive]`, you can use another crate that provides `proc_macro_derive`, or you can define `proc_macro_derive` yourself([derive_utils] probably can help it).
+If you want to use traits that are not supported by `#[enum_derive]`, you can use another crate that provides `proc_macro_derive`, or you can define `proc_macro_derive` yourself ([derive_utils] probably can help it).
 
 Basic usage of `#[enum_derive]`
 
@@ -138,7 +129,7 @@ Note that some traits have aliases.
 
 `[std|core]::fmt`
 
-* [`Debug`](https://doc.rust-lang.org/std/fmt/trait.Debug.html) (alias: `fmt::Debug`) - note that it is a different implementation from `#[derive(Debug)]`.
+* [`Debug`](https://doc.rust-lang.org/std/fmt/trait.Debug.html) (alias: `fmt::Debug`) - [generated code](docs/supported_traits/std/debug.md)
 * [`Display`](https://doc.rust-lang.org/std/fmt/trait.Display.html) (alias: `fmt::Display`)
 * [`fmt::Binary`](https://doc.rust-lang.org/std/fmt/trait.Binary.html) (*requires `"fmt"` crate feature*)
 * [`fmt::LowerExp`](https://doc.rust-lang.org/std/fmt/trait.LowerExp.html) (*requires `"fmt"` crate feature*)
@@ -191,41 +182,7 @@ You can add support for external library by activating the each crate feature.
 
 [`serde`](https://github.com/serde-rs/serde) (*requires `"serde"` crate feature*)
 
-* [`serde::Serialize`](https://docs.serde.rs/serde/trait.Serialize.html) - note that it is a different implementation from `#[derive(Serialize)]`.
-
-### Static methods
-
-These don't derive traits, but derive static methods instead.
-
-* `Transpose` (*requires `"transpose_methods"` crate feature*) - this derives the following conversion methods.
-
-  * `transpose` - convert from `enum<Option<T1>,..>` to `Option<enum<T1,..>>`
-
-  * `transpose` - convert from `enum<Result<T1, E1>,..>` to `Result<enum<T1,..>, enum<E1,..>>`
-
-  * `transpose_ok` - convert from `enum<Result<T1, E>,..>` to `Option<enum<T1,..>, E>`
-
-    Examples:
-
-    ```rust
-    use std::{fs, io, path::Path};
-
-    #[auto_enum(Transpose, io::Write)]
-    fn output_stream(file: Option<&Path>) -> io::Result<impl io::Write> {
-        match file {
-            Some(f) => fs::File::create(f),
-            None => Ok(io::stdout()),
-        }.transpose_ok()
-    }
-    ```
-
-  * `transpose_err` - convert from `enum<Result<T, E1>,..>` to `Result<T, enum<E1,..>>`
-
-## Known limitations
-
-* There needs to explicitly specify the trait to be implemented (`type_analysis` crate feature reduces this limitation).
-
-* There needs to be marker macros for expressions other than `match` and `if`.
+* [`serde::Serialize`](https://docs.serde.rs/serde/trait.Serialize.html) - [generated code](docs/supported_traits/external/serde/serialize.md)
 
 ## Rust Version
 

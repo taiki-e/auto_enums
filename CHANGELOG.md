@@ -1,6 +1,7 @@
 # Unreleased
 
 * Add support for `break` in loop. This includes support for nested loops and labeled `break`.
+
 * Update minimum derive_utils version to 0.5.0
 
 # 0.2.1 - 2018-12-22
@@ -10,6 +11,7 @@
 # 0.2.0 - 2018-12-20
 
 * Make `[std|core]::fmt`'s traits other than `Debug`, `Display` and `Write` optional
+
 * Support `return` in function and closure
 
 # 0.1.3 - 2018-12-15
@@ -20,6 +22,7 @@
 # 0.1.2 - 2018-12-15
 
 * Move features of derive/utils to [derive_utils](https://github.com/taiki-e/derive_utils)
+
 * Align version number of `auto_enumerate` and `auto_enums`.
 
 # 0.1.1 - 2018-12-13
