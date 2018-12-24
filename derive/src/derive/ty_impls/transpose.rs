@@ -32,7 +32,6 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
 
 fn transpose_option(data: &Data, root: &TokenStream) -> Result<TokenStream> {
     let ident = data.ident();
-    let variants = data.variants();
     let fields = data.fields();
     let option = quote!(#root::option::Option);
 
@@ -41,7 +40,11 @@ fn transpose_option(data: &Data, root: &TokenStream) -> Result<TokenStream> {
     let ty_generics = fields.iter().map(|f| quote!(#option<#f>));
     *impls.self_ty() = syn::parse2(quote!(#ident<#(#ty_generics),*>))?;
 
-    let transpose = variants.iter().map(|v| quote!(#ident::#v(x) => x.map(#ident::#v)));
+    let transpose = data
+        .variants()
+        .iter()
+        .map(|v| quote!(#ident::#v(x) => x.map(#ident::#v)));
+
     impls.push_item(syn::parse2(quote! {
         #[inline]
         fn transpose(self) -> #option<#ident<#(#fields),*>> {
@@ -54,7 +57,6 @@ fn transpose_option(data: &Data, root: &TokenStream) -> Result<TokenStream> {
 
 fn transpose_result(data: &Data, root: &TokenStream) -> Result<TokenStream> {
     let ident = data.ident();
-    let variants = data.variants();
     let fields = data.fields();
     let result = quote!(#root::result::Result);
 
@@ -74,7 +76,8 @@ fn transpose_result(data: &Data, root: &TokenStream) -> Result<TokenStream> {
         .map(|(f, ef)| quote!(#result<#f, #ef>));
     *impls.self_ty() = syn::parse2(quote!(#ident<#(#ty_generics),*>))?;
 
-    let transpose = variants
+    let transpose = data
+        .variants()
         .iter()
         .map(|v| quote!(#ident::#v(x) => x.map(#ident::#v).map_err(#ident::#v)));
 
@@ -90,7 +93,6 @@ fn transpose_result(data: &Data, root: &TokenStream) -> Result<TokenStream> {
 
 fn transpose_ok(data: &Data, root: &TokenStream) -> Result<TokenStream> {
     let ident = data.ident();
-    let variants = data.variants();
     let fields = data.fields();
     let result = quote!(#root::result::Result);
 
@@ -101,7 +103,7 @@ fn transpose_ok(data: &Data, root: &TokenStream) -> Result<TokenStream> {
     let ty_generics = fields.iter().map(|f| quote!(#result<#f, __E>));
     *impls.self_ty() = syn::parse2(quote!(#ident<#(#ty_generics),*>))?;
 
-    let transpose = variants.iter().map(|v| quote!(#ident::#v(x) => x.map(#ident::#v)));
+    let transpose = data.variants().iter().map(|v| quote!(#ident::#v(x) => x.map(#ident::#v)));
     impls.push_item(syn::parse2(quote! {
         #[inline]
         fn transpose_ok(self) -> #result<#ident<#(#fields),*>, __E> {
@@ -114,7 +116,6 @@ fn transpose_ok(data: &Data, root: &TokenStream) -> Result<TokenStream> {
 
 fn transpose_err(data: &Data, root: &TokenStream) -> Result<TokenStream> {
     let ident = data.ident();
-    let variants = data.variants();
     let fields = data.fields();
     let result = quote!(#root::result::Result);
 
@@ -125,7 +126,7 @@ fn transpose_err(data: &Data, root: &TokenStream) -> Result<TokenStream> {
     let ty_generics = fields.iter().map(|f| quote!(#result<__T, #f>));
     *impls.self_ty() = syn::parse2(quote!(#ident<#(#ty_generics),*>))?;
 
-    let transpose = variants.iter().map(|v| quote!(#ident::#v(x) => x.map_err(#ident::#v)));
+    let transpose = data.variants().iter().map(|v| quote!(#ident::#v(x) => x.map_err(#ident::#v)));
     impls.push_item(syn::parse2(quote! {
         #[inline]
         fn transpose_err(self) -> #result<__T, #ident<#(#fields),*>> {
