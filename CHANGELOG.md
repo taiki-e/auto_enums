@@ -1,5 +1,7 @@
 # Unreleased
 
+# 0.3.0 - 2018-12-24
+
 * Add support for `break` in loop. This includes support for nested loops and labeled `break`.
 
 * Change `#[enum_derive(Error)]` implementation<br>
