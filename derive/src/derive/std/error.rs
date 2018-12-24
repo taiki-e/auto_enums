@@ -9,23 +9,32 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
     let root = std_root();
     let trait_ = quote!(#root::error::Error);
 
-    #[cfg(all(stable_1_33, not(feature = "error_cause")))]
-    let cause = TokenStream::new();
-    #[cfg(any(not(stable_1_33), feature = "error_cause"))]
-    let cause = quote! {
-        #[allow(deprecated)]
-        fn cause(&self) -> #root::option::Option<&dyn (#trait_)>;
-    };
+    let ident = data.ident();
+    let source = data
+        .variants()
+        .iter()
+        .map(|v| quote!(#ident::#v(x) => #root::option::Option::Some(x)));
 
-    derive_trait!(
-        data,
+    let mut impls = data.impl_trait_with_capacity(
+        2,
         syn::parse2(trait_.clone())?,
+        None,
         syn::parse2(quote! {
             trait Error {
                 fn description(&self) -> &str;
-                #cause
-                fn source(&self) -> #root::option::Option<&(dyn (#trait_) + 'static)>;
             }
-        })?
-    )
+        })?,
+    )?;
+
+    data.fields().iter().try_for_each(|f| {
+        syn::parse2(quote!(#f: 'static)).map(|f| impls.push_where_predicate(f))
+    })?;
+
+    impls.push_item(syn::parse2(quote! {
+        fn source(&self) -> #root::option::Option<&(dyn (#trait_) + 'static)> {
+            match self { #(#source,)* }
+        }
+    })?);
+
+    Ok(impls.build())
 }

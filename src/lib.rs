@@ -590,7 +590,7 @@
 //!
 //! `std::error`
 //!
-//! * [`Error`](https://doc.rust-lang.org/std/error/trait.Error.html)
+//! * [`Error`](https://doc.rust-lang.org/std/error/trait.Error.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/error.md)
 //!
 //! ### External libraries
 //!
@@ -699,10 +699,6 @@
 //! * `transpose_methods`
 //!   * Disabled by default.
 //!   * Use `transpose*` methods.
-//!
-//! * `error_cause`
-//!   * Disabled by default.
-//!   * Even Rust 1.33 or later, implements `Error::cause`.
 //!
 //! * `unstable`
 //!   * Disabled by default.

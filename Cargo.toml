@@ -54,9 +54,6 @@ std = ["auto_enums_derive/std"]
 # Use `[std|core]::fmt`'s traits other than `Debug`, `Display` and `Write`
 fmt = ["auto_enums_derive/fmt"]
 
-# Even Rust 1.33 or later, implements `Error::cause`.
-error_cause = ["auto_enums_derive/error_cause"]
-
 # Enable unstable features of [std|core] libraries.
 
 # Implements `ExactSizeIterator::is_empty`.

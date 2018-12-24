@@ -507,7 +507,7 @@ fn stable_1_30_std() {
         }
         .transpose_err()
     }
-    assert!(transpose_err(None).is_err());
+    assert!(transpose_err(None).unwrap_err().source().is_some());
 }
 
 #[cfg(feature = "unstable")]

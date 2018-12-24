@@ -9,7 +9,7 @@ repository = "https://github.com/taiki-e/auto_enums"
 documentation = "https://docs.rs/auto_enums_derive/"
 keywords = ["enum", "macros", "derive", "attribute"]
 categories = ["rust-patterns"]
-include = ["Cargo.toml", "build.rs", "src/**/*.rs", "LICENSE-APACHE", "LICENSE-MIT"]
+include = ["Cargo.toml", "src/**/*.rs", "LICENSE-APACHE", "LICENSE-MIT"]
 
 [badges]
 travis-ci = { repository = "taiki-e/auto_enums" }
@@ -43,9 +43,6 @@ std = ["derive_utils/std"]
 
 # Use `[std|core]::fmt`'s traits other than `Debug`, `Display` and `Write`
 fmt = []
-
-# Even Rust 1.33 or later, implements `Error::cause`.
-error_cause = []
 
 # Enable unstable features of [std|core] libraries.
 

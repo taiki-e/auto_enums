@@ -153,7 +153,7 @@ Note that some traits have aliases.
 
 `std::error`
 
-* [`Error`](https://doc.rust-lang.org/std/error/trait.Error.html)
+* [`Error`](https://doc.rust-lang.org/std/error/trait.Error.html) - [generated code](docs/supported_traits/std/error.md)
 
 ### External libraries
 
