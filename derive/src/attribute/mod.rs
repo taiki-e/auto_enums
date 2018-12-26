@@ -26,7 +26,7 @@ macro_rules! trait_map {
 }
 
 lazy_static! {
-    static ref TRAITS: HashMap<&'static str, &'static [&'static str]> = {
+    static ref TRAIT_DEPENDENCIES: HashMap<&'static str, &'static [&'static str]> = {
         let mut map: HashMap<&'static str, &'static [&'static str]> = HashMap::new();
         trait_map! {
             map,
@@ -84,13 +84,13 @@ lazy_static! {
     };
 }
 
-type DeriveFn = Box<dyn Fn(&'_ Data) -> Result<TokenStream2> + Send + Sync>;
+type DeriveFn = &'static (dyn Fn(&'_ Data) -> Result<TokenStream2> + Send + Sync);
 
 macro_rules! derive_map {
     ($map:expr, $($(#[$meta:meta])* $($arm:ident)::*,)*) => {$(
         $(#[$meta])*
         crate::derive::$($arm)::*::NAME.iter().for_each(|name| {
-            if $map.insert(*name, Box::new(crate::derive::$($arm)::*::derive) as DeriveFn).is_some() {
+            if $map.insert(*name, (&crate::derive::$($arm)::*::derive) as DeriveFn).is_some() {
                 panic!("`#[{}]` internal error: there are multiple `{}`", NAME, name);
             }
         });
@@ -171,6 +171,7 @@ lazy_static! {
             external::rayon::indexed_par_iter,
             #[cfg(feature = "rayon")]
             external::rayon::par_extend,
+            // serde
             #[cfg(feature = "serde")]
             external::serde::serialize,
         );
@@ -187,25 +188,26 @@ fn expand(args: TokenStream2, input: TokenStream) -> Result<TokenStream2> {
 
     let item = syn::parse(input).map_err(|_| format!("`#[{}]` can only be used on enums", NAME))?;
     let data = Data::from_item(&item).map_err(|e| format!("`#[{}]` {}", NAME, e))?;
-    let args = parse_args(args).map_err(|e| format!("`#[{}]` {}", NAME, e))?;
     let mut stack = Stack::new();
-    args.iter().cloned().for_each(|(s, x)| {
-        if let Some(traits) = TRAITS.get(s.as_str()) {
-            traits
-                .iter()
-                .filter(|&x| !args.iter().any(|(s, _)| s == x))
-                .for_each(|&x| {
-                    if !alias_exists(x, &stack) {
-                        stack.push((Cow::Borrowed(x), None))
-                    }
-                });
-        }
+    {
+        let args = parse_args(args).map_err(|e| format!("`#[{}]` {}", NAME, e))?;
+        args.iter().cloned().for_each(|(s, x)| {
+            if let Some(traits) = TRAIT_DEPENDENCIES.get(s.as_str()) {
+                traits
+                    .iter()
+                    .filter(|&x| !args.iter().any(|(s, _)| s == x))
+                    .for_each(|&x| {
+                        if !alias_exists(x, &stack) {
+                            stack.push((Cow::Borrowed(x), None))
+                        }
+                    });
+            }
 
-        if !alias_exists(s.as_str(), &stack) {
-            stack.push((Cow::Owned(s), x));
-        }
-    });
-    drop(args);
+            if !alias_exists(s.as_str(), &stack) {
+                stack.push((Cow::Owned(s), Some(x)));
+            }
+        });
+    }
 
     let mut derive = Stack::new();
     let mut ts = TokenStream2::new();

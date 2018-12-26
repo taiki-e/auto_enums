@@ -56,9 +56,9 @@ impl PartialEq<Arg> for Arg {
     }
 }
 
-pub(super) fn parse_args(args: TokenStream2) -> Result<Stack<(String, Option<Arg>)>> {
-    fn push(args: &mut Stack<(String, Option<Arg>)>, arg: Arg) {
-        args.push((arg.to_trimed_string(), Some(arg)))
+pub(super) fn parse_args(args: TokenStream2) -> Result<Stack<(String, Arg)>> {
+    fn push(args: &mut Stack<(String, Arg)>, arg: Arg) {
+        args.push((arg.to_trimed_string(), arg))
     }
 
     const ERR: &str = "expected one of `,`, `::`, or identifier, found ";
