@@ -1,6 +1,5 @@
 use proc_macro2::{Group, TokenStream as TokenStream2};
 use syn::{
-    fold::{self, Fold},
     visit::{self, Visit},
     visit_mut::{self, VisitMut},
     *,
@@ -140,17 +139,17 @@ impl<'a> Replacer<'a> {
     }
 }
 
-impl<'a> Fold for Replacer<'a> {
-    fn fold_expr(&mut self, mut expr: Expr) -> Expr {
+impl<'a> VisitMut for Replacer<'a> {
+    fn visit_expr_mut(&mut self, expr: &mut Expr) {
         if !expr.any_attr(NAME) || (self.foreign && self.marker_count != 0) {
-            expr = fold::fold_expr(self, expr);
+            visit_mut::visit_expr_mut(self, expr);
 
             if !self.foreign {
-                attrs_mut(&mut expr, |attrs| self.find_remove_empty_attrs(attrs));
+                attrs_mut(expr, |attrs| self.find_remove_empty_attrs(attrs));
             }
 
             if self.marker_count != 0 {
-                expr = match expr {
+                replace_expr(expr, |expr| match expr {
                     Expr::Macro(expr) => {
                         if expr.mac.path.is_ident(self.marker) {
                             let args = syn::parse2(expr.mac.tts).unwrap_or_else(|_| {
@@ -164,51 +163,45 @@ impl<'a> Fold for Replacer<'a> {
                         }
                     }
                     expr => expr,
-                };
+                });
             }
         } else {
             let tmp = self.foreign;
             self.foreign = true;
-            expr = fold::fold_expr(self, expr);
+            visit_mut::visit_expr_mut(self, expr);
             self.foreign = tmp;
         }
-
-        expr
     }
 
-    fn fold_arm(&mut self, mut arm: Arm) -> Arm {
-        arm = fold::fold_arm(self, arm);
+    fn visit_arm_mut(&mut self, arm: &mut Arm) {
+        visit_mut::visit_arm_mut(self, arm);
 
         if !self.foreign {
             self.find_remove_empty_attrs(&mut arm.attrs);
         }
-
-        arm
     }
 
-    fn fold_local(&mut self, mut local: Local) -> Local {
+    fn visit_local_mut(&mut self, local: &mut Local) {
         if !local.any_attr(NAME) || (self.foreign && self.marker_count != 0) {
-            fold::fold_local(self, local)
+            visit_mut::visit_local_mut(self, local);
         } else {
             let tmp = self.foreign;
             self.foreign = true;
-            local = fold::fold_local(self, local);
+            visit_mut::visit_local_mut(self, local);
             self.foreign = tmp;
-            local
         }
     }
 
     // Stop at item bounds
-    fn fold_item(&mut self, item: Item) -> Item {
-        item
-    }
+    fn visit_item_mut(&mut self, _item: &mut Item) {}
 
-    fn fold_stmt(&mut self, stmt: Stmt) -> Stmt {
-        fold_stmt(fold::fold_stmt(self, stmt)).unwrap_or_else(|e| panic!("`#[{}]` {}", NAME, e))
+    fn visit_stmt_mut(&mut self, stmt: &mut Stmt) {
+        visit_mut::visit_stmt_mut(self, stmt);
+        visit_stmt_mut(stmt).unwrap_or_else(|e| panic!("`#[{}]` {}", NAME, e));
     }
 }
 
-fn fold_stmt(stmt: Stmt) -> Result<Stmt> {
+fn visit_stmt_mut(stmt: &mut Stmt) -> Result<()> {
     fn parse_tts(tts: TokenStream2) -> Result<Params> {
         syn::parse2(tts)
             .map_err(|e| invalid_args!(e))
@@ -216,24 +209,23 @@ fn fold_stmt(stmt: Stmt) -> Result<Stmt> {
     }
 
     match stmt {
-        Stmt::Expr(mut expr) => {
-            if let Some(attr) = attrs_mut(&mut expr, |attrs| attrs.find_remove_attr(NAME)) {
-                expr = parse_tts(attr.tts).and_then(|params| parent_expr(expr, params))?;
+        Stmt::Expr(expr) => {
+            if let Some(attr) = attrs_mut(expr, |attrs| attrs.find_remove_attr(NAME)) {
+                parse_tts(attr.tts).and_then(|params| parent_expr(expr, params))?;
             }
-            Ok(Stmt::Expr(expr))
         }
-        Stmt::Semi(mut expr, semi) => {
-            if let Some(attr) = attrs_mut(&mut expr, |attrs| attrs.find_remove_attr(NAME)) {
-                expr = parse_tts(attr.tts).and_then(|params| stmt_semi(expr, params))?;
+        Stmt::Semi(expr, _) => {
+            if let Some(attr) = attrs_mut(expr, |attrs| attrs.find_remove_attr(NAME)) {
+                parse_tts(attr.tts).and_then(|params| stmt_semi(expr, params))?;
             }
-            Ok(Stmt::Semi(expr, semi))
         }
-        Stmt::Local(mut local) => {
+        Stmt::Local(local) => {
             if let Some(attr) = local.find_remove_attr(NAME) {
-                local = parse_tts(attr.tts).and_then(|params| stmt_let(local, params))?;
+                parse_tts(attr.tts).and_then(|params| stmt_let(local, params))?;
             }
-            Ok(Stmt::Local(local))
         }
-        stmt => Ok(stmt),
+        _ => {}
     }
+
+    Ok(())
 }

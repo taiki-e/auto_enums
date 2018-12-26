@@ -1,11 +1,13 @@
+use std::mem;
+
 use proc_macro2::{Ident, Span};
 use smallvec::SmallVec;
-use syn::{punctuated::Punctuated, Block, Expr, ExprBlock, ExprTuple, Path, PathSegment, Stmt};
+use syn::{punctuated::Punctuated, *};
 
 #[macro_use]
 mod error;
 
-pub(crate) use self::error::*;
+pub(crate) use self::error::{Error, Result, *};
 
 pub(crate) type Stack<T> = SmallVec<[T; 8]>;
 
@@ -68,4 +70,27 @@ pub(crate) fn unit() -> ExprTuple {
         paren_token: default(),
         elems: Punctuated::new(),
     }
+}
+
+fn expr_continue() -> Expr {
+    // probably the lowest cost expression.
+    Expr::Continue(ExprContinue {
+        attrs: Vec::with_capacity(0),
+        continue_token: default(),
+        label: None,
+    })
+}
+
+pub(crate) fn replace_expr<F>(this: &mut Expr, op: F)
+where
+    F: FnOnce(Expr) -> Expr,
+{
+    *this = op(mem::replace(this, expr_continue()));
+}
+
+pub(crate) fn replace_block<F>(this: &mut Block, op: F)
+where
+    F: FnOnce(Block) -> Block,
+{
+    *this = op(mem::replace(this, block(Vec::with_capacity(0))));
 }

@@ -1,4 +1,4 @@
-use std::{cell::Cell, mem};
+use std::cell::Cell;
 
 use syn::{
     visit_mut::{self, VisitMut},
@@ -180,15 +180,6 @@ fn rec_attr(expr: &mut Expr, builder: &mut Builder, params: &Params) -> Result<b
     )
 }
 
-fn expr_continue() -> Expr {
-    // probably the lowest cost expression.
-    Expr::Continue(ExprContinue {
-        attrs: Vec::with_capacity(0),
-        continue_token: default(),
-        label: None,
-    })
-}
-
 fn expr_match(expr: &mut ExprMatch, builder: &mut Builder, params: &Params) -> Result<()> {
     fn skip(arm: &mut Arm, builder: &mut Builder, params: &Params) -> Result<bool> {
         Ok(arm.any_empty_attr(NEVER_ATTR)
@@ -200,7 +191,7 @@ fn expr_match(expr: &mut ExprMatch, builder: &mut Builder, params: &Params) -> R
     expr.arms.iter_mut().try_for_each(|arm| {
         if !skip(arm, builder, params)? {
             arm.comma = Some(default());
-            *arm.body = builder.next_expr(mem::replace(&mut *arm.body, expr_continue()));
+            replace_expr(&mut *arm.body, |x| builder.next_expr(x));
         }
 
         Ok(())
@@ -221,20 +212,20 @@ fn expr_if(expr: &mut ExprIf, builder: &mut Builder, params: &Params) -> Result<
         })
     }
 
-    fn replace_block(branch: &mut Block, builder: &mut Builder) {
-        *branch = block(vec![Stmt::Expr(builder.next_expr(expr_block(
-            mem::replace(branch, block(Vec::with_capacity(0))),
-        )))]);
+    fn replace_branch(branch: &mut Block, builder: &mut Builder) {
+        replace_block(branch, |branch| {
+            block(vec![Stmt::Expr(builder.next_expr(expr_block(branch)))])
+        });
     }
 
     if !skip(expr.then_branch.stmts.last_mut(), builder, params)? {
-        replace_block(&mut expr.then_branch, builder);
+        replace_branch(&mut expr.then_branch, builder);
     }
 
     match expr.else_branch.as_mut().map(|(_, expr)| &mut **expr) {
         Some(Expr::Block(expr)) => {
             if !skip(expr.block.stmts.last_mut(), builder, params)? {
-                replace_block(&mut expr.block, builder);
+                replace_branch(&mut expr.block, builder);
             }
 
             Ok(())
