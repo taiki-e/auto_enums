@@ -25,7 +25,7 @@ const NAME: &str = "auto_enum";
 
 pub(crate) fn attribute(args: TokenStream, input: TokenStream) -> TokenStream {
     expand(args.into(), input)
-        .unwrap_or_else(|e| compile_err(&format!("`#[{}]` {}", NAME, e)))
+        .unwrap_or_else(|e| compile_err(&format!("`{}` {}", NAME, e)))
         .into()
 }
 
@@ -35,7 +35,7 @@ fn expand(args: TokenStream2, input: TokenStream) -> Result<TokenStream2> {
     match syn::parse(input.clone()) {
         Ok(mut stmt) => parent_stmt(&mut stmt, params).map(|()| stmt.into_token_stream()),
         Err(_) => syn::parse(input)
-            .map_err(|_| "can only be used on expression, statement, or function".into())
+            .map_err(|_| "may only be used on expression, statement, or function".into())
             .and_then(|mut expr| parent_expr(&mut expr, params).map(|()| expr.into_token_stream())),
     }
 }
@@ -46,9 +46,7 @@ fn parent_stmt(stmt: &mut Stmt, params: Params) -> Result<()> {
         Stmt::Semi(expr, _) => stmt_semi(expr, params),
         Stmt::Local(local) => stmt_let(local, params),
         Stmt::Item(Item::Fn(item)) => item_fn(item, params),
-        Stmt::Item(_) => Err(unsupported_item(
-            "items other than function are not supported",
-        )),
+        Stmt::Item(_) => Err("may only be used on expression, statement, or function".into()),
     }
 }
 

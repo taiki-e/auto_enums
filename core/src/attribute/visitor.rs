@@ -153,7 +153,7 @@ impl<'a> VisitMut for Replacer<'a> {
                     Expr::Macro(expr) => {
                         if expr.mac.path.is_ident(self.marker) {
                             let args = syn::parse2(expr.mac.tts).unwrap_or_else(|_| {
-                                panic!("`#[{}]` invalid tokens: the arguments of `{}!` macro must be an expression", NAME, self.marker)
+                                panic!("`{}` invalid tokens: the arguments of `{}!` macro must be an expression", NAME, self.marker)
                             });
 
                             self.marker_count -= 1;
@@ -197,7 +197,7 @@ impl<'a> VisitMut for Replacer<'a> {
 
     fn visit_stmt_mut(&mut self, stmt: &mut Stmt) {
         visit_mut::visit_stmt_mut(self, stmt);
-        visit_stmt_mut(stmt).unwrap_or_else(|e| panic!("`#[{}]` {}", NAME, e));
+        visit_stmt_mut(stmt).unwrap_or_else(|e| panic!("`{}` {}", NAME, e));
     }
 }
 

@@ -91,7 +91,7 @@ macro_rules! derive_map {
         $(#[$meta])*
         crate::derive::$($arm)::*::NAME.iter().for_each(|name| {
             if $map.insert(*name, (&crate::derive::$($arm)::*::derive) as DeriveFn).is_some() {
-                panic!("`#[{}]` internal error: there are multiple `{}`", NAME, name);
+                panic!("`{}` internal error: there are multiple `{}`", NAME, name);
             }
         });
     )*};
@@ -186,11 +186,11 @@ fn expand(args: TokenStream2, input: TokenStream) -> Result<TokenStream2> {
             .map_or(false, |x| stack.iter().any(|(s, _)| s == x))
     }
 
-    let item = syn::parse(input).map_err(|_| format!("`#[{}]` can only be used on enums", NAME))?;
-    let data = Data::from_item(&item).map_err(|e| format!("`#[{}]` {}", NAME, e))?;
+    let item = syn::parse(input).map_err(|_| format!("`{}` may only be used on enums", NAME))?;
+    let data = Data::from_item(&item).map_err(|e| format!("`{}` {}", NAME, e))?;
     let mut stack = Stack::new();
     {
-        let args = parse_args(args).map_err(|e| format!("`#[{}]` {}", NAME, e))?;
+        let args = parse_args(args).map_err(|e| format!("`{}` {}", NAME, e))?;
         args.iter().cloned().for_each(|(s, x)| {
             if let Some(traits) = TRAIT_DEPENDENCIES.get(s.as_str()) {
                 traits
@@ -214,7 +214,7 @@ fn expand(args: TokenStream2, input: TokenStream) -> Result<TokenStream2> {
     for (s, x) in stack {
         match DERIVE_MAP.get(&&*s) {
             Some(f) => (&**f)(&data)
-                .map_err(|e| format!("`#[{}({})]` {}", NAME, s, e))
+                .map_err(|e| format!("`{}({})` {}", NAME, s, e))
                 .map(|x| ts.extend(x.into_token_stream()))?,
             None => derive.push(x.unwrap()),
         }

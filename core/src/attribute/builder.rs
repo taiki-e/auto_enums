@@ -101,7 +101,7 @@ impl EnumBuilder {
 
     pub(super) fn build(&self, args: &[Arg]) -> Result<ItemEnum> {
         if self.len() < 2 {
-            Err("macro is required two or more branches or marker macros in total")?;
+            Err("is required two or more branches or marker macros in total")?;
         }
 
         let ident = ident_call_site(&self.ident);

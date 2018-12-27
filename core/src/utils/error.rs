@@ -6,6 +6,7 @@ use quote::quote;
 pub(crate) type StdResult<T, E> = result::Result<T, E>;
 pub(crate) type Result<T> = StdResult<T, Error>;
 
+#[inline(never)]
 pub(crate) fn compile_err(msg: &str) -> TokenStream2 {
     quote!(compile_error!(#msg);)
 }
