@@ -20,8 +20,7 @@ struct EnumVariant(String);
 
 pub(super) struct EnumBuilder {
     ident: String,
-    variants: Stack<EnumVariant>,
-    next: usize,
+    variants: SmallVec<[EnumVariant; 4]>,
 }
 
 impl EnumVariant {
@@ -57,9 +56,12 @@ impl EnumBuilder {
     pub(super) fn new() -> Self {
         Self {
             ident: format!("__Enum{}", RNG.with(|rng| rng.borrow_mut().gen::<u32>())),
-            variants: Stack::new(),
-            next: 0,
+            variants: SmallVec::new(),
         }
+    }
+
+    pub(super) fn ident(&self) -> &str {
+        &self.ident
     }
 
     pub(super) fn len(&self) -> usize {
@@ -75,12 +77,8 @@ impl EnumBuilder {
         self.variants.push(field);
     }
 
-    pub(super) fn reserve(&mut self, additional: usize) {
-        (0..additional).for_each(|_| self.push_variant());
-    }
-
     fn get_expr(&self, index: usize, attrs: Vec<Attribute>, expr: Expr) -> Expr {
-        self.variants[index].expr(&self.ident, attrs, expr)
+        self.variants[index].expr(self.ident(), attrs, expr)
     }
 
     pub(super) fn next_expr(&mut self, expr: Expr) -> Expr {
@@ -88,15 +86,8 @@ impl EnumBuilder {
     }
 
     pub(super) fn next_expr_with_attrs(&mut self, attrs: Vec<Attribute>, expr: Expr) -> Expr {
-        assert!(self.next <= self.len());
-
-        if self.next == self.len() {
-            self.push_variant();
-        }
-
-        let expr = self.get_expr(self.next, attrs, expr);
-        self.next += 1;
-        expr
+        self.push_variant();
+        self.get_expr(self.len() - 1, attrs, expr)
     }
 
     pub(super) fn build(&self, args: &[Arg]) -> Result<ItemEnum> {
@@ -104,7 +95,7 @@ impl EnumBuilder {
             Err("is required two or more branches or marker macros in total")?;
         }
 
-        let ident = ident_call_site(&self.ident);
+        let ident = ident_call_site(self.ident());
         let ty_generics = self.iter();
         let variants = self.iter();
         let fields = self.iter();

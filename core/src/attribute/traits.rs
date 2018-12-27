@@ -1,6 +1,6 @@
 use smallvec::SmallVec;
 use syn::{
-    visit::{self, Visit},
+    visit_mut::{self, VisitMut},
     *,
 };
 
@@ -8,9 +8,9 @@ use crate::utils::*;
 
 use super::*;
 
-pub(super) fn collect_impl_traits(ty: &Type) -> Option<SmallVec<[Path; 4]>> {
+pub(super) fn collect_impl_traits(ty: &mut Type) -> Option<SmallVec<[Path; 4]>> {
     let mut traits = SmallVec::new();
-    ImplTraits::new(&mut traits).visit_type(ty);
+    ImplTraits::new(&mut traits).visit_type_mut(ty);
 
     if traits.is_empty() {
         None
@@ -29,9 +29,9 @@ impl<'a> ImplTraits<'a> {
     }
 }
 
-impl<'a, 'ast> Visit<'ast> for ImplTraits<'a> {
-    fn visit_type_impl_trait(&mut self, ty: &'ast TypeImplTrait) {
-        visit::visit_type_impl_trait(self, ty);
+impl<'a, > VisitMut for ImplTraits<'a> {
+    fn visit_type_impl_trait_mut(&mut self, ty: &mut TypeImplTrait) {
+        visit_mut::visit_type_impl_trait_mut(self, ty);
         ty.bounds.iter().for_each(|ty| {
             if let TypeParamBound::Trait(ty) = ty {
                 self.traits.push(path(

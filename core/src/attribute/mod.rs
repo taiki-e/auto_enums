@@ -1,7 +1,7 @@
 use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
 use quote::ToTokens;
-use syn::{visit::Visit, visit_mut::VisitMut, *};
+use syn::{visit_mut::VisitMut, *};
 
 use crate::utils::{Result, *};
 
@@ -54,32 +54,36 @@ fn parent_expr(expr: &mut Expr, mut params: Params) -> Result<()> {
     let mut builder = Builder::new();
 
     if params.args().is_empty() {
-        Replacer::dummy(&mut builder).visit_expr_mut(expr);
+        Replacer::new().visit_expr_mut(expr);
         return Ok(());
     }
 
-    params.count_marker(|c| c.visit_expr(&expr));
+    match expr {
+        Expr::Closure(ExprClosure { body, .. }) if !params.never() => {
+            params.fn_visitor(true, &mut builder, |v| v.visit_expr_mut(&mut **body));
 
-    if !params.never() {
-        match expr {
-            Expr::Closure(expr) => {
-                params.fn_visitor(true, &mut builder, |v| v.visit_expr_mut(&mut *expr.body));
-                child_expr(&mut *expr.body, &mut builder, &params)?;
+            child_expr(&mut **body, &mut builder, &params)?;
+        }
+        _ => {
+            params.count_marker(&mut builder, |v| v.visit_expr_mut(expr));
+
+            if !params.never() {
+                child_expr(expr, &mut builder, &params)?;
             }
-            _ => child_expr(expr, &mut builder, &params)?,
         }
     }
 
-    if builder.len() + params.count() < 2 && params.attr() {
-        Replacer::dummy(&mut builder).visit_expr_mut(expr);
+    if builder.len() < 2 && params.attr() {
+        Replacer::new().visit_expr_mut(expr);
         return Ok(());
     }
 
-    params.build(&mut builder).map(|item| {
+    builder.build(params.args()).map(|item| {
         replace_expr(expr, |expr| {
             expr_block(block(vec![Stmt::Item(item.into()), Stmt::Expr(expr)]))
         });
-        params.replacer(&mut builder).visit_expr_mut(expr);
+
+        Replacer::new().visit_expr_mut(expr);
     })
 }
 
@@ -87,28 +91,28 @@ fn stmt_semi(expr: &mut Expr, mut params: Params) -> Result<()> {
     let mut builder = Builder::new();
 
     if params.args().is_empty() {
-        Replacer::dummy(&mut builder).visit_expr_mut(expr);
+        Replacer::new().visit_expr_mut(expr);
         return Ok(());
     }
 
-    params.count_marker(|c| c.visit_expr(&expr));
+    params.count_marker(&mut builder, |c| c.visit_expr_mut(expr));
 
-    match params.count() {
+    match builder.len() {
         0 | 1 if !params.attr() => Err(unsupported_stmt(
             "expression with trailing semicolon is required two or more marker macros",
         ))?,
         0 => {
-            Replacer::dummy(&mut builder).visit_expr_mut(expr);
+            Replacer::new().visit_expr_mut(expr);
             return Ok(());
         }
         _ => {}
     }
 
-    params.build(&mut builder).map(|item| {
+    builder.build(params.args()).map(|item| {
         replace_expr(expr, |expr| {
             expr_block(block(vec![Stmt::Item(item.into()), Stmt::Expr(expr)]))
         });
-        params.replacer(&mut builder).visit_expr_mut(expr);
+        Replacer::new().visit_expr_mut(expr);
     })
 }
 
@@ -117,46 +121,49 @@ fn stmt_let(local: &mut Local, mut params: Params) -> Result<()> {
 
     #[cfg(feature = "type_analysis")]
     {
-        if let Some((_, ty)) = &local.ty {
-            params.impl_traits(&*ty);
+        if let Some((_, ty)) = &mut local.ty {
+            params.impl_traits(&mut *ty);
         }
     }
 
     if params.args().is_empty() {
-        Replacer::dummy(&mut builder).visit_local_mut(local);
+        Replacer::new().visit_local_mut(local);
         return Ok(());
     }
-
-    params.count_marker(|c| c.visit_local(&local));
 
     let mut expr = (local.init)
         .take()
         .map(|(_, expr)| expr)
         .ok_or_else(|| unsupported_stmt("uninitialized let statement"))?;
 
-    if !params.never() {
-        match &mut *expr {
-            Expr::Closure(expr) => {
-                params.fn_visitor(true, &mut builder, |v| v.visit_expr_mut(&mut *expr.body));
-                child_expr(&mut *expr.body, &mut builder, &params)?;
+    match &mut *expr {
+        Expr::Closure(ExprClosure { body, .. }) if !params.never() => {
+            params.fn_visitor(true, &mut builder, |v| v.visit_expr_mut(&mut **body));
+
+            child_expr(&mut **body, &mut builder, &params)?;
+        }
+        expr => {
+            params.count_marker(&mut builder, |c| c.visit_expr_mut(expr));
+
+            if !params.never() {
+                child_expr(expr, &mut builder, &params)?;
             }
-            expr => child_expr(expr, &mut builder, &params)?,
         }
     }
 
-    if builder.len() + params.count() < 2 && params.attr() {
+    if builder.len() < 2 && params.attr() {
         local.init = Some((default(), expr));
-        Replacer::dummy(&mut builder).visit_local_mut(local);
+        Replacer::new().visit_local_mut(local);
         return Ok(());
     }
 
-    params.build(&mut builder).map(|item| {
+    builder.build(params.args()).map(|item| {
         replace_expr(&mut *expr, |expr| {
             expr_block(block(vec![Stmt::Item(item.into()), Stmt::Expr(expr)]))
         });
         local.init = Some((default(), expr));
 
-        params.replacer(&mut builder).visit_local_mut(local);
+        Replacer::new().visit_local_mut(local);
     })
 }
 
@@ -164,24 +171,24 @@ fn item_fn(item: &mut ItemFn, mut params: Params) -> Result<()> {
     let mut builder = Builder::new();
     let mut return_impl_trait = false;
 
-    if let ReturnType::Type(_, ty) = &item.decl.output {
+    if let ReturnType::Type(_, ty) = &mut item.decl.output {
         if let Type::ImplTrait(_) = &**ty {
             return_impl_trait = true;
         }
 
         #[cfg(feature = "type_analysis")]
-        params.impl_traits(&*ty);
+        params.impl_traits(&mut *ty);
     }
 
     if params.args().is_empty() {
-        Replacer::dummy(&mut builder).visit_item_fn_mut(item);
+        Replacer::new().visit_item_fn_mut(item);
         return Ok(());
     }
 
-    params.count_marker(|c| c.visit_item_fn(&item));
-
     if !params.never() && return_impl_trait {
         params.fn_visitor(false, &mut builder, |v| v.visit_item_fn_mut(item));
+    } else {
+        params.count_marker(&mut builder, |v| v.visit_item_fn_mut(item));
     }
 
     match (*item.block).stmts.last_mut() {
@@ -190,21 +197,17 @@ fn item_fn(item: &mut ItemFn, mut params: Params) -> Result<()> {
         None => Err(unsupported_item("empty function"))?,
     }
 
-    if builder.len() + params.count() < 2 {
-        if !params.attr() {
-            Err(unsupported_item("for function that returns a non-expression statement, you need to specify `marker` macros"))?;
-        }
-
-        Replacer::dummy(&mut builder).visit_item_fn_mut(item);
+    if builder.len() < 2 && params.attr() {
+        Replacer::new().visit_item_fn_mut(item);
         return Ok(());
     }
 
-    params.build(&mut builder).map(|i| {
+    builder.build(params.args()).map(|i| {
         let mut stmts = Vec::with_capacity((*item.block).stmts.len() + 1);
         stmts.push(Stmt::Item(i.into()));
         stmts.append(&mut (*item.block).stmts);
         (*item.block).stmts = stmts;
 
-        params.replacer(&mut builder).visit_item_fn_mut(item);
+        Replacer::new().visit_item_fn_mut(item);
     })
 }

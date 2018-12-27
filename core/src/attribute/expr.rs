@@ -18,20 +18,18 @@ pub(super) const EMPTY_ATTRS: &[&str] = &[NEVER_ATTR, REC_ATTR];
 #[derive(Debug)]
 struct Params<'a> {
     marker_ident: &'a str,
-    count: usize,
+    rec: Cell<bool>,
     #[cfg(feature = "type_analysis")]
     attr: bool,
-    rec: Cell<bool>,
 }
 
 impl<'a> From<&'a super::Params> for Params<'a> {
     fn from(params: &'a super::Params) -> Self {
         Self {
             marker_ident: params.marker_ident(),
-            count: params.count(),
+            rec: Cell::new(false),
             #[cfg(feature = "type_analysis")]
             attr: params.attr(),
-            rec: Cell::new(false),
         }
     }
 }
@@ -41,9 +39,13 @@ where
     F: FnMut(&Expr) -> bool,
     OP: FnOnce(&Expr) -> T,
 {
-    macro_rules! last_stmt {
-        ($expr:expr) => {
-            match $expr {
+    if !filter(expr) {
+        return success;
+    }
+
+    match expr {
+        Expr::Block(ExprBlock { block, .. }) | Expr::Unsafe(ExprUnsafe { block, .. }) => {
+            match block.stmts.last() {
                 Some(Stmt::Expr(expr)) => return last_expr(expr, success, filter, op),
                 Some(Stmt::Semi(expr, _)) => {
                     if !filter(expr) {
@@ -53,56 +55,42 @@ where
                 Some(_) => return success,
                 None => {}
             }
-        };
-    }
-
-    if !filter(expr) {
-        return success;
-    }
-
-    match expr {
-        Expr::Block(e) => last_stmt!(e.block.stmts.last()),
-        Expr::Unsafe(e) => last_stmt!(e.block.stmts.last()),
+        }
         _ => {}
     }
 
     op(expr)
 }
 
-fn last_expr_mut<T, F, OP>(expr: &mut Expr, success: T, mut filter: F, op: OP) -> T
+fn last_expr_mut<T, U, F, OP>(expr: &mut Expr, state: U, success: T, mut filter: F, op: OP) -> T
 where
-    F: FnMut(&Expr) -> bool,
-    OP: FnOnce(&mut Expr) -> T,
+    F: FnMut(&Expr, &U) -> bool,
+    OP: FnOnce(&mut Expr, U) -> T,
 {
-    macro_rules! last_stmt {
-        ($expr:expr) => {
-            match $expr {
-                Some(Stmt::Expr(expr)) => return last_expr_mut(expr, success, filter, op),
+    if !filter(expr, &state) {
+        return success;
+    }
+
+    match expr {
+        Expr::Block(ExprBlock { block, .. }) | Expr::Unsafe(ExprUnsafe { block, .. }) => {
+            match block.stmts.last_mut() {
+                Some(Stmt::Expr(expr)) => return last_expr_mut(expr, state, success, filter, op),
                 Some(Stmt::Semi(expr, _)) => {
-                    if !filter(expr) {
+                    if !filter(expr, &state) {
                         return success;
                     }
                 }
                 Some(_) => return success,
                 None => {}
             }
-        };
-    }
-
-    if !filter(expr) {
-        return success;
-    }
-
-    match expr {
-        Expr::Block(expr) => last_stmt!(expr.block.stmts.last_mut()),
-        Expr::Unsafe(expr) => last_stmt!(expr.block.stmts.last_mut()),
+        }
         _ => {}
     }
 
-    op(expr)
+    op(expr, state)
 }
 
-fn is_unreachable(expr: &Expr, params: &Params) -> bool {
+fn is_unreachable(expr: &Expr, builder: &Builder, params: &Params) -> bool {
     const UNREACHABLE_MACROS: &[&str] = &["unreachable", "panic"];
 
     last_expr(
@@ -111,18 +99,28 @@ fn is_unreachable(expr: &Expr, params: &Params) -> bool {
         |expr| !expr.any_empty_attr(NEVER_ATTR) && !expr.any_attr(NAME),
         |expr| match expr {
             Expr::Break(_) | Expr::Continue(_) | Expr::Return(_) => true,
-            Expr::Macro(expr) => {
-                UNREACHABLE_MACROS.iter().any(|i| expr.mac.path.is_ident(i))
-                    || expr.mac.path.is_ident(params.marker_ident)
+            Expr::Macro(ExprMacro { mac, .. }) => {
+                UNREACHABLE_MACROS.iter().any(|i| mac.path.is_ident(i))
+                    || mac.path.is_ident(params.marker_ident)
             }
-            Expr::Match(expr) => expr
-                .arms
-                .iter()
-                .all(|arm| arm.any_empty_attr(NEVER_ATTR) || is_unreachable(&*arm.body, params)),
-            Expr::Try(expr) => match &*expr.expr {
-                Expr::Path(expr) => expr.path.is_ident("None") && expr.qself.is_none(),
-                Expr::Call(expr) if expr.args.len() == 1 => match &*expr.func {
-                    Expr::Path(expr) => expr.path.is_ident("Err") && expr.qself.is_none(),
+            Expr::Call(ExprCall { args, func, .. }) if args.len() == 1 => match &**func {
+                Expr::Path(path) => {
+                    path.qself.is_none()
+                        && path.path.leading_colon.is_none()
+                        && path.path.segments.len() == 2
+                        && path.path.segments[0].arguments.is_empty()
+                        && path.path.segments[1].arguments.is_empty()
+                        && path.path.segments[0].ident == builder.ident()
+                }
+                _ => false,
+            },
+            Expr::Match(ExprMatch { arms, .. }) => arms.iter().all(|arm| {
+                arm.any_empty_attr(NEVER_ATTR) || is_unreachable(&*arm.body, builder, params)
+            }),
+            Expr::Try(ExprTry { expr, .. }) => match &**expr {
+                Expr::Path(path) => path.qself.is_none() && path.path.is_ident("None"),
+                Expr::Call(ExprCall { args, func, .. }) if args.len() == 1 => match &**func {
+                    Expr::Path(path) => path.qself.is_none() && path.path.is_ident("Err"),
                     _ => false,
                 },
                 _ => false,
@@ -143,19 +141,20 @@ pub(super) fn child_expr(
 
         last_expr_mut(
             expr,
+            builder,
             Ok(()),
-            |expr| {
+            |expr, builder| {
                 if expr.any_empty_attr(REC_ATTR) {
                     params.rec.set(true);
                 }
-                !is_unreachable(expr, params)
+                !is_unreachable(expr, builder, params)
             },
-            |expr| match expr {
+            |expr, builder| match expr {
                 Expr::Match(expr) => expr_match(expr, builder, params),
                 Expr::If(expr) => expr_if(expr, builder, params),
                 Expr::Loop(expr) => expr_loop(expr, builder, params),
                 Expr::MethodCall(expr) => _child_expr(&mut *expr.receiver, builder, params),
-                _ if builder.len() + params.count >= 2 => Ok(()),
+                _ if builder.len() >= 2 => Ok(()),
                 #[cfg(feature = "type_analysis")]
                 _ if params.attr => Ok(()),
                 _ => Err(unsupported_expr(ERR)),
@@ -169,9 +168,10 @@ pub(super) fn child_expr(
 fn rec_attr(expr: &mut Expr, builder: &mut Builder, params: &Params) -> Result<bool> {
     last_expr_mut(
         expr,
+        builder,
         Ok(true),
-        |expr| !is_unreachable(expr, params),
-        |expr| match expr {
+        |expr, builder| !is_unreachable(expr, builder, params),
+        |expr, builder| match expr {
             Expr::Match(expr) => expr_match(expr, builder, params).map(|_| true),
             Expr::If(expr) => expr_if(expr, builder, params).map(|_| true),
             Expr::Loop(expr) => expr_loop(expr, builder, params).map(|_| true),
@@ -183,7 +183,7 @@ fn rec_attr(expr: &mut Expr, builder: &mut Builder, params: &Params) -> Result<b
 fn expr_match(expr: &mut ExprMatch, builder: &mut Builder, params: &Params) -> Result<()> {
     fn skip(arm: &mut Arm, builder: &mut Builder, params: &Params) -> Result<bool> {
         Ok(arm.any_empty_attr(NEVER_ATTR)
-            || is_unreachable(&*arm.body, params)
+            || is_unreachable(&*arm.body, &builder, params)
             || ((arm.any_empty_attr(REC_ATTR) || params.rec.get())
                 && rec_attr(&mut *arm.body, builder, params)?))
     }
@@ -201,7 +201,9 @@ fn expr_match(expr: &mut ExprMatch, builder: &mut Builder, params: &Params) -> R
 fn expr_if(expr: &mut ExprIf, builder: &mut Builder, params: &Params) -> Result<()> {
     fn skip(last: Option<&mut Stmt>, builder: &mut Builder, params: &Params) -> Result<bool> {
         Ok(match &last {
-            Some(Stmt::Expr(expr)) | Some(Stmt::Semi(expr, _)) => is_unreachable(expr, params),
+            Some(Stmt::Expr(expr)) | Some(Stmt::Semi(expr, _)) => {
+                is_unreachable(expr, &builder, params)
+            }
             _ => true,
         } || match last {
             Some(Stmt::Expr(expr)) => {

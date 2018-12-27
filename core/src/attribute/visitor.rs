@@ -1,6 +1,5 @@
 use proc_macro2::{Group, TokenStream as TokenStream2};
 use syn::{
-    visit::{self, Visit},
     visit_mut::{self, VisitMut},
     *,
 };
@@ -11,165 +10,149 @@ use super::*;
 
 pub(super) const DEFAULT_MARKER: &str = "marker";
 
-pub(super) struct MarkerCounter<'a> {
+pub(super) struct Visitor<'a> {
+    builder: &'a mut Builder,
     marker: &'a str,
-    count: &'a mut usize,
     attr: &'a mut bool,
+    in_closure: isize,
+    count_return: bool,
     unique_marker: bool,
+    foreign: bool,
 }
 
-impl<'a> MarkerCounter<'a> {
-    pub(super) fn new(marker: &'a str, count: &'a mut usize, attr: &'a mut bool) -> Self {
+impl<'a> Visitor<'a> {
+    pub(super) fn new(
+        marker: &'a str,
+        count_return: bool,
+        is_closure: bool,
+        attr: &'a mut bool,
+        builder: &'a mut Builder,
+    ) -> Self {
         Self {
+            builder,
             marker,
-            count,
             attr,
+            in_closure: if is_closure { 2 } else { 1 },
+            count_return,
             unique_marker: marker != DEFAULT_MARKER,
+            foreign: false,
         }
+    }
+
+    fn foreign<F: FnOnce(&mut Self)>(&mut self, f: F) {
+        let tmp = self.foreign;
+        self.foreign = true;
+        f(self);
+        self.foreign = tmp;
     }
 }
 
-impl<'a, 'ast> Visit<'ast> for MarkerCounter<'a> {
-    fn visit_expr(&mut self, expr: &'ast Expr) {
-        if !expr.any_attr(NAME) || self.unique_marker {
-            if let Expr::Macro(expr) = expr {
-                visit::visit_expr_macro(self, expr);
-                if expr.mac.path.is_ident(self.marker) {
-                    *self.count += 1;
+impl<'a> VisitMut for Visitor<'a> {
+    fn visit_expr_mut(&mut self, expr: &mut Expr) {
+        let tmp = self.in_closure;
+
+        if self.count_return {
+            if let Expr::Closure(_) = &expr {
+                self.in_closure -= 1;
+            }
+
+            if self.in_closure > 0 && !expr.any_empty_attr(NEVER_ATTR) {
+                if let Expr::Return(ret) = expr {
+                    let expr = match ret.expr.take().map_or_else(|| Expr::Tuple(unit()), |e| *e) {
+                        Expr::Macro(expr) => {
+                            if expr.mac.path.is_ident(self.marker) {
+                                Expr::Macro(expr)
+                            } else {
+                                self.builder.next_expr(Expr::Macro(expr))
+                            }
+                        }
+                        expr => self.builder.next_expr(expr),
+                    };
+                    ret.expr = Some(Box::new(expr));
                 }
-            } else {
-                visit::visit_expr(self, expr);
             }
         }
+
+        if (!self.foreign && !expr.any_attr(NAME)) || self.unique_marker {
+            visit_mut::visit_expr_mut(self, expr);
+
+            replace_expr(expr, |expr| match expr {
+                Expr::Macro(expr) => {
+                    if expr.mac.path.is_ident(self.marker) {
+                        let args = syn::parse2(expr.mac.tts).unwrap_or_else(|_| {
+                            panic!("`{}` invalid tokens: the arguments of `{}!` macro must be an expression", NAME, self.marker)
+                        });
+
+                        self.builder.next_expr_with_attrs(expr.attrs, args)
+                    } else {
+                        Expr::Macro(expr)
+                    }
+                }
+                expr => expr,
+            });
+        } else {
+            self.foreign(|v| visit_mut::visit_expr_mut(v, expr));
+        }
+
+        self.in_closure = tmp;
     }
 
-    fn visit_local(&mut self, local: &'ast Local) {
-        if !local.any_attr(NAME) || self.unique_marker {
-            visit::visit_local(self, local);
+    fn visit_local_mut(&mut self, local: &mut Local) {
+        if (!self.foreign && !local.any_attr(NAME)) || self.unique_marker {
+            visit_mut::visit_local_mut(self, local);
+        } else {
+            self.foreign(|v| visit_mut::visit_local_mut(v, local));
         }
     }
 
-    fn visit_stmt(&mut self, stmt: &'ast Stmt) {
-        visit::visit_stmt(self, stmt);
+    fn visit_stmt_mut(&mut self, stmt: &mut Stmt) {
+        // Record whether other `auto_enum` exists.
         match stmt {
             Stmt::Expr(expr) | Stmt::Semi(expr, _) if expr.any_attr(NAME) => *self.attr = true,
             Stmt::Local(local) if local.any_attr(NAME) => *self.attr = true,
             _ => {}
         }
-    }
 
-    // Stop at item bounds
-    fn visit_item(&mut self, _item: &'ast Item) {}
-}
-
-pub(super) struct FnVisitor<'a> {
-    marker: &'a str,
-    builder: &'a mut Builder,
-    in_closure: isize,
-}
-
-impl<'a> FnVisitor<'a> {
-    pub(super) fn new(marker: &'a str, is_closure: bool, builder: &'a mut Builder) -> Self {
-        Self {
-            marker,
-            builder,
-            in_closure: if is_closure { 2 } else { 1 },
-        }
-    }
-}
-
-impl<'a> VisitMut for FnVisitor<'a> {
-    fn visit_expr_mut(&mut self, expr: &mut Expr) {
-        let tmp = self.in_closure;
-        if let Expr::Closure(_) = &expr {
-            self.in_closure -= 1;
-        }
-
-        if self.in_closure > 0 && !expr.any_empty_attr(NEVER_ATTR) {
-            if let Expr::Return(ret) = expr {
-                let expr = match ret.expr.take().map_or_else(|| Expr::Tuple(unit()), |e| *e) {
-                    Expr::Macro(expr) => {
-                        if expr.mac.path.is_ident(self.marker) {
-                            Expr::Macro(expr)
-                        } else {
-                            self.builder.next_expr(Expr::Macro(expr))
-                        }
-                    }
-                    expr => self.builder.next_expr(expr),
-                };
-                ret.expr = Some(Box::new(expr));
-            }
-        }
-
-        visit_mut::visit_expr_mut(self, expr);
-        self.in_closure = tmp;
+        visit_mut::visit_stmt_mut(self, stmt);
     }
 
     // Stop at item bounds
     fn visit_item_mut(&mut self, _item: &mut Item) {}
 }
 
-pub(super) struct Replacer<'a> {
-    marker: &'a str,
-    marker_count: usize,
-    builder: &'a mut Builder,
-    empty_attrs: &'static [&'static str],
+pub(super) struct Replacer {
     foreign: bool,
 }
 
-impl<'a> Replacer<'a> {
-    pub(super) fn new(marker: &'a str, marker_count: usize, builder: &'a mut Builder) -> Self {
-        Self {
-            marker,
-            marker_count,
-            builder,
-            empty_attrs: EMPTY_ATTRS,
-            foreign: false,
-        }
+impl Replacer {
+    pub(super) fn new() -> Self {
+        Self { foreign: false }
     }
 
-    pub(super) fn dummy(builder: &'a mut Builder) -> Self {
-        Self::new(DEFAULT_MARKER, 0, builder)
+    fn foreign<F: FnOnce(&mut Self)>(&mut self, f: F) {
+        let tmp = self.foreign;
+        self.foreign = true;
+        f(self);
+        self.foreign = tmp;
     }
 
     fn find_remove_empty_attrs(&self, attrs: &mut Vec<Attribute>) {
-        self.empty_attrs.iter().for_each(|ident| {
+        EMPTY_ATTRS.iter().for_each(|ident| {
             attrs.find_remove_empty_attr(ident);
         });
     }
 }
 
-impl<'a> VisitMut for Replacer<'a> {
+impl VisitMut for Replacer {
     fn visit_expr_mut(&mut self, expr: &mut Expr) {
-        if !expr.any_attr(NAME) || (self.foreign && self.marker_count != 0) {
+        if !expr.any_attr(NAME) {
             visit_mut::visit_expr_mut(self, expr);
 
             if !self.foreign {
                 attrs_mut(expr, |attrs| self.find_remove_empty_attrs(attrs));
             }
-
-            if self.marker_count != 0 {
-                replace_expr(expr, |expr| match expr {
-                    Expr::Macro(expr) => {
-                        if expr.mac.path.is_ident(self.marker) {
-                            let args = syn::parse2(expr.mac.tts).unwrap_or_else(|_| {
-                                panic!("`{}` invalid tokens: the arguments of `{}!` macro must be an expression", NAME, self.marker)
-                            });
-
-                            self.marker_count -= 1;
-                            self.builder.next_expr_with_attrs(expr.attrs, args)
-                        } else {
-                            Expr::Macro(expr)
-                        }
-                    }
-                    expr => expr,
-                });
-            }
         } else {
-            let tmp = self.foreign;
-            self.foreign = true;
-            visit_mut::visit_expr_mut(self, expr);
-            self.foreign = tmp;
+            self.foreign(|v| visit_mut::visit_expr_mut(v, expr));
         }
     }
 
@@ -182,13 +165,14 @@ impl<'a> VisitMut for Replacer<'a> {
     }
 
     fn visit_local_mut(&mut self, local: &mut Local) {
-        if !local.any_attr(NAME) || (self.foreign && self.marker_count != 0) {
+        if !local.any_attr(NAME) {
             visit_mut::visit_local_mut(self, local);
+
+            if !self.foreign {
+                self.find_remove_empty_attrs(&mut local.attrs);
+            }
         } else {
-            let tmp = self.foreign;
-            self.foreign = true;
-            visit_mut::visit_local_mut(self, local);
-            self.foreign = tmp;
+            self.foreign(|v| visit_mut::visit_local_mut(v, local));
         }
     }
 
