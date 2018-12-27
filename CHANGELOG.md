@@ -1,5 +1,7 @@
 # Unreleased
 
+# 0.3.2 - 2018-12-27
+
 * Improve error messages
 
 * Update minimum derive_utils version to 0.5.3
