@@ -48,8 +48,8 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
 
     derive_trait!(
         data,
-        syn::parse2(quote!(#iter::Iterator))?,
-        syn::parse2(quote! {
+        parse_quote!(#iter::Iterator)?,
+        parse_quote! {
             trait Iterator {
                 type Item;
                 #[inline]
@@ -72,6 +72,6 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
                     __F: #root::ops::FnMut(&Self::Item) -> bool;
                 #try_trait
             }
-        })?
+        }?,
     )
 }

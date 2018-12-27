@@ -22,6 +22,12 @@ pub(crate) fn param_ident(ident: &str) -> GenericParam {
     })
 }
 
+macro_rules! parse_quote {
+    ($($tt:tt)*) => {
+        $crate::syn::parse2($crate::quote::quote!($($tt)*))
+    };
+}
+
 macro_rules! invalid_args {
     ($expr:expr) => {
         $crate::utils::Error::Other(format!("invalid attribute arguments: {}", $expr))

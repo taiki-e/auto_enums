@@ -10,8 +10,8 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
 
     derive_trait!(
         data,
-        syn::parse2(quote!(#crate_::sink::Sink))?,
-        syn::parse2(quote! {
+        parse_quote!(#crate_::sink::Sink)?,
+        parse_quote! {
             trait Sink {
                 type SinkItem;
                 type SinkError;
@@ -22,7 +22,7 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
                 #[inline]
                 fn close(&mut self) -> #crate_::Poll<(), Self::SinkError>;
             }
-        })?
+        }?,
     )
 }
 

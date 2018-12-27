@@ -11,12 +11,12 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
 
     derive_trait!(
         data,
-        syn::parse2(quote!(#iter::Extend))?,
-        syn::parse2(quote! {
+        parse_quote!(#iter::Extend)?,
+        parse_quote! {
             trait Extend<__A> {
                 #[inline]
                 fn extend<__T: #iter::IntoIterator<Item = __A>>(&mut self, iter: __T);
             }
-        })?
+        }?,
     )
 }

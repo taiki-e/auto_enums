@@ -12,9 +12,9 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
     derive_trait!(
         data,
         Some(ident_call_site("Item")),
-        syn::parse2(quote!(#iter::FusedIterator))?,
-        syn::parse2(quote! {
+        parse_quote!(#iter::FusedIterator)?,
+        parse_quote! {
             trait FusedIterator: #iter::Iterator {}
-        })?
+        }?,
     )
 }

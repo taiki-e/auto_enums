@@ -10,14 +10,14 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
 
     derive_trait!(
         data,
-        syn::parse2(quote!(#crate_::ToTokens))?,
-        syn::parse2(quote! {
+        parse_quote!(#crate_::ToTokens)?,
+        parse_quote! {
             trait ToTokens {
                 #[inline]
                 fn to_tokens(&self, tokens: &mut #crate_::__rt::TokenStream);
                 #[inline]
                 fn into_token_stream(self) -> #crate_::__rt::TokenStream;
             }
-        })?
+        }?,
     )
 }

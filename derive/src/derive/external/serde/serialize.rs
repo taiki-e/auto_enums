@@ -11,14 +11,14 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
 
     derive_trait!(
         data,
-        syn::parse2(quote!(#ser::Serialize))?,
-        syn::parse2(quote! {
+        parse_quote!(#ser::Serialize)?,
+        parse_quote! {
             trait Serialize {
                 #[inline]
                 fn serialize<__S>(&self, serializer: __S) -> #root::result::Result<__S::Ok, __S::Error>
                 where
                     __S: #ser::Serializer;
             }
-        })?
+        }?,
     )
 }

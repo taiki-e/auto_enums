@@ -11,13 +11,13 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
 
     derive_trait!(
         data,
-        syn::parse2(quote!(::futures::stream::Stream))?,
-        syn::parse2(quote! {
+        parse_quote!(::futures::stream::Stream)?,
+        parse_quote! {
             trait Stream {
                 type Item;
                 #[inline]
                 fn poll_next(self: #pin<&mut Self>, lw: &#root::task::LocalWaker) -> #root::task::Poll<#root::option::Option<Self::Item>>;
             }
-        })?
+        }?,
     )
 }

@@ -19,8 +19,8 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
 
     derive_trait!(
         data,
-        syn::parse2(quote!(#io::Read))?,
-        syn::parse2(quote! {
+        parse_quote!(#io::Read)?,
+        parse_quote! {
             trait Iterator {
                 #[inline]
                 fn read(&mut self, buf: &mut [u8]) -> #io::Result<usize>;
@@ -32,6 +32,6 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
                 fn read_exact(&mut self, buf: &mut [u8]) -> #io::Result<()>;
                 #initializer
             }
-        })?
+        }?,
     )
 }

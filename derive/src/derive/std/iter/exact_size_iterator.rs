@@ -20,13 +20,13 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
     derive_trait!(
         data,
         Some(ident_call_site("Item")),
-        syn::parse2(quote!(#iter::ExactSizeIterator))?,
-        syn::parse2(quote! {
+        parse_quote!(#iter::ExactSizeIterator)?,
+        parse_quote! {
             trait ExactSizeIterator: #iter::Iterator {
                 #[inline]
                 fn len(&self) -> usize;
                 #is_empty
             }
-        })?
+        }?,
     )
 }

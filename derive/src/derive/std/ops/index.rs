@@ -9,20 +9,20 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
     let root = std_root();
     let ops = quote!(#root::ops);
 
+    #[cfg(not(feature = "unsized_locals"))]
+    let bounds = TokenStream::new();
     #[cfg(feature = "unsized_locals")]
     let bounds = quote!(: ?Sized);
-    #[cfg(not(feature = "unsized_locals"))]
-    let bounds = quote!();
 
     derive_trait!(
         data,
-        syn::parse2(quote!(#ops::Index))?,
-        syn::parse2(quote! {
+        parse_quote!(#ops::Index)?,
+        parse_quote! {
             trait Index<__Idx #bounds> {
                 type Output;
                 #[inline]
                 fn index(&self, index: __Idx) -> &Self::Output;
             }
-        })?
+        }?,
     )
 }

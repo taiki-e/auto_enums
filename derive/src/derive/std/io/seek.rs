@@ -11,12 +11,12 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
 
     derive_trait!(
         data,
-        syn::parse2(quote!(#io::Seek))?,
-        syn::parse2(quote! {
+        parse_quote!(#io::Seek)?,
+        parse_quote! {
             trait Seek {
                 #[inline]
                 fn seek(&mut self, pos: #io::SeekFrom) -> #io::Result<u64>;
             }
-        })?
+        }?,
     )
 }

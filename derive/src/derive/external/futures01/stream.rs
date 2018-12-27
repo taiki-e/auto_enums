@@ -11,14 +11,14 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
 
     derive_trait!(
         data,
-        syn::parse2(quote!(#crate_::stream::Stream))?,
-        syn::parse2(quote! {
+        parse_quote!(#crate_::stream::Stream)?,
+        parse_quote! {
             trait Stream {
                 type Item;
                 type Error;
                 #[inline]
                 fn poll(&mut self) -> #crate_::Poll<#root::option::Option<Self::Item>, Self::Error>;
             }
-        })?
+        }?,
     )
 }

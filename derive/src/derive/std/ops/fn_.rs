@@ -15,20 +15,21 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
 
     *impls.trait_() = Some(Trait::new(
         syn::parse2(trait_path.clone())?,
-        syn::parse2(quote!(#trait_path<(__T,)>))?,
+        parse_quote!(#trait_path<(__T,)>)?,
     ));
     impls.push_generic_param(param_ident("__T"));
     impls.push_generic_param(param_ident("__U"));
 
-    impls.push_where_predicate(syn::parse2(quote!(#fst: #trait_))?);
-    data.fields().iter().skip(1).try_for_each(|f| {
-        syn::parse2(quote!(#f: #trait_)).map(|f| impls.push_where_predicate(f))
-    })?;
+    impls.push_where_predicate(parse_quote!(#fst: #trait_)?);
+    data.fields()
+        .iter()
+        .skip(1)
+        .try_for_each(|f| parse_quote!(#f: #trait_).map(|f| impls.push_where_predicate(f)))?;
 
-    impls.push_method(syn::parse2(quote! {
+    impls.push_method(parse_quote! {
         #[inline]
         extern "rust-call" fn call(&self, args: (__T,)) -> Self::Output;
-    })?)?;
+    }?)?;
 
     Ok(impls.build())
 }

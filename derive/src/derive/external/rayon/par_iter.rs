@@ -11,8 +11,8 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
 
     derive_trait!(
         data,
-        syn::parse2(quote!(#iter::ParallelIterator))?,
-        syn::parse2(quote! {
+        parse_quote!(#iter::ParallelIterator)?,
+        parse_quote! {
             trait ParallelIterator {
                 type Item;
                 #[inline]
@@ -22,6 +22,6 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
                 #[inline]
                 fn opt_len(&self) -> #root::option::Option<usize>;
             }
-        })?
+        }?,
     )
 }

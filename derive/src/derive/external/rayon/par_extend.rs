@@ -10,15 +10,15 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
 
     derive_trait!(
         data,
-        syn::parse2(quote!(#iter::ParallelExtend))?,
-        syn::parse2(quote! {
+        parse_quote!(#iter::ParallelExtend)?,
+        parse_quote! {
             trait ParallelExtend<__T: Send> {
                 #[inline]
                 fn par_extend<__I>(&mut self, par_iter: __I)
                 where
                     __I: #iter::IntoParallelIterator<Item = __T>;
             }
-        })?
+        }?,
     )
 }
 

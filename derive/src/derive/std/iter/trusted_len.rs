@@ -12,9 +12,9 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
     derive_trait!(
         data,
         Some(ident_call_site("Item")),
-        syn::parse2(quote!(#iter::TrustedLen))?,
-        syn::parse2(quote! {
+        parse_quote!(#iter::TrustedLen)?,
+        parse_quote! {
             unsafe trait TrustedLen: #iter::Iterator {}
-        })?
+        }?,
     )
 }

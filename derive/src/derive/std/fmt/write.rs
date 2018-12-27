@@ -11,8 +11,8 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
 
     derive_trait!(
         data,
-        syn::parse2(quote!(#fmt::Write))?,
-        syn::parse2(quote! {
+        parse_quote!(#fmt::Write)?,
+        parse_quote! {
             trait Write {
                 #[inline]
                 fn write_str(&mut self, s: &str) -> #fmt::Result;
@@ -21,6 +21,6 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
                 #[inline]
                 fn write_fmt(&mut self, args: #fmt::Arguments<'_>) -> #fmt::Result;
             }
-        })?
+        }?,
     )
 }

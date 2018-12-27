@@ -14,13 +14,13 @@ macro_rules! fmt_impl {
 
                 derive_trait!(
                     data,
-                    syn::parse2(quote!(#fmt::$Trait))?,
-                    syn::parse2(quote! {
+                    parse_quote!(#fmt::$Trait)?,
+                    parse_quote! {
                         trait $Trait {
                             #[inline]
                             fn fmt(&self, f: &mut #fmt::Formatter<'_>) -> #fmt::Result;
                         }
-                    })?
+                    }?,
                 )
             }
         }

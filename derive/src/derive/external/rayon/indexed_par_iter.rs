@@ -11,8 +11,8 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
     derive_trait!(
         data,
         Some(ident_call_site("Item")),
-        syn::parse2(quote!(#iter::IndexedParallelIterator))?,
-        syn::parse2(quote! {
+        parse_quote!(#iter::IndexedParallelIterator)?,
+        parse_quote! {
             trait IndexedParallelIterator: #iter::ParallelIterator {
                 #[inline]
                 fn drive<__C>(self, consumer: __C) -> __C::Result
@@ -25,6 +25,6 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
                 where
                     __CB: #iter::plumbing::ProducerCallback<Self::Item>;
             }
-        })?
+        }?,
     )
 }

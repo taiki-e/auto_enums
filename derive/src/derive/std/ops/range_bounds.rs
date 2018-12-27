@@ -11,14 +11,14 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
 
     derive_trait!(
         data,
-        syn::parse2(quote!(#ops::RangeBounds))?,
-        syn::parse2(quote! {
+        parse_quote!(#ops::RangeBounds)?,
+        parse_quote! {
             trait RangeBounds<__T: ?Sized> {
                 #[inline]
                 fn start_bound(&self) -> #ops::Bound<&__T>;
                 #[inline]
                 fn end_bound(&self) -> #ops::Bound<&__T>;
             }
-        })?
+        }?,
     )
 }

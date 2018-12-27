@@ -2,9 +2,12 @@
 
 * Improve error messages
 
+* Update minimum derive_utils version to 0.5.3
+
 # 0.3.1 - 2018-12-26
 
-* Update minimum derive_utils version to 0.5.1
+* Update minimum derive_utils version to 0.5.1<br>
+  This includes support to stable Pin API.
 
 # 0.3.0 - 2018-12-24
 

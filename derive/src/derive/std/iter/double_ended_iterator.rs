@@ -33,13 +33,13 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
     derive_trait!(
         data,
         Some(ident_call_site("Item")),
-        syn::parse2(quote!(#iter::DoubleEndedIterator))?,
-        syn::parse2(quote! {
+        parse_quote!(#iter::DoubleEndedIterator)?,
+        parse_quote! {
             trait DoubleEndedIterator: #iter::Iterator {
                 #[inline]
                 fn next_back(&mut self) -> #root::option::Option<Self::Item>;
                 #try_trait
             }
-        })?
+        }?,
     )
 }

@@ -11,13 +11,13 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
 
     derive_trait!(
         data,
-        syn::parse2(quote!(#ops::Deref))?,
-        syn::parse2(quote! {
+        parse_quote!(#ops::Deref)?,
+        parse_quote! {
             trait Deref {
                 type Target;
                 #[inline]
                 fn deref(&self) -> &Self::Target;
             }
-        })?
+        }?,
     )
 }

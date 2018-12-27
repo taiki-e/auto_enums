@@ -12,12 +12,12 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
     derive_trait!(
         data,
         Some(ident_call_site("Target")),
-        syn::parse2(quote!(#ops::DerefMut))?,
-        syn::parse2(quote! {
+        parse_quote!(#ops::DerefMut)?,
+        parse_quote! {
             trait DerefMut: #ops::Deref {
                 #[inline]
                 fn deref_mut(&mut self) -> &mut Self::Target;
             }
-        })?
+        }?,
     )
 }

@@ -11,8 +11,8 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
 
     derive_trait!(
         data,
-        syn::parse2(quote!(#io::BufRead))?,
-        syn::parse2(quote! {
+        parse_quote!(#io::BufRead)?,
+        parse_quote! {
             trait BufRead {
                 #[inline]
                 fn fill_buf(&mut self) -> #io::Result<&[u8]>;
@@ -23,6 +23,6 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
                 #[inline]
                 fn read_line(&mut self, buf: &mut #root::string::String) -> #io::Result<usize>;
             }
-        })?
+        }?,
     )
 }

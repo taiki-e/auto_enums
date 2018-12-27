@@ -1,5 +1,4 @@
 use proc_macro2::TokenStream;
-use quote::quote;
 
 use crate::utils::*;
 
@@ -10,12 +9,12 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
 
     derive_trait!(
         data,
-        syn::parse2(quote!(#root::convert::AsMut))?,
-        syn::parse2(quote! {
+        parse_quote!(#root::convert::AsMut)?,
+        parse_quote! {
             trait AsMut<__T: ?Sized> {
                 #[inline]
                 fn as_mut(&mut self) -> &mut __T;
             }
-        })?
+        }?,
     )
 }
