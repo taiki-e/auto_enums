@@ -204,7 +204,6 @@ fn stable_1_30() {
     assert_eq!(break3(14).fold(0, |sum, x| sum + x), 55);
     assert_eq!(break3(-5).fold(0, |sum, x| sum + x), -15);
 
-
     #[auto_enum(Iterator)]
     fn return_in_loop(mut x: i32) -> impl Iterator<Item = i32> {
         loop {
@@ -501,7 +500,7 @@ fn stable_1_30_std() {
     #[auto_enum(Transpose, Debug, Display, Error)]
     fn transpose_err(file: Option<&Path>) -> Result<(), impl Error> {
         if let Some(_) = file {
-            Err(io::Error::from(io::ErrorKind::NotFound)).map_err(IoError::Io)
+            Err(io::Error::from(io::ErrorKind::NotFound)).map_err(IoError::Io2)
         } else {
             Err(io::Error::from(io::ErrorKind::NotFound))
         }
