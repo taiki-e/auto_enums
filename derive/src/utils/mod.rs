@@ -5,9 +5,9 @@ use syn::{punctuated::Punctuated, *};
 pub(crate) use derive_utils::{Error, Result, *};
 
 pub(crate) type Data = EnumData;
-pub(crate) type Stack<T> = SmallVec<[T; 8]>;
+pub(crate) type Stack<T> = SmallVec<[T; 4]>;
 
-pub fn ident_call_site(s: &str) -> Ident {
+pub(crate) fn ident_call_site(s: &str) -> Ident {
     Ident::new(s, Span::call_site())
 }
 
