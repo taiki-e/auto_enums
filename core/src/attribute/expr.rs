@@ -99,10 +99,12 @@ fn is_unreachable(expr: &Expr, builder: &Builder, params: &Params) -> bool {
         |expr| !expr.any_empty_attr(NEVER_ATTR) && !expr.any_attr(NAME),
         |expr| match expr {
             Expr::Break(_) | Expr::Continue(_) | Expr::Return(_) => true,
+
             Expr::Macro(ExprMacro { mac, .. }) => {
                 UNREACHABLE_MACROS.iter().any(|i| mac.path.is_ident(i))
                     || mac.path.is_ident(params.marker_ident)
             }
+
             Expr::Call(ExprCall { args, func, .. }) if args.len() == 1 => match &**func {
                 Expr::Path(path) => {
                     path.qself.is_none()
@@ -114,9 +116,11 @@ fn is_unreachable(expr: &Expr, builder: &Builder, params: &Params) -> bool {
                 }
                 _ => false,
             },
+
             Expr::Match(ExprMatch { arms, .. }) => arms.iter().all(|arm| {
                 arm.any_empty_attr(NEVER_ATTR) || is_unreachable(&*arm.body, builder, params)
             }),
+
             Expr::Try(ExprTry { expr, .. }) => match &**expr {
                 Expr::Path(path) => path.qself.is_none() && path.path.is_ident("None"),
                 Expr::Call(ExprCall { args, func, .. }) if args.len() == 1 => match &**func {
@@ -125,6 +129,7 @@ fn is_unreachable(expr: &Expr, builder: &Builder, params: &Params) -> bool {
                 },
                 _ => false,
             },
+
             _ => false,
         },
     )

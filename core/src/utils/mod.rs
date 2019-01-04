@@ -9,7 +9,7 @@ mod error;
 
 pub(crate) use self::error::{Error, Result, *};
 
-pub(crate) type Stack<T> = SmallVec<[T; 8]>;
+pub(crate) type Stack<T> = SmallVec<[T; 4]>;
 
 pub(crate) fn default<T: Default>() -> T {
     T::default()

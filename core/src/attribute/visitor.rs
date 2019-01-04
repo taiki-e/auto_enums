@@ -136,7 +136,7 @@ impl Replacer {
         self.foreign = tmp;
     }
 
-    fn find_remove_empty_attrs(&self, attrs: &mut Vec<Attribute>) {
+    fn find_remove_empty_attrs<A: AttrsMut>(&self, mut attrs: A) {
         EMPTY_ATTRS.iter().for_each(|ident| {
             attrs.find_remove_empty_attr(ident);
         });
@@ -149,7 +149,7 @@ impl VisitMut for Replacer {
             visit_mut::visit_expr_mut(self, expr);
 
             if !self.foreign {
-                attrs_mut(expr, |attrs| self.find_remove_empty_attrs(attrs));
+                self.find_remove_empty_attrs(expr);
             }
         } else {
             self.foreign(|v| visit_mut::visit_expr_mut(v, expr));
@@ -160,7 +160,7 @@ impl VisitMut for Replacer {
         visit_mut::visit_arm_mut(self, arm);
 
         if !self.foreign {
-            self.find_remove_empty_attrs(&mut arm.attrs);
+            self.find_remove_empty_attrs(arm);
         }
     }
 
@@ -169,7 +169,7 @@ impl VisitMut for Replacer {
             visit_mut::visit_local_mut(self, local);
 
             if !self.foreign {
-                self.find_remove_empty_attrs(&mut local.attrs);
+                self.find_remove_empty_attrs(local);
             }
         } else {
             self.foreign(|v| visit_mut::visit_local_mut(v, local));
@@ -194,12 +194,12 @@ fn visit_stmt_mut(stmt: &mut Stmt) -> Result<()> {
 
     match stmt {
         Stmt::Expr(expr) => {
-            if let Some(attr) = attrs_mut(expr, |attrs| attrs.find_remove_attr(NAME)) {
+            if let Some(attr) = expr.find_remove_attr(NAME) {
                 parse_tts(attr.tts).and_then(|params| parent_expr(expr, params))?;
             }
         }
         Stmt::Semi(expr, _) => {
-            if let Some(attr) = attrs_mut(expr, |attrs| attrs.find_remove_attr(NAME)) {
+            if let Some(attr) = expr.find_remove_attr(NAME) {
                 parse_tts(attr.tts).and_then(|params| stmt_semi(expr, params))?;
             }
         }

@@ -4,8 +4,8 @@ use proc_macro2::{
     token_stream::IntoIter, Delimiter, Ident, TokenStream as TokenStream2, TokenTree,
 };
 use quote::ToTokens;
-use smallvec::{smallvec, SmallVec};
-use syn::*;
+use smallvec::smallvec;
+use syn::Path;
 
 use crate::utils::{Result, *};
 
@@ -72,8 +72,8 @@ pub(super) struct Params {
 }
 
 impl Params {
-    fn new(args: Stack<Arg>, never: bool, marker: Option<String>) -> Self {
-        Params {
+    fn new(args: Stack<Arg>, marker: Option<String>, never: bool) -> Self {
+        Self {
             args,
             marker: marker.map_or_else(|| Cow::Borrowed(DEFAULT_MARKER), Cow::Owned),
             attr_exists: false,
@@ -123,9 +123,7 @@ impl Params {
 
     #[cfg(feature = "type_analysis")]
     pub(super) fn impl_traits(&mut self, ty: &mut Type) {
-        if let Some(traits) = collect_impl_traits(ty) {
-            parse_impl_traits(&mut self.args, traits);
-        }
+        collect_impl_traits(&mut self.args, ty);
     }
 }
 
@@ -166,10 +164,10 @@ pub(super) fn parse_args(args: TokenStream2) -> Result<Params> {
         }
     }
 
-    Ok(Params::new(args, never, marker))
+    Ok(Params::new(args, marker, never))
 }
 
-fn parse_path(mut path: SmallVec<[TokenTree; 16]>, iter: &mut IntoIter) -> Result<Arg> {
+fn parse_path(mut path: Stack<TokenTree>, iter: &mut IntoIter) -> Result<Arg> {
     for tt in iter {
         match tt {
             TokenTree::Punct(ref p) if p.as_char() == ',' => break,

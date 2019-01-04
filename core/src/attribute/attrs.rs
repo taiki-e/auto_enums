@@ -1,4 +1,4 @@
-use syn::*;
+use syn::{Arm, Attribute, Expr, Local};
 
 use crate::utils::*;
 
@@ -21,14 +21,14 @@ fn any_attr(attrs: &[Attribute], ident: &str, require_empty: bool) -> bool {
 }
 
 pub(super) trait AttrsMut: Attrs {
-    fn attrs_mut(&mut self) -> &mut Vec<Attribute>;
+    fn attrs_mut<T, F: FnOnce(&mut Vec<Attribute>) -> T>(&mut self, f: F) -> T;
 
     fn find_remove_attr<S: AsRef<str>>(&mut self, ident: S) -> Option<Attribute> {
-        find_remove_attr(self.attrs_mut(), ident.as_ref(), false)
+        self.attrs_mut(|attrs| find_remove_attr(attrs, ident.as_ref(), false))
     }
 
     fn find_remove_empty_attr<S: AsRef<str>>(&mut self, ident: S) -> bool {
-        find_remove_attr(self.attrs_mut(), ident.as_ref(), true).is_some()
+        self.attrs_mut(|attrs| find_remove_attr(attrs, ident.as_ref(), true).is_some())
     }
 }
 
@@ -51,8 +51,8 @@ impl<'a, A: Attrs> Attrs for &'a mut A {
     }
 }
 impl<'a, A: AttrsMut> AttrsMut for &'a mut A {
-    fn attrs_mut(&mut self) -> &mut Vec<Attribute> {
-        (**self).attrs_mut()
+    fn attrs_mut<T, F: FnOnce(&mut Vec<Attribute>) -> T>(&mut self, f: F) -> T {
+        (**self).attrs_mut(f)
     }
 }
 
@@ -67,8 +67,8 @@ impl Attrs for Vec<Attribute> {
     }
 }
 impl AttrsMut for Vec<Attribute> {
-    fn attrs_mut(&mut self) -> &mut Vec<Attribute> {
-        self
+    fn attrs_mut<T, F: FnOnce(&mut Vec<Attribute>) -> T>(&mut self, f: F) -> T {
+        f(self)
     }
 }
 
@@ -78,8 +78,8 @@ impl Attrs for Local {
     }
 }
 impl AttrsMut for Local {
-    fn attrs_mut(&mut self) -> &mut Vec<Attribute> {
-        &mut self.attrs
+    fn attrs_mut<T, F: FnOnce(&mut Vec<Attribute>) -> T>(&mut self, f: F) -> T {
+        f(&mut self.attrs)
     }
 }
 impl Attrs for Arm {
@@ -88,23 +88,13 @@ impl Attrs for Arm {
     }
 }
 impl AttrsMut for Arm {
-    fn attrs_mut(&mut self) -> &mut Vec<Attribute> {
-        &mut self.attrs
+    fn attrs_mut<T, F: FnOnce(&mut Vec<Attribute>) -> T>(&mut self, f: F) -> T {
+        f(&mut self.attrs)
     }
 }
 
 macro_rules! attrs_impl {
     ($($Expr:ident($Self:ident)),*) => {
-        $(impl Attrs for $Self {
-            fn attrs(&self) -> &[Attribute] {
-                &self.attrs
-            }
-        }
-        impl AttrsMut for $Self {
-            fn attrs_mut(&mut self) -> &mut Vec<Attribute> {
-                &mut self.attrs
-            }
-        })*
         impl Attrs for Expr {
             fn attrs(&self) -> &[Attribute] {
                 match self {
@@ -113,10 +103,12 @@ macro_rules! attrs_impl {
                 }
             }
         }
-        pub(super) fn attrs_mut<T, F: FnOnce(&mut Vec<Attribute>) -> T>(expr: &mut Expr, f: F) -> T {
-            match expr {
-                $(Expr::$Expr(expr) => f(&mut expr.attrs),)*
-                Expr::Verbatim(_) => f(&mut Vec::with_capacity(0)),
+        impl AttrsMut for Expr {
+            fn attrs_mut<T, F: FnOnce(&mut Vec<Attribute>) -> T>(&mut self, f: F) -> T {
+                match self {
+                    $(Expr::$Expr(expr) => f(&mut expr.attrs),)*
+                    Expr::Verbatim(_) => f(&mut Vec::with_capacity(0)),
+                }
             }
         }
     };

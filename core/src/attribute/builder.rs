@@ -4,11 +4,11 @@ use proc_macro2::Ident;
 use quote::quote;
 use rand::{rngs::ThreadRng, Rng};
 use smallvec::{smallvec, SmallVec};
-use syn::*;
+use syn::{Attribute, Expr, ExprCall, ExprPath, ItemEnum, Path};
 
 use crate::utils::{Result, *};
 
-use super::*;
+use super::Arg;
 
 thread_local! {
     static RNG: RefCell<ThreadRng> = RefCell::new(rand::thread_rng());
@@ -20,7 +20,7 @@ struct EnumVariant(String);
 
 pub(super) struct EnumBuilder {
     ident: String,
-    variants: SmallVec<[EnumVariant; 4]>,
+    variants: Stack<EnumVariant>,
 }
 
 impl EnumVariant {
@@ -56,7 +56,7 @@ impl EnumBuilder {
     pub(super) fn new() -> Self {
         Self {
             ident: format!("__Enum{}", RNG.with(|rng| rng.borrow_mut().gen::<u32>())),
-            variants: SmallVec::new(),
+            variants: Stack::new(),
         }
     }
 
