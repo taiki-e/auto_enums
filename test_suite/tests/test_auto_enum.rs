@@ -1,6 +1,5 @@
-#![cfg_attr(feature = "unstable", feature(proc_macro_hygiene))]
-#![cfg_attr(feature = "unstable", feature(stmt_expr_attributes))]
-#![cfg_attr(feature = "unstable", feature(arbitrary_self_types, futures_api))]
+#![cfg_attr(feature = "unstable", feature(proc_macro_hygiene, stmt_expr_attributes))]
+#![cfg_attr(feature = "unstable", feature(futures_api))]
 #![cfg_attr(feature = "unstable", feature(fn_traits, unboxed_closures))]
 #![cfg_attr(feature = "unstable", feature(read_initializer))]
 #![cfg_attr(feature = "unstable", feature(trusted_len))]
