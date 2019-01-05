@@ -154,6 +154,10 @@ lazy_static! {
             external::futures::stream,
             #[cfg(feature = "futures")]
             external::futures::sink,
+            #[cfg(feature = "futures")]
+            external::futures::async_read,
+            #[cfg(feature = "futures")]
+            external::futures::async_write,
             // futures01
             #[cfg(feature = "futures01")]
             external::futures01::future,

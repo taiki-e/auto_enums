@@ -66,7 +66,13 @@ mod enum_derive {
     #[cfg(feature = "unstable")]
     #[test]
     fn unstable() {
-        #[enum_derive(Future, futures::Stream, futures::Sink)]
+        #[enum_derive(
+            Future,
+            futures::Stream,
+            futures::Sink,
+            futures::AsyncRead,
+            futures::AsyncWrite
+        )]
         enum Enum1<A, B> {
             A(A),
             B(B),
