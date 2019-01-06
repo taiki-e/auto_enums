@@ -1,5 +1,9 @@
 # Unreleased
 
+# 0.3.4 - 2019-01-06
+
+* Support futures::AsyncRead and futures::AsyncWrite
+
 # 0.3.3 - 2019-01-04
 
 * Update minimum derive_utils version to 0.5.4
