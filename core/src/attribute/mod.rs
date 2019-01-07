@@ -30,7 +30,8 @@ pub(crate) fn attribute(args: TokenStream, input: TokenStream) -> TokenStream {
 }
 
 fn expand(args: TokenStream2, input: TokenStream) -> Result<TokenStream2> {
-    let params = parse_args(args)?;
+    let mut params = parse_args(args)?;
+    params.root();
 
     match syn::parse(input.clone()) {
         Ok(mut stmt) => parent_stmt(&mut stmt, params).map(|()| stmt.into_token_stream()),
@@ -60,31 +61,30 @@ fn parent_expr(expr: &mut Expr, mut params: Params) -> Result<()> {
 
     match expr {
         Expr::Closure(ExprClosure { body, .. }) if !params.never() => {
-            params.fn_visitor(true, &mut builder, |v| v.visit_expr_mut(&mut **body));
-
             child_expr(&mut **body, &mut builder, &params)?;
+
+            params.fn_visitor(true, &mut builder, |v| v.visit_expr_mut(&mut **body));
         }
         _ => {
-            params.count_marker(&mut builder, |v| v.visit_expr_mut(expr));
-
             if !params.never() {
                 child_expr(expr, &mut builder, &params)?;
             }
+
+            params.visitor(&mut builder, |v| v.visit_expr_mut(expr));
         }
     }
 
-    if builder.len() < 2 && params.attr() {
-        Replacer::new().visit_expr_mut(expr);
-        return Ok(());
+    match builder.len() {
+        0 | 1 if !params.attr() => Err(unsupported_expr(
+            "is required two or more branches or marker macros in total",
+        ))?,
+        0 => Ok(()),
+        _ => builder.build(params.args()).map(|item| {
+            replace_expr(expr, |expr| {
+                expr_block(block(vec![Stmt::Item(item.into()), Stmt::Expr(expr)]))
+            });
+        }),
     }
-
-    builder.build(params.args()).map(|item| {
-        replace_expr(expr, |expr| {
-            expr_block(block(vec![Stmt::Item(item.into()), Stmt::Expr(expr)]))
-        });
-
-        Replacer::new().visit_expr_mut(expr);
-    })
 }
 
 fn stmt_semi(expr: &mut Expr, mut params: Params) -> Result<()> {
@@ -95,25 +95,19 @@ fn stmt_semi(expr: &mut Expr, mut params: Params) -> Result<()> {
         return Ok(());
     }
 
-    params.count_marker(&mut builder, |c| c.visit_expr_mut(expr));
+    params.visitor(&mut builder, |c| c.visit_expr_mut(expr));
 
     match builder.len() {
         0 | 1 if !params.attr() => Err(unsupported_stmt(
             "expression with trailing semicolon is required two or more marker macros",
-        ))?,
-        0 => {
-            Replacer::new().visit_expr_mut(expr);
-            return Ok(());
-        }
-        _ => {}
+        )),
+        0 => Ok(()),
+        _ => builder.build(params.args()).map(|item| {
+            replace_expr(expr, |expr| {
+                expr_block(block(vec![Stmt::Item(item.into()), Stmt::Expr(expr)]))
+            });
+        }),
     }
-
-    builder.build(params.args()).map(|item| {
-        replace_expr(expr, |expr| {
-            expr_block(block(vec![Stmt::Item(item.into()), Stmt::Expr(expr)]))
-        });
-        Replacer::new().visit_expr_mut(expr);
-    })
 }
 
 fn stmt_let(local: &mut Local, mut params: Params) -> Result<()> {
@@ -138,33 +132,34 @@ fn stmt_let(local: &mut Local, mut params: Params) -> Result<()> {
 
     match &mut *expr {
         Expr::Closure(ExprClosure { body, .. }) if !params.never() => {
-            params.fn_visitor(true, &mut builder, |v| v.visit_expr_mut(&mut **body));
-
             child_expr(&mut **body, &mut builder, &params)?;
+
+            params.fn_visitor(true, &mut builder, |v| v.visit_expr_mut(&mut **body));
         }
         expr => {
-            params.count_marker(&mut builder, |c| c.visit_expr_mut(expr));
-
             if !params.never() {
                 child_expr(expr, &mut builder, &params)?;
             }
+
+            params.visitor(&mut builder, |c| c.visit_expr_mut(expr));
         }
     }
 
-    if builder.len() < 2 && params.attr() {
-        local.init = Some((default(), expr));
-        Replacer::new().visit_local_mut(local);
-        return Ok(());
+    match builder.len() {
+        0 | 1 if !params.attr() => Err(unsupported_stmt(
+            "is required two or more branches or marker macros in total",
+        ))?,
+        0 => {
+            local.init = Some((default(), expr));
+            Ok(())
+        }
+        _ => builder.build(params.args()).map(|item| {
+            replace_expr(&mut *expr, |expr| {
+                expr_block(block(vec![Stmt::Item(item.into()), Stmt::Expr(expr)]))
+            });
+            local.init = Some((default(), expr));
+        }),
     }
-
-    builder.build(params.args()).map(|item| {
-        replace_expr(&mut *expr, |expr| {
-            expr_block(block(vec![Stmt::Item(item.into()), Stmt::Expr(expr)]))
-        });
-        local.init = Some((default(), expr));
-
-        Replacer::new().visit_local_mut(local);
-    })
 }
 
 fn item_fn(item: &mut ItemFn, mut params: Params) -> Result<()> {
@@ -185,29 +180,28 @@ fn item_fn(item: &mut ItemFn, mut params: Params) -> Result<()> {
         return Ok(());
     }
 
-    if !params.never() && return_impl_trait {
-        params.fn_visitor(false, &mut builder, |v| v.visit_item_fn_mut(item));
-    } else {
-        params.count_marker(&mut builder, |v| v.visit_item_fn_mut(item));
-    }
-
     match (*item.block).stmts.last_mut() {
         Some(Stmt::Expr(expr)) if !params.never() => child_expr(expr, &mut builder, &params)?,
         Some(_) => {}
         None => Err(unsupported_item("empty function"))?,
     }
 
-    if builder.len() < 2 && params.attr() {
-        Replacer::new().visit_item_fn_mut(item);
-        return Ok(());
+    if !params.never() && return_impl_trait {
+        params.fn_visitor(false, &mut builder, |v| v.visit_item_fn_mut(item));
+    } else {
+        params.visitor(&mut builder, |v| v.visit_item_fn_mut(item));
     }
 
-    builder.build(params.args()).map(|i| {
-        let mut stmts = Vec::with_capacity((*item.block).stmts.len() + 1);
-        stmts.push(Stmt::Item(i.into()));
-        stmts.append(&mut (*item.block).stmts);
-        (*item.block).stmts = stmts;
-
-        Replacer::new().visit_item_fn_mut(item);
-    })
+    match builder.len() {
+        0 | 1 if !params.attr() => Err(unsupported_item(
+            "is required two or more branches or marker macros in total",
+        ))?,
+        0 => Ok(()),
+        _ => builder.build(params.args()).map(|i| {
+            let mut stmts = Vec::with_capacity((*item.block).stmts.len() + 1);
+            stmts.push(Stmt::Item(i.into()));
+            stmts.append(&mut (*item.block).stmts);
+            (*item.block).stmts = stmts;
+        }),
+    }
 }

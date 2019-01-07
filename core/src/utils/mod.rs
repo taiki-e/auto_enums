@@ -64,12 +64,12 @@ pub(crate) fn expr_block(block: Block) -> Expr {
     })
 }
 
-pub(crate) fn unit() -> ExprTuple {
-    ExprTuple {
+pub(crate) fn unit() -> Expr {
+    Expr::Tuple(ExprTuple {
         attrs: Vec::with_capacity(0),
         paren_token: default(),
         elems: Punctuated::new(),
-    }
+    })
 }
 
 fn expr_continue() -> Expr {

@@ -290,6 +290,23 @@ fn stable_1_30() {
     }
     assert_eq!(marker4(10, 10).fold(0, |sum, x| sum + x), 63);
 
+    #[auto_enum(Iterator)]
+    fn marker5(x: i32, y: i32) -> impl Iterator<Item = i32> {
+        let iter;
+        #[auto_enum(marker(marker_a), Iterator)]
+        match x {
+            0 => iter = marker_a!(2..8),
+            _ if y < 0 => return y..=0,
+            _ => iter = marker_a!(2..=10),
+        };
+
+        match y {
+            0 => iter.flat_map(|x| 0..x),
+            _ => iter.map(|x| x + 1),
+        }
+    }
+    assert_eq!(marker5(10, 10).fold(0, |sum, x| sum + x), 63);
+
     #[auto_enum]
     fn closure() {
         #[auto_enum(Iterator)]
