@@ -1,5 +1,7 @@
 # Unreleased
 
+* Improve performance of `#[auto_enum]` attribute macro
+
 # 0.3.4 - 2019-01-06
 
 * Support futures::AsyncRead and futures::AsyncWrite

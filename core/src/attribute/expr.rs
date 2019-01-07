@@ -17,19 +17,15 @@ pub(super) const EMPTY_ATTRS: &[&str] = &[NEVER_ATTR, REC_ATTR];
 
 #[derive(Debug)]
 struct Params<'a> {
-    marker_ident: &'a str,
+    marker: &'a Marker,
     rec: Cell<bool>,
-    #[cfg(feature = "type_analysis")]
-    attr: bool,
 }
 
 impl<'a> From<&'a super::Params> for Params<'a> {
     fn from(params: &'a super::Params) -> Self {
         Self {
-            marker_ident: params.marker_ident(),
+            marker: params.marker(),
             rec: Cell::new(false),
-            #[cfg(feature = "type_analysis")]
-            attr: params.attr(),
         }
     }
 }
@@ -102,7 +98,7 @@ fn is_unreachable(expr: &Expr, builder: &Builder, params: &Params) -> bool {
 
             Expr::Macro(ExprMacro { mac, .. }) => {
                 UNREACHABLE_MACROS.iter().any(|i| mac.path.is_ident(i))
-                    || mac.path.is_ident(params.marker_ident)
+                    || params.marker.marker_macro(mac)
             }
 
             Expr::Call(ExprCall { args, func, .. }) if args.len() == 1 => match &**func {
@@ -141,9 +137,6 @@ pub(super) fn child_expr(
     params: &super::Params,
 ) -> Result<()> {
     fn _child_expr(expr: &mut Expr, builder: &mut Builder, params: &Params) -> Result<()> {
-        const ERR: &str =
-            "for expressions other than `match` or `if`, you need to specify marker macros";
-
         last_expr_mut(
             expr,
             builder,
@@ -159,10 +152,7 @@ pub(super) fn child_expr(
                 Expr::If(expr) => expr_if(expr, builder, params),
                 Expr::Loop(expr) => expr_loop(expr, builder, params),
                 Expr::MethodCall(expr) => _child_expr(&mut *expr.receiver, builder, params),
-                _ if builder.len() >= 2 => Ok(()),
-                #[cfg(feature = "type_analysis")]
-                _ if params.attr => Ok(()),
-                _ => Err(unsupported_expr(ERR)),
+                _ => Ok(()),
             },
         )
     }
@@ -244,20 +234,20 @@ fn expr_if(expr: &mut ExprIf, builder: &mut Builder, params: &Params) -> Result<
 }
 
 fn expr_loop(expr: &mut ExprLoop, builder: &mut Builder, params: &Params) -> Result<()> {
-    LoopVisitor::new(params.marker_ident, &expr, builder).visit_block_mut(&mut expr.body);
+    LoopVisitor::new(params.marker, &expr, builder).visit_block_mut(&mut expr.body);
 
     Ok(())
 }
 
 struct LoopVisitor<'a> {
-    marker: &'a str,
+    marker: &'a Marker,
     builder: &'a mut Builder,
     depth: usize,
     label: Option<Lifetime>,
 }
 
 impl<'a> LoopVisitor<'a> {
-    fn new(marker: &'a str, expr: &ExprLoop, builder: &'a mut Builder) -> Self {
+    fn new(marker: &'a Marker, expr: &ExprLoop, builder: &'a mut Builder) -> Self {
         Self {
             marker,
             builder,
@@ -274,10 +264,10 @@ impl<'a> LoopVisitor<'a> {
         }
     }
 
-    fn loop_bounds<F: FnOnce(&mut Self)>(&mut self, f: F) {
+    fn loop_bounds<E, F: FnOnce(&mut Self, E)>(&mut self, expr: E, f: F) {
         if self.label.is_some() {
             self.depth += 1;
-            f(self);
+            f(self, expr);
             self.depth -= 1;
         }
     }
@@ -291,22 +281,16 @@ impl<'a> VisitMut for LoopVisitor<'a> {
                 Expr::Closure(_) => {}
 
                 // Other loop bounds
-                Expr::Loop(expr) => {
-                    self.loop_bounds(|v| visit_mut::visit_expr_loop_mut(v, expr));
-                }
-                Expr::ForLoop(expr) => {
-                    self.loop_bounds(|v| visit_mut::visit_expr_for_loop_mut(v, expr));
-                }
-                Expr::While(expr) => {
-                    self.loop_bounds(|v| visit_mut::visit_expr_while_mut(v, expr));
-                }
+                Expr::Loop(expr) => self.loop_bounds(expr, visit_mut::visit_expr_loop_mut),
+                Expr::ForLoop(expr) => self.loop_bounds(expr, visit_mut::visit_expr_for_loop_mut),
+                Expr::While(expr) => self.loop_bounds(expr, visit_mut::visit_expr_while_mut),
 
+                // `break` in loop
                 Expr::Break(br) => {
                     if (self.depth == 0 && br.label.is_none()) || self.label_eq(br.label.as_ref()) {
-                        let expr = match br.expr.take().map_or_else(|| Expr::Tuple(unit()), |e| *e)
-                        {
+                        let expr = match br.expr.take().map_or_else(unit, |e| *e) {
                             Expr::Macro(expr) => {
-                                if expr.mac.path.is_ident(self.marker) {
+                                if self.marker.marker_macro(&expr.mac) {
                                     Expr::Macro(expr)
                                 } else {
                                     self.builder.next_expr(Expr::Macro(expr))

@@ -1,5 +1,3 @@
-use std::borrow::Cow;
-
 use proc_macro2::{
     token_stream::IntoIter, Delimiter, Ident, TokenStream as TokenStream2, TokenTree,
 };
@@ -66,17 +64,17 @@ impl PartialEq<Arg> for Arg {
 #[derive(Debug)]
 pub(super) struct Params {
     args: Stack<Arg>,
-    marker: Cow<'static, str>,
-    attr_exists: bool,
+    marker: Marker,
+    attr: bool,
     never: bool,
 }
 
 impl Params {
-    fn new(args: Stack<Arg>, marker: Option<String>, never: bool) -> Self {
+    fn new(args: Stack<Arg>, marker: Marker, never: bool) -> Self {
         Self {
             args,
-            marker: marker.map_or_else(|| Cow::Borrowed(DEFAULT_MARKER), Cow::Owned),
-            attr_exists: false,
+            marker,
+            attr: false,
             never,
         }
     }
@@ -84,39 +82,45 @@ impl Params {
     pub(super) fn args(&self) -> &[Arg] {
         &self.args
     }
-    pub(super) fn marker_ident(&self) -> &str {
+    pub(super) fn marker(&self) -> &Marker {
         &self.marker
     }
     pub(super) fn never(&self) -> bool {
         self.never
     }
     pub(super) fn attr(&self) -> bool {
-        self.attr_exists
+        self.attr
+    }
+    pub(super) fn root(&mut self) {
+        self.marker.root();
+    }
+    pub(super) fn _is_root(&self) -> bool {
+        self.marker.is_root()
     }
 
-    pub(super) fn count_marker<F>(&mut self, builder: &mut Builder, f: F)
+    pub(super) fn visitor<F>(&mut self, builder: &mut Builder, f: F)
     where
         F: FnOnce(&mut Visitor<'_>),
     {
-        self.visitor(false, false, builder, f)
+        self._visitor(false, false, builder, f)
     }
 
     pub(super) fn fn_visitor<F>(&mut self, is_closure: bool, builder: &mut Builder, f: F)
     where
         F: FnOnce(&mut Visitor<'_>),
     {
-        self.visitor(true, is_closure, builder, f)
+        self._visitor(true, is_closure, builder, f)
     }
 
-    fn visitor<F>(&mut self, count_return: bool, is_closure: bool, builder: &mut Builder, f: F)
+    fn _visitor<F>(&mut self, visit_return: bool, is_closure: bool, builder: &mut Builder, f: F)
     where
         F: FnOnce(&mut Visitor<'_>),
     {
         f(&mut Visitor::new(
             &self.marker,
-            count_return,
+            visit_return,
             is_closure,
-            &mut self.attr_exists,
+            &mut self.attr,
             builder,
         ));
     }
@@ -164,7 +168,7 @@ pub(super) fn parse_args(args: TokenStream2) -> Result<Params> {
         }
     }
 
-    Ok(Params::new(args, marker, never))
+    Ok(Params::new(args, Marker::new(marker), never))
 }
 
 fn parse_path(mut path: Stack<TokenTree>, iter: &mut IntoIter) -> Result<Arg> {
