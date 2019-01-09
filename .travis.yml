@@ -1,6 +1,5 @@
 language: rust
 sudo: false
-cache: cargo
 
 branches:
   only:
@@ -21,21 +20,17 @@ matrix:
     - rust: beta
     - rust: nightly
       script:
-        - cargo test
-        - cargo test --all-features
+        - cargo test --all
+        - cargo test --all --all-features
         - cd "${TRAVIS_BUILD_DIR}/test_suite"
-        - cargo test
         - cargo test --no-default-features
-        - cargo test --all-features
 
     - rust: nightly
       name: cargo test (minimal versions)
       env: ALLOW_FAILURES=true
       script:
         - cargo update -Zminimal-versions
-        - cargo test --all-features
-        - cd "${TRAVIS_BUILD_DIR}/test_suite"
-        - cargo test --all-features
+        - cargo test --all --all-features
 
     - rust: nightly
       name: cargo test (2018 edition)
@@ -52,9 +47,8 @@ before_script:
   - set -o errexit
 
 script:
-  - cargo test
+  - cargo test --all
   - cd "${TRAVIS_BUILD_DIR}/test_suite"
-  - cargo test
   - cargo test --no-default-features
 
 notifications:
