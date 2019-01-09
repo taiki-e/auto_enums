@@ -39,6 +39,16 @@ matrix:
         - cargo test --all-features
 
     - rust: nightly
+      name: cargo clippy
+      script:
+        - if rustup component add clippy-preview;
+          then
+            cargo clippy --all --all-features -- -Dwarnings;
+          else
+            echo 'Skipping clippy';
+          fi
+
+    - rust: nightly
       name: cargo doc
       script:
         - cargo doc --all-features --no-deps -p auto_enums -p auto_enums_core -p auto_enums_derive
