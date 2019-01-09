@@ -1,5 +1,7 @@
 # Unreleased
 
+# 0.3.5 - 2019-01-09
+
 * Improve performance of `#[auto_enum]` attribute macro
 
 * Update minimum derive_utils version to 0.6.0
