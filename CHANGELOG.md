@@ -2,6 +2,8 @@
 
 * Improve performance of `#[auto_enum]` attribute macro
 
+* Update minimum derive_utils version to 0.6.0
+
 # 0.3.4 - 2019-01-06
 
 * Support futures::AsyncRead and futures::AsyncWrite
