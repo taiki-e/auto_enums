@@ -209,20 +209,14 @@ fn expr_if(expr: &mut ExprIf, builder: &mut Builder, params: &Params) -> Result<
         })
     }
 
-    fn replace_branch(branch: &mut Block, builder: &mut Builder) {
-        replace_block(branch, |branch| {
-            block(vec![Stmt::Expr(builder.next_expr(expr_block(branch)))])
-        });
-    }
-
     if !skip(expr.then_branch.stmts.last_mut(), builder, params)? {
-        replace_branch(&mut expr.then_branch, builder);
+        replace_block(&mut expr.then_branch, |b| builder.next_expr(expr_block(b)));
     }
 
     match expr.else_branch.as_mut().map(|(_, expr)| &mut **expr) {
         Some(Expr::Block(expr)) => {
             if !skip(expr.block.stmts.last_mut(), builder, params)? {
-                replace_branch(&mut expr.block, builder);
+                replace_block(&mut expr.block, |b| builder.next_expr(expr_block(b)));
             }
 
             Ok(())
@@ -263,50 +257,48 @@ impl<'a> LoopVisitor<'a> {
             _ => false,
         }
     }
-
-    fn loop_bounds<E, F: FnOnce(&mut Self, E)>(&mut self, expr: E, f: F) {
-        if self.label.is_some() {
-            self.depth += 1;
-            f(self, expr);
-            self.depth -= 1;
-        }
-    }
 }
 
 impl<'a> VisitMut for LoopVisitor<'a> {
     fn visit_expr_mut(&mut self, expr: &mut Expr) {
-        if !expr.any_empty_attr(NEVER_ATTR) {
-            match expr {
-                // Stop at closure bounds
-                Expr::Closure(_) => {}
-
-                // Other loop bounds
-                Expr::Loop(expr) => self.loop_bounds(expr, visit_mut::visit_expr_loop_mut),
-                Expr::ForLoop(expr) => self.loop_bounds(expr, visit_mut::visit_expr_for_loop_mut),
-                Expr::While(expr) => self.loop_bounds(expr, visit_mut::visit_expr_while_mut),
-
-                // `break` in loop
-                Expr::Break(br) => {
-                    if (self.depth == 0 && br.label.is_none()) || self.label_eq(br.label.as_ref()) {
-                        let expr = match br.expr.take().map_or_else(unit, |e| *e) {
-                            Expr::Macro(expr) => {
-                                if self.marker.marker_macro(&expr.mac) {
-                                    Expr::Macro(expr)
-                                } else {
-                                    self.builder.next_expr(Expr::Macro(expr))
-                                }
-                            }
-                            expr => self.builder.next_expr(expr),
-                        };
-                        br.expr = Some(Box::new(expr));
-                    }
-
-                    visit_mut::visit_expr_break_mut(self, br);
-                }
-
-                expr => visit_mut::visit_expr_mut(self, expr),
-            }
+        if expr.any_empty_attr(NEVER_ATTR) {
+            return;
         }
+
+        let tmp = self.depth;
+        match expr {
+            // Stop at closure bounds
+            Expr::Closure(_) => return,
+
+            // Other loop bounds
+            Expr::Loop(_) | Expr::ForLoop(_) | Expr::While(_) => {
+                if self.label.is_some() {
+                    self.depth += 1;
+                } else {
+                    return;
+                }
+            }
+
+            // `break` in loop
+            Expr::Break(ExprBreak { label, expr, .. }) => {
+                if (self.depth == 0 && label.is_none()) || self.label_eq(label.as_ref()) {
+                    expr.replace_boxed_expr(|expr| match expr {
+                        Expr::Macro(expr) => {
+                            if self.marker.marker_macro(&expr.mac) {
+                                Expr::Macro(expr)
+                            } else {
+                                self.builder.next_expr(Expr::Macro(expr))
+                            }
+                        }
+                        expr => self.builder.next_expr(expr),
+                    });
+                }
+            }
+            _ => {}
+        }
+
+        visit_mut::visit_expr_mut(self, expr);
+        self.depth = tmp;
     }
 
     // Stop at item bounds

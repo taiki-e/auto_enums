@@ -73,6 +73,58 @@ impl<'a> Visitor<'a> {
             foreign: false,
         }
     }
+
+    /// `return` in functions or closures
+    fn visit_return(&mut self, expr: &mut Expr) {
+        if !self.visit_return {
+            return;
+        }
+
+        if let Expr::Closure(_) = &expr {
+            self.in_closure -= 1;
+        }
+
+        if self.in_closure > 0 && !expr.any_empty_attr(NEVER_ATTR) {
+            if let Expr::Return(ExprReturn { expr, .. }) = expr {
+                expr.replace_boxed_expr(|expr| match expr {
+                    Expr::Macro(expr) => {
+                        if self.marker.marker_macro(&expr.mac) {
+                            Expr::Macro(expr)
+                        } else {
+                            self.builder.next_expr(Expr::Macro(expr))
+                        }
+                    }
+                    expr => self.builder.next_expr(expr),
+                });
+            }
+        }
+    }
+
+    /// Expression level marker (`marker!` macro)
+    fn visit_marker(&mut self, expr: &mut Expr) {
+        if !(!self.foreign || self.marker.is_unique()) {
+            return;
+        }
+
+        replace_expr(expr, |expr| match expr {
+            Expr::Macro(expr) => {
+                if expr.mac.path.is_ident(self.marker.ident()) {
+                    let args = syn::parse2(expr.mac.tts).unwrap_or_else(|_| {
+                            panic!("`{}` invalid tokens: the arguments of `{}!` macro must be an expression", NAME, self.marker.ident())
+                        });
+
+                    self.builder.next_expr_with_attrs(expr.attrs, args)
+                } else {
+                    Expr::Macro(expr)
+                }
+            }
+            expr => expr,
+        });
+
+        if !self.foreign {
+            find_remove_empty_attrs(expr);
+        }
+    }
 }
 
 impl<'a> VisitMut for Visitor<'a> {
@@ -80,28 +132,7 @@ impl<'a> VisitMut for Visitor<'a> {
         let tmp_in_closure = self.in_closure;
         let tmp_foreign = self.foreign;
 
-        // `return` in functions or closures
-        if self.visit_return {
-            if let Expr::Closure(_) = &expr {
-                self.in_closure -= 1;
-            }
-
-            if self.in_closure > 0 && !expr.any_empty_attr(NEVER_ATTR) {
-                if let Expr::Return(ret) = expr {
-                    let expr = match ret.expr.take().map_or_else(unit, |e| *e) {
-                        Expr::Macro(expr) => {
-                            if self.marker.marker_macro(&expr.mac) {
-                                Expr::Macro(expr)
-                            } else {
-                                self.builder.next_expr(Expr::Macro(expr))
-                            }
-                        }
-                        expr => self.builder.next_expr(expr),
-                    };
-                    ret.expr = Some(Box::new(expr));
-                }
-            }
-        }
+        self.visit_return(expr);
 
         if expr.any_attr(NAME) {
             self.foreign = true;
@@ -110,27 +141,7 @@ impl<'a> VisitMut for Visitor<'a> {
         }
         visit_mut::visit_expr_mut(self, expr);
 
-        // Expression level marker (`marker!` macro)
-        if !self.foreign || self.marker.is_unique() {
-            replace_expr(expr, |expr| match expr {
-                Expr::Macro(expr) => {
-                    if expr.mac.path.is_ident(self.marker.ident()) {
-                        let args = syn::parse2(expr.mac.tts).unwrap_or_else(|_| {
-                            panic!("`{}` invalid tokens: the arguments of `{}!` macro must be an expression", NAME, self.marker.ident())
-                        });
-
-                        self.builder.next_expr_with_attrs(expr.attrs, args)
-                    } else {
-                        Expr::Macro(expr)
-                    }
-                }
-                expr => expr,
-            });
-
-            if !self.foreign {
-                find_remove_empty_attrs(expr);
-            }
-        }
+        self.visit_marker(expr);
 
         self.in_closure = tmp_in_closure;
         self.foreign = tmp_foreign;
@@ -169,48 +180,9 @@ impl<'a> VisitMut for Visitor<'a> {
     fn visit_item_mut(&mut self, _item: &mut Item) {}
 }
 
-pub(super) struct Replacer {
-    foreign: bool,
-}
-
-impl Replacer {
-    pub(super) fn new() -> Self {
-        Self { foreign: false }
-    }
-
-    fn foreign<A: AttrsMut, F: FnOnce(&mut Self, &mut A)>(&mut self, attrs: &mut A, f: F) {
-        let tmp = self.foreign;
-
-        if attrs.any_attr(NAME) {
-            self.foreign = true;
-        }
-        f(self, attrs);
-
-        if !self.foreign {
-            find_remove_empty_attrs(attrs);
-        }
-
-        self.foreign = tmp;
-    }
-}
+pub(super) struct Replacer;
 
 impl VisitMut for Replacer {
-    fn visit_expr_mut(&mut self, expr: &mut Expr) {
-        self.foreign(expr, visit_mut::visit_expr_mut)
-    }
-
-    fn visit_arm_mut(&mut self, arm: &mut Arm) {
-        visit_mut::visit_arm_mut(self, arm);
-
-        if !self.foreign {
-            find_remove_empty_attrs(arm);
-        }
-    }
-
-    fn visit_local_mut(&mut self, local: &mut Local) {
-        self.foreign(local, visit_mut::visit_local_mut)
-    }
-
     fn visit_stmt_mut(&mut self, stmt: &mut Stmt) {
         visit_stmt_mut(self, stmt);
     }

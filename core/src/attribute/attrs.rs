@@ -5,30 +5,26 @@ use crate::utils::*;
 pub(super) trait Attrs {
     fn attrs(&self) -> &[Attribute];
 
-    fn any_attr<S: AsRef<str>>(&self, ident: S) -> bool {
-        any_attr(self.attrs(), ident.as_ref(), false)
+    fn any_attr(&self, ident: &str) -> bool {
+        self.attrs().iter().any(|attr| attr.path.is_ident(ident))
     }
 
-    fn any_empty_attr<S: AsRef<str>>(&self, ident: S) -> bool {
-        any_attr(self.attrs(), ident.as_ref(), true)
+    fn any_empty_attr(&self, ident: &str) -> bool {
+        self.attrs()
+            .iter()
+            .any(|Attribute { path, tts, .. }| path.is_ident(ident) && tts.is_empty())
     }
-}
-
-fn any_attr(attrs: &[Attribute], ident: &str, require_empty: bool) -> bool {
-    attrs
-        .iter()
-        .any(|attr| attr.path.is_ident(ident) && (!require_empty || attr.tts.is_empty()))
 }
 
 pub(super) trait AttrsMut: Attrs {
     fn attrs_mut<T, F: FnOnce(&mut Vec<Attribute>) -> T>(&mut self, f: F) -> T;
 
-    fn find_remove_attr<S: AsRef<str>>(&mut self, ident: S) -> Option<Attribute> {
-        self.attrs_mut(|attrs| find_remove_attr(attrs, ident.as_ref(), false))
+    fn find_remove_attr(&mut self, ident: &str) -> Option<Attribute> {
+        self.attrs_mut(|attrs| attrs.find_remove(|attr| attr.path.is_ident(ident)))
     }
 
-    fn find_remove_empty_attr<S: AsRef<str>>(&mut self, ident: S) -> bool {
-        self.attrs_mut(|attrs| find_remove_attr(attrs, ident.as_ref(), true).is_some())
+    fn find_remove_empty_attr(&mut self, ident: &str) -> bool {
+        self.attrs_mut(|attrs| find_remove_attr(attrs, ident, true).is_some())
     }
 }
 

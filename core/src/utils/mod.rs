@@ -15,6 +15,22 @@ pub(crate) fn default<T: Default>() -> T {
     T::default()
 }
 
+pub(crate) trait OptionExt {
+    fn replace_boxed_expr<F: FnOnce(Expr) -> Expr>(&mut self, f: F);
+}
+
+impl<'a> OptionExt for Option<Box<Expr>> {
+    fn replace_boxed_expr<F: FnOnce(Expr) -> Expr>(&mut self, f: F) {
+        if self.is_none() {
+            *self = Some(Box::new(unit()));
+        }
+
+        if let Some(expr) = self {
+            replace_expr(&mut **expr, f);
+        }
+    }
+}
+
 pub(crate) trait VecExt<T> {
     fn find_remove<P>(&mut self, predicate: P) -> Option<T>
     where
@@ -90,7 +106,10 @@ where
 
 pub(crate) fn replace_block<F>(this: &mut Block, op: F)
 where
-    F: FnOnce(Block) -> Block,
+    F: FnOnce(Block) -> Expr,
 {
-    *this = op(mem::replace(this, block(Vec::with_capacity(0))));
+    *this = block(vec![Stmt::Expr(op(mem::replace(
+        this,
+        block(Vec::with_capacity(0)),
+    )))]);
 }
