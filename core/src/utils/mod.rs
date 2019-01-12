@@ -88,19 +88,19 @@ pub(crate) fn unit() -> Expr {
     })
 }
 
-fn expr_continue() -> Expr {
-    // probably the lowest cost expression.
-    Expr::Continue(ExprContinue {
-        attrs: Vec::with_capacity(0),
-        continue_token: default(),
-        label: None,
-    })
-}
-
 pub(crate) fn replace_expr<F>(this: &mut Expr, op: F)
 where
     F: FnOnce(Expr) -> Expr,
 {
+    fn expr_continue() -> Expr {
+        // probably the lowest cost expression.
+        Expr::Continue(ExprContinue {
+            attrs: Vec::with_capacity(0),
+            continue_token: default(),
+            label: None,
+        })
+    }
+
     *this = op(mem::replace(this, expr_continue()));
 }
 

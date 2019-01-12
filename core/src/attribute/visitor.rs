@@ -74,6 +74,14 @@ impl<'a> Visitor<'a> {
         }
     }
 
+    fn find_remove_empty_attrs<A: AttrsMut>(&self, attrs: &mut A) {
+        if !self.foreign {
+            EMPTY_ATTRS.iter().for_each(|ident| {
+                attrs.find_remove_empty_attr(ident);
+            });
+        }
+    }
+
     /// `return` in functions or closures
     fn visit_return(&mut self, expr: &mut Expr) {
         if !self.visit_return {
@@ -100,6 +108,14 @@ impl<'a> Visitor<'a> {
 
     /// Expression level marker (`marker!` macro)
     fn visit_marker(&mut self, expr: &mut Expr) {
+        #[inline(never)]
+        fn err(ident: &str) -> ! {
+            panic!(
+                "`{}` invalid tokens: the arguments of `{}!` macro must be an expression",
+                NAME, ident
+            )
+        }
+
         if self.foreign && !self.marker.is_unique() {
             return;
         }
@@ -107,9 +123,8 @@ impl<'a> Visitor<'a> {
         replace_expr(expr, |expr| match expr {
             Expr::Macro(expr) => {
                 if expr.mac.path.is_ident(self.marker.ident()) {
-                    let args = syn::parse2(expr.mac.tts).unwrap_or_else(|_| {
-                            panic!("`{}` invalid tokens: the arguments of `{}!` macro must be an expression", NAME, self.marker.ident())
-                        });
+                    let args =
+                        syn::parse2(expr.mac.tts).unwrap_or_else(|_| err(self.marker.ident()));
 
                     self.builder.next_expr_with_attrs(expr.attrs, args)
                 } else {
@@ -119,9 +134,7 @@ impl<'a> Visitor<'a> {
             expr => expr,
         });
 
-        if !self.foreign {
-            find_remove_empty_attrs(expr);
-        }
+        self.find_remove_empty_attrs(expr);
     }
 }
 
@@ -140,17 +153,13 @@ impl<'a> VisitMut for Visitor<'a> {
         visit_mut::visit_expr_mut(self, expr);
 
         self.visit_marker(expr);
-
         self.in_closure = tmp_in_closure;
         self.foreign = tmp_foreign;
     }
 
     fn visit_arm_mut(&mut self, arm: &mut Arm) {
         visit_mut::visit_arm_mut(self, arm);
-
-        if !self.foreign {
-            find_remove_empty_attrs(arm);
-        }
+        self.find_remove_empty_attrs(arm);
     }
 
     fn visit_local_mut(&mut self, local: &mut Local) {
@@ -161,12 +170,9 @@ impl<'a> VisitMut for Visitor<'a> {
             // Record whether other `auto_enum` exists.
             *self.attr = true;
         }
+
         visit_mut::visit_local_mut(self, local);
-
-        if !self.foreign {
-            find_remove_empty_attrs(local);
-        }
-
+        self.find_remove_empty_attrs(local);
         self.foreign = tmp;
     }
 
@@ -187,12 +193,6 @@ impl VisitMut for Replacer {
 
     // Stop at item bounds
     fn visit_item_mut(&mut self, _item: &mut Item) {}
-}
-
-fn find_remove_empty_attrs<A: AttrsMut>(attrs: &mut A) {
-    EMPTY_ATTRS.iter().for_each(|ident| {
-        attrs.find_remove_empty_attr(ident);
-    });
 }
 
 fn visit_stmt_mut<V: VisitMut + ?Sized>(visitor: &mut V, stmt: &mut Stmt) {

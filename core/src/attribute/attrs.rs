@@ -24,16 +24,12 @@ pub(super) trait AttrsMut: Attrs {
     }
 
     fn find_remove_empty_attr(&mut self, ident: &str) -> bool {
-        self.attrs_mut(|attrs| find_remove_attr(attrs, ident, true).is_some())
-    }
-}
+        fn find_remove(attrs: &mut Vec<Attribute>, ident: &str) -> Option<Attribute> {
+            attrs.find_remove(|Attribute { path, tts, .. }| path.is_ident(ident) && tts.is_empty())
+        }
 
-fn find_remove_attr(
-    attrs: &mut Vec<Attribute>,
-    ident: &str,
-    require_empty: bool,
-) -> Option<Attribute> {
-    attrs.find_remove(|attr| attr.path.is_ident(ident) && (!require_empty || attr.tts.is_empty()))
+        self.attrs_mut(|attrs| find_remove(attrs, ident).is_some())
+    }
 }
 
 impl<'a, A: Attrs> Attrs for &'a A {

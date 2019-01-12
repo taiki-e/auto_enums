@@ -219,8 +219,14 @@ fn marker_opt(
                 None => Err(invalid_args!("empty `marker` option"))?,
             }
 
-            if g.next().is_some() {
-                Err(invalid_args!("multiple identifier in `marker` option"))?;
+            match g.next() {
+                None => {}
+                Some(TokenTree::Punct(ref p)) if p.as_char() == ',' => {
+                    if g.next().is_some() {
+                        Err(invalid_args!("multiple identifier in `marker` option"))?;
+                    }
+                }
+                Some(_) => Err(invalid_args!("multiple identifier in `marker` option"))?,
             }
         }
         Some(TokenTree::Punct(ref p)) if p.as_char() == '=' => {

@@ -102,13 +102,13 @@ fn is_unreachable(expr: &Expr, builder: &Builder, params: &Params) -> bool {
             }
 
             Expr::Call(ExprCall { args, func, .. }) if args.len() == 1 => match &**func {
-                Expr::Path(path) => {
-                    path.qself.is_none()
-                        && path.path.leading_colon.is_none()
-                        && path.path.segments.len() == 2
-                        && path.path.segments[0].arguments.is_empty()
-                        && path.path.segments[1].arguments.is_empty()
-                        && path.path.segments[0].ident == builder.ident()
+                Expr::Path(ExprPath { path, qself, .. }) => {
+                    qself.is_none()
+                        && path.leading_colon.is_none()
+                        && path.segments.len() == 2
+                        && path.segments[0].arguments.is_empty()
+                        && path.segments[1].arguments.is_empty()
+                        && path.segments[0].ident == builder.ident()
                 }
                 _ => false,
             },
@@ -272,11 +272,10 @@ impl<'a> VisitMut for LoopVisitor<'a> {
 
             // Other loop bounds
             Expr::Loop(_) | Expr::ForLoop(_) | Expr::While(_) => {
-                if self.label.is_some() {
-                    self.depth += 1;
-                } else {
+                if self.label.is_none() {
                     return;
                 }
+                self.depth += 1;
             }
 
             // `break` in loop
