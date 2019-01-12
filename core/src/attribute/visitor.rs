@@ -78,9 +78,7 @@ impl<'a> Visitor<'a> {
     fn visit_return(&mut self, expr: &mut Expr) {
         if !self.visit_return {
             return;
-        }
-
-        if let Expr::Closure(_) = &expr {
+        } else if let Expr::Closure(_) = &expr {
             self.in_closure -= 1;
         }
 
@@ -102,7 +100,7 @@ impl<'a> Visitor<'a> {
 
     /// Expression level marker (`marker!` macro)
     fn visit_marker(&mut self, expr: &mut Expr) {
-        if !(!self.foreign || self.marker.is_unique()) {
+        if self.foreign && !self.marker.is_unique() {
             return;
         }
 
