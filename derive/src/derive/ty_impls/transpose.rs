@@ -1,5 +1,5 @@
 use proc_macro2::TokenStream;
-use quote::{quote, ToTokens};
+use quote::quote;
 
 use crate::utils::*;
 
@@ -53,7 +53,7 @@ fn transpose_option(data: &Data, root: &TokenStream) -> Result<TokenStream> {
         }
     }?);
 
-    Ok(impls.build().into_token_stream())
+    Ok(impls.build())
 }
 
 fn transpose_result(data: &Data, root: &TokenStream) -> Result<TokenStream> {
@@ -89,7 +89,7 @@ fn transpose_result(data: &Data, root: &TokenStream) -> Result<TokenStream> {
         }
     }?);
 
-    Ok(impls.build().into_token_stream())
+    Ok(impls.build())
 }
 
 fn transpose_ok(data: &Data, root: &TokenStream) -> Result<TokenStream> {
@@ -112,7 +112,7 @@ fn transpose_ok(data: &Data, root: &TokenStream) -> Result<TokenStream> {
         }
     }?);
 
-    Ok(impls.build().into_token_stream())
+    Ok(impls.build())
 }
 
 fn transpose_err(data: &Data, root: &TokenStream) -> Result<TokenStream> {
@@ -135,5 +135,5 @@ fn transpose_err(data: &Data, root: &TokenStream) -> Result<TokenStream> {
         }
     }?);
 
-    Ok(impls.build().into_token_stream())
+    Ok(impls.build())
 }

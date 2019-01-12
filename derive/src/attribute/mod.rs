@@ -184,9 +184,9 @@ lazy_static! {
 }
 
 fn expand(args: TokenStream2, input: TokenStream) -> Result<TokenStream2> {
-    fn alias_exists(x: &str, stack: &[(Cow<'_, str>, Option<Arg>)]) -> bool {
+    fn alias_exists(s: &str, stack: &[(Cow<'_, str>, Option<Arg>)]) -> bool {
         ALIAS_MAP
-            .get(x)
+            .get(s)
             .map_or(false, |x| stack.iter().any(|(s, _)| s == x))
     }
 
@@ -195,32 +195,32 @@ fn expand(args: TokenStream2, input: TokenStream) -> Result<TokenStream2> {
     let mut stack = Stack::new();
     {
         let args = parse_args(args).map_err(|e| format!("`{}` {}", NAME, e))?;
-        args.iter().cloned().for_each(|(s, x)| {
-            if let Some(traits) = TRAIT_DEPENDENCIES.get(s.as_str()) {
+        args.iter().cloned().for_each(|(s, arg)| {
+            if let Some(traits) = TRAIT_DEPENDENCIES.get(&&*s) {
                 traits
                     .iter()
                     .filter(|&x| !args.iter().any(|(s, _)| s == x))
-                    .for_each(|&x| {
-                        if !alias_exists(x, &stack) {
-                            stack.push((Cow::Borrowed(x), None))
+                    .for_each(|&s| {
+                        if !alias_exists(s, &stack) {
+                            stack.push((Cow::Borrowed(s), None))
                         }
                     });
             }
 
-            if !alias_exists(s.as_str(), &stack) {
-                stack.push((Cow::Owned(s), Some(x)));
+            if !alias_exists(&s, &stack) {
+                stack.push((Cow::Owned(s), Some(arg)));
             }
         });
     }
 
     let mut derive = Stack::new();
     let mut ts = TokenStream2::new();
-    for (s, x) in stack {
+    for (s, arg) in stack {
         match DERIVE_MAP.get(&&*s) {
             Some(f) => (&**f)(&data)
                 .map_err(|e| format!("`{}({})` {}", NAME, s, e))
                 .map(|x| ts.extend(x.into_token_stream()))?,
-            None => derive.push(x.unwrap()),
+            None => derive.push(arg.unwrap()),
         }
     }
 
