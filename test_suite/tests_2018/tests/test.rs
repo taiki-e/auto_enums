@@ -1,11 +1,18 @@
-#![cfg_attr(feature = "unstable", feature(proc_macro_hygiene, stmt_expr_attributes))]
-#![cfg_attr(feature = "unstable", feature(futures_api))]
-#![cfg_attr(feature = "unstable", feature(fn_traits, unboxed_closures))]
-#![cfg_attr(feature = "unstable", feature(read_initializer))]
-#![cfg_attr(feature = "unstable", feature(trusted_len))]
-#![cfg_attr(feature = "unstable", feature(exact_size_is_empty))]
-#![cfg_attr(feature = "unstable", feature(try_trait))]
-#![cfg_attr(feature = "unstable", feature(unsized_locals))]
+#![cfg_attr(
+    feature = "unstable",
+    feature(
+        proc_macro_hygiene,
+        stmt_expr_attributes,
+        fn_traits,
+        unboxed_closures,
+        futures_api,
+        read_initializer,
+        trusted_len,
+        exact_size_is_empty,
+        try_trait,
+        unsized_locals,
+    )
+)]
 #![deny(warnings)]
 #![allow(unused_imports)]
 #![cfg(test)]
