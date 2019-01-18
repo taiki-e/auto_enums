@@ -1,5 +1,7 @@
 # Unreleased
 
+* Parentheses and type ascription can now be searched recursively
+
 # 0.3.5 - 2019-01-09
 
 * Improve performance of `#[auto_enum]` attribute macro

@@ -108,14 +108,6 @@ impl<'a> Visitor<'a> {
 
     /// Expression level marker (`marker!` macro)
     fn visit_marker(&mut self, expr: &mut Expr) {
-        #[inline(never)]
-        fn err(ident: &str) -> ! {
-            panic!(
-                "`{}` invalid tokens: the arguments of `{}!` macro must be an expression",
-                NAME, ident
-            )
-        }
-
         if self.foreign && !self.marker.is_unique() {
             return;
         }
@@ -123,8 +115,8 @@ impl<'a> Visitor<'a> {
         replace_expr(expr, |expr| match expr {
             Expr::Macro(expr) => {
                 if expr.mac.path.is_ident(self.marker.ident()) {
-                    let args =
-                        syn::parse2(expr.mac.tts).unwrap_or_else(|_| err(self.marker.ident()));
+                    let args = syn::parse2(expr.mac.tts)
+                        .unwrap_or_else(|_| parse_failed(self.marker.ident()));
 
                     self.builder.next_expr_with_attrs(expr.attrs, args)
                 } else {
@@ -136,6 +128,15 @@ impl<'a> Visitor<'a> {
 
         self.find_remove_empty_attrs(expr);
     }
+}
+
+#[inline(never)]
+#[cold]
+fn parse_failed(ident: &str) -> ! {
+    panic!(
+        "`{}` invalid tokens: the arguments of `{}!` macro must be an expression",
+        NAME, ident
+    )
 }
 
 impl<'a> VisitMut for Visitor<'a> {
@@ -218,6 +219,7 @@ fn _visit_stmt_mut(stmt: &mut Stmt) -> Result<()> {
         Stmt::Expr(expr) => parse_attr(expr, parent_expr),
         Stmt::Semi(expr, _) => parse_attr(expr, stmt_semi),
         Stmt::Local(local) => parse_attr(local, stmt_let),
-        _ => Ok(()),
+        // Stop at item bounds
+        Stmt::Item(_) => Ok(()),
     }
 }

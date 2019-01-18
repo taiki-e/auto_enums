@@ -11,6 +11,7 @@
         exact_size_is_empty,
         try_trait,
         unsized_locals,
+        type_ascription,
     )
 )]
 #![cfg_attr(not(feature = "std"), no_std)]
@@ -44,17 +45,18 @@ fn stable_1_30() {
         assert_eq!(match_(i).fold(0, |sum, x| sum + x), ANS[i]);
     }
 
+    // block + unsafe block + parentheses
     #[cfg_attr(feature = "rustfmt", rustfmt_skip)]
     #[allow(unused_unsafe)]
     #[auto_enum(Iterator)]
     fn block(x: usize) -> impl Iterator<Item = i32> {
-        {{{ unsafe {{{ unsafe { unsafe {{
+        {{({ unsafe {{({ unsafe { unsafe {{
             match x {
                 0 => 1..8,
                 n if n > 3 => 2..=10,
                 _ => (0..2).map(|x| x + 1),
             }
-        }}}}}}}}}
+        }}}})}}})}}
     }
     for i in 0..2 {
         assert_eq!(block(i).fold(0, |sum, x| sum + x), ANS[i]);
@@ -762,4 +764,11 @@ fn nightly() {
         }
     }
     assert_eq!(fn_traits(true)(1), 2);
+
+    // parentheses and type ascription
+    #[auto_enum(Fn)]
+    fn fn_traits2(option: bool) -> impl Fn(i32) -> i32 {
+        (if option { |x| x + 1 } else { |y| y - 1 }): _
+    }
+    assert_eq!(fn_traits2(true)(1), 2);
 }

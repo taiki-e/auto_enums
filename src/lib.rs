@@ -214,39 +214,6 @@
 //!   # fn main() { let _ = expr_loop(0); }
 //!   ```
 //!
-//! * Block, unsafe block and method call
-//!
-//!   Blocks, unsafe blocks, and method calls are recursively searched until an `if`, `match`, `loop` or unsupported expression is found.
-//!
-//!   ```rust
-//!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]
-//!   # #[macro_use]
-//!   # extern crate auto_enums;
-//!   // block
-//!   #[auto_enum]
-//!   fn expr_block(x: i32) -> impl Iterator<Item=i32> {
-//!       #[auto_enum(Iterator)]
-//!       {
-//!           if x == 0 {
-//!               Some(0).into_iter()
-//!           } else {
-//!               0..x
-//!           }
-//!       }
-//!   }
-//!
-//!   // method call
-//!   #[auto_enum]
-//!   fn expr_method(x: i32) -> impl Iterator<Item=i32> {
-//!      #[auto_enum(Iterator)]
-//!       match x {
-//!           0 => Some(0).into_iter(),
-//!           _ => 0..x,
-//!       }.map(|y| y + 1)
-//!   }
-//!   # fn main() { let _ = expr_block(0); let _ = expr_method(0); }
-//!   ```
-//!
 //! * `return` (in functions)
 //!
 //!   `#[auto_enum]` can parse the `return` in the scope.
@@ -301,6 +268,51 @@
 //!       f(1)
 //!   }
 //!   # fn main() { let _ = closure(); }
+//!   ```
+//!
+//! * Block, unsafe block, method call, parentheses, and type ascription
+//!
+//!   The following expressions are recursively searched until an `if`, `match`, `loop` or unsupported expression is found.
+//!
+//!   * blocks
+//!   * unsafe blocks
+//!   * method calls
+//!   * parentheses
+//!   * type ascriptions
+//!
+//!   ```rust
+//!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]
+//!   # #[macro_use]
+//!   # extern crate auto_enums;
+//!   // block
+//!   #[auto_enum]
+//!   fn expr_block(x: i32) -> impl Iterator<Item=i32> {
+//!       #[auto_enum(Iterator)]
+//!       {
+//!           if x == 0 {
+//!               Some(0).into_iter()
+//!           } else {
+//!               0..x
+//!           }
+//!       }
+//!   }
+//!
+//!   // method call
+//!   #[auto_enum]
+//!   fn expr_method(x: i32) -> impl Iterator<Item=i32> {
+//!      #[auto_enum(Iterator)]
+//!       match x {
+//!           0 => Some(0).into_iter(),
+//!           _ => 0..x,
+//!       }.map(|y| y + 1)
+//!   }
+//!
+//!   // parentheses
+//!   #[auto_enum(Iterator)]
+//!   fn expr_parentheses(x: i32) -> impl Iterator<Item=i32> {
+//!       (if x == 0 { Some(0).into_iter() } else { 0..x })
+//!   }
+//!   # fn main() { let _ = expr_block(0); let _ = expr_method(0); let _ = expr_parentheses(0); }
 //!   ```
 //!
 //! ### Parse nested branches
