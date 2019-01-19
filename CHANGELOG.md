@@ -1,5 +1,7 @@
 # Unreleased
 
+# 0.3.6 - 2019-01-19
+
 * Parentheses and type ascription can now be searched recursively
 
 # 0.3.5 - 2019-01-09

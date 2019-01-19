@@ -1,6 +1,6 @@
 #![crate_type = "proc-macro"]
 #![recursion_limit = "256"]
-#![doc(html_root_url = "https://docs.rs/auto_enums_core/0.3.5")]
+#![doc(html_root_url = "https://docs.rs/auto_enums_core/0.3.6")]
 
 extern crate proc_macro;
 extern crate proc_macro2;
