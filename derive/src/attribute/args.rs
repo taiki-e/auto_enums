@@ -41,8 +41,8 @@ impl From<Path> for Arg {
     }
 }
 
-impl PartialEq<Arg> for Arg {
-    fn eq(&self, other: &Arg) -> bool {
+impl PartialEq for Arg {
+    fn eq(&self, other: &Self) -> bool {
         match self {
             Arg::Ident(x) => match other {
                 Arg::Ident(y) => x.eq(y),

@@ -151,9 +151,10 @@ pub(super) fn child_expr(
                 Expr::Match(expr) => expr_match(expr, builder, params),
                 Expr::If(expr) => expr_if(expr, builder, params),
                 Expr::Loop(expr) => expr_loop(expr, builder, params),
-                Expr::MethodCall(expr) => _child_expr(&mut *expr.receiver, builder, params),
-                Expr::Paren(expr) => _child_expr(&mut *expr.expr, builder, params),
-                Expr::Type(expr) => _child_expr(&mut *expr.expr, builder, params),
+                // search recursively
+                Expr::MethodCall(ExprMethodCall { receiver: expr, .. })
+                | Expr::Paren(ExprParen { expr, .. })
+                | Expr::Type(ExprType { expr, .. }) => _child_expr(&mut **expr, builder, params),
                 _ => Ok(()),
             },
         )

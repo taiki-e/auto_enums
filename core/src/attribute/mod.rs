@@ -63,7 +63,7 @@ fn parent_expr(expr: &mut Expr, mut params: Params) -> Result<()> {
     let mut builder = Builder::new();
 
     if params.args().is_empty() {
-        Replacer.visit_expr_mut(expr);
+        Dummy.visit_expr_mut(expr);
         return Ok(());
     }
 
@@ -95,7 +95,7 @@ fn stmt_semi(expr: &mut Expr, mut params: Params) -> Result<()> {
     let mut builder = Builder::new();
 
     if params.args().is_empty() {
-        Replacer.visit_expr_mut(expr);
+        Dummy.visit_expr_mut(expr);
         return Ok(());
     }
 
@@ -121,7 +121,7 @@ fn stmt_let(local: &mut Local, mut params: Params) -> Result<()> {
     }
 
     if params.args().is_empty() {
-        Replacer.visit_local_mut(local);
+        Dummy.visit_local_mut(local);
         return Ok(());
     }
 
@@ -171,7 +171,7 @@ fn item_fn(item: &mut ItemFn, mut params: Params) -> Result<()> {
     }
 
     if params.args().is_empty() {
-        Replacer.visit_item_fn_mut(item);
+        Dummy.visit_item_fn_mut(item);
         return Ok(());
     }
 

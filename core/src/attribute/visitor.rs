@@ -185,9 +185,9 @@ impl<'a> VisitMut for Visitor<'a> {
     fn visit_item_mut(&mut self, _item: &mut Item) {}
 }
 
-pub(super) struct Replacer;
+pub(super) struct Dummy;
 
-impl VisitMut for Replacer {
+impl VisitMut for Dummy {
     fn visit_stmt_mut(&mut self, stmt: &mut Stmt) {
         visit_stmt_mut(self, stmt);
     }
