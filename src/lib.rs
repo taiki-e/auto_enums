@@ -180,7 +180,7 @@
 //!   }
 //!
 //!   // match
-//!   #[auto_enum]
+//!   #[auto_enum] // Nightly does not need an empty attribute to the function.
 //!   fn expr_match(x: i32) -> impl Iterator<Item=i32> {
 //!       #[auto_enum(Iterator)]
 //!       let iter = match x {
@@ -251,7 +251,7 @@
 //!   # #[macro_use]
 //!   # extern crate auto_enums;
 //!   // return (in closures)
-//!   #[auto_enum]
+//!   #[auto_enum] // Nightly does not need an empty attribute to the function.
 //!   fn closure() -> impl Iterator<Item=i32> {
 //!       #[auto_enum(Iterator)]
 //!       let f = |x| {
@@ -285,7 +285,7 @@
 //!   # #[macro_use]
 //!   # extern crate auto_enums;
 //!   // block
-//!   #[auto_enum]
+//!   #[auto_enum] // Nightly does not need an empty attribute to the function.
 //!   fn expr_block(x: i32) -> impl Iterator<Item=i32> {
 //!       #[auto_enum(Iterator)]
 //!       {
@@ -298,7 +298,7 @@
 //!   }
 //!
 //!   // method call
-//!   #[auto_enum]
+//!   #[auto_enum] // Nightly does not need an empty attribute to the function.
 //!   fn expr_method(x: i32) -> impl Iterator<Item=i32> {
 //!      #[auto_enum(Iterator)]
 //!       match x {
