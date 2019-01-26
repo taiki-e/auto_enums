@@ -1,5 +1,3 @@
-use std::cell::Cell;
-
 use syn::{
     visit_mut::{self, VisitMut},
     *,
@@ -18,14 +16,14 @@ pub(super) const EMPTY_ATTRS: &[&str] = &[NEVER_ATTR, REC_ATTR];
 #[derive(Debug)]
 struct Params<'a> {
     marker: &'a Marker,
-    rec: Cell<bool>,
+    rec: bool,
 }
 
 impl<'a> From<&'a super::Params> for Params<'a> {
     fn from(params: &'a super::Params) -> Self {
         Self {
             marker: params.marker(),
-            rec: Cell::new(false),
+            rec: false,
         }
     }
 }
@@ -58,12 +56,18 @@ where
     op(expr)
 }
 
-fn last_expr_mut<T, U, F, OP>(expr: &mut Expr, state: U, success: T, mut filter: F, op: OP) -> T
+fn last_expr_mut<T, U, F, OP>(
+    expr: &mut Expr,
+    state: &mut U,
+    success: T,
+    mut filter: F,
+    op: OP,
+) -> T
 where
-    F: FnMut(&Expr, &U) -> bool,
-    OP: FnOnce(&mut Expr, U) -> T,
+    F: FnMut(&Expr, &mut U) -> bool,
+    OP: FnOnce(&mut Expr, &mut U) -> T,
 {
-    if !filter(expr, &state) {
+    if !filter(expr, state) {
         return success;
     }
 
@@ -72,7 +76,7 @@ where
             match block.stmts.last_mut() {
                 Some(Stmt::Expr(expr)) => return last_expr_mut(expr, state, success, filter, op),
                 Some(Stmt::Semi(expr, _)) => {
-                    if !filter(expr, &state) {
+                    if !filter(expr, state) {
                         return success;
                     }
                 }
@@ -96,15 +100,19 @@ fn is_unreachable(expr: &Expr, builder: &Builder, params: &Params) -> bool {
         |expr| match expr {
             Expr::Break(_) | Expr::Continue(_) | Expr::Return(_) => true,
 
+            // `unreachable!`, `panic!` or Expression level marker (`marker!` macro).
             Expr::Macro(ExprMacro { mac, .. }) => {
                 UNREACHABLE_MACROS.iter().any(|i| mac.path.is_ident(i))
                     || params.marker.marker_macro(mac)
             }
 
+            // FIXME: This may not be necessary.
+            // Assigned.
             Expr::Call(ExprCall { args, func, .. }) if args.len() == 1 => match &**func {
-                Expr::Path(ExprPath { path, qself, .. }) => {
-                    qself.is_none()
-                        && path.leading_colon.is_none()
+                Expr::Path(ExprPath {
+                    path, qself: None, ..
+                }) => {
+                    path.leading_colon.is_none()
                         && path.segments.len() == 2
                         && path.segments[0].arguments.is_empty()
                         && path.segments[1].arguments.is_empty()
@@ -117,10 +125,15 @@ fn is_unreachable(expr: &Expr, builder: &Builder, params: &Params) -> bool {
                 arm.any_empty_attr(NEVER_ATTR) || is_unreachable(&*arm.body, builder, params)
             }),
 
+            // `Err(expr)?` or `None?`.
             Expr::Try(ExprTry { expr, .. }) => match &**expr {
-                Expr::Path(path) => path.qself.is_none() && path.path.is_ident("None"),
+                Expr::Path(ExprPath {
+                    path, qself: None, ..
+                }) => path.is_ident("None"),
                 Expr::Call(ExprCall { args, func, .. }) if args.len() == 1 => match &**func {
-                    Expr::Path(path) => path.qself.is_none() && path.path.is_ident("Err"),
+                    Expr::Path(ExprPath {
+                        path, qself: None, ..
+                    }) => path.is_ident("Err"),
                     _ => false,
                 },
                 _ => false,
@@ -131,36 +144,39 @@ fn is_unreachable(expr: &Expr, builder: &Builder, params: &Params) -> bool {
     )
 }
 
+/// Note that do not use this after `params.*visitor`.
 pub(super) fn child_expr(
     expr: &mut Expr,
     builder: &mut Builder,
     params: &super::Params,
 ) -> Result<()> {
-    fn _child_expr(expr: &mut Expr, builder: &mut Builder, params: &Params) -> Result<()> {
+    fn _child_expr(expr: &mut Expr, builder: &mut Builder, params: &mut Params) -> Result<()> {
         last_expr_mut(
             expr,
-            builder,
+            &mut (builder, params),
             Ok(()),
-            |expr, builder| {
+            |expr, (builder, params)| {
                 if expr.any_empty_attr(REC_ATTR) {
-                    params.rec.set(true);
+                    params.rec = true;
                 }
                 !is_unreachable(expr, builder, params)
             },
-            |expr, builder| match expr {
+            |expr, (builder, params)| match expr {
                 Expr::Match(expr) => expr_match(expr, builder, params),
                 Expr::If(expr) => expr_if(expr, builder, params),
                 Expr::Loop(expr) => expr_loop(expr, builder, params),
-                // search recursively
+
+                // Search recursively
                 Expr::MethodCall(ExprMethodCall { receiver: expr, .. })
                 | Expr::Paren(ExprParen { expr, .. })
                 | Expr::Type(ExprType { expr, .. }) => _child_expr(&mut **expr, builder, params),
+
                 _ => Ok(()),
             },
         )
     }
 
-    _child_expr(expr, builder, &Params::from(params))
+    _child_expr(expr, builder, &mut Params::from(params))
 }
 
 fn rec_attr(expr: &mut Expr, builder: &mut Builder, params: &Params) -> Result<bool> {
@@ -182,7 +198,7 @@ fn expr_match(expr: &mut ExprMatch, builder: &mut Builder, params: &Params) -> R
     fn skip(arm: &mut Arm, builder: &mut Builder, params: &Params) -> Result<bool> {
         Ok(arm.any_empty_attr(NEVER_ATTR)
             || is_unreachable(&*arm.body, &builder, params)
-            || ((arm.any_empty_attr(REC_ATTR) || params.rec.get())
+            || ((arm.any_empty_attr(REC_ATTR) || params.rec)
                 && rec_attr(&mut *arm.body, builder, params)?))
     }
 
@@ -205,8 +221,7 @@ fn expr_if(expr: &mut ExprIf, builder: &mut Builder, params: &Params) -> Result<
             _ => true,
         } || match last {
             Some(Stmt::Expr(expr)) => {
-                (expr.any_empty_attr(REC_ATTR) || params.rec.get())
-                    && rec_attr(expr, builder, params)?
+                (expr.any_empty_attr(REC_ATTR) || params.rec) && rec_attr(expr, builder, params)?
             }
             _ => true,
         })
@@ -296,6 +311,7 @@ impl<'a> VisitMut for LoopVisitor<'a> {
                     });
                 }
             }
+
             _ => {}
         }
 
