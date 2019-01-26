@@ -1,5 +1,9 @@
 # Unreleased
 
+* Update minimum derive_utils version to 0.6.1
+
+* Update minimum smallvec version to 0.6.8
+
 # 0.3.7 - 2019-01-26
 
 * Fix bug of closure support

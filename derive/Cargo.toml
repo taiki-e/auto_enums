@@ -18,11 +18,11 @@ travis-ci = { repository = "taiki-e/auto_enums" }
 proc-macro = true
 
 [dependencies]
-derive_utils = "^0.6.0"
+derive_utils = "^0.6.1"
 lazy_static = "1.2"
 proc-macro2 = "^0.4.13"
 quote = "^0.6.8"
-smallvec = "^0.6.7"
+smallvec = "^0.6.8"
 syn = { version = "^0.15.19", features = ["full", "extra-traits"] }
 
 [features]
