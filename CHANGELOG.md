@@ -1,5 +1,7 @@
 # Unreleased
 
+# 0.3.8 - 2019-01-26
+
 * Update minimum derive_utils version to 0.6.1
 
 * Update minimum smallvec version to 0.6.8
