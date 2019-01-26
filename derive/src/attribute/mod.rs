@@ -224,9 +224,11 @@ fn expand(args: TokenStream2, input: TokenStream) -> Result<TokenStream2> {
         }
     }
 
-    if derive.is_empty() {
-        Ok(quote!(#item #ts))
+    let mut item = if derive.is_empty() {
+        item.into_token_stream()
     } else {
-        Ok(quote!(#[derive(#(#derive),*)] #item #ts))
-    }
+        quote!(#[derive(#(#derive),*)] #item)
+    };
+    item.extend(ts);
+    Ok(item)
 }
