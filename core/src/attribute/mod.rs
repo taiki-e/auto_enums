@@ -51,6 +51,36 @@ fn parent_stmt(stmt: &mut Stmt, params: Params) -> Result<()> {
     }
 }
 
+fn visit_expr(expr: &mut Expr, builder: &mut Builder, params: &mut Params) -> Result<()> {
+    match expr {
+        Expr::Closure(ExprClosure { body, .. }) if !params.never() => {
+            let visit_try = find_try(params.marker(), |v| v.visit_expr_mut(body));
+            if !visit_try {
+                child_expr(&mut **body, builder, params)?;
+            }
+
+            params._visitor(
+                if visit_try {
+                    VisitOption::Try
+                } else {
+                    VisitOption::Return
+                },
+                builder,
+                |v| v.visit_expr_mut(&mut **body),
+            );
+        }
+        _ => {
+            if !params.never() {
+                child_expr(expr, builder, params)?;
+            }
+
+            params.visitor(builder, |v| v.visit_expr_mut(expr));
+        }
+    }
+
+    Ok(())
+}
+
 fn build_expr(expr: &mut Expr, builder: &mut Builder, params: &Params) -> Result<()> {
     builder.build(params.args()).map(|item| {
         replace_expr(expr, |expr| {
@@ -67,20 +97,7 @@ fn parent_expr(expr: &mut Expr, mut params: Params) -> Result<()> {
         return Ok(());
     }
 
-    match expr {
-        Expr::Closure(ExprClosure { body, .. }) if !params.never() => {
-            child_expr(&mut **body, &mut builder, &params)?;
-
-            params.fn_visitor(&mut builder, |v| v.visit_expr_mut(&mut **body));
-        }
-        _ => {
-            if !params.never() {
-                child_expr(expr, &mut builder, &params)?;
-            }
-
-            params.visitor(&mut builder, |v| v.visit_expr_mut(expr));
-        }
-    }
+    visit_expr(expr, &mut builder, &mut params)?;
 
     match builder.len() {
         0 | 1 if !params.attr() => Err(unsupported_expr(
@@ -130,20 +147,7 @@ fn stmt_let(local: &mut Local, mut params: Params) -> Result<()> {
         .map(|(_, expr)| expr)
         .ok_or_else(|| unsupported_stmt("uninitialized let statement"))?;
 
-    match &mut *expr {
-        Expr::Closure(ExprClosure { body, .. }) if !params.never() => {
-            child_expr(&mut **body, &mut builder, &params)?;
-
-            params.fn_visitor(&mut builder, |v| v.visit_expr_mut(&mut **body));
-        }
-        expr => {
-            if !params.never() {
-                child_expr(expr, &mut builder, &params)?;
-            }
-
-            params.visitor(&mut builder, |c| c.visit_expr_mut(expr));
-        }
-    }
+    visit_expr(&mut *expr, &mut builder, &mut params)?;
 
     match builder.len() {
         0 | 1 if !params.attr() => Err(unsupported_stmt(
@@ -159,15 +163,45 @@ fn stmt_let(local: &mut Local, mut params: Params) -> Result<()> {
 
 fn item_fn(item: &mut ItemFn, mut params: Params) -> Result<()> {
     let mut builder = Builder::new();
-    let mut return_impl_trait = false;
+    let mut option = VisitOption::default();
 
-    if let ReturnType::Type(_, ty) = &mut item.decl.output {
-        if let Type::ImplTrait(_) = &**ty {
-            return_impl_trait = true;
+    {
+        let ItemFn { decl, block, .. } = item;
+        if let ReturnType::Type(_, ty) = &mut decl.output {
+            match &**ty {
+                // `return`
+                Type::ImplTrait(_) if !params.never() => option = VisitOption::Return,
+
+                // `?` operator
+                Type::Path(TypePath { qself: None, path }) if !params.never() => {
+                    let PathSegment { arguments, ident } = &path.segments[path.segments.len() - 1];
+                    // `Result<T, impl Trait>`
+                    match arguments {
+                        PathArguments::AngleBracketed(AngleBracketedGenericArguments {
+                            colon2_token: None,
+                            args,
+                            ..
+                        }) if args.len() == 2 && ident == "Result" => {
+                            if let (
+                                GenericArgument::Type(_),
+                                GenericArgument::Type(Type::ImplTrait(_)),
+                            ) = (&args[0], &args[1])
+                            {
+                                if find_try(params.marker(), |v| v.visit_block_mut(&mut **block)) {
+                                    option = VisitOption::Try;
+                                }
+                            }
+                        }
+                        _ => {}
+                    }
+                }
+
+                _ => {}
+            }
+
+            #[cfg(feature = "type_analysis")]
+            params.impl_traits(&mut *ty);
         }
-
-        #[cfg(feature = "type_analysis")]
-        params.impl_traits(&mut *ty);
     }
 
     if params.args().is_empty() {
@@ -175,17 +209,15 @@ fn item_fn(item: &mut ItemFn, mut params: Params) -> Result<()> {
         return Ok(());
     }
 
-    match (*item.block).stmts.last_mut() {
-        Some(Stmt::Expr(expr)) if !params.never() => child_expr(expr, &mut builder, &params)?,
+    match item.block.stmts.last_mut() {
+        Some(Stmt::Expr(expr)) if !params.never() && !option.is_try() => {
+            child_expr(expr, &mut builder, &params)?
+        }
         Some(_) => {}
         None => Err(unsupported_item("empty function"))?,
     }
 
-    if !params.never() && return_impl_trait {
-        params.fn_visitor(&mut builder, |v| v.visit_item_fn_mut(item));
-    } else {
-        params.visitor(&mut builder, |v| v.visit_item_fn_mut(item));
-    }
+    params._visitor(option, &mut builder, |v| v.visit_item_fn_mut(item));
 
     match builder.len() {
         0 | 1 if !params.attr() => Err(unsupported_item(
@@ -193,10 +225,10 @@ fn item_fn(item: &mut ItemFn, mut params: Params) -> Result<()> {
         )),
         0 => Ok(()),
         _ => builder.build(params.args()).map(|i| {
-            let mut stmts = Vec::with_capacity((*item.block).stmts.len() + 1);
+            let mut stmts = Vec::with_capacity(item.block.stmts.len() + 1);
             stmts.push(Stmt::Item(i.into()));
-            stmts.append(&mut (*item.block).stmts);
-            (*item.block).stmts = stmts;
+            stmts.append(&mut item.block.stmts);
+            item.block.stmts = stmts;
         }),
     }
 }
