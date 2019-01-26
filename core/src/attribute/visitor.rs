@@ -51,8 +51,8 @@ pub(super) struct Visitor<'a> {
     builder: &'a mut Builder,
     marker: &'a Marker,
     attr: &'a mut bool,
-    in_closure: isize,
     visit_return: bool,
+    in_closure: bool,
     foreign: bool,
 }
 
@@ -60,7 +60,6 @@ impl<'a> Visitor<'a> {
     pub(super) fn new(
         marker: &'a Marker,
         visit_return: bool,
-        is_closure: bool,
         attr: &'a mut bool,
         builder: &'a mut Builder,
     ) -> Self {
@@ -68,8 +67,8 @@ impl<'a> Visitor<'a> {
             builder,
             marker,
             attr,
-            in_closure: if is_closure { 2 } else { 1 },
             visit_return,
+            in_closure: false,
             foreign: false,
         }
     }
@@ -87,10 +86,10 @@ impl<'a> Visitor<'a> {
         if !self.visit_return {
             return;
         } else if let Expr::Closure(_) = &expr {
-            self.in_closure -= 1;
+            self.in_closure = true;
         }
 
-        if self.in_closure > 0 && !expr.any_empty_attr(NEVER_ATTR) {
+        if !self.in_closure && !expr.any_empty_attr(NEVER_ATTR) {
             if let Expr::Return(ExprReturn { expr, .. }) = expr {
                 expr.replace_boxed_expr(|expr| match expr {
                     Expr::Macro(expr) => {

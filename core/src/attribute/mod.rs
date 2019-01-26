@@ -71,7 +71,7 @@ fn parent_expr(expr: &mut Expr, mut params: Params) -> Result<()> {
         Expr::Closure(ExprClosure { body, .. }) if !params.never() => {
             child_expr(&mut **body, &mut builder, &params)?;
 
-            params.fn_visitor(true, &mut builder, |v| v.visit_expr_mut(&mut **body));
+            params.fn_visitor(&mut builder, |v| v.visit_expr_mut(&mut **body));
         }
         _ => {
             if !params.never() {
@@ -134,7 +134,7 @@ fn stmt_let(local: &mut Local, mut params: Params) -> Result<()> {
         Expr::Closure(ExprClosure { body, .. }) if !params.never() => {
             child_expr(&mut **body, &mut builder, &params)?;
 
-            params.fn_visitor(true, &mut builder, |v| v.visit_expr_mut(&mut **body));
+            params.fn_visitor(&mut builder, |v| v.visit_expr_mut(&mut **body));
         }
         expr => {
             if !params.never() {
@@ -182,7 +182,7 @@ fn item_fn(item: &mut ItemFn, mut params: Params) -> Result<()> {
     }
 
     if !params.never() && return_impl_trait {
-        params.fn_visitor(false, &mut builder, |v| v.visit_item_fn_mut(item));
+        params.fn_visitor(&mut builder, |v| v.visit_item_fn_mut(item));
     } else {
         params.visitor(&mut builder, |v| v.visit_item_fn_mut(item));
     }
