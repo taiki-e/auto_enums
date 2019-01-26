@@ -347,7 +347,9 @@ fn stable_1_30() {
                 } else if x > 3 {
                     2..=10
                 } else {
-                    (0..2).map(|x| x + 1)
+                    (0..2).map(|x| {
+                        return x + 1;
+                    })
                 }
             }
         };

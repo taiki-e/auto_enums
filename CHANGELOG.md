@@ -1,5 +1,7 @@
 # Unreleased
 
+* Fix bug of closure support
+
 # 0.3.6 - 2019-01-19
 
 * Parentheses and type ascription can now be searched recursively
