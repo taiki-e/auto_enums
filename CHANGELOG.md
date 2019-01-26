@@ -1,5 +1,7 @@
 # Unreleased
 
+# 0.3.7 - 2019-01-26
+
 * Fix bug of closure support
 
 # 0.3.6 - 2019-01-19
