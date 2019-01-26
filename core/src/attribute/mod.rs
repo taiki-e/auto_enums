@@ -98,6 +98,35 @@ fn parent_expr(expr: &mut Expr, mut params: Params) -> Result<()> {
     }
 
     visit_expr(expr, &mut builder, &mut params)?;
+    /*
+    match expr {
+        Expr::Closure(ExprClosure { body, output, .. }) if !params.never() => {
+            // If `true`, the closures returns `impl Trait` or default.
+            let mut return_impl_trait = match output {
+                ReturnType::Type(_, ty) => match &**ty {
+                    Type::ImplTrait(_) => true,
+                    _ => false,
+                },
+                ReturnType::Default => true,
+            };
+
+            child_expr(&mut **body, &mut builder, &params)?;
+
+            if return_impl_trait {
+                params.fn_visitor(true, &mut builder, |v| v.visit_expr_mut(&mut **body));
+            } else {
+                params.visitor(&mut builder, |v| v.visit_expr_mut(&mut **body));
+            }
+        }
+        _ => {
+            if !params.never() {
+                child_expr(expr, &mut builder, &params)?;
+            }
+
+            params.visitor(&mut builder, |v| v.visit_expr_mut(expr));
+        }
+    }
+    */
 
     match builder.len() {
         0 | 1 if !params.attr() => Err(unsupported_expr(

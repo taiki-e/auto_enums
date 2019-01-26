@@ -248,6 +248,7 @@
 //!
 //!     * `#[auto_enum]` must be used directly for that closure (or the let binding of the closure).
 //!     * `?` operator not used in the scope.
+//!     * The return type is not specified or is `impl Trait`.
 //!
 //!   ```rust
 //!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]

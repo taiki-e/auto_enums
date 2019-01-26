@@ -260,6 +260,25 @@ fn stable_1_30() {
     }
     assert_eq!(return3(10).unwrap().fold(0, |sum, x| sum + x), 54);
 
+    #[auto_enum]
+    fn return4(x: i32) -> Option<impl Iterator<Item = i32>> {
+        // error[E0562]: `impl Trait` not allowed outside of function and inherent method return types
+        #[auto_enum(Iterator)]
+        let f = |x| -> Option<_> {
+            if x < 0 {
+                return None;
+            }
+
+            Some(match x {
+                0 => marker!(2..8),
+                _ => marker!(2..=10),
+            })
+        };
+
+        f(x)
+    }
+    assert_eq!(return3(10).unwrap().fold(0, |sum, x| sum + x), 54);
+
     #[auto_enum(Debug, Display)]
     fn try_operator1(x: i32) -> Result<impl Iterator<Item = i32>, impl core::fmt::Debug> {
         if x < 0 {
