@@ -102,24 +102,17 @@ impl Params {
     where
         F: FnOnce(&mut Visitor<'_>),
     {
-        self._visitor(false, builder, f)
+        self._visitor(VisitOption::default(), builder, f)
     }
 
-    pub(super) fn fn_visitor<F>(&mut self, builder: &mut Builder, f: F)
-    where
-        F: FnOnce(&mut Visitor<'_>),
-    {
-        self._visitor(true, builder, f)
-    }
-
-    fn _visitor<F>(&mut self, visit_return: bool, builder: &mut Builder, f: F)
+    pub(super) fn _visitor<F>(&mut self, option: VisitOption, builder: &mut Builder, f: F)
     where
         F: FnOnce(&mut Visitor<'_>),
     {
         f(&mut Visitor::new(
             &self.marker,
-            visit_return,
             &mut self.attr,
+            option,
             builder,
         ));
     }

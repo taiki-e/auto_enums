@@ -258,6 +258,34 @@ fn stable_1_30() {
     }
     assert_eq!(return3(10).unwrap().fold(0, |sum, x| sum + x), 54);
 
+    #[auto_enum(Debug, Display)]
+    fn try_operator1(x: i32) -> Result<impl Iterator<Item = i32>, impl core::fmt::Debug> {
+        if x < 0 {
+            Err(1i32)?;
+        }
+
+        let iter = match x {
+            0 => Err(())?,
+            _ => 2..=10,
+        };
+
+        Ok(iter)
+    }
+    assert_eq!(try_operator1(10).unwrap().fold(0, |sum, x| sum + x), 54);
+
+    #[auto_enum(Debug)]
+    fn try_operator2(x: i32) -> Result<impl Iterator<Item = i32>, impl core::fmt::Debug> {
+        if x < 0 {
+            Err(1i32)?;
+        }
+
+        match x {
+            0 => Err(())?,
+            _ => Ok(2..=10),
+        }
+    }
+    assert_eq!(try_operator2(10).unwrap().fold(0, |sum, x| sum + x), 54);
+
     #[auto_enum(Iterator)]
     fn marker3(x: i32, y: i32) -> impl Iterator<Item = i32> {
         let iter;
@@ -534,6 +562,18 @@ fn stable_1_30_std() {
         .transpose_err()
     }
     assert!(transpose_err(None).unwrap_err().source().is_some());
+
+    #[auto_enum(Debug, Display, Error)]
+    fn try_operator(file: Option<&Path>) -> Result<(), impl Error> {
+        if let Some(_) = file {
+            Err(io::Error::from(io::ErrorKind::NotFound)).map_err(IoError::Io2)?
+        } else {
+            Err(io::Error::from(io::ErrorKind::NotFound))?
+        }
+
+        Ok(())
+    }
+    assert!(try_operator(None).unwrap_err().source().is_some());
 }
 
 #[cfg(feature = "unstable")]
@@ -635,6 +675,8 @@ fn nightly() {
         };
         assert_eq!(iter.fold(0, |sum, x| sum + x), ANS[i]);
     }
+
+    // never attr
     for i in 0..2 {
         #[cfg_attr(feature = "rustfmt", rustfmt_skip)]
         #[auto_enum(Iterator)]
@@ -687,23 +729,23 @@ fn nightly() {
         assert_eq!(iter.fold(0, |sum, x| sum + x), ANS[i]);
     }
 
-    #[auto_enum(Iterator, Clone)]
-    fn manual_4(x: usize) -> impl Iterator<Item = i32> + Clone {
-        {
-            if x == 0 {
-                return 2..8;
-            }
-            match x {
-                _ if x < 2 => vec![2, 0].into_iter(),
-                _ => 2..=10,
-            }
+    #[auto_enum(Debug)]
+    fn try_operator(x: i32) -> Result<impl Iterator<Item = i32>, impl core::fmt::Debug> {
+        if x < 0 {
+            Err(1i32)?;
         }
-    }
-    for i in 0..2 {
-        assert_eq!(manual_4(i).clone().fold(0, |sum, x| sum + x), ANS[i] - 1);
-    }
 
-    fn manual_5(x: usize) -> impl Iterator<Item = i32> + Clone {
+        let iter = match x {
+            0 => Err(())?,
+            1 => None?,
+            _ => 2..=10,
+        };
+
+        Ok(iter)
+    }
+    assert_eq!(try_operator(10).unwrap().fold(0, |sum, x| sum + x), 54);
+
+    fn marker1(x: usize) -> impl Iterator<Item = i32> + Clone {
         #[auto_enum(Iterator, Clone)]
         (0..x as i32).map(|x| x + 1).flat_map(|x| {
             if x > 10 {
@@ -714,10 +756,10 @@ fn nightly() {
         })
     }
     for i in 0..2 {
-        let _ = manual_5(i).fold(0, |sum, x| sum + x);
+        let _ = marker1(i).clone().fold(0, |sum, x| sum + x);
     }
 
-    fn manual_6(x: usize) -> impl Iterator<Item = i32> + Clone {
+    fn marker2(x: usize) -> impl Iterator<Item = i32> + Clone {
         let a;
 
         #[auto_enum(Iterator, Clone)]
@@ -729,7 +771,7 @@ fn nightly() {
         a
     }
     for i in 0..2 {
-        assert_eq!(manual_6(i).fold(0, |sum, x| sum + x), ANS[i] - 1);
+        assert_eq!(marker2(i).clone().fold(0, |sum, x| sum + x), ANS[i] - 1);
     }
 
     /*
@@ -743,7 +785,7 @@ fn nightly() {
         _ => 2..=10,
     };
     */
-    fn manual_7(x: usize) -> impl Iterator<Item = i32> + Clone {
+    fn assign(x: usize) -> impl Iterator<Item = i32> + Clone {
         let a;
         a = #[auto_enum(Iterator, Clone)]
         match x {
@@ -754,18 +796,18 @@ fn nightly() {
         a
     }
     for i in 0..2 {
-        assert_eq!(manual_7(i).fold(0, |sum, x| sum + x), ANS[i] - 1);
+        assert_eq!(assign(i).fold(0, |sum, x| sum + x), ANS[i] - 1);
     }
 
     #[auto_enum(Fn)]
-    fn fn_traits(option: bool) -> impl Fn(i32) -> i32 {
+    fn fn_traits1(option: bool) -> impl Fn(i32) -> i32 {
         if option {
             |x| x + 1
         } else {
             |y| y - 1
         }
     }
-    assert_eq!(fn_traits(true)(1), 2);
+    assert_eq!(fn_traits1(true)(1), 2);
 
     // parentheses and type ascription
     #[auto_enum(Fn)]

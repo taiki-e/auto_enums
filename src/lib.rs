@@ -244,7 +244,10 @@
 //!
 //!   `#[auto_enum]` can parse the `return` in the scope.
 //!
-//!   However, `#[auto_enum]` must be used directly for that closure (or the let binding of the closure).
+//!   This analysis is valid only when the following two conditions are satisfied.
+//!
+//!     * `#[auto_enum]` must be used directly for that closure (or the let binding of the closure).
+//!     * `?` operator not used in the scope.
 //!
 //!   ```rust
 //!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]
@@ -263,6 +266,102 @@
 //!               0..x
 //!           } else {
 //!               x..=0
+//!           }
+//!       };
+//!       f(1)
+//!   }
+//!   # fn main() { let _ = closure(); }
+//!   ```
+//!
+//! * `?` operator (in functions)
+//!
+//!   `#[auto_enum]` can parse the `?` operator in the scope.
+//!
+//!   This analysis is valid only when the return type is `Result<T, impl Trait>`.
+//!
+//!   ```rust
+//!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]
+//!   # #[macro_use]
+//!   # extern crate auto_enums;
+//!   use std::fmt::{Debug, Display};
+//!
+//!   // `?` operator (in functions)
+//!   #[auto_enum(Debug, Display)]
+//!   fn func(x: i32) -> Result<i32, impl Debug + Display> {
+//!       if x == 0 {
+//!           Err("`x` is zero")?;
+//!       }
+//!
+//!       // The last branch of the function is not parsed.
+//!       if x < 0 {
+//!           Err(x)?
+//!       } else {
+//!           Ok(x + 1)
+//!       }
+//!   }
+//!   # fn main() { let _ = func(1); }
+//!   ```
+//!
+//!   By default, `?` operator is expanded as follows:
+//!
+//!   ```rust
+//!   # pub enum Enum<A> { Veriant(A) }
+//!   # pub fn a<T, E>(expr: Result<T, E>) -> Result<T, Enum<E>> {
+//!   # Ok(
+//!   match expr {
+//!       Ok(val) => val,
+//!       Err(err) => return Err(Enum::Veriant(err)),
+//!   }
+//!   # )
+//!   # }
+//!   ```
+//!
+//!   When "try_trait" crate feature is enabled, `?` operator is expanded as follows (note that this uses [an unstable feature](https://github.com/rust-lang/rust/issues/42327)):
+//!
+//!   ```rust
+//!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]
+//!   # #[cfg(feature = "try_trait")]
+//!   # use std::ops::Try;
+//!   # #[cfg(feature = "try_trait")]
+//!   # pub enum Enum<A> { Veriant(A) }
+//!   # #[cfg(feature = "try_trait")]
+//!   # pub fn a<T, E>(expr: Result<T, E>) -> Result<T, Enum<E>> {
+//!   # Ok(
+//!   match Try::into_result(expr) {
+//!       Ok(val) => val,
+//!       Err(err) => return Try::from_error(Enum::Veriant(err)),
+//!   }
+//!   # )
+//!   # }
+//!   # fn main() {}
+//!   ```
+//!
+//! * `?` operator (in closures)
+//!
+//!   `#[auto_enum]` can parse the `?` operator in the scope.
+//!
+//!   However, `#[auto_enum]` must be used directly for that closure (or the let binding of the closure).
+//!
+//!   ```rust
+//!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]
+//!   # #[macro_use]
+//!   # extern crate auto_enums;
+//!   use std::fmt::{Debug, Display};
+//!
+//!   // `?` operator (in closures)
+//!   #[auto_enum] // Nightly does not need an empty attribute to the function.
+//!   fn closure() -> Result<i32, impl Debug + Display> {
+//!       #[auto_enum(Debug, Display)]
+//!       let f = |x| {
+//!           if x == 0 {
+//!               Err("`x` is zero")?
+//!           }
+//!
+//!           // The last branch of the function is not parsed.
+//!           if x < 0 {
+//!               Err(x)?
+//!           } else {
+//!               Ok(x + 1)
 //!           }
 //!       };
 //!       f(1)
@@ -713,6 +812,11 @@
 //! * `transpose_methods`
 //!   * Disabled by default.
 //!   * Use `transpose*` methods.
+//!
+//! * `try_trait`
+//!   * Disabled by default.
+//!   * Make `?` operator support more flexible, and to make iterator implementation more effective.
+//!   * This requires Rust Nightly and you need to enable the unstable [`try_trait`](https://github.com/rust-lang/rust/issues/42327) feature gate.
 //!
 //! * `unstable`
 //!   * Disabled by default.

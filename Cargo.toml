@@ -42,6 +42,9 @@ type_analysis = ["auto_enums_core/type_analysis"]
 # Use `transpose*` methods.
 transpose_methods = ["auto_enums_derive/transpose_methods"]
 
+# Make `?` operator support more flexible, and to make iterator implementation more effective.
+try_trait = ["auto_enums_core/try_trait", "auto_enums_derive/try_trait"]
+
 # Use unstable features to make attribute macro more effective.
 unstable = ["auto_enums_core/unstable", "auto_enums_derive/unstable"]
 
@@ -60,8 +63,6 @@ fmt = ["auto_enums_derive/fmt"]
 exact_size_is_empty = ["auto_enums_derive/exact_size_is_empty"]
 # Implements `io::Read::read_initializer`.
 read_initializer = ["auto_enums_derive/read_initializer"]
-# Make iterator implementation more effective.
-try_trait = ["auto_enums_derive/try_trait"]
 # Allow `Index<Idx: ?Sized>` and `IndexMut<Idx: ?Sized>`.
 unsized_locals = ["auto_enums_derive/unsized_locals"]
 
