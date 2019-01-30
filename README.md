@@ -24,7 +24,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-auto_enums = "0.3"
+auto_enums = "0.4"
 ```
 
 and this to your crate root:

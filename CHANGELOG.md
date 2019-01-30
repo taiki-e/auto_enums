@@ -1,5 +1,7 @@
 # Unreleased
 
+# 0.4.0 - 2019-01-30
+
 * Add support for `?` operator in functions and closures
 
 * Add support for `[core|std]::ops::Generator`
