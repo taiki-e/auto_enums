@@ -1,5 +1,4 @@
 use proc_macro2::TokenStream;
-use quote::quote;
 
 use crate::utils::*;
 
@@ -17,9 +16,17 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
                 #[inline]
                 unsafe fn initializer(&self) -> #io::Initializer;
                 #[inline]
-                fn poll_read(&mut self, lw: &#root::task::LocalWaker, buf: &mut [u8]) -> #root::task::Poll<#root::result::Result<usize, #io::Error>>;
+                fn poll_read(
+                    &mut self,
+                    lw: &#root::task::LocalWaker,
+                    buf: &mut [u8],
+                ) -> #root::task::Poll<#root::result::Result<usize, #io::Error>>;
                 #[inline]
-                fn poll_vectored_read(&mut self, lw: &#root::task::LocalWaker, vec: &mut [&mut #io::IoVec]) -> #root::task::Poll<#root::result::Result<usize, #io::Error>>;
+                fn poll_vectored_read(
+                    &mut self,
+                    lw: &#root::task::LocalWaker,
+                    vec: &mut [&mut #io::IoVec],
+                ) -> #root::task::Poll<#root::result::Result<usize, #io::Error>>;
             }
         }?,
     )

@@ -1,5 +1,4 @@
 use proc_macro2::TokenStream;
-use quote::quote;
 
 use crate::utils::*;
 
@@ -104,7 +103,10 @@ fn transpose_ok(data: &Data, root: &TokenStream) -> Result<TokenStream> {
     let ty_generics = fields.iter().map(|f| quote!(#result<#f, __E>));
     *impls.self_ty() = parse_quote!(#ident<#(#ty_generics),*>)?;
 
-    let transpose = data.variants().iter().map(|v| quote!(#ident::#v(x) => x.map(#ident::#v)));
+    let transpose = data
+        .variants()
+        .iter()
+        .map(|v| quote!(#ident::#v(x) => x.map(#ident::#v)));
     impls.push_item(parse_quote! {
         #[inline]
         fn transpose_ok(self) -> #result<#ident<#(#fields),*>, __E> {
@@ -127,7 +129,10 @@ fn transpose_err(data: &Data, root: &TokenStream) -> Result<TokenStream> {
     let ty_generics = fields.iter().map(|f| quote!(#result<__T, #f>));
     *impls.self_ty() = parse_quote!(#ident<#(#ty_generics),*>)?;
 
-    let transpose = data.variants().iter().map(|v| quote!(#ident::#v(x) => x.map_err(#ident::#v)));
+    let transpose = data
+        .variants()
+        .iter()
+        .map(|v| quote!(#ident::#v(x) => x.map_err(#ident::#v)));
     impls.push_item(parse_quote! {
         #[inline]
         fn transpose_err(self) -> #result<__T, #ident<#(#fields),*>> {

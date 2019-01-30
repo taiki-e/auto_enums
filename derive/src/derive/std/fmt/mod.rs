@@ -2,7 +2,6 @@ macro_rules! fmt_impl {
     ($trait:ident, $Trait:ident, [$($name:expr),*]) => {
         pub(crate) mod $trait {
             use proc_macro2::TokenStream;
-            use quote::quote;
 
             use crate::utils::*;
 

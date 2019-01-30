@@ -1,9 +1,9 @@
 use proc_macro2::{Ident, Span, TokenStream};
-use quote::quote;
 use smallvec::SmallVec;
 use syn::{punctuated::Punctuated, *};
 
 pub(crate) use derive_utils::{Error, Result, *};
+pub(crate) use quote::{quote, ToTokens};
 
 pub(crate) type Data = EnumData;
 pub(crate) type Stack<T> = SmallVec<[T; 4]>;

@@ -1,5 +1,4 @@
 use proc_macro2::TokenStream;
-use quote::quote;
 
 use crate::utils::*;
 
@@ -7,7 +6,6 @@ pub(crate) const NAME: &[&str] = &["Iterator"];
 
 pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
     let root = std_root();
-    let iter = quote!(#root::iter);
 
     #[cfg(feature = "try_trait")]
     let try_trait = quote! {
@@ -48,7 +46,7 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
 
     derive_trait!(
         data,
-        parse_quote!(#iter::Iterator)?,
+        parse_quote!(#root::iter::Iterator)?,
         parse_quote! {
             trait Iterator {
                 type Item;
@@ -64,11 +62,11 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
                 fn nth(&mut self, n: usize) -> #root::option::Option<Self::Item>;
                 #[inline]
                 #[must_use = "if you really need to exhaust the iterator, consider `.for_each(drop)` instead"]
-                fn collect<__U: #iter::FromIterator<Self::Item>>(self) -> __U;
+                fn collect<__U: #root::iter::FromIterator<Self::Item>>(self) -> __U;
                 #[inline]
                 fn partition<__U, __F>(self, f: __F) -> (__U, __U)
                 where
-                    __U: #root::default::Default + #iter::Extend<Self::Item>,
+                    __U: #root::default::Default + #root::iter::Extend<Self::Item>,
                     __F: #root::ops::FnMut(&Self::Item) -> bool;
                 #try_trait
             }

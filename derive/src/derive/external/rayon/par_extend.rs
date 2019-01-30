@@ -1,5 +1,4 @@
 use proc_macro2::TokenStream;
-use quote::quote;
 
 use crate::utils::*;
 
@@ -21,4 +20,3 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
         }?,
     )
 }
-

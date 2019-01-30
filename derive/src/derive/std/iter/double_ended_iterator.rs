@@ -1,5 +1,4 @@
 use proc_macro2::TokenStream;
-use quote::quote;
 
 use crate::utils::*;
 
@@ -7,7 +6,6 @@ pub(crate) const NAME: &[&str] = &["DoubleEndedIterator"];
 
 pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
     let root = std_root();
-    let iter = quote!(#root::iter);
 
     #[cfg(feature = "try_trait")]
     let try_trait = quote! {
@@ -33,9 +31,9 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
     derive_trait!(
         data,
         Some(ident_call_site("Item")),
-        parse_quote!(#iter::DoubleEndedIterator)?,
+        parse_quote!(#root::iter::DoubleEndedIterator)?,
         parse_quote! {
-            trait DoubleEndedIterator: #iter::Iterator {
+            trait DoubleEndedIterator: #root::iter::Iterator {
                 #[inline]
                 fn next_back(&mut self) -> #root::option::Option<Self::Item>;
                 #try_trait

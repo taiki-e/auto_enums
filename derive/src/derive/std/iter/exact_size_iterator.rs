@@ -1,5 +1,4 @@
 use proc_macro2::TokenStream;
-use quote::quote;
 
 use crate::utils::*;
 
@@ -7,7 +6,6 @@ pub(crate) const NAME: &[&str] = &["ExactSizeIterator"];
 
 pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
     let root = std_root();
-    let iter = quote!(#root::iter);
 
     #[cfg(not(feature = "exact_size_is_empty"))]
     let is_empty = TokenStream::new();
@@ -20,9 +18,9 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
     derive_trait!(
         data,
         Some(ident_call_site("Item")),
-        parse_quote!(#iter::ExactSizeIterator)?,
+        parse_quote!(#root::iter::ExactSizeIterator)?,
         parse_quote! {
-            trait ExactSizeIterator: #iter::Iterator {
+            trait ExactSizeIterator: #root::iter::Iterator {
                 #[inline]
                 fn len(&self) -> usize;
                 #is_empty

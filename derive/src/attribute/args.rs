@@ -1,5 +1,4 @@
 use proc_macro2::{token_stream::IntoIter, Ident, TokenStream as TokenStream2, TokenTree};
-use quote::ToTokens;
 use smallvec::smallvec;
 use syn::Path;
 

@@ -1,5 +1,4 @@
 use proc_macro2::TokenStream;
-use quote::quote;
 
 use crate::utils::*;
 
@@ -15,13 +14,27 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
         parse_quote! {
             trait AsyncWrite {
                 #[inline]
-                fn poll_write(&mut self, lw: &#root::task::LocalWaker, buf: &[u8]) -> #root::task::Poll<#root::result::Result<usize, #io::Error>>;
+                fn poll_write(
+                    &mut self,
+                    lw: &#root::task::LocalWaker,
+                    buf: &[u8],
+                ) -> #root::task::Poll<#root::result::Result<usize, #io::Error>>;
                 #[inline]
-                fn poll_vectored_write(&mut self, lw: &#root::task::LocalWaker, vec: &[&#io::IoVec]) -> #root::task::Poll<#root::result::Result<usize, #io::Error>>;
+                fn poll_vectored_write(
+                    &mut self,
+                    lw: &#root::task::LocalWaker,
+                    vec: &[&#io::IoVec],
+                ) -> #root::task::Poll<#root::result::Result<usize, #io::Error>>;
                 #[inline]
-                fn poll_flush(&mut self, lw: &#root::task::LocalWaker) -> #root::task::Poll<#root::result::Result<(), #io::Error>>;
+                fn poll_flush(
+                    &mut self,
+                    lw: &#root::task::LocalWaker,
+                ) -> #root::task::Poll<#root::result::Result<(), #io::Error>>;
                 #[inline]
-                fn poll_close(&mut self, lw: &#root::task::LocalWaker) -> #root::task::Poll<#root::result::Result<(), #io::Error>>;
+                fn poll_close(
+                    &mut self,
+                    lw: &#root::task::LocalWaker,
+                ) -> #root::task::Poll<#root::result::Result<(), #io::Error>>;
             }
         }?,
     )
