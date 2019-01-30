@@ -5,10 +5,12 @@
         stmt_expr_attributes,
         fn_traits,
         unboxed_closures,
+        exact_size_is_empty,
         futures_api,
+        generators,
+        generator_trait,
         read_initializer,
         trusted_len,
-        exact_size_is_empty,
         try_trait,
         unsized_locals,
         type_ascription,
@@ -815,4 +817,43 @@ fn nightly() {
         (if option { |x| x + 1 } else { |y| y - 1 }): _
     }
     assert_eq!(fn_traits2(true)(1), 2);
+
+    use core::{
+        ops::{Generator, GeneratorState},
+        pin::Pin,
+    };
+
+    #[auto_enum(Generator)]
+    fn generator_trait(x: i32) -> impl Generator<Yield = i32, Return = &'static str> {
+        match x {
+            0 => || {
+                yield 1;
+                return "foo";
+            },
+            _ => || {
+                yield 2;
+                return "bar";
+            },
+        }
+    }
+
+    let mut generator = generator_trait(0);
+    match Pin::new(&mut generator).resume() {
+        GeneratorState::Yielded(1) => {}
+        _ => panic!("unexpected return from resume"),
+    }
+    match Pin::new(&mut generator).resume() {
+        GeneratorState::Complete("foo") => {}
+        _ => panic!("unexpected return from resume"),
+    }
+
+    let mut generator = generator_trait(1);
+    match Pin::new(&mut generator).resume() {
+        GeneratorState::Yielded(2) => {}
+        _ => panic!("unexpected return from resume"),
+    }
+    match Pin::new(&mut generator).resume() {
+        GeneratorState::Complete("bar") => {}
+        _ => panic!("unexpected return from resume"),
+    }
 }

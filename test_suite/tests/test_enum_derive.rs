@@ -5,10 +5,11 @@
         stmt_expr_attributes,
         fn_traits,
         unboxed_closures,
+        exact_size_is_empty,
         futures_api,
+        generator_trait,
         read_initializer,
         trusted_len,
-        exact_size_is_empty,
         try_trait,
         unsized_locals,
     )
@@ -124,7 +125,7 @@ fn stable_1_30_external() {
 #[cfg(feature = "unstable")]
 #[test]
 fn unstable() {
-    #[enum_derive(Future, Fn, FnMut, FnOnce, Iterator, TrustedLen)]
+    #[enum_derive(Future, Fn, FnMut, FnOnce, Generator, Iterator, TrustedLen)]
     enum Enum1<A, B> {
         A(A),
         B(B),

@@ -2,6 +2,8 @@
 
 * Add support for `?` operator in functions and closures
 
+* Add support for `[core|std]::ops::Generator`
+
 # 0.3.8 - 2019-01-26
 
 * Update minimum derive_utils version to 0.6.1

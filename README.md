@@ -108,10 +108,11 @@ Note that some traits have aliases.
 * [`DerefMut`](https://doc.rust-lang.org/std/ops/trait.DerefMut.html)
 * [`Index`](https://doc.rust-lang.org/std/ops/trait.Index.html)
 * [`IndexMut`](https://doc.rust-lang.org/std/ops/trait.IndexMut.html)
+* [`RangeBounds`](https://doc.rust-lang.org/std/ops/trait.RangeBounds.html)
 * [`Fn`](https://doc.rust-lang.org/std/ops/trait.Fn.html) (*nightly-only*)
 * [`FnMut`](https://doc.rust-lang.org/std/ops/trait.FnMut.html) (*nightly-only*)
 * [`FnOnce`](https://doc.rust-lang.org/std/ops/trait.FnOnce.html) (*nightly-only*)
-* [`RangeBounds`](https://doc.rust-lang.org/std/ops/trait.RangeBounds.html)
+* [`Generator`](https://doc.rust-lang.org/nightly/std/ops/trait.Generator.html) (*nightly-only*)
 
 `[std|core]::convert`
 
