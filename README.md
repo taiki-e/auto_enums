@@ -1,6 +1,6 @@
 # auto_enums
 
-[![Build Status](http://img.shields.io/travis/taiki-e/auto_enums.svg)](https://travis-ci.org/taiki-e/auto_enums)
+[![Build Status](https://travis-ci.org/taiki-e/auto_enums.svg?branch=master)](https://travis-ci.org/taiki-e/auto_enums)
 [![version](https://img.shields.io/crates/v/auto_enums.svg)](https://crates.io/crates/auto_enums/)
 [![documentation](https://docs.rs/auto_enums/badge.svg)](https://docs.rs/auto_enums/)
 [![license](https://img.shields.io/crates/l/auto_enums.svg)](https://crates.io/crates/auto_enums/)
