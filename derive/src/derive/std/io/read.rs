@@ -20,7 +20,7 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
         data,
         parse_quote!(#io::Read)?,
         parse_quote! {
-            trait Iterator {
+            trait Read {
                 #[inline]
                 fn read(&mut self, buf: &mut [u8]) -> #io::Result<usize>;
                 #[inline]
