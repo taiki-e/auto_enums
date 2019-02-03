@@ -90,7 +90,7 @@ where
     op(expr, state)
 }
 
-fn is_unreachable(expr: &Expr, builder: &Builder, params: &Params) -> bool {
+fn is_unreachable(expr: &Expr, builder: &Builder, params: &Params<'_>) -> bool {
     const UNREACHABLE_MACROS: &[&str] = &["unreachable", "panic"];
 
     last_expr(
@@ -150,7 +150,7 @@ pub(super) fn child_expr(
     builder: &mut Builder,
     params: &super::Params,
 ) -> Result<()> {
-    fn _child_expr(expr: &mut Expr, builder: &mut Builder, params: &mut Params) -> Result<()> {
+    fn _child_expr(expr: &mut Expr, builder: &mut Builder, params: &mut Params<'_>) -> Result<()> {
         last_expr_mut(
             expr,
             &mut (builder, params),
@@ -179,7 +179,7 @@ pub(super) fn child_expr(
     _child_expr(expr, builder, &mut Params::from(params))
 }
 
-fn rec_attr(expr: &mut Expr, builder: &mut Builder, params: &Params) -> Result<bool> {
+fn rec_attr(expr: &mut Expr, builder: &mut Builder, params: &Params<'_>) -> Result<bool> {
     last_expr_mut(
         expr,
         builder,
@@ -194,8 +194,8 @@ fn rec_attr(expr: &mut Expr, builder: &mut Builder, params: &Params) -> Result<b
     )
 }
 
-fn expr_match(expr: &mut ExprMatch, builder: &mut Builder, params: &Params) -> Result<()> {
-    fn skip(arm: &mut Arm, builder: &mut Builder, params: &Params) -> Result<bool> {
+fn expr_match(expr: &mut ExprMatch, builder: &mut Builder, params: &Params<'_>) -> Result<()> {
+    fn skip(arm: &mut Arm, builder: &mut Builder, params: &Params<'_>) -> Result<bool> {
         Ok(arm.any_empty_attr(NEVER_ATTR)
             || is_unreachable(&*arm.body, &builder, params)
             || ((arm.any_empty_attr(REC_ATTR) || params.rec)
@@ -212,8 +212,8 @@ fn expr_match(expr: &mut ExprMatch, builder: &mut Builder, params: &Params) -> R
     })
 }
 
-fn expr_if(expr: &mut ExprIf, builder: &mut Builder, params: &Params) -> Result<()> {
-    fn skip(last: Option<&mut Stmt>, builder: &mut Builder, params: &Params) -> Result<bool> {
+fn expr_if(expr: &mut ExprIf, builder: &mut Builder, params: &Params<'_>) -> Result<()> {
+    fn skip(last: Option<&mut Stmt>, builder: &mut Builder, params: &Params<'_>) -> Result<bool> {
         Ok(match &last {
             Some(Stmt::Expr(expr)) | Some(Stmt::Semi(expr, _)) => {
                 is_unreachable(expr, &builder, params)
@@ -245,7 +245,7 @@ fn expr_if(expr: &mut ExprIf, builder: &mut Builder, params: &Params) -> Result<
     }
 }
 
-fn expr_loop(expr: &mut ExprLoop, builder: &mut Builder, params: &Params) -> Result<()> {
+fn expr_loop(expr: &mut ExprLoop, builder: &mut Builder, params: &Params<'_>) -> Result<()> {
     LoopVisitor::new(params.marker, &expr, builder).visit_block_mut(&mut expr.body);
 
     Ok(())
