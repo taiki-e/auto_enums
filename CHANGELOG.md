@@ -1,5 +1,7 @@
 # Unreleased
 
+* Update minimum derive_utils version to 0.6.3
+
 * Update minimum syn version to 0.15.22
 
 # 0.4.0 - 2019-01-30

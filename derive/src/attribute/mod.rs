@@ -3,6 +3,7 @@ use std::{borrow::Cow, collections::HashMap};
 use lazy_static::lazy_static;
 use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
+use syn::ItemEnum;
 
 use crate::utils::*;
 
@@ -190,8 +191,9 @@ fn expand(args: TokenStream2, input: TokenStream) -> Result<TokenStream2> {
             .map_or(false, |x| stack.iter().any(|(s, _)| s == x))
     }
 
-    let item = syn::parse(input).map_err(|_| format!("`{}` may only be used on enums", NAME))?;
-    let data = Data::from_item(&item).map_err(|e| format!("`{}` {}", NAME, e))?;
+    let item: ItemEnum =
+        syn::parse(input).map_err(|_| format!("`{}` may only be used on enums", NAME))?;
+    let data = Data::new(&item).map_err(|e| format!("`{}` {}", NAME, e))?;
     let mut stack = Stack::new();
     {
         let args = parse_args(args).map_err(|e| format!("`{}` {}", NAME, e))?;
