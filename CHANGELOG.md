@@ -1,5 +1,7 @@
 # Unreleased
 
+* Update minimum syn version to 0.15.22
+
 # 0.4.0 - 2019-01-30
 
 * Add support for `?` operator in functions and closures

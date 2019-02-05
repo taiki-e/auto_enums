@@ -22,7 +22,7 @@ proc-macro2 = "^0.4.13"
 quote = "^0.6.8"
 rand = "^0.6.1"
 smallvec = "^0.6.8"
-syn = { version = "^0.15.19", features = ["full", "visit-mut", "extra-traits"] }
+syn = { version = "^0.15.22", features = ["full", "visit-mut", "extra-traits"] }
 
 [features]
 # Default features.
