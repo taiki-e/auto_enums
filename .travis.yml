@@ -16,7 +16,10 @@ matrix:
       env: ALLOW_FAILURES=true
 
   include:
+    # This is the minimum Rust version supported by auto_enums.
+    # When updating this, the reminder to update the minimum required version in README.md.
     - rust: 1.30.0
+
     - rust: stable
     - rust: beta
     - rust: nightly

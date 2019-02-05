@@ -854,10 +854,6 @@
 //!
 //! * There needs to be marker macros for unsupported expressions.
 //!
-//! ## Rust Version
-//!
-//! The current minimum required Rust version is 1.30.
-//!
 
 #![recursion_limit = "256"]
 #![doc(html_root_url = "https://docs.rs/auto_enums/0.4.0")]
