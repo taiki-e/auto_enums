@@ -330,7 +330,7 @@ impl<'a> VisitMut for FindTry<'a> {
             self.foreign = true;
         }
         if !self.has {
-        visit_mut::visit_expr_mut(self, expr);
+            visit_mut::visit_expr_mut(self, expr);
         }
 
         self.in_closure = tmp_in_closure;

@@ -16,7 +16,9 @@ thread_local! {
 
 pub(super) type Builder = EnumBuilder;
 
-struct EnumVariant(String);
+struct EnumVariant {
+    ident: String,
+}
 
 pub(super) struct EnumBuilder {
     ident: String,
@@ -25,11 +27,13 @@ pub(super) struct EnumBuilder {
 
 impl EnumVariant {
     fn new(id: usize) -> Self {
-        EnumVariant(format!("__T{}", id))
+        Self {
+            ident: format!("__T{}", id),
+        }
     }
 
     fn ident(&self) -> Ident {
-        ident_call_site(&self.0)
+        ident_call_site(&self.ident)
     }
 
     fn path(&self, ident: &str) -> Path {
