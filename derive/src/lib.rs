@@ -1,6 +1,7 @@
 #![crate_type = "proc-macro"]
 #![recursion_limit = "256"]
 #![doc(html_root_url = "https://docs.rs/auto_enums_derive/0.4.0")]
+#![deny(unsafe_code)]
 #![deny(bare_trait_objects, elided_lifetimes_in_paths)]
 
 extern crate derive_utils;
