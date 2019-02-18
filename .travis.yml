@@ -11,10 +11,6 @@ branches:
 matrix:
   fast_finish: true
 
-  allow_failures:
-    - rust: nightly
-      env: ALLOW_FAILURES=true
-
   include:
     # This is the minimum Rust version supported by auto_enums.
     # When updating this, the reminder to update the minimum required version in README.md.
@@ -31,7 +27,6 @@ matrix:
 
     - rust: nightly
       name: cargo test (minimal versions)
-      env: ALLOW_FAILURES=true
       script:
         - cargo update -Zminimal-versions
         - cargo test --all --all-features

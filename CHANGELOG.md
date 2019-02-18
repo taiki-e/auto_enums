@@ -4,6 +4,8 @@
 
 * Update minimum syn version to 0.15.22
 
+* Update minimum smallvec version to 0.6.9
+
 # 0.4.0 - 2019-01-30
 
 * Add support for `?` operator in functions and closures
