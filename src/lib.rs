@@ -709,10 +709,10 @@
 //!
 //! [`futures(v0.3)`](https://github.com/rust-lang-nursery/futures-rs) (*requires `"futures"` crate feature*)
 //!
-//! * [`futures::Stream`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.11/futures/stream/trait.Stream.html)
-//! * [`futures::Sink`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.11/futures/sink/trait.Sink.html)
-//! * [`futures::AsyncRead`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.11/futures/io/trait.AsyncRead.html)
-//! * [`futures::AsyncWrite`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.11/futures/io/trait.AsyncWrite.html)
+//! * [`futures::Stream`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.12/futures/stream/trait.Stream.html)
+//! * [`futures::Sink`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.12/futures/sink/trait.Sink.html)
+//! * [`futures::AsyncRead`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.12/futures/io/trait.AsyncRead.html)
+//! * [`futures::AsyncWrite`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.12/futures/io/trait.AsyncWrite.html)
 //!
 //! [`futures(v0.1)`](https://github.com/rust-lang-nursery/futures-rs) (*requires `"futures01"` crate feature*)
 //!

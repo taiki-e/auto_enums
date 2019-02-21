@@ -1,4 +1,4 @@
-# [`serde::Serialize`](https://docs.serde.rs/serde/trait.Serialize.html)
+## [`serde::Serialize`](https://docs.serde.rs/serde/trait.Serialize.html)
 
 When deriving for enum like the following:
 
