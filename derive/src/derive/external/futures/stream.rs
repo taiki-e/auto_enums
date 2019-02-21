@@ -16,7 +16,7 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
                 #[inline]
                 fn poll_next(
                     self: #root::pin::Pin<&mut Self>,
-                    lw: &#root::task::LocalWaker,
+                    waker: &#root::task::Waker,
                 ) -> #root::task::Poll<#root::option::Option<Self::Item>>;
             }
         }?,

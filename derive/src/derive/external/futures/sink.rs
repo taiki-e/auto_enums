@@ -17,7 +17,7 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
                 #[inline]
                 fn poll_ready(
                     self: #root::pin::Pin<&mut Self>,
-                    lw: &#root::task::LocalWaker,
+                    waker: &#root::task::Waker,
                 ) -> #root::task::Poll<#root::result::Result<(), Self::SinkError>>;
                 #[inline]
                 fn start_send(
@@ -27,12 +27,12 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
                 #[inline]
                 fn poll_flush(
                     self: #root::pin::Pin<&mut Self>,
-                    lw: &#root::task::LocalWaker,
+                    waker: &#root::task::Waker,
                 ) -> #root::task::Poll<#root::result::Result<(), Self::SinkError>>;
                 #[inline]
                 fn poll_close(
                     self: #root::pin::Pin<&mut Self>,
-                    lw: &#root::task::LocalWaker,
+                    waker: &#root::task::Waker,
                 ) -> #root::task::Poll<#root::result::Result<(), Self::SinkError>>;
             }
         }?,

@@ -1,5 +1,9 @@
 # Unreleased
 
+* Update to new nightly.
+
+* Add some generated code examples.
+
 * Update minimum derive_utils version to 0.6.3
 
 * Update minimum syn version to 0.15.22

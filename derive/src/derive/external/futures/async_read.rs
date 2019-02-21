@@ -18,13 +18,13 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
                 #[inline]
                 fn poll_read(
                     &mut self,
-                    lw: &#root::task::LocalWaker,
+                    waker: &#root::task::Waker,
                     buf: &mut [u8],
                 ) -> #root::task::Poll<#root::result::Result<usize, #io::Error>>;
                 #[inline]
                 fn poll_vectored_read(
                     &mut self,
-                    lw: &#root::task::LocalWaker,
+                    waker: &#root::task::Waker,
                     vec: &mut [&mut #io::IoVec],
                 ) -> #root::task::Poll<#root::result::Result<usize, #io::Error>>;
             }

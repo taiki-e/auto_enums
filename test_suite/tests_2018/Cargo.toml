@@ -8,7 +8,7 @@ publish = false
 [workspace]
 
 [dependencies]
-futures-preview = { version = "=0.3.0-alpha.12", optional = true }
+futures-preview = { version = "=0.3.0-alpha.13", optional = true }
 
 [dev-dependencies.auto_enums]
 path = "../.."

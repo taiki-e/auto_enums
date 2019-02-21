@@ -16,24 +16,24 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
                 #[inline]
                 fn poll_write(
                     &mut self,
-                    lw: &#root::task::LocalWaker,
+                    waker: &#root::task::Waker,
                     buf: &[u8],
                 ) -> #root::task::Poll<#root::result::Result<usize, #io::Error>>;
                 #[inline]
                 fn poll_vectored_write(
                     &mut self,
-                    lw: &#root::task::LocalWaker,
+                    waker: &#root::task::Waker,
                     vec: &[&#io::IoVec],
                 ) -> #root::task::Poll<#root::result::Result<usize, #io::Error>>;
                 #[inline]
                 fn poll_flush(
                     &mut self,
-                    lw: &#root::task::LocalWaker,
+                    waker: &#root::task::Waker,
                 ) -> #root::task::Poll<#root::result::Result<(), #io::Error>>;
                 #[inline]
                 fn poll_close(
                     &mut self,
-                    lw: &#root::task::LocalWaker,
+                    waker: &#root::task::Waker,
                 ) -> #root::task::Poll<#root::result::Result<(), #io::Error>>;
             }
         }?,
