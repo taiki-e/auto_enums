@@ -25,11 +25,12 @@ matrix:
         - cd "${TRAVIS_BUILD_DIR}/test_suite"
         - cargo test --no-default-features
 
-    - rust: nightly
-      name: cargo test (minimal versions)
-      script:
-        - cargo update -Zminimal-versions
-        - cargo test --all --all-features
+    # rand does not correspond to a build with -Zminimal-versions.
+    # - rust: nightly
+    #   name: cargo test (minimal versions)
+    #   script:
+    #     - cargo update -Zminimal-versions
+    #     - cargo test --all-features -p auto_enums -p auto_enums_core -p auto_enums_derive
 
     - rust: nightly
       name: cargo test (2018 edition)
