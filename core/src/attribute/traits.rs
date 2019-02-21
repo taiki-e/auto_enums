@@ -25,7 +25,7 @@ fn collect(ty: &mut Type) -> Option<Stack<Path>> {
 }
 
 fn parse(args: &mut Stack<Arg>, traits: Stack<Path>) {
-    traits.into_iter().map(|t| t.into()).for_each(|t| {
+    traits.into_iter().map(Arg::from).for_each(|t| {
         if !args.contains(&t) && TRAITS.contains(&&*t.to_trimed_string()) {
             args.push(t);
         }

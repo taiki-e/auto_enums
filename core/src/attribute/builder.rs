@@ -73,7 +73,7 @@ impl EnumBuilder {
     }
 
     fn iter(&self) -> impl Iterator<Item = Ident> + '_ {
-        self.variants.iter().map(|v| v.ident())
+        self.variants.iter().map(EnumVariant::ident)
     }
 
     fn push_variant(&mut self) {
