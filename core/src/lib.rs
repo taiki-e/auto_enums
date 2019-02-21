@@ -1,6 +1,6 @@
 #![crate_type = "proc-macro"]
 #![recursion_limit = "256"]
-#![doc(html_root_url = "https://docs.rs/auto_enums_core/0.4.0")]
+#![doc(html_root_url = "https://docs.rs/auto_enums_core/0.4.1")]
 #![deny(unsafe_code)]
 #![deny(bare_trait_objects, elided_lifetimes_in_paths)]
 
