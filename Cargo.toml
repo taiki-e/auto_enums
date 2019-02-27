@@ -18,6 +18,7 @@ members = [
     "core",
     "derive",
     "test_suite",
+    "test_suite/tests_unstable",
 ]
 
 [badges]

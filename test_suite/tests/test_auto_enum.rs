@@ -20,13 +20,10 @@
 #![cfg_attr(all(not(feature = "std"), feature = "unstable"), feature(alloc))]
 #![deny(warnings)]
 #![allow(unused_imports)]
-#![cfg(test)]
 
 #[cfg(all(not(feature = "std"), feature = "unstable"))]
 #[macro_use]
 extern crate alloc;
-#[cfg(feature = "std")]
-extern crate core;
 
 #[macro_use]
 extern crate auto_enums;

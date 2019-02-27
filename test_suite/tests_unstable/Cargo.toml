@@ -1,11 +1,9 @@
 [package]
-name = "auto_enums_tests_2018"
+name = "auto_enums_tests_unstable"
 version = "0.0.0"
 authors = ["Taiki Endo <te316e89@gmail.com>"]
 edition = "2018"
 publish = false
-
-[workspace]
 
 [dependencies]
 futures-preview = { version = "=0.3.0-alpha.13", optional = true }

@@ -33,12 +33,6 @@ matrix:
     #     - cargo test --all-features -p auto_enums -p auto_enums_core -p auto_enums_derive
 
     - rust: nightly
-      name: cargo test (2018 edition)
-      script:
-        - cd "${TRAVIS_BUILD_DIR}/test_suite/tests_2018"
-        - cargo test --all-features
-
-    - rust: nightly
       name: cargo clippy
       script:
         - if rustup component add clippy-preview;
