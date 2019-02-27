@@ -8,8 +8,7 @@ macro_rules! fmt_impl {
             pub(crate) const NAME: &[&str] = &[$($name),*];
 
             pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
-                let root = std_root();
-                let fmt = quote!(#root::fmt);
+                let fmt = quote!(::core::fmt);
 
                 derive_trait!(
                     data,

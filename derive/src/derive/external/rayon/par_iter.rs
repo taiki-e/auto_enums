@@ -5,7 +5,6 @@ use crate::utils::*;
 pub(crate) const NAME: &[&str] = &["rayon::ParallelIterator"];
 
 pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
-    let root = std_root();
     let iter = quote!(::rayon::iter);
 
     derive_trait!(
@@ -19,7 +18,7 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
                 where
                     __C: #iter::plumbing::UnindexedConsumer<Self::Item>;
                 #[inline]
-                fn opt_len(&self) -> #root::option::Option<usize>;
+                fn opt_len(&self) -> ::core::option::Option<usize>;
             }
         }?,
     )

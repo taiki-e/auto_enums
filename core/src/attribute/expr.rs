@@ -277,7 +277,7 @@ impl<'a> LoopVisitor<'a> {
     }
 }
 
-impl<'a> VisitMut for LoopVisitor<'a> {
+impl VisitMut for LoopVisitor<'_> {
     fn visit_expr_mut(&mut self, expr: &mut Expr) {
         if expr.any_empty_attr(NEVER_ATTR) {
             return;

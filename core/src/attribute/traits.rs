@@ -42,7 +42,7 @@ impl<'a> ImplTraits<'a> {
     }
 }
 
-impl<'a> VisitMut for ImplTraits<'a> {
+impl VisitMut for ImplTraits<'_> {
     fn visit_type_impl_trait_mut(&mut self, ty: &mut TypeImplTrait) {
         visit_mut::visit_type_impl_trait_mut(self, ty);
 

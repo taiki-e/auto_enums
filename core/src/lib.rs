@@ -2,14 +2,10 @@
 #![recursion_limit = "256"]
 #![doc(html_root_url = "https://docs.rs/auto_enums_core/0.4.1")]
 #![deny(unsafe_code)]
-#![deny(bare_trait_objects, elided_lifetimes_in_paths)]
+#![deny(rust_2018_idioms)]
+#![deny(unreachable_pub)]
 
 extern crate proc_macro;
-extern crate proc_macro2;
-extern crate quote;
-extern crate rand;
-extern crate smallvec;
-extern crate syn;
 
 #[macro_use]
 mod utils;

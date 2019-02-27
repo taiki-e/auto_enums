@@ -3,6 +3,7 @@ name = "auto_enums_derive"
 # NB: When modifying, also modify html_root_url in lib.rs
 version = "0.4.1"
 authors = ["Taiki Endo <te316e89@gmail.com>"]
+edition = "2018"
 license = "Apache-2.0/MIT"
 description = "This library provides an attribute macro like a wrapper of `#[derive]`, implementing the supported traits and passing unsupported traits to `#[derive]`."
 repository = "https://github.com/taiki-e/auto_enums"
@@ -38,9 +39,8 @@ unstable = ["smallvec/union", "smallvec/may_dangle"]
 # =============================================================================
 # [std|core] libraries
 
-# Use `std` library.
+# Use `std` library's traits.
 std = []
-
 # Use `[std|core]::fmt`'s traits other than `Debug`, `Display` and `Write`
 fmt = []
 

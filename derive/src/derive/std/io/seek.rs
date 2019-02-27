@@ -5,8 +5,7 @@ use crate::utils::*;
 pub(crate) const NAME: &[&str] = &["Seek", "io::Seek"];
 
 pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
-    let root = std_root();
-    let io = quote!(#root::io);
+    let io = quote!(::std::io);
 
     derive_trait!(
         data,

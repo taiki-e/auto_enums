@@ -5,8 +5,7 @@ use crate::utils::*;
 pub(crate) const NAME: &[&str] = &["BufRead", "io::BufRead"];
 
 pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
-    let root = std_root();
-    let io = quote!(#root::io);
+    let io = quote!(::std::io);
 
     derive_trait!(
         data,
@@ -18,9 +17,9 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
                 #[inline]
                 fn consume(&mut self, amt: usize);
                 #[inline]
-                fn read_until(&mut self, byte: u8, buf: &mut #root::vec::Vec<u8>) -> #io::Result<usize>;
+                fn read_until(&mut self, byte: u8, buf: &mut ::std::vec::Vec<u8>) -> #io::Result<usize>;
                 #[inline]
-                fn read_line(&mut self, buf: &mut #root::string::String) -> #io::Result<usize>;
+                fn read_line(&mut self, buf: &mut ::std::string::String) -> #io::Result<usize>;
             }
         }?,
     )

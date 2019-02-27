@@ -2,6 +2,7 @@
 name = "auto_enums_test_suite"
 version = "0.0.0"
 authors = ["Taiki Endo <te316e89@gmail.com>"]
+edition = "2018"
 publish = false
 
 [dependencies]

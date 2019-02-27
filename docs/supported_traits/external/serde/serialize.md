@@ -12,8 +12,6 @@ enum Enum<A, B> {
 
 Code like this will be generated:
 
-*If `std` crate feature is disabled, `::std` is replaced with `::core`.*
-
 Note that it is a different implementation from `#[derive(Serialize)]`.
 
 ```rust
