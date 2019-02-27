@@ -33,9 +33,6 @@ default = ["std"]
 # Use conversion methods.
 transpose_methods = []
 
-# Use unstable features to make attribute macro more effective.
-unstable = ["smallvec/union", "smallvec/may_dangle"]
-
 # =============================================================================
 # [std|core] libraries
 

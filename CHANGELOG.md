@@ -4,6 +4,8 @@
 
 * Reduce the feature of "std" crate feature. The current "std" crate feature only determines whether to enable `std` library's traits (e.g., `std::io::Read`) support. "std" crate feature is enabled by default, but you can reduce compile time by disabling this feature.
 
+* Remove "unstable" crate feature.
+
 # 0.4.1 - 2019-02-21
 
 * Update to new nightly.

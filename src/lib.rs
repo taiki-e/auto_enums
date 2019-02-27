@@ -817,12 +817,6 @@
 //!   * Make `?` operator support more flexible, and to make iterator implementation more effective.
 //!   * This requires Rust Nightly and you need to enable the unstable [`try_trait`](https://github.com/rust-lang/rust/issues/42327) feature gate.
 //!
-//! * `unstable`
-//!   * Disabled by default.
-//!   * Use unstable features to make attribute macros more effective.
-//!   * The traits supported by `#[enum_derive]` are **not** related to this feature.
-//!   * This requires Rust Nightly.
-//!
 //! ### Using external libraries (disabled by default)
 //!
 //! * `futures` - [futures(v0.3)](https://github.com/rust-lang-nursery/futures-rs)

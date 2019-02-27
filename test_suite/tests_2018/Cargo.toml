@@ -18,7 +18,6 @@ features = ["std"]
 [features]
 unstable = [
     "futures-preview",
-    "auto_enums/unstable",
     "auto_enums/futures",
     "auto_enums/read_initializer",
     "auto_enums/exact_size_is_empty",

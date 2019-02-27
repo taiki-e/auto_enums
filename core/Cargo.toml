@@ -32,8 +32,5 @@ default = []
 # Analyze return type of function and `let` binding.
 type_analysis = []
 
-# Use unstable features to make attribute macro more effective.
-unstable = ["smallvec/union", "smallvec/may_dangle"]
-
 # Make `?` operator support more flexible.
 try_trait = []

@@ -46,9 +46,6 @@ transpose_methods = ["auto_enums_derive/transpose_methods"]
 # Make `?` operator support more flexible, and to make iterator implementation more effective.
 try_trait = ["auto_enums_core/try_trait", "auto_enums_derive/try_trait"]
 
-# Use unstable features to make attribute macro more effective.
-unstable = ["auto_enums_core/unstable", "auto_enums_derive/unstable"]
-
 # =============================================================================
 # [std|core] libraries
 
