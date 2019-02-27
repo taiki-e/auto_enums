@@ -159,20 +159,18 @@ impl<'a> Visitor<'a> {
                     #[cfg(feature = "try_trait")]
                     {
                         parse_quote! {{
-                            extern crate core;
-                            match core::ops::Try::into_result(#expr) {
-                                core::result::Result::Ok(val) => val,
-                                core::result::Result::Err(err) => return core::ops::Try::from_error(#err),
+                            match ::core::ops::Try::into_result(#expr) {
+                                ::core::result::Result::Ok(val) => val,
+                                ::core::result::Result::Err(err) => return ::core::ops::Try::from_error(#err),
                             }
                         }}
                     }
                     #[cfg(not(feature = "try_trait"))]
                     {
                         parse_quote! {{
-                            extern crate core;
                             match #expr {
-                                core::result::Result::Ok(val) => val,
-                                core::result::Result::Err(err) => return core::result::Result::Err(#err),
+                                ::core::result::Result::Ok(val) => val,
+                                ::core::result::Result::Err(err) => return ::core::result::Result::Err(#err),
                             }
                         }}
                     }
@@ -228,7 +226,7 @@ impl Tmp {
     }
 }
 
-impl<'a> VisitMut for Visitor<'a> {
+impl VisitMut for Visitor<'_> {
     fn visit_expr_mut(&mut self, expr: &mut Expr) {
         let tmp = Tmp::store(self);
         self.other_attr(expr);
@@ -304,7 +302,7 @@ impl<'a> FindTry<'a> {
     }
 }
 
-impl<'a> VisitMut for FindTry<'a> {
+impl VisitMut for FindTry<'_> {
     fn visit_expr_mut(&mut self, expr: &mut Expr) {
         let tmp_in_closure = self.in_closure;
         let tmp_foreign = self.foreign;

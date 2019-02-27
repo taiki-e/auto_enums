@@ -5,8 +5,7 @@ use crate::utils::*;
 pub(crate) const NAME: &[&str] = &["FnMut"];
 
 pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
-    let root = std_root();
-    let trait_path = quote!(#root::ops::FnMut);
+    let trait_path = quote!(::core::ops::FnMut);
     let trait_ = quote!(#trait_path(__T) -> __U);
     let fst = data.fields().iter().next();
 

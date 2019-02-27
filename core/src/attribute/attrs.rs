@@ -32,17 +32,17 @@ pub(super) trait AttrsMut: Attrs {
     }
 }
 
-impl<'a, A: Attrs> Attrs for &'a A {
+impl<A: Attrs> Attrs for &'_ A {
     fn attrs(&self) -> &[Attribute] {
         (**self).attrs()
     }
 }
-impl<'a, A: Attrs> Attrs for &'a mut A {
+impl<A: Attrs> Attrs for &'_ mut A {
     fn attrs(&self) -> &[Attribute] {
         (**self).attrs()
     }
 }
-impl<'a, A: AttrsMut> AttrsMut for &'a mut A {
+impl<A: AttrsMut> AttrsMut for &'_ mut A {
     fn attrs_mut<T, F: FnOnce(&mut Vec<Attribute>) -> T>(&mut self, f: F) -> T {
         (**self).attrs_mut(f)
     }

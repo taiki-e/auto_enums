@@ -5,8 +5,6 @@ use crate::utils::*;
 pub(crate) const NAME: &[&str] = &["Index"];
 
 pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
-    let root = std_root();
-
     #[cfg(not(feature = "unsized_locals"))]
     let bounds = TokenStream::new();
     #[cfg(feature = "unsized_locals")]
@@ -14,7 +12,7 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
 
     derive_trait!(
         data,
-        parse_quote!(#root::ops::Index)?,
+        parse_quote!(::core::ops::Index)?,
         parse_quote! {
             trait Index<__Idx #bounds> {
                 type Output;

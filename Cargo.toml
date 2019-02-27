@@ -3,6 +3,7 @@ name = "auto_enums"
 # NB: When modifying, also modify html_root_url in lib.rs
 version = "0.4.1"
 authors = ["Taiki Endo <te316e89@gmail.com>"]
+edition = "2018"
 license = "Apache-2.0/MIT"
 description = "A library for to allow multiple return types by automatically generated enum."
 repository = "https://github.com/taiki-e/auto_enums"
@@ -17,6 +18,7 @@ members = [
     "core",
     "derive",
     "test_suite",
+    "test_suite/tests_unstable",
 ]
 
 [badges]
@@ -39,22 +41,18 @@ default = ["std"]
 # Analyze return type of function and `let` binding.
 type_analysis = ["auto_enums_core/type_analysis"]
 
-# Use `transpose*` methods.
+# Enable to use `transpose*` methods.
 transpose_methods = ["auto_enums_derive/transpose_methods"]
 
 # Make `?` operator support more flexible, and to make iterator implementation more effective.
 try_trait = ["auto_enums_core/try_trait", "auto_enums_derive/try_trait"]
 
-# Use unstable features to make attribute macro more effective.
-unstable = ["auto_enums_core/unstable", "auto_enums_derive/unstable"]
-
 # =============================================================================
 # [std|core] libraries
 
-# Use `std` library.
+# Enable to use `std` library's traits.
 std = ["auto_enums_derive/std"]
-
-# Use `[std|core]::fmt`'s traits other than `Debug`, `Display` and `Write`
+# Enable to use `[std|core]::fmt`'s traits other than `Debug`, `Display` and `Write`
 fmt = ["auto_enums_derive/fmt"]
 
 # Enable unstable features of [std|core] libraries.

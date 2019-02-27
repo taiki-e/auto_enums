@@ -2,6 +2,7 @@
 name = "auto_enums_test_suite"
 version = "0.0.0"
 authors = ["Taiki Endo <te316e89@gmail.com>"]
+edition = "2018"
 publish = false
 
 [dependencies]
@@ -38,7 +39,6 @@ external_libraries = [
 ]
 
 unstable = [
-    "auto_enums/unstable",
     "auto_enums/read_initializer",
     "auto_enums/exact_size_is_empty",
     "auto_enums/try_trait",

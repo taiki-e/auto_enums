@@ -15,7 +15,6 @@
 )]
 #![deny(warnings)]
 #![allow(unused_imports)]
-#![cfg(test)]
 
 #[macro_use]
 extern crate auto_enums;
@@ -65,7 +64,6 @@ mod test_futures {
     }
 }
 
-#[cfg(test)]
 mod enum_derive {
     #![allow(dead_code)]
 

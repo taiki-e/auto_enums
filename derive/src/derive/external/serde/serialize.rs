@@ -5,7 +5,6 @@ use crate::utils::*;
 pub(crate) const NAME: &[&str] = &["serde::Serialize"];
 
 pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
-    let root = std_root();
     let ser = quote!(::serde::ser);
 
     derive_trait!(
@@ -14,7 +13,7 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
         parse_quote! {
             trait Serialize {
                 #[inline]
-                fn serialize<__S>(&self, serializer: __S) -> #root::result::Result<__S::Ok, __S::Error>
+                fn serialize<__S>(&self, serializer: __S) -> ::core::result::Result<__S::Ok, __S::Error>
                 where
                     __S: #ser::Serializer;
             }

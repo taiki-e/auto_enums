@@ -19,25 +19,23 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
         }
     }
 
-    let root = &std_root();
     let mut ts = TokenStream::new();
 
-    ts.extend(transpose_option(data, root)?);
-    ts.extend(transpose_result(data, root)?);
-    ts.extend(transpose_ok(data, root)?);
-    ts.extend(transpose_err(data, root)?);
+    ts.extend(transpose_option(data)?);
+    ts.extend(transpose_result(data)?);
+    ts.extend(transpose_ok(data)?);
+    ts.extend(transpose_err(data)?);
 
     Ok(ts)
 }
 
-fn transpose_option(data: &Data, root: &TokenStream) -> Result<TokenStream> {
+fn transpose_option(data: &Data) -> Result<TokenStream> {
     let ident = data.ident();
     let fields = data.fields();
-    let option = quote!(#root::option::Option);
 
     let mut impls = data.impl_with_capacity(1)?;
 
-    let ty_generics = fields.iter().map(|f| quote!(#option<#f>));
+    let ty_generics = fields.iter().map(|f| quote!(::core::option::Option<#f>));
     *impls.self_ty() = parse_quote!(#ident<#(#ty_generics),*>)?;
 
     let transpose = data
@@ -47,7 +45,7 @@ fn transpose_option(data: &Data, root: &TokenStream) -> Result<TokenStream> {
 
     impls.push_item(parse_quote! {
         #[inline]
-        fn transpose(self) -> #option<#ident<#(#fields),*>> {
+        fn transpose(self) -> ::core::option::Option<#ident<#(#fields),*>> {
             match self { #(#transpose,)* }
         }
     }?);
@@ -55,10 +53,9 @@ fn transpose_option(data: &Data, root: &TokenStream) -> Result<TokenStream> {
     Ok(impls.build())
 }
 
-fn transpose_result(data: &Data, root: &TokenStream) -> Result<TokenStream> {
+fn transpose_result(data: &Data) -> Result<TokenStream> {
     let ident = data.ident();
     let fields = data.fields();
-    let result = quote!(#root::result::Result);
 
     let mut impls = data.impl_with_capacity(1)?;
 
@@ -73,7 +70,7 @@ fn transpose_result(data: &Data, root: &TokenStream) -> Result<TokenStream> {
     let ty_generics = fields
         .iter()
         .zip(err_fields.iter())
-        .map(|(f, ef)| quote!(#result<#f, #ef>));
+        .map(|(f, ef)| quote!(::core::result::Result<#f, #ef>));
     *impls.self_ty() = parse_quote!(#ident<#(#ty_generics),*>)?;
 
     let transpose = data
@@ -83,7 +80,7 @@ fn transpose_result(data: &Data, root: &TokenStream) -> Result<TokenStream> {
 
     impls.push_item(parse_quote! {
         #[inline]
-        fn transpose(self) -> #result<#ident<#(#fields),*>, #ident<#(#err_fields),*>> {
+        fn transpose(self) -> ::core::result::Result<#ident<#(#fields),*>, #ident<#(#err_fields),*>> {
             match self { #(#transpose,)* }
         }
     }?);
@@ -91,16 +88,15 @@ fn transpose_result(data: &Data, root: &TokenStream) -> Result<TokenStream> {
     Ok(impls.build())
 }
 
-fn transpose_ok(data: &Data, root: &TokenStream) -> Result<TokenStream> {
+fn transpose_ok(data: &Data) -> Result<TokenStream> {
     let ident = data.ident();
     let fields = data.fields();
-    let result = quote!(#root::result::Result);
 
     let mut impls = data.impl_with_capacity(1)?;
 
     impls.push_generic_param(param_ident("__E"));
 
-    let ty_generics = fields.iter().map(|f| quote!(#result<#f, __E>));
+    let ty_generics = fields.iter().map(|f| quote!(::core::result::Result<#f, __E>));
     *impls.self_ty() = parse_quote!(#ident<#(#ty_generics),*>)?;
 
     let transpose = data
@@ -109,7 +105,7 @@ fn transpose_ok(data: &Data, root: &TokenStream) -> Result<TokenStream> {
         .map(|v| quote!(#ident::#v(x) => x.map(#ident::#v)));
     impls.push_item(parse_quote! {
         #[inline]
-        fn transpose_ok(self) -> #result<#ident<#(#fields),*>, __E> {
+        fn transpose_ok(self) -> ::core::result::Result<#ident<#(#fields),*>, __E> {
             match self { #(#transpose,)* }
         }
     }?);
@@ -117,16 +113,15 @@ fn transpose_ok(data: &Data, root: &TokenStream) -> Result<TokenStream> {
     Ok(impls.build())
 }
 
-fn transpose_err(data: &Data, root: &TokenStream) -> Result<TokenStream> {
+fn transpose_err(data: &Data) -> Result<TokenStream> {
     let ident = data.ident();
     let fields = data.fields();
-    let result = quote!(#root::result::Result);
 
     let mut impls = data.impl_with_capacity(1)?;
 
     impls.push_generic_param(param_ident("__T"));
 
-    let ty_generics = fields.iter().map(|f| quote!(#result<__T, #f>));
+    let ty_generics = fields.iter().map(|f| quote!(::core::result::Result<__T, #f>));
     *impls.self_ty() = parse_quote!(#ident<#(#ty_generics),*>)?;
 
     let transpose = data
@@ -135,7 +130,7 @@ fn transpose_err(data: &Data, root: &TokenStream) -> Result<TokenStream> {
         .map(|v| quote!(#ident::#v(x) => x.map_err(#ident::#v)));
     impls.push_item(parse_quote! {
         #[inline]
-        fn transpose_err(self) -> #result<__T, #ident<#(#fields),*>> {
+        fn transpose_err(self) -> ::core::result::Result<__T, #ident<#(#fields),*>> {
             match self { #(#transpose,)* }
         }
     }?);

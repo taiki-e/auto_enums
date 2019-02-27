@@ -4,7 +4,7 @@
 [![version](https://img.shields.io/crates/v/auto_enums.svg)](https://crates.io/crates/auto_enums/)
 [![documentation](https://docs.rs/auto_enums/badge.svg)](https://docs.rs/auto_enums/)
 [![license](https://img.shields.io/crates/l/auto_enums.svg)](https://crates.io/crates/auto_enums/)
-[![Rustc Version](https://img.shields.io/badge/rustc-1.30+-lightgray.svg)](https://blog.rust-lang.org/2018/10/25/Rust-1.30.0.html)
+[![Rustc Version](https://img.shields.io/badge/rustc-1.31+-lightgray.svg)](https://blog.rust-lang.org/2018/12/06/Rust-1.31-and-rust-2018.html)
 
 A library for to allow multiple return types by automatically generated enum.
 
@@ -132,13 +132,13 @@ Note that some traits have aliases.
 
 * [`Debug`](https://doc.rust-lang.org/std/fmt/trait.Debug.html) (alias: `fmt::Debug`) - [generated code](docs/supported_traits/std/debug.md)
 * [`Display`](https://doc.rust-lang.org/std/fmt/trait.Display.html) (alias: `fmt::Display`)
-* [`fmt::Binary`](https://doc.rust-lang.org/std/fmt/trait.Binary.html) (*requires `"fmt"` crate feature*)
-* [`fmt::LowerExp`](https://doc.rust-lang.org/std/fmt/trait.LowerExp.html) (*requires `"fmt"` crate feature*)
-* [`fmt::LowerHex`](https://doc.rust-lang.org/std/fmt/trait.LowerHex.html) (*requires `"fmt"` crate feature*)
-* [`fmt::Octal`](https://doc.rust-lang.org/std/fmt/trait.Octal.html) (*requires `"fmt"` crate feature*)
-* [`fmt::Pointer`](https://doc.rust-lang.org/std/fmt/trait.Pointer.html) (*requires `"fmt"` crate feature*)
-* [`fmt::UpperExp`](https://doc.rust-lang.org/std/fmt/trait.UpperExp.html) (*requires `"fmt"` crate feature*)
-* [`fmt::UpperHex`](https://doc.rust-lang.org/std/fmt/trait.UpperHex.html) (*requires `"fmt"` crate feature*)
+* [`fmt::Binary`](https://doc.rust-lang.org/std/fmt/trait.Binary.html) *(requires `"fmt"` crate feature)*
+* [`fmt::LowerExp`](https://doc.rust-lang.org/std/fmt/trait.LowerExp.html) *(requires `"fmt"` crate feature)*
+* [`fmt::LowerHex`](https://doc.rust-lang.org/std/fmt/trait.LowerHex.html) *(requires `"fmt"` crate feature)*
+* [`fmt::Octal`](https://doc.rust-lang.org/std/fmt/trait.Octal.html) *(requires `"fmt"` crate feature)*
+* [`fmt::Pointer`](https://doc.rust-lang.org/std/fmt/trait.Pointer.html) *(requires `"fmt"` crate feature)*
+* [`fmt::UpperExp`](https://doc.rust-lang.org/std/fmt/trait.UpperExp.html) *(requires `"fmt"` crate feature)*
+* [`fmt::UpperHex`](https://doc.rust-lang.org/std/fmt/trait.UpperHex.html) *(requires `"fmt"` crate feature)*
 * [`fmt::Write`](https://doc.rust-lang.org/std/fmt/trait.Write.html)
 
 `[std|core]::future`
@@ -160,36 +160,36 @@ Note that some traits have aliases.
 
 You can add support for external library by activating the each crate feature.
 
-[`futures(v0.3)`](https://github.com/rust-lang-nursery/futures-rs) (*requires `"futures"` crate feature*)
+[`futures(v0.3)`](https://github.com/rust-lang-nursery/futures-rs) *(requires `"futures"` crate feature)*
 
 * [`futures::Stream`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.12/futures/stream/trait.Stream.html) - [generated code](docs/supported_traits/external/futures/stream.md)
 * [`futures::Sink`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.12/futures/sink/trait.Sink.html) - [generated code](docs/supported_traits/external/futures/sink.md)
 * [`futures::AsyncRead`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.12/futures/io/trait.AsyncRead.html) - [generated code](docs/supported_traits/external/futures/async_read.md)
 * [`futures::AsyncWrite`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.12/futures/io/trait.AsyncWrite.html) - [generated code](docs/supported_traits/external/futures/async_write.md)
 
-[`futures(v0.1)`](https://github.com/rust-lang-nursery/futures-rs) (*requires `"futures01"` crate feature*)
+[`futures(v0.1)`](https://github.com/rust-lang-nursery/futures-rs) *(requires `"futures01"` crate feature)*
 
 * [`futures01::Future`](https://docs.rs/futures/0.1/futures/future/trait.Future.html)
 * [`futures01::Stream`](https://docs.rs/futures/0.1/futures/stream/trait.Stream.html)
 * [`futures01::Sink`](https://docs.rs/futures/0.1/futures/sink/trait.Sink.html)
 
-[`quote`](https://github.com/dtolnay/quote) (*requires `"proc_macro"` crate feature*)
+[`quote`](https://github.com/dtolnay/quote) *(requires `"proc_macro"` crate feature)*
 
 * [`quote::ToTokens`](https://docs.rs/quote/0.6/quote/trait.ToTokens.html)
 
-[`rayon`](https://github.com/rayon-rs/rayon) (*requires `"rayon"` crate feature*)
+[`rayon`](https://github.com/rayon-rs/rayon) *(requires `"rayon"` crate feature)*
 
 * [`rayon::ParallelIterator`](https://docs.rs/rayon/1.0/rayon/iter/trait.ParallelIterator.html)
 * [`rayon::IndexedParallelIterator`](https://docs.rs/rayon/1.0/rayon/iter/trait.IndexedParallelIterator.html)
 * [`rayon::ParallelExtend`](https://docs.rs/rayon/1.0/rayon/iter/trait.ParallelExtend.html)
 
-[`serde`](https://github.com/serde-rs/serde) (*requires `"serde"` crate feature*)
+[`serde`](https://github.com/serde-rs/serde) *(requires `"serde"` crate feature)*
 
 * [`serde::Serialize`](https://docs.serde.rs/serde/trait.Serialize.html) - [generated code](docs/supported_traits/external/serde/serialize.md)
 
 ## Rust Version
 
-The current minimum required Rust version is 1.30.
+The current minimum required Rust version is 1.31.
 
 ## License
 

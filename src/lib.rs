@@ -71,21 +71,21 @@
 //!         __T2(__T2),
 //!     }
 //!
-//!     impl<__T1, __T2> ::std::iter::Iterator for __Enum1<__T1, __T2>
+//!     impl<__T1, __T2> ::core::iter::Iterator for __Enum1<__T1, __T2>
 //!     where
-//!         __T1: ::std::iter::Iterator,
-//!         __T2: ::std::iter::Iterator<Item = <__T1 as ::std::iter::Iterator>::Item>,
+//!         __T1: ::core::iter::Iterator,
+//!         __T2: ::core::iter::Iterator<Item = <__T1 as ::core::iter::Iterator>::Item>,
 //!     {
-//!         type Item = <__T1 as ::std::iter::Iterator>::Item;
+//!         type Item = <__T1 as ::core::iter::Iterator>::Item;
 //!         #[inline]
-//!         fn next(&mut self) -> ::std::option::Option<Self::Item> {
+//!         fn next(&mut self) -> ::core::option::Option<Self::Item> {
 //!             match self {
 //!                 __Enum1::__T1(x) => x.next(),
 //!                 __Enum1::__T2(x) => x.next(),
 //!             }
 //!         }
 //!         #[inline]
-//!         fn size_hint(&self) -> (usize, ::std::option::Option<usize>) {
+//!         fn size_hint(&self) -> (usize, ::core::option::Option<usize>) {
 //!             match self {
 //!                 __Enum1::__T1(x) => x.size_hint(),
 //!                 __Enum1::__T2(x) => x.size_hint(),
@@ -679,27 +679,27 @@
 //!
 //! * [`Debug`](https://doc.rust-lang.org/std/fmt/trait.Debug.html) (alias: `fmt::Debug`) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/debug.md)
 //! * [`Display`](https://doc.rust-lang.org/std/fmt/trait.Display.html) (alias: `fmt::Display`)
-//! * [`fmt::Binary`](https://doc.rust-lang.org/std/fmt/trait.Binary.html)
-//! * [`fmt::LowerExp`](https://doc.rust-lang.org/std/fmt/trait.LowerExp.html)
-//! * [`fmt::LowerHex`](https://doc.rust-lang.org/std/fmt/trait.LowerHex.html)
-//! * [`fmt::Octal`](https://doc.rust-lang.org/std/fmt/trait.Octal.html)
-//! * [`fmt::Pointer`](https://doc.rust-lang.org/std/fmt/trait.Pointer.html)
-//! * [`fmt::UpperExp`](https://doc.rust-lang.org/std/fmt/trait.UpperExp.html)
-//! * [`fmt::UpperHex`](https://doc.rust-lang.org/std/fmt/trait.UpperHex.html)
+//! * [`fmt::Binary`](https://doc.rust-lang.org/std/fmt/trait.Binary.html) *(requires `"fmt"` crate feature)*
+//! * [`fmt::LowerExp`](https://doc.rust-lang.org/std/fmt/trait.LowerExp.html) *(requires `"fmt"` crate feature)*
+//! * [`fmt::LowerHex`](https://doc.rust-lang.org/std/fmt/trait.LowerHex.html) *(requires `"fmt"` crate feature)*
+//! * [`fmt::Octal`](https://doc.rust-lang.org/std/fmt/trait.Octal.html) *(requires `"fmt"` crate feature)*
+//! * [`fmt::Pointer`](https://doc.rust-lang.org/std/fmt/trait.Pointer.html) *(requires `"fmt"` crate feature)*
+//! * [`fmt::UpperExp`](https://doc.rust-lang.org/std/fmt/trait.UpperExp.html) *(requires `"fmt"` crate feature)*
+//! * [`fmt::UpperHex`](https://doc.rust-lang.org/std/fmt/trait.UpperHex.html) *(requires `"fmt"` crate feature)*
 //! * [`fmt::Write`](https://doc.rust-lang.org/std/fmt/trait.Write.html)
 //!
 //! `[std|core]::future`
 //!
 //! * [`Future`](https://doc.rust-lang.org/std/future/trait.Future.html) - *nightly-only* - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/future.md)
 //!
-//! `std::io`
+//! `std::io` *(requires `"std"` crate feature)*
 //!
 //! * [`Read`](https://doc.rust-lang.org/std/io/trait.Read.html) (alias: `io::Read`)
 //! * [`BufRead`](https://doc.rust-lang.org/std/io/trait.BufRead.html) (alias: `io::BufRead`)
 //! * [`Write`](https://doc.rust-lang.org/std/io/trait.Write.html) (alias: `io::Write`)
 //! * [`Seek`](https://doc.rust-lang.org/std/io/trait.Seek.html) (alias: `io::Seek`)
 //!
-//! `std::error`
+//! `std::error` *(requires `"std"` crate feature)*
 //!
 //! * [`Error`](https://doc.rust-lang.org/std/error/trait.Error.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/error.md)
 //!
@@ -707,30 +707,30 @@
 //!
 //! You can add support for external library by activating the each crate feature.
 //!
-//! [`futures(v0.3)`](https://github.com/rust-lang-nursery/futures-rs) (*requires `"futures"` crate feature*)
+//! [`futures(v0.3)`](https://github.com/rust-lang-nursery/futures-rs) *(requires `"futures"` crate feature)*
 //!
 //! * [`futures::Stream`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.12/futures/stream/trait.Stream.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/futures/stream.md)
 //! * [`futures::Sink`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.12/futures/sink/trait.Sink.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/futures/sink.md)
 //! * [`futures::AsyncRead`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.12/futures/io/trait.AsyncRead.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/futures/async_read.md)
 //! * [`futures::AsyncWrite`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.12/futures/io/trait.AsyncWrite.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/futures/async_write.md)
 //!
-//! [`futures(v0.1)`](https://github.com/rust-lang-nursery/futures-rs) (*requires `"futures01"` crate feature*)
+//! [`futures(v0.1)`](https://github.com/rust-lang-nursery/futures-rs) *(requires `"futures01"` crate feature)*
 //!
 //! * [`futures01::Future`](https://docs.rs/futures/0.1/futures/future/trait.Future.html)
 //! * [`futures01::Stream`](https://docs.rs/futures/0.1/futures/stream/trait.Stream.html)
 //! * [`futures01::Sink`](https://docs.rs/futures/0.1/futures/sink/trait.Sink.html)
 //!
-//! [`quote`](https://github.com/dtolnay/quote) (*requires `"proc_macro"` crate feature*)
+//! [`quote`](https://github.com/dtolnay/quote) *(requires `"proc_macro"` crate feature)*
 //!
 //! * [`quote::ToTokens`](https://docs.rs/quote/0.6/quote/trait.ToTokens.html)
 //!
-//! [`rayon`](https://github.com/rayon-rs/rayon) (*requires `"rayon"` crate feature*)
+//! [`rayon`](https://github.com/rayon-rs/rayon) *(requires `"rayon"` crate feature)*
 //!
 //! * [`rayon::ParallelIterator`](https://docs.rs/rayon/1.0/rayon/iter/trait.ParallelIterator.html)
 //! * [`rayon::IndexedParallelIterator`](https://docs.rs/rayon/1.0/rayon/iter/trait.IndexedParallelIterator.html)
 //! * [`rayon::ParallelExtend`](https://docs.rs/rayon/1.0/rayon/iter/trait.ParallelExtend.html)
 //!
-//! [`serde`](https://github.com/serde-rs/serde) (*requires `"serde"` crate feature*)
+//! [`serde`](https://github.com/serde-rs/serde) *(requires `"serde"` crate feature)*
 //!
 //! * [`serde::Serialize`](https://docs.serde.rs/serde/trait.Serialize.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/serde/serialize.md)
 //!
@@ -738,7 +738,7 @@
 //!
 //! These don't derive traits, but derive static methods instead.
 //!
-//! * `Transpose` (*requires `"transpose_methods"` crate feature*) - this derives the following conversion methods.
+//! * `Transpose` *(requires `"transpose_methods"` crate feature)* - this derives the following conversion methods.
 //!
 //!   * `transpose` - convert from `enum<Option<T1>,..>` to `Option<enum<T1,..>>`
 //!
@@ -775,12 +775,11 @@
 //!
 //! * `std`
 //!   * Enabled by default.
-//!   * Generate code for `std` library.
-//!   * Disable this feature to generate code for `no_std`.
+//!   * Enable to use `std` library's traits.
 //!
 //! * `fmt`
 //!   * Disabled by default.
-//!   * Use `[std|core]::fmt`'s traits other than `Debug`, `Display` and `Write`.
+//!   * Enable to use `[std|core]::fmt`'s traits other than `Debug`, `Display` and `Write`.
 //!
 //! * `type_analysis`
 //!   * Disabled by default.
@@ -811,18 +810,12 @@
 //!
 //! * `transpose_methods`
 //!   * Disabled by default.
-//!   * Use `transpose*` methods.
+//!   * Enable to use `transpose*` methods.
 //!
 //! * `try_trait`
 //!   * Disabled by default.
 //!   * Make `?` operator support more flexible, and to make iterator implementation more effective.
 //!   * This requires Rust Nightly and you need to enable the unstable [`try_trait`](https://github.com/rust-lang/rust/issues/42327) feature gate.
-//!
-//! * `unstable`
-//!   * Disabled by default.
-//!   * Use unstable features to make attribute macros more effective.
-//!   * The traits supported by `#[enum_derive]` are **not** related to this feature.
-//!   * This requires Rust Nightly.
 //!
 //! ### Using external libraries (disabled by default)
 //!
@@ -858,9 +851,6 @@
 #![recursion_limit = "256"]
 #![doc(html_root_url = "https://docs.rs/auto_enums/0.4.1")]
 #![no_std]
-
-extern crate auto_enums_core;
-extern crate auto_enums_derive;
 
 #[doc(hidden)]
 pub use auto_enums_core::auto_enum;

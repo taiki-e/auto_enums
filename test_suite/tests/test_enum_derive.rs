@@ -19,21 +19,9 @@
 #![deny(warnings)]
 #![allow(unused_imports)]
 #![allow(dead_code)]
-#![cfg(test)]
 
 #[cfg(all(not(feature = "std"), feature = "unstable"))]
 extern crate alloc;
-#[cfg(feature = "std")]
-extern crate core;
-
-#[cfg(feature = "external_libraries")]
-extern crate futures;
-#[cfg(feature = "external_libraries")]
-extern crate quote;
-#[cfg(feature = "external_libraries")]
-extern crate rayon;
-#[cfg(feature = "external_libraries")]
-extern crate serde;
 
 #[macro_use]
 extern crate auto_enums;

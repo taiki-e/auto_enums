@@ -5,8 +5,6 @@ use crate::utils::*;
 pub(crate) const NAME: &[&str] = &["futures::Stream"];
 
 pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
-    let root = std_root();
-
     derive_trait!(
         data,
         parse_quote!(::futures::stream::Stream)?,
@@ -15,9 +13,9 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
                 type Item;
                 #[inline]
                 fn poll_next(
-                    self: #root::pin::Pin<&mut Self>,
-                    waker: &#root::task::Waker,
-                ) -> #root::task::Poll<#root::option::Option<Self::Item>>;
+                    self: ::core::pin::Pin<&mut Self>,
+                    waker: &::core::task::Waker,
+                ) -> ::core::task::Poll<::core::option::Option<Self::Item>>;
             }
         }?,
     )

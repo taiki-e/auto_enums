@@ -12,8 +12,6 @@ enum Enum<A, B> {
 
 Code like this will be generated:
 
-*If `std` crate feature is disabled, `::std` is replaced with `::core`.*
-
 Note that it is a different implementation from `#[derive(Debug)]`.
 
 ```rust
@@ -22,15 +20,15 @@ enum Enum<A, B> {
     B(B),
 }
 
-impl<A, B> ::std::fmt::Debug for Enum<A, B>
+impl<A, B> ::core::fmt::Debug for Enum<A, B>
 where
-    A: ::std::fmt::Debug,
-    B: ::std::fmt::Debug,
+    A: ::core::fmt::Debug,
+    B: ::core::fmt::Debug,
 {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         match self {
-            Enum::A(x) => ::std::fmt::Debug::fmt(x, f),
-            Enum::B(x) => ::std::fmt::Debug::fmt(x, f),
+            Enum::A(x) => ::core::fmt::Debug::fmt(x, f),
+            Enum::B(x) => ::core::fmt::Debug::fmt(x, f),
         }
     }
 }

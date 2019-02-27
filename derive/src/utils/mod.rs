@@ -1,9 +1,10 @@
-use proc_macro2::{Ident, Span, TokenStream};
+use proc_macro2::{Ident, Span};
 use smallvec::SmallVec;
 use syn::{punctuated::Punctuated, *};
 
 pub(crate) use derive_utils::{Error, Result, *};
 pub(crate) use quote::{quote, ToTokens};
+pub(crate) use syn::parse2;
 
 pub(crate) type Data = EnumData;
 pub(crate) type Stack<T> = SmallVec<[T; 4]>;
@@ -23,21 +24,9 @@ pub(crate) fn param_ident(ident: &str) -> GenericParam {
     })
 }
 
-/// Returns standard library's root.
-///
-/// In default returns `::std`.
-/// if disabled default crate feature, returned `::core`.
-pub(crate) fn std_root() -> TokenStream {
-    #[cfg(feature = "std")]
-    let root = quote!(::std);
-    #[cfg(not(feature = "std"))]
-    let root = quote!(::core);
-    root
-}
-
 macro_rules! parse_quote {
     ($($tt:tt)*) => {
-        $crate::syn::parse2($crate::quote::quote!($($tt)*))
+        $crate::utils::parse2($crate::utils::quote!($($tt)*))
     };
 }
 

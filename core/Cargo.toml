@@ -3,6 +3,7 @@ name = "auto_enums_core"
 # NB: When modifying, also modify html_root_url in lib.rs
 version = "0.4.1"
 authors = ["Taiki Endo <te316e89@gmail.com>"]
+edition = "2018"
 license = "Apache-2.0/MIT"
 description = "This library provides an attribute macro for to allow multiple return types by automatically generated enum."
 repository = "https://github.com/taiki-e/auto_enums"
@@ -30,9 +31,6 @@ default = []
 
 # Analyze return type of function and `let` binding.
 type_analysis = []
-
-# Use unstable features to make attribute macro more effective.
-unstable = ["smallvec/union", "smallvec/may_dangle"]
 
 # Make `?` operator support more flexible.
 try_trait = []

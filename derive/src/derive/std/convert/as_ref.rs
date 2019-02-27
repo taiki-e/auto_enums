@@ -5,11 +5,9 @@ use crate::utils::*;
 pub(crate) const NAME: &[&str] = &["AsRef"];
 
 pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
-    let root = std_root();
-
     derive_trait!(
         data,
-        parse_quote!(#root::convert::AsRef)?,
+        parse_quote!(::core::convert::AsRef)?,
         parse_quote! {
             trait AsRef<__T: ?Sized> {
                 #[inline]

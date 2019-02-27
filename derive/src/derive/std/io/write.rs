@@ -5,8 +5,7 @@ use crate::utils::*;
 pub(crate) const NAME: &[&str] = &["Write", "io::Write"];
 
 pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
-    let root = std_root();
-    let io = quote!(#root::io);
+    let io = quote!(::std::io);
 
     derive_trait!(
         data,
@@ -20,7 +19,7 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
                 #[inline]
                 fn write_all(&mut self, buf: &[u8]) -> #io::Result<()>;
                 #[inline]
-                fn write_fmt(&mut self, fmt: #root::fmt::Arguments) -> #io::Result<()>;
+                fn write_fmt(&mut self, fmt: ::std::fmt::Arguments) -> #io::Result<()>;
             }
         }?,
     )
