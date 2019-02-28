@@ -2,7 +2,6 @@ use std::cell::RefCell;
 
 use proc_macro2::Ident;
 use quote::quote;
-use rand::{rngs::ThreadRng, Rng};
 use smallvec::{smallvec, SmallVec};
 use syn::{Attribute, Expr, ExprCall, ExprPath, ItemEnum, Path};
 
@@ -11,7 +10,7 @@ use crate::utils::{Result, *};
 use super::Arg;
 
 thread_local! {
-    static RNG: RefCell<ThreadRng> = RefCell::new(rand::thread_rng());
+    static RNG: RefCell<XorShiftRng> = RefCell::new(xorshift_rng());
 }
 
 pub(super) type Builder = EnumBuilder;
