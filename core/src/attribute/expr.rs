@@ -13,7 +13,6 @@ pub(super) const NEVER_ATTR: &str = "never";
 
 pub(super) const EMPTY_ATTRS: &[&str] = &[NEVER_ATTR, REC_ATTR];
 
-#[derive(Debug)]
 struct Params<'a> {
     marker: &'a Marker,
     rec: bool,

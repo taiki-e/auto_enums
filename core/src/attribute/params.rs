@@ -61,7 +61,6 @@ impl PartialEq for Arg {
     }
 }
 
-#[derive(Debug)]
 pub(super) struct Params {
     args: Stack<Arg>,
     marker: Marker,
