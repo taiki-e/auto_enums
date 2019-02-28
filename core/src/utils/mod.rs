@@ -7,7 +7,10 @@ use syn::{punctuated::Punctuated, *};
 #[macro_use]
 mod error;
 
+mod rand;
+
 pub(crate) use self::error::{Error, Result, *};
+pub(crate) use self::rand::*;
 
 pub(crate) type Stack<T> = SmallVec<[T; 4]>;
 

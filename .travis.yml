@@ -25,12 +25,24 @@ matrix:
         - cd "${TRAVIS_BUILD_DIR}/test_suite"
         - cargo test --no-default-features
 
-    # rand does not correspond to a build with -Zminimal-versions.
-    # - rust: nightly
-    #   name: cargo test (minimal versions)
-    #   script:
-    #     - cargo update -Zminimal-versions
-    #     - cargo test --all-features -p auto_enums -p auto_enums_core -p auto_enums_derive
+    - rust: nightly
+      name: cargo test (minimal versions)
+      script:
+        - cargo update -Zminimal-versions
+        - cargo test --all-features -p auto_enums -p auto_enums_core -p auto_enums_derive
+
+    - rust: nightly
+      name: cargo tree
+      script:
+        - if [[ ! -x "$(command -v cargo-tree)" ]]; then
+            cargo install --debug cargo-tree || exit 1;
+          fi
+        - cargo update
+        - cargo tree
+        - cargo tree --duplicate
+        - cargo update -Zminimal-versions
+        - cargo tree
+        - cargo tree --duplicate
 
     - rust: nightly
       name: cargo clippy
