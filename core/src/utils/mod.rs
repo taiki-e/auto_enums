@@ -19,7 +19,7 @@ pub(crate) trait OptionExt {
     fn replace_boxed_expr<F: FnOnce(Expr) -> Expr>(&mut self, f: F);
 }
 
-impl<'a> OptionExt for Option<Box<Expr>> {
+impl OptionExt for Option<Box<Expr>> {
     fn replace_boxed_expr<F: FnOnce(Expr) -> Expr>(&mut self, f: F) {
         if self.is_none() {
             *self = Some(Box::new(unit()));
