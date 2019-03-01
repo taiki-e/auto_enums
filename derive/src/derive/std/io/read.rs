@@ -1,14 +1,12 @@
-use proc_macro2::TokenStream;
-
 use crate::utils::*;
 
 pub(crate) const NAME: &[&str] = &["Read", "io::Read"];
 
-pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+pub(crate) fn derive(data: &Data, stack: &mut Stack<ItemImpl>) -> Result<()> {
     let io = quote!(::std::io);
 
     #[cfg(not(feature = "read_initializer"))]
-    let initializer = TokenStream::new();
+    let initializer = quote!();
     #[cfg(feature = "read_initializer")]
     let initializer = quote! {
         #[inline]
@@ -32,4 +30,5 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
             }
         }?,
     )
+    .map(|item| stack.push(item))
 }

@@ -1,13 +1,11 @@
 macro_rules! fmt_impl {
     ($trait:ident, $Trait:ident, [$($name:expr),*]) => {
         pub(crate) mod $trait {
-            use proc_macro2::TokenStream;
-
             use crate::utils::*;
 
             pub(crate) const NAME: &[&str] = &[$($name),*];
 
-            pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+            pub(crate) fn derive(data: &Data, stack: &mut Stack<ItemImpl>) -> Result<()> {
                 let fmt = quote!(::core::fmt);
 
                 derive_trait!(
@@ -20,6 +18,7 @@ macro_rules! fmt_impl {
                         }
                     }?,
                 )
+                .map(|item| stack.push(item))
             }
         }
     };

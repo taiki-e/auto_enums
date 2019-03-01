@@ -5,7 +5,7 @@ use crate::utils::*;
 pub(crate) const NAME: &[&str] = &["Transpose"];
 
 // Implementing this with `Into` requires many type annotations.
-pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+pub(crate) fn derive(data: &Data, stack: &mut Stack<ItemImpl>) -> Result<()> {
     {
         let generics = data.generics();
         let fields = data.fields();
@@ -19,17 +19,15 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
         }
     }
 
-    let mut ts = TokenStream::new();
+    stack.push(transpose_option(data)?);
+    stack.push(transpose_result(data)?);
+    stack.push(transpose_ok(data)?);
+    stack.push(transpose_err(data)?);
 
-    ts.extend(transpose_option(data)?);
-    ts.extend(transpose_result(data)?);
-    ts.extend(transpose_ok(data)?);
-    ts.extend(transpose_err(data)?);
-
-    Ok(ts)
+    Ok(())
 }
 
-fn transpose_option(data: &Data) -> Result<TokenStream> {
+fn transpose_option(data: &Data) -> Result<ItemImpl> {
     let ident = data.ident();
     let fields = data.fields();
 
@@ -50,10 +48,10 @@ fn transpose_option(data: &Data) -> Result<TokenStream> {
         }
     }?);
 
-    Ok(impls.build())
+    Ok(impls.build_item())
 }
 
-fn transpose_result(data: &Data) -> Result<TokenStream> {
+fn transpose_result(data: &Data) -> Result<ItemImpl> {
     let ident = data.ident();
     let fields = data.fields();
 
@@ -85,10 +83,10 @@ fn transpose_result(data: &Data) -> Result<TokenStream> {
         }
     }?);
 
-    Ok(impls.build())
+    Ok(impls.build_item())
 }
 
-fn transpose_ok(data: &Data) -> Result<TokenStream> {
+fn transpose_ok(data: &Data) -> Result<ItemImpl> {
     let ident = data.ident();
     let fields = data.fields();
 
@@ -96,7 +94,9 @@ fn transpose_ok(data: &Data) -> Result<TokenStream> {
 
     impls.push_generic_param(param_ident("__E"));
 
-    let ty_generics = fields.iter().map(|f| quote!(::core::result::Result<#f, __E>));
+    let ty_generics = fields
+        .iter()
+        .map(|f| quote!(::core::result::Result<#f, __E>));
     *impls.self_ty() = parse_quote!(#ident<#(#ty_generics),*>)?;
 
     let transpose = data
@@ -110,10 +110,10 @@ fn transpose_ok(data: &Data) -> Result<TokenStream> {
         }
     }?);
 
-    Ok(impls.build())
+    Ok(impls.build_item())
 }
 
-fn transpose_err(data: &Data) -> Result<TokenStream> {
+fn transpose_err(data: &Data) -> Result<ItemImpl> {
     let ident = data.ident();
     let fields = data.fields();
 
@@ -121,7 +121,9 @@ fn transpose_err(data: &Data) -> Result<TokenStream> {
 
     impls.push_generic_param(param_ident("__T"));
 
-    let ty_generics = fields.iter().map(|f| quote!(::core::result::Result<__T, #f>));
+    let ty_generics = fields
+        .iter()
+        .map(|f| quote!(::core::result::Result<__T, #f>));
     *impls.self_ty() = parse_quote!(#ident<#(#ty_generics),*>)?;
 
     let transpose = data
@@ -135,5 +137,5 @@ fn transpose_err(data: &Data) -> Result<TokenStream> {
         }
     }?);
 
-    Ok(impls.build())
+    Ok(impls.build_item())
 }

@@ -1,10 +1,8 @@
-use proc_macro2::TokenStream;
-
 use crate::utils::*;
 
 pub(crate) const NAME: &[&str] = &["futures01::Sink"];
 
-pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+pub(crate) fn derive(data: &Data, stack: &mut Stack<ItemImpl>) -> Result<()> {
     let crate_ = quote!(::futures);
 
     derive_trait!(
@@ -23,4 +21,5 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
             }
         }?,
     )
+    .map(|item| stack.push(item))
 }

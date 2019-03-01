@@ -1,10 +1,8 @@
-use proc_macro2::TokenStream;
-
 use crate::utils::*;
 
 pub(crate) const NAME: &[&str] = &["rayon::IndexedParallelIterator"];
 
-pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+pub(crate) fn derive(data: &Data, stack: &mut Stack<ItemImpl>) -> Result<()> {
     let iter = quote!(::rayon::iter);
 
     derive_trait!(
@@ -26,4 +24,5 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
             }
         }?,
     )
+    .map(|item| stack.push(item))
 }

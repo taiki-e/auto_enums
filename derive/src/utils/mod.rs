@@ -2,9 +2,11 @@ use proc_macro2::{Ident, Span};
 use smallvec::SmallVec;
 use syn::{punctuated::Punctuated, *};
 
-pub(crate) use derive_utils::{Error, Result, *};
+pub(crate) use derive_utils::{
+    compile_err, derive_trait_internal as derive_trait, EnumData, Error, Result, Trait,
+};
 pub(crate) use quote::{quote, ToTokens};
-pub(crate) use syn::parse2;
+pub(crate) use syn::{parse2, ItemImpl};
 
 pub(crate) type Data = EnumData;
 pub(crate) type Stack<T> = SmallVec<[T; 4]>;

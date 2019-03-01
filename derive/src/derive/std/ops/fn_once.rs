@@ -1,10 +1,8 @@
-use proc_macro2::TokenStream;
-
 use crate::utils::*;
 
 pub(crate) const NAME: &[&str] = &["FnOnce"];
 
-pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+pub(crate) fn derive(data: &Data, stack: &mut Stack<ItemImpl>) -> Result<()> {
     let trait_path = quote!(::core::ops::FnOnce);
     let trait_ = quote!(#trait_path(__T) -> __U);
     let fst = data.fields().iter().next();
@@ -32,5 +30,6 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
         }
     }?)?;
 
-    Ok(impls.build())
+    stack.push(impls.build_item());
+    Ok(())
 }

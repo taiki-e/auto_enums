@@ -1,10 +1,8 @@
-use proc_macro2::TokenStream;
-
 use crate::utils::*;
 
 pub(crate) const NAME: &[&str] = &["DerefMut"];
 
-pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+pub(crate) fn derive(data: &Data, stack: &mut Stack<ItemImpl>) -> Result<()> {
     derive_trait!(
         data,
         Some(ident_call_site("Target")),
@@ -16,4 +14,5 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
             }
         }?,
     )
+    .map(|item| stack.push(item))
 }

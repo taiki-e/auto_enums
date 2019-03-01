@@ -1,10 +1,8 @@
-use proc_macro2::TokenStream;
-
 use crate::utils::*;
 
 pub(crate) const NAME: &[&str] = &["Error"];
 
-pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+pub(crate) fn derive(data: &Data, stack: &mut Stack<ItemImpl>) -> Result<()> {
     let ident = data.ident();
     let source = data
         .variants()
@@ -33,5 +31,6 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
         .try_for_each(|f| parse_quote!(#f: 'static).map(|f| impls.push_where_predicate(f)))?;
     impls.push_item(source);
 
-    Ok(impls.build())
+    stack.push(impls.build_item());
+    Ok(())
 }

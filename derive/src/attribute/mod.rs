@@ -1,4 +1,4 @@
-use std::{borrow::Cow, collections::HashMap};
+use std::collections::HashMap;
 
 use lazy_static::lazy_static;
 use proc_macro::TokenStream;
@@ -84,7 +84,7 @@ lazy_static! {
     };
 }
 
-type DeriveFn = &'static (dyn Fn(&'_ Data) -> Result<TokenStream2> + Send + Sync);
+type DeriveFn = &'static (dyn Fn(&'_ Data, &'_ mut Stack<ItemImpl>) -> Result<()> + Send + Sync);
 
 macro_rules! derive_map {
     ($map:expr, $($(#[$meta:meta])* $($arm:ident)::*,)*) => {$(
@@ -185,7 +185,7 @@ lazy_static! {
 }
 
 fn expand(args: TokenStream2, input: TokenStream) -> Result<TokenStream2> {
-    fn alias_exists(s: &str, stack: &[(Cow<'_, str>, Option<Arg>)]) -> bool {
+    fn alias_exists(s: &str, stack: &[(&str, Option<&Arg>)]) -> bool {
         ALIAS_MAP
             .get(s)
             .map_or(false, |x| stack.iter().any(|(s, _)| s == x))
@@ -194,35 +194,34 @@ fn expand(args: TokenStream2, input: TokenStream) -> Result<TokenStream2> {
     let item: ItemEnum =
         syn::parse(input).map_err(|_| format!("`{}` may only be used on enums", NAME))?;
     let data = Data::new(&item).map_err(|e| format!("`{}` {}", NAME, e))?;
+    let args = parse_args(args).map_err(|e| format!("`{}` {}", NAME, e))?;
     let mut stack = Stack::new();
-    {
-        let args = parse_args(args).map_err(|e| format!("`{}` {}", NAME, e))?;
-        args.iter().cloned().for_each(|(s, arg)| {
-            if let Some(traits) = TRAIT_DEPENDENCIES.get(&&*s) {
-                traits
-                    .iter()
-                    .filter(|&x| !args.iter().any(|(s, _)| s == x))
-                    .for_each(|&s| {
-                        if !alias_exists(s, &stack) {
-                            stack.push((Cow::Borrowed(s), None))
-                        }
-                    });
-            }
+    args.iter().for_each(|(s, arg)| {
+        if let Some(traits) = TRAIT_DEPENDENCIES.get(&&**s) {
+            traits
+                .iter()
+                .filter(|&x| !args.iter().any(|(s, _)| s == x))
+                .for_each(|s| {
+                    if !alias_exists(s, &stack) {
+                        stack.push((s, None))
+                    }
+                });
+        }
 
-            if !alias_exists(&s, &stack) {
-                stack.push((Cow::Owned(s), Some(arg)));
-            }
-        });
-    }
+        if !alias_exists(s, &stack) {
+            stack.push((s, Some(arg)));
+        }
+    });
 
     let mut derive = Stack::new();
-    let mut ts = TokenStream2::new();
+    let mut impls = Stack::new();
     for (s, arg) in stack {
-        match DERIVE_MAP.get(&&*s) {
-            Some(f) => (&**f)(&data)
-                .map_err(|e| format!("`{}({})` {}", NAME, s, e))
-                .map(|x| ts.extend(x.into_token_stream()))?,
-            None => derive.push(arg.unwrap()),
+        match (DERIVE_MAP.get(&s), arg) {
+            (Some(f), _) => {
+                (&**f)(&data, &mut impls).map_err(|e| format!("`{}({})` {}", NAME, s, e))?
+            }
+            (_, Some(arg)) => derive.push(arg),
+            _ => {}
         }
     }
 
@@ -231,6 +230,6 @@ fn expand(args: TokenStream2, input: TokenStream) -> Result<TokenStream2> {
     } else {
         quote!(#[derive(#(#derive),*)] #item)
     };
-    item.extend(ts);
+    item.extend(impls.into_iter().map(ToTokens::into_token_stream));
     Ok(item)
 }
