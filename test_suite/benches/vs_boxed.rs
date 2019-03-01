@@ -1,14 +1,10 @@
 #![feature(test)]
 #![feature(box_syntax)]
 #![cfg_attr(feature = "unstable", feature(try_trait))]
-#![cfg(test)]
 
-extern crate rand;
 extern crate test;
 
-#[macro_use]
-extern crate auto_enums;
-
+use auto_enums::auto_enum;
 use rand::Rng;
 use test::Bencher;
 

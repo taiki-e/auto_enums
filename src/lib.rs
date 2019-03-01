@@ -16,8 +16,7 @@
 //!
 //! ```rust
 //! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
-//! # #[macro_use]
-//! # extern crate auto_enums;
+//! # use auto_enums::auto_enum;
 //! #[auto_enum(Iterator)]
 //! fn foo(x: i32) -> impl Iterator<Item = i32> {
 //!     match x {
@@ -40,8 +39,7 @@
 //!
 //! ```rust
 //! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
-//! # #[macro_use]
-//! # extern crate auto_enums;
+//! # use auto_enums::enum_derive;
 //! fn foo(x: i32) -> impl Iterator<Item = i32> {
 //!     #[enum_derive(Iterator)]
 //!     enum __Enum1<__T1, __T2> {
@@ -64,7 +62,6 @@
 //!
 //! ```rust
 //! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
-//! # extern crate auto_enums;
 //! fn foo(x: i32) -> impl Iterator<Item = i32> {
 //!     enum __Enum1<__T1, __T2> {
 //!         __T1(__T1),
@@ -111,8 +108,7 @@
 //!
 //!   ```rust
 //!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]
-//!   # #[macro_use]
-//!   # extern crate auto_enums;
+//!   # use auto_enums::auto_enum;
 //!   #[auto_enum(Iterator)]
 //!   fn func(x: i32) -> impl Iterator<Item=i32> {
 //!       if x == 0 {
@@ -128,8 +124,7 @@
 //!
 //!   ```rust
 //!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]
-//!   # #[macro_use]
-//!   # extern crate auto_enums;
+//!   # use auto_enums::auto_enum;
 //!   #[auto_enum] // Nightly does not need an empty attribute to the function.
 //!   fn expr(x: i32) -> impl Iterator<Item=i32> {
 //!       #[auto_enum(Iterator)]
@@ -145,8 +140,7 @@
 //!
 //!   ```rust
 //!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]
-//!   # #[macro_use]
-//!   # extern crate auto_enums;
+//!   # use auto_enums::auto_enum;
 //!   #[auto_enum] // Nightly does not need an empty attribute to the function.
 //!   fn let_binding(x: i32) -> impl Iterator<Item=i32> {
 //!       #[auto_enum(Iterator)]
@@ -167,8 +161,7 @@
 //!
 //!   ```rust
 //!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]
-//!   # #[macro_use]
-//!   # extern crate auto_enums;
+//!   # use auto_enums::auto_enum;
 //!   // if
 //!   #[auto_enum(Iterator)]
 //!   fn expr_if(x: i32) -> impl Iterator<Item=i32> {
@@ -198,8 +191,7 @@
 //!
 //!   ```rust
 //!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]
-//!   # #[macro_use]
-//!   # extern crate auto_enums;
+//!   # use auto_enums::auto_enum;
 //!   #[auto_enum(Iterator)]
 //!   fn expr_loop(mut x: i32) -> impl Iterator<Item = i32> {
 //!       loop {
@@ -222,8 +214,7 @@
 //!
 //!   ```rust
 //!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]
-//!   # #[macro_use]
-//!   # extern crate auto_enums;
+//!   # use auto_enums::auto_enum;
 //!   // return (in functions)
 //!   #[auto_enum(Iterator)]
 //!   fn func(x: i32) -> impl Iterator<Item=i32> {
@@ -251,8 +242,7 @@
 //!
 //!   ```rust
 //!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]
-//!   # #[macro_use]
-//!   # extern crate auto_enums;
+//!   # use auto_enums::auto_enum;
 //!   // return (in closures)
 //!   #[auto_enum] // Nightly does not need an empty attribute to the function.
 //!   fn closure() -> impl Iterator<Item=i32> {
@@ -281,8 +271,7 @@
 //!
 //!   ```rust
 //!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]
-//!   # #[macro_use]
-//!   # extern crate auto_enums;
+//!   # use auto_enums::auto_enum;
 //!   use std::fmt::{Debug, Display};
 //!
 //!   // `?` operator (in functions)
@@ -344,8 +333,7 @@
 //!
 //!   ```rust
 //!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]
-//!   # #[macro_use]
-//!   # extern crate auto_enums;
+//!   # use auto_enums::auto_enum;
 //!   use std::fmt::{Debug, Display};
 //!
 //!   // `?` operator (in closures)
@@ -381,8 +369,7 @@
 //!
 //!   ```rust
 //!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]
-//!   # #[macro_use]
-//!   # extern crate auto_enums;
+//!   # use auto_enums::auto_enum;
 //!   // block
 //!   #[auto_enum] // Nightly does not need an empty attribute to the function.
 //!   fn expr_block(x: i32) -> impl Iterator<Item=i32> {
@@ -420,8 +407,7 @@
 //!
 //! ```rust
 //! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
-//! # #[macro_use]
-//! # extern crate auto_enums;
+//! # use auto_enums::auto_enum;
 //! #[auto_enum(Iterator)]
 //! fn foo(x: i32) -> impl Iterator<Item = i32> {
 //!     match x {
@@ -452,8 +438,7 @@
 //!
 //! ```rust
 //! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
-//! # #[macro_use]
-//! # extern crate auto_enums;
+//! # use auto_enums::auto_enum;
 //! #[auto_enum(Iterator)]
 //! fn foo(x: i32) -> impl Iterator<Item = i32> {
 //!     match x {
@@ -469,8 +454,7 @@
 //!
 //! ```rust
 //! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
-//! # #[macro_use]
-//! # extern crate auto_enums;
+//! # use auto_enums::auto_enum;
 //! #[auto_enum(Iterator)]
 //! fn foo(x: i32) -> impl Iterator<Item = i32> {
 //!     match x {
@@ -489,8 +473,7 @@
 //!
 //! ```rust
 //! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
-//! # #[macro_use]
-//! # extern crate auto_enums;
+//! # use auto_enums::auto_enum;
 //! #[auto_enum(never, Iterator)]
 //! fn foo(x: i32) -> impl Iterator<Item = i32> {
 //!     match x {
@@ -515,8 +498,7 @@
 //!
 //! ```rust
 //! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
-//! # #[macro_use]
-//! # extern crate auto_enums;
+//! # use auto_enums::auto_enum;
 //! #[auto_enum(Iterator)]
 //! fn foo(x: i32) -> impl Iterator<Item = i32> {
 //!     if x < 0 {
@@ -531,8 +513,7 @@
 //!
 //! ```rust
 //! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
-//! # #[macro_use]
-//! # extern crate auto_enums;
+//! # use auto_enums::auto_enum;
 //! #[auto_enum(marker(bar), Iterator)]
 //! fn foo(x: i32) -> impl Iterator<Item = i32> {
 //!     if x < 0 {
@@ -558,8 +539,7 @@
 //! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //! # #![cfg_attr(feature = "unstable", feature(proc_macro_hygiene, stmt_expr_attributes))]
 //! # #[cfg(feature = "unstable")]
-//! # #[macro_use]
-//! # extern crate auto_enums;
+//! # use auto_enums::auto_enum;
 //! # #[cfg(feature = "unstable")]
 //! fn foo(x: i32) -> i32 {
 //!     #[auto_enum(Iterator)]
@@ -588,8 +568,7 @@
 //! ```rust
 //! # #![cfg_attr(feature = "unstable", feature(fn_traits, unboxed_closures))]
 //! # #[cfg(feature = "unstable")]
-//! # #[macro_use]
-//! # extern crate auto_enums;
+//! # use auto_enums::auto_enum;
 //! # #[cfg(feature = "unstable")]
 //! #[auto_enum(Fn)]
 //! fn foo(x: bool) -> impl Fn(i32) -> i32 {
@@ -615,8 +594,7 @@
 //!
 //! ```rust
 //! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
-//! # #[macro_use]
-//! # extern crate auto_enums;
+//! # use auto_enums::enum_derive;
 //! // `#[enum_derive]` implements `Iterator`, and `#[derive]` implements `Clone`.
 //! #[enum_derive(Iterator, Clone)]
 //! enum Foo<A, B> {
@@ -631,8 +609,7 @@
 //! ```rust
 //! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //! # #![cfg_attr(feature = "exact_size_is_empty", feature(exact_size_is_empty))]
-//! # #[macro_use]
-//! # extern crate auto_enums;
+//! # use auto_enums::enum_derive;
 //! // `#[enum_derive]` implements `Iterator` and `ExactSizeIterator`.
 //! #[enum_derive(ExactSizeIterator)]
 //! enum Foo<A, B> {
@@ -751,8 +728,7 @@
 //!
 //!     ```rust
 //!     # #[cfg(feature = "transpose_methods")]
-//!     # #[macro_use]
-//!     # extern crate auto_enums;
+//!     # use auto_enums::auto_enum;
 //!     # #[cfg(feature = "transpose_methods")]
 //!     use std::{fs, io, path::Path};
 //!
@@ -791,8 +767,7 @@
 //!     ```rust
 //!     # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //!     # #[cfg(feature = "type_analysis")]
-//!     # #[macro_use]
-//!     # extern crate auto_enums;
+//!     # use auto_enums::auto_enum;
 //!     # #[cfg(feature = "type_analysis")]
 //!     #[auto_enum] // there is no need to specify std library's traits
 //!     fn foo(x: i32) -> impl Iterator<Item = i32> {

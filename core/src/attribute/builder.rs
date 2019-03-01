@@ -102,7 +102,7 @@ impl EnumBuilder {
         let fields = self.iter();
 
         syn::parse2(quote! {
-            #[enum_derive(#(#args),*)]
+            #[::auto_enums::enum_derive(#(#args),*)]
             enum #ident<#(#ty_generics),*> {
                 #(#variants(#fields),)*
             }

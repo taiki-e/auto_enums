@@ -27,11 +27,10 @@ Add this to your `Cargo.toml`:
 auto_enums = "0.4"
 ```
 
-and this to your crate root:
+Now, you can use auto_enums:
 
 ```rust
-#[macro_use]
-extern crate auto_enums;
+use auto_enums::auto_enum;
 ```
 
 ## Examples

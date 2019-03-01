@@ -1,12 +1,10 @@
-use proc_macro2::TokenStream;
-
 use crate::utils::*;
 
 pub(crate) const NAME: &[&str] = &["IndexMut"];
 
-pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+pub(crate) fn derive(data: &Data, stack: &mut Stack<ItemImpl>) -> Result<()> {
     #[cfg(not(feature = "unsized_locals"))]
-    let bounds = TokenStream::new();
+    let bounds = quote!();
     #[cfg(feature = "unsized_locals")]
     let bounds = quote!(: ?Sized);
 
@@ -21,4 +19,5 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
             }
         }?,
     )
+    .map(|item| stack.push(item))
 }

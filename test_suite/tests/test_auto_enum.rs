@@ -19,14 +19,15 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 #![cfg_attr(all(not(feature = "std"), feature = "unstable"), feature(alloc))]
 #![deny(warnings)]
+#![deny(rust_2018_idioms)]
+#![allow(ellipsis_inclusive_range_patterns)] // syn generates both as `...`.
 #![allow(unused_imports)]
 
 #[cfg(all(not(feature = "std"), feature = "unstable"))]
 #[macro_use]
 extern crate alloc;
 
-#[macro_use]
-extern crate auto_enums;
+use auto_enums::auto_enum;
 
 #[test]
 fn stable_1_30() {
@@ -509,6 +510,7 @@ fn stable_1_30() {
 #[cfg(feature = "std")]
 #[test]
 fn stable_1_30_std() {
+    use auto_enums::enum_derive;
     use std::{error::Error, fs, io, path::Path};
 
     #[auto_enum(Transpose, Write)]

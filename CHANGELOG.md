@@ -4,6 +4,8 @@
 
 * Reduce the feature of "std" crate feature. The current "std" crate feature only determines whether to enable `std` library's traits (e.g., `std::io::Read`) support. "std" crate feature is enabled by default, but you can reduce compile time by disabling this feature.
 
+* No longer need `#[macro_use] extern crate auto_enums;`. You can use `#[auto_enum]` by `use auto_enums::auto_enum;`.
+
 * Remove "unstable" crate feature.
 
 # 0.4.1 - 2019-02-21

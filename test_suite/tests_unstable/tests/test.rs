@@ -14,13 +14,13 @@
     )
 )]
 #![deny(warnings)]
+#![deny(rust_2018_idioms)]
 #![allow(unused_imports)]
-
-#[macro_use]
-extern crate auto_enums;
 
 #[cfg(feature = "unstable")]
 mod test_futures {
+    use auto_enums::auto_enum;
+
     #[test]
     fn stream() {
         use futures::executor::block_on;
@@ -66,6 +66,8 @@ mod test_futures {
 
 mod enum_derive {
     #![allow(dead_code)]
+
+    use auto_enums::enum_derive;
 
     #[cfg(feature = "unstable")]
     #[test]
