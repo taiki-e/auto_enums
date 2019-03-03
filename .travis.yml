@@ -20,10 +20,9 @@ matrix:
     - rust: beta
     - rust: nightly
       script:
+        - cargo test --all --no-default-features
         - cargo test --all
         - cargo test --all --all-features
-        - cd "${TRAVIS_BUILD_DIR}/test_suite"
-        - cargo test --no-default-features
 
     - rust: nightly
       name: cargo test (minimal versions)
@@ -63,9 +62,8 @@ before_script:
   - set -o errexit
 
 script:
+  - cargo test --all --no-default-features
   - cargo test --all
-  - cd "${TRAVIS_BUILD_DIR}/test_suite"
-  - cargo test --no-default-features
 
 notifications:
   email:
