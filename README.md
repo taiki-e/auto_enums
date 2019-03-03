@@ -27,7 +27,7 @@ Add this to your `Cargo.toml`:
 auto_enums = "0.5"
 ```
 
-The current version of easytime requires Rust 1.31 or later.
+The current version of auto_enums requires Rust 1.31 or later.
 
 ## Examples
 
