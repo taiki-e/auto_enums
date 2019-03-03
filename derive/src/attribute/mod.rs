@@ -2,10 +2,7 @@ use std::collections::HashMap;
 
 use lazy_static::lazy_static;
 use proc_macro2::TokenStream;
-use syn::{
-    parse::{Parse, ParseStream},
-    Attribute, ItemEnum,
-};
+use syn::ItemEnum;
 
 use crate::utils::*;
 
@@ -227,21 +224,10 @@ fn expand(args: TokenStream, input: TokenStream) -> Result<TokenStream> {
     }
 
     if !derive.is_empty() {
-        let mut derive: Attributes = syn::parse_quote!(#[derive(#(#derive),*)]);
-        if let Some(derive) = derive.0.pop() {
-            item.attrs.push(derive);
-        }
+        item.attrs.push(syn::parse_quote!(#[derive(#(#derive),*)]));
     }
 
     let mut item = item.into_token_stream();
     item.extend(impls.into_iter().map(ToTokens::into_token_stream));
     Ok(item)
-}
-
-struct Attributes(Vec<Attribute>);
-
-impl Parse for Attributes {
-    fn parse(input: ParseStream<'_>) -> syn::Result<Self> {
-        input.call(Attribute::parse_outer).map(Attributes)
-    }
 }
