@@ -595,7 +595,8 @@
 //!
 //! ```rust
 //! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
-//! # use auto_enums::enum_derive;
+//! use auto_enums::enum_derive;
+//!
 //! // `#[enum_derive]` implements `Iterator`, and `#[derive]` implements `Clone`.
 //! #[enum_derive(Iterator, Clone)]
 //! enum Foo<A, B> {
@@ -610,7 +611,8 @@
 //! ```rust
 //! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //! # #![cfg_attr(feature = "exact_size_is_empty", feature(exact_size_is_empty))]
-//! # use auto_enums::enum_derive;
+//! use auto_enums::enum_derive;
+//!
 //! // `#[enum_derive]` implements `Iterator` and `ExactSizeIterator`.
 //! #[enum_derive(ExactSizeIterator)]
 //! enum Foo<A, B> {
@@ -826,7 +828,7 @@
 //!
 
 #![recursion_limit = "256"]
-#![doc(html_root_url = "https://docs.rs/auto_enums/0.5.0")]
+#![doc(html_root_url = "https://docs.rs/auto_enums/0.5.1")]
 #![deny(unsafe_code)]
 #![deny(rust_2018_idioms, unreachable_pub)]
 #![no_std]

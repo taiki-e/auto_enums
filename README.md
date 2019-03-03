@@ -85,6 +85,8 @@ If you want to use traits that are not supported by `#[enum_derive]`, you can us
 Basic usage of `#[enum_derive]`
 
 ```rust
+use auto_enums::enum_derive;
+
 // `#[enum_derive]` implements `Iterator`, and `#[derive]` implements `Clone`.
 #[enum_derive(Iterator, Clone)]
 enum Foo<A, B> {

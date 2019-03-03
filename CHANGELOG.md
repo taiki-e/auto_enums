@@ -1,5 +1,9 @@
 # Unreleased
 
+# 0.5.1 - 2019-03-03
+
+* Fix examples and wrong name in README.md.
+
 # 0.5.0 - 2019-03-03
 
 * Transition to Rust 2018. With this change, the minimum required version will go up to Rust 1.31.
