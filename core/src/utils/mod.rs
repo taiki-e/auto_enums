@@ -14,9 +14,8 @@ pub(crate) use self::rand::*;
 
 pub(crate) type Stack<T> = SmallVec<[T; 4]>;
 
-pub(crate) fn default<T: Default>() -> T {
-    T::default()
-}
+// =============================================================================
+// Extension traits
 
 pub(crate) trait OptionExt {
     fn replace_boxed_expr<F: FnOnce(Expr) -> Expr>(&mut self, f: F);
@@ -55,6 +54,13 @@ impl<T> VecExt<T> for Vec<T> {
 
         self.iter().position(predicate).map(|i| remove(self, i))
     }
+}
+
+// =============================================================================
+// Functions
+
+pub(crate) fn default<T: Default>() -> T {
+    T::default()
 }
 
 pub(crate) fn ident_call_site<S: AsRef<str>>(s: S) -> Ident {

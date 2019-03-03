@@ -3,12 +3,13 @@ use quote::quote;
 use syn::{
     parse_quote,
     visit_mut::{self, VisitMut},
-    *,
+    Arm, Attribute, Expr, ExprMacro, ExprReturn, ExprTry, Item, Local, Macro, Stmt,
 };
 
-use crate::utils::Result;
+use super::{builder::Builder, *};
 
-use super::*;
+// =============================================================================
+// Expression level marker
 
 const DEFAULT_MARKER: &str = "marker";
 
@@ -39,20 +40,23 @@ impl Marker {
         self.ident.as_ref().map_or(DEFAULT_MARKER, |s| s)
     }
 
-    pub(super) fn marker_macro(&self, mac: &Macro) -> bool {
+    pub(super) fn marker_macro(&self, Macro { path, .. }: &Macro) -> bool {
         match &self.ident {
-            None => mac.path.is_ident(DEFAULT_MARKER),
+            None => path.is_ident(DEFAULT_MARKER),
             Some(marker) => {
-                mac.path.is_ident(marker) || (!self.is_root() && mac.path.is_ident(DEFAULT_MARKER))
+                path.is_ident(marker) || (!self.is_root() && path.is_ident(DEFAULT_MARKER))
             }
         }
     }
 }
 
+// =============================================================================
+// Visitor
+
 pub(super) enum VisitOption {
+    Default,
     Return,
     Try,
-    None,
 }
 
 impl VisitOption {
@@ -61,12 +65,6 @@ impl VisitOption {
             VisitOption::Try => true,
             _ => false,
         }
-    }
-}
-
-impl Default for VisitOption {
-    fn default() -> Self {
-        VisitOption::None
     }
 }
 
@@ -120,7 +118,7 @@ impl<'a> Visitor<'a> {
             self.in_closure = true;
         }
 
-        if !self.in_closure && !expr.any_empty_attr(NEVER_ATTR) {
+        if !self.in_closure && !expr.any_empty_attr(NEVER) {
             if let Expr::Return(ExprReturn { expr, .. }) = expr {
                 expr.replace_boxed_expr(|expr| match expr {
                     Expr::Macro(expr) => {
@@ -145,7 +143,7 @@ impl<'a> Visitor<'a> {
             _ => {}
         }
 
-        if !self.in_try_block && !self.in_closure && !expr.any_empty_attr(NEVER_ATTR) {
+        if !self.in_try_block && !self.in_closure && !expr.any_empty_attr(NEVER) {
             *expr = match expr {
                 Expr::Try(ExprTry { expr, .. }) => {
                     if let Expr::Macro(ExprMacro { mac, .. }) = &**expr {
@@ -311,7 +309,7 @@ impl VisitMut for FindTry<'_> {
             self.in_closure = true;
         }
 
-        if !self.in_closure && !expr.any_empty_attr(NEVER_ATTR) {
+        if !self.in_closure && !expr.any_empty_attr(NEVER) {
             if let Expr::Try(ExprTry { expr, .. }) = expr {
                 match &**expr {
                     Expr::Macro(expr) => {
@@ -363,25 +361,16 @@ impl VisitMut for Dummy {
 }
 
 fn visit_stmt_mut(stmt: &mut Stmt) {
-    fn parse_attr<A: AttrsMut, F>(attrs: &mut A, f: F) -> Result<()>
-    where
-        F: FnOnce(&mut A, Params) -> Result<()>,
-    {
-        match attrs.find_remove_attr(NAME) {
-            None => Ok(()),
-            Some(Attribute { tts, .. }) => syn::parse2(tts)
-                .map_err(|e| invalid_args!(e))
-                .and_then(|group: Group| parse_args(group.stream()))
-                .and_then(|params| f(attrs, params)),
-        }
+    // Stop at item bounds
+    if let Stmt::Item(_) = stmt {
+        return;
     }
 
-    match stmt {
-        Stmt::Expr(expr) => parse_attr(expr, parent_expr),
-        Stmt::Semi(expr, _) => parse_attr(expr, stmt_semi),
-        Stmt::Local(local) => parse_attr(local, stmt_let),
-        // Stop at item bounds
-        Stmt::Item(_) => return,
+    if let Some(Attribute { tts, .. }) = stmt.find_remove_attr(NAME) {
+        syn::parse2(tts)
+            .map_err(|e| invalid_args!(e))
+            .and_then(|group: Group| parse_args(group.stream()))
+            .and_then(|params| stmt.visit_parent(params))
+            .unwrap_or_else(|e| panic!("`{}` {}", NAME, e));
     }
-    .unwrap_or_else(|e| panic!("`{}` {}", NAME, e));
 }

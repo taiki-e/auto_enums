@@ -1,5 +1,4 @@
-use proc_macro::TokenStream;
-use proc_macro2::TokenStream as TokenStream2;
+use proc_macro2::TokenStream;
 use quote::ToTokens;
 use syn::{visit_mut::VisitMut, *};
 
@@ -14,49 +13,37 @@ mod traits;
 mod visitor;
 
 use self::attrs::*;
-use self::builder::Builder;
-use self::expr::*;
+use self::expr::{child_expr, EMPTY_ATTRS, NEVER};
 use self::params::*;
 #[cfg(feature = "type_analysis")]
 use self::traits::*;
 use self::visitor::*;
 
-const NAME: &str = "auto_enum";
+/// The attribute name.
+pub(crate) const NAME: &str = "auto_enum";
 
 pub(crate) fn attribute(args: TokenStream, input: TokenStream) -> TokenStream {
-    expand(args.into(), input)
-        .unwrap_or_else(|e| compile_err(&format!("`{}` {}", NAME, e)))
-        .into()
+    expand(args, input).unwrap_or_else(|e| e.to_compile_err())
 }
 
-fn expand(args: TokenStream2, input: TokenStream) -> Result<TokenStream2> {
+fn expand(args: TokenStream, input: TokenStream) -> Result<TokenStream> {
     let mut params = parse_args(args)?;
     params.root();
 
-    match syn::parse(input.clone()) {
-        Ok(mut stmt) => parent_stmt(&mut stmt, params).map(|()| stmt.into_token_stream()),
-        Err(_) => syn::parse(input)
+    match syn::parse2::<Stmt>(input.clone()) {
+        Ok(mut stmt) => stmt.visit_parent(params).map(|()| stmt.into_token_stream()),
+        Err(_) => syn::parse2::<Expr>(input)
             .map_err(|_| "may only be used on expression, statement, or function".into())
-            .and_then(|mut expr| parent_expr(&mut expr, params).map(|()| expr.into_token_stream())),
+            .and_then(|mut expr| expr.visit_parent(params).map(|()| expr.into_token_stream())),
     }
 }
 
-fn parent_stmt(stmt: &mut Stmt, params: Params) -> Result<()> {
-    match stmt {
-        Stmt::Expr(expr) => parent_expr(expr, params),
-        Stmt::Semi(expr, _) => stmt_semi(expr, params),
-        Stmt::Local(local) => stmt_let(local, params),
-        Stmt::Item(Item::Fn(item)) => item_fn(item, params),
-        Stmt::Item(_) => Err("may only be used on expression, statement, or function".into()),
-    }
-}
-
-fn visit_expr(expr: &mut Expr, builder: &mut Builder, params: &mut Params) -> Result<()> {
+fn visit_expr(expr: &mut Expr, params: &mut Params) -> Result<()> {
     match expr {
         Expr::Closure(ExprClosure { body, .. }) if !params.never() => {
             let visit_try = find_try(params.marker(), |v| v.visit_expr_mut(body));
             if !visit_try {
-                child_expr(&mut **body, builder, params)?;
+                child_expr(&mut **body, params)?;
             }
 
             params._visitor(
@@ -65,108 +52,124 @@ fn visit_expr(expr: &mut Expr, builder: &mut Builder, params: &mut Params) -> Re
                 } else {
                     VisitOption::Return
                 },
-                builder,
                 |v| v.visit_expr_mut(&mut **body),
             );
         }
         _ => {
             if !params.never() {
-                child_expr(expr, builder, params)?;
+                child_expr(expr, params)?;
             }
 
-            params.visitor(builder, |v| v.visit_expr_mut(expr));
+            params.visitor(|v| v.visit_expr_mut(expr));
         }
     }
 
     Ok(())
 }
 
-fn build_expr(expr: &mut Expr, builder: &mut Builder, params: &Params) -> Result<()> {
-    builder.build(params.args()).map(|item| {
+fn build_expr(expr: &mut Expr, params: &Params) -> Result<()> {
+    params.build().map(|item| {
         replace_expr(expr, |expr| {
             expr_block(block(vec![Stmt::Item(item.into()), Stmt::Expr(expr)]))
         });
     })
 }
 
-fn parent_expr(expr: &mut Expr, mut params: Params) -> Result<()> {
-    let mut builder = Builder::new();
-
-    if params.args().is_empty() {
-        Dummy.visit_expr_mut(expr);
-        return Ok(());
-    }
-
-    visit_expr(expr, &mut builder, &mut params)?;
-
-    match builder.len() {
-        0 | 1 if !params.attr() => Err(unsupported_expr(
-            "is required two or more branches or marker macros in total",
-        )),
-        0 => Ok(()),
-        _ => build_expr(expr, &mut builder, &params),
-    }
+/// The statement or expression in which `#[auto_enum]` was directly used.
+trait Parent {
+    fn visit_parent(&mut self, params: Params) -> Result<()>;
 }
 
-fn stmt_semi(expr: &mut Expr, mut params: Params) -> Result<()> {
-    let mut builder = Builder::new();
+impl Parent for Stmt {
+    fn visit_parent(&mut self, params: Params) -> Result<()> {
+        fn stmt_semi(expr: &mut Expr, mut params: Params) -> Result<()> {
+            if params.args().is_empty() {
+                Dummy.visit_expr_mut(expr);
+                return Ok(());
+            }
 
-    if params.args().is_empty() {
-        Dummy.visit_expr_mut(expr);
-        return Ok(());
-    }
+            params.visitor(|v| v.visit_expr_mut(expr));
 
-    params.visitor(&mut builder, |c| c.visit_expr_mut(expr));
+            match params.builder().len() {
+                len @ 0 | len @ 1 if !params.attr() => Err(unsupported_stmt(format!(
+                    "expression with trailing semicolon is required two or more marker macros. There is {} marker macro in this statement.",
+                    less_than_two(len),
+                ))),
+                0 => Ok(()),
+                _ => build_expr(expr, &params),
+            }
+        }
 
-    match builder.len() {
-        0 | 1 if !params.attr() => Err(unsupported_stmt(
-            "expression with trailing semicolon is required two or more marker macros",
-        )),
-        0 => Ok(()),
-        _ => build_expr(expr, &mut builder, &params),
-    }
-}
-
-fn stmt_let(local: &mut Local, mut params: Params) -> Result<()> {
-    let mut builder = Builder::new();
-
-    #[cfg(feature = "type_analysis")]
-    {
-        if let Some((_, ty)) = &mut local.ty {
-            params.impl_traits(&mut *ty);
+        match self {
+            Stmt::Expr(expr) => expr.visit_parent(params),
+            Stmt::Semi(expr, _) => stmt_semi(expr, params),
+            Stmt::Local(local) => local.visit_parent(params),
+            Stmt::Item(Item::Fn(item)) => item.visit_parent(params),
+            Stmt::Item(_) => Err("may only be used on expression, statement, or function".into()),
         }
     }
-
-    if params.args().is_empty() {
-        Dummy.visit_local_mut(local);
-        return Ok(());
-    }
-
-    let mut expr = (local.init)
-        .take()
-        .map(|(_, expr)| expr)
-        .ok_or_else(|| unsupported_stmt("uninitialized let statement"))?;
-
-    visit_expr(&mut *expr, &mut builder, &mut params)?;
-
-    match builder.len() {
-        0 | 1 if !params.attr() => Err(unsupported_stmt(
-            "is required two or more branches or marker macros in total",
-        ))?,
-        0 => {}
-        _ => build_expr(&mut *expr, &mut builder, &params)?,
-    }
-
-    local.init = Some((default(), expr));
-    Ok(())
 }
 
-fn item_fn(item: &mut ItemFn, mut params: Params) -> Result<()> {
-    let mut builder = Builder::new();
-    let mut option = VisitOption::default();
+impl Parent for Expr {
+    fn visit_parent(&mut self, mut params: Params) -> Result<()> {
+        if params.args().is_empty() {
+            Dummy.visit_expr_mut(self);
+            return Ok(());
+        }
 
-    {
-        let ItemFn { decl, block, .. } = item;
+        visit_expr(self, &mut params)?;
+
+        match params.builder().len() {
+            len @ 0 | len @ 1 if !params.attr() => Err(unsupported_expr(format!(
+                "is required two or more branches or marker macros in total. There is {} branch or marker macro in this expression.",
+                less_than_two(len),
+            ))),
+            0 => Ok(()),
+            _ => build_expr(self, &params),
+        }
+    }
+}
+
+impl Parent for Local {
+    fn visit_parent(&mut self, mut params: Params) -> Result<()> {
+        #[cfg(feature = "type_analysis")]
+        {
+            if let Some((_, ty)) = &mut self.ty {
+                params.impl_traits(&mut *ty);
+            }
+        }
+
+        if params.args().is_empty() {
+            Dummy.visit_local_mut(self);
+            return Ok(());
+        }
+
+        let mut expr = (self.init)
+            .take()
+            .map(|(_, expr)| expr)
+            .ok_or_else(|| unsupported_stmt("uninitialized let statement"))?;
+
+        visit_expr(&mut *expr, &mut params)?;
+
+        match params.builder().len() {
+            len @ 0 | len @ 1 if !params.attr() => Err(unsupported_stmt(format!(
+                "is required two or more branches or marker macros in total. There is {} branch or marker macro in this statement.",
+                less_than_two(len),
+            )))?,
+            0 => {}
+            _ => build_expr(&mut *expr, &params)?,
+        }
+
+        self.init = Some((default(), expr));
+        Ok(())
+    }
+}
+
+impl Parent for ItemFn {
+    fn visit_parent(&mut self, mut params: Params) -> Result<()> {
+        let mut option = VisitOption::Default;
+
+        let ItemFn { decl, block, .. } = self;
         if let ReturnType::Type(_, ty) = &mut decl.output {
             match &**ty {
                 // `return`
@@ -202,33 +205,41 @@ fn item_fn(item: &mut ItemFn, mut params: Params) -> Result<()> {
             #[cfg(feature = "type_analysis")]
             params.impl_traits(&mut *ty);
         }
-    }
 
-    if params.args().is_empty() {
-        Dummy.visit_item_fn_mut(item);
-        return Ok(());
-    }
-
-    match item.block.stmts.last_mut() {
-        Some(Stmt::Expr(expr)) if !params.never() && !option.is_try() => {
-            child_expr(expr, &mut builder, &params)?
+        if params.args().is_empty() {
+            Dummy.visit_item_fn_mut(self);
+            return Ok(());
         }
-        Some(_) => {}
-        None => Err(unsupported_item("empty function"))?,
+
+        match self.block.stmts.last_mut() {
+            Some(Stmt::Expr(expr)) if !params.never() && !option.is_try() => {
+                child_expr(expr, &mut params)?
+            }
+            Some(_) => {}
+            None => Err(unsupported_item("empty function"))?,
+        }
+
+        params._visitor(option, |v| v.visit_item_fn_mut(self));
+
+        match params.builder().len() {
+            len @ 0 | len @ 1 if !params.attr() => Err(unsupported_stmt(format!(
+                "is required two or more branches or marker macros in total. There is {} branch or marker macro in this function.",
+                less_than_two(len),
+            ))),
+            0 => Ok(()),
+            _ => params
+                .build()
+                .map(|i| self.block.stmts.insert(0, Stmt::Item(i.into()))),
+        }
     }
+}
 
-    params._visitor(option, &mut builder, |v| v.visit_item_fn_mut(item));
-
-    match builder.len() {
-        0 | 1 if !params.attr() => Err(unsupported_item(
-            "is required two or more branches or marker macros in total",
-        )),
-        0 => Ok(()),
-        _ => builder.build(params.args()).map(|i| {
-            let mut stmts = Vec::with_capacity(item.block.stmts.len() + 1);
-            stmts.push(Stmt::Item(i.into()));
-            stmts.append(&mut item.block.stmts);
-            item.block.stmts = stmts;
-        }),
+#[inline(never)]
+fn less_than_two(n: usize) -> &'static str {
+    assert!(n < 2);
+    if n == 0 {
+        "no"
+    } else {
+        "only one"
     }
 }

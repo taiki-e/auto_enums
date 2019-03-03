@@ -33,7 +33,7 @@ pub(crate) trait Distribution<T> {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> T;
 }
 
-impl<T, D: Distribution<T>> Distribution<T> for &'_ D {
+impl<T, D: Distribution<T>> Distribution<T> for &D {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> T {
         (*self).sample(rng)
     }

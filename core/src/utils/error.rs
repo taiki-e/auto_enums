@@ -1,15 +1,13 @@
 use std::{fmt, result};
 
-use proc_macro2::TokenStream as TokenStream2;
+use proc_macro2::TokenStream;
 use quote::quote;
 
-pub(crate) type StdResult<T, E> = result::Result<T, E>;
-pub(crate) type Result<T> = StdResult<T, Error>;
+use crate::attribute::NAME;
 
-#[inline(never)]
-pub(crate) fn compile_err(msg: &str) -> TokenStream2 {
-    quote!(compile_error!(#msg);)
-}
+use self::Error::*;
+
+pub(crate) type Result<T> = result::Result<T, Error>;
 
 #[derive(Debug)]
 pub(crate) enum Error {
@@ -25,16 +23,23 @@ pub(crate) enum Error {
     Other(String),
 }
 
+impl Error {
+    #[inline(never)]
+    pub(crate) fn to_compile_err(&self) -> TokenStream {
+        let msg = &format!("{}", self);
+        quote!(compile_error!(#msg);)
+    }
+}
+
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        use self::Error::*;
         match self {
-            InvalidArgs(s) => write!(f, "invalid attribute arguments: {}", s),
-            InvalidExpr(s) => write!(f, "invalid expression: {}", s),
-            UnsupportedExpr(s) => write!(f, "unsupported expression: {}", s),
-            UnsupportedStmt(s) => write!(f, "unsupported statement: {}", s),
-            UnsupportedItem(s) => write!(f, "unsupported item: {}", s),
-            Other(s) => write!(f, "{}", s),
+            InvalidArgs(msg) => write!(f, "invalid attribute arguments: `{}` {}", NAME, msg),
+            InvalidExpr(msg) => write!(f, "invalid expression: `{}` {}", NAME, msg),
+            UnsupportedExpr(msg) => write!(f, "unsupported expression: `{}` {}", NAME, msg),
+            UnsupportedStmt(msg) => write!(f, "unsupported statement: `{}` {}", NAME, msg),
+            UnsupportedItem(msg) => write!(f, "unsupported item: `{}` {}", NAME, msg),
+            Other(msg) => write!(f, "`{}` {}", NAME, msg),
         }
     }
 }
@@ -55,15 +60,15 @@ macro_rules! invalid_args {
 }
 
 pub(crate) fn invalid_expr<S: Into<String>>(s: S) -> Error {
-    Error::InvalidExpr(s.into())
+    InvalidExpr(s.into())
 }
 
 pub(crate) fn unsupported_expr<S: Into<String>>(s: S) -> Error {
-    Error::UnsupportedExpr(s.into())
+    UnsupportedExpr(s.into())
 }
 pub(crate) fn unsupported_stmt<S: Into<String>>(s: S) -> Error {
-    Error::UnsupportedStmt(s.into())
+    UnsupportedStmt(s.into())
 }
 pub(crate) fn unsupported_item<S: Into<String>>(s: S) -> Error {
-    Error::UnsupportedItem(s.into())
+    UnsupportedItem(s.into())
 }

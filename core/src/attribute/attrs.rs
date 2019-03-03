@@ -1,4 +1,4 @@
-use syn::{Arm, Attribute, Expr, Local};
+use syn::{Arm, Attribute, Expr, Local, Stmt};
 
 use crate::utils::*;
 
@@ -32,17 +32,17 @@ pub(super) trait AttrsMut: Attrs {
     }
 }
 
-impl<A: Attrs> Attrs for &'_ A {
+impl<A: Attrs> Attrs for &A {
     fn attrs(&self) -> &[Attribute] {
         (**self).attrs()
     }
 }
-impl<A: Attrs> Attrs for &'_ mut A {
+impl<A: Attrs> Attrs for &mut A {
     fn attrs(&self) -> &[Attribute] {
         (**self).attrs()
     }
 }
-impl<A: AttrsMut> AttrsMut for &'_ mut A {
+impl<A: AttrsMut> AttrsMut for &mut A {
     fn attrs_mut<T, F: FnOnce(&mut Vec<Attribute>) -> T>(&mut self, f: F) -> T {
         (**self).attrs_mut(f)
     }
@@ -74,6 +74,7 @@ impl AttrsMut for Local {
         f(&mut self.attrs)
     }
 }
+
 impl Attrs for Arm {
     fn attrs(&self) -> &[Attribute] {
         &self.attrs
@@ -82,6 +83,27 @@ impl Attrs for Arm {
 impl AttrsMut for Arm {
     fn attrs_mut<T, F: FnOnce(&mut Vec<Attribute>) -> T>(&mut self, f: F) -> T {
         f(&mut self.attrs)
+    }
+}
+
+impl Attrs for Stmt {
+    fn attrs(&self) -> &[Attribute] {
+        match self {
+            Stmt::Expr(expr) | Stmt::Semi(expr, _) => expr.attrs(),
+            Stmt::Local(local) => local.attrs(),
+            // Stop at item bounds
+            Stmt::Item(_) => &[],
+        }
+    }
+}
+impl AttrsMut for Stmt {
+    fn attrs_mut<T, F: FnOnce(&mut Vec<Attribute>) -> T>(&mut self, f: F) -> T {
+        match self {
+            Stmt::Expr(expr) | Stmt::Semi(expr, _) => expr.attrs_mut(f),
+            Stmt::Local(local) => local.attrs_mut(f),
+            // Stop at item bounds
+            Stmt::Item(_) => f(&mut Vec::with_capacity(0)),
+        }
     }
 }
 

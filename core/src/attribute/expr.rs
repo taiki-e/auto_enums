@@ -5,27 +5,37 @@ use syn::{
 
 use crate::utils::{Result, *};
 
-use super::*;
+use super::{builder::Builder, *};
 
-const REC_ATTR: &str = "rec";
+/// The annotation for recursively parsing.
+const REC: &str = "rec";
+/// The annotation for skipping branch.
+pub(super) const NEVER: &str = "never";
+/// The annotations used by `#[auto_enum]`.
+pub(super) const EMPTY_ATTRS: &[&str] = &[NEVER, REC];
 
-pub(super) const NEVER_ATTR: &str = "never";
-
-pub(super) const EMPTY_ATTRS: &[&str] = &[NEVER_ATTR, REC_ATTR];
+// =============================================================================
+// Params
 
 struct Params<'a> {
+    builder: &'a mut Builder,
     marker: &'a Marker,
     rec: bool,
 }
 
-impl<'a> From<&'a super::Params> for Params<'a> {
-    fn from(params: &'a super::Params) -> Self {
+impl<'a> From<&'a mut super::Params> for Params<'a> {
+    fn from(params: &'a mut super::Params) -> Self {
+        let (builder, marker) = params.double();
         Self {
-            marker: params.marker(),
+            builder,
+            marker,
             rec: false,
         }
     }
 }
+
+// =============================================================================
+// Functions and trait for visiting last expression
 
 fn last_expr<T, F, OP>(expr: &Expr, success: T, mut filter: F, op: OP) -> T
 where
@@ -89,13 +99,13 @@ where
     op(expr, state)
 }
 
-fn is_unreachable(expr: &Expr, builder: &Builder, params: &Params<'_>) -> bool {
+fn is_unreachable(expr: &Expr, params: &Params<'_>) -> bool {
     const UNREACHABLE_MACROS: &[&str] = &["unreachable", "panic"];
 
     last_expr(
         expr,
         true,
-        |expr| !expr.any_empty_attr(NEVER_ATTR) && !expr.any_attr(NAME),
+        |expr| !expr.any_empty_attr(NEVER) && !expr.any_attr(NAME),
         |expr| match expr {
             Expr::Break(_) | Expr::Continue(_) | Expr::Return(_) => true,
 
@@ -115,14 +125,14 @@ fn is_unreachable(expr: &Expr, builder: &Builder, params: &Params<'_>) -> bool {
                         && path.segments.len() == 2
                         && path.segments[0].arguments.is_empty()
                         && path.segments[1].arguments.is_empty()
-                        && path.segments[0].ident == builder.ident()
+                        && path.segments[0].ident == params.builder.ident()
                 }
                 _ => false,
             },
 
-            Expr::Match(ExprMatch { arms, .. }) => arms.iter().all(|arm| {
-                arm.any_empty_attr(NEVER_ATTR) || is_unreachable(&*arm.body, builder, params)
-            }),
+            Expr::Match(ExprMatch { arms, .. }) => arms
+                .iter()
+                .all(|arm| arm.any_empty_attr(NEVER) || is_unreachable(&*arm.body, params)),
 
             // `Err(expr)?` or `None?`.
             Expr::Try(ExprTry { expr, .. }) => match &**expr {
@@ -144,121 +154,135 @@ fn is_unreachable(expr: &Expr, builder: &Builder, params: &Params<'_>) -> bool {
 }
 
 /// Note that do not use this after `params.*visitor`.
-pub(super) fn child_expr(
-    expr: &mut Expr,
-    builder: &mut Builder,
-    params: &super::Params,
-) -> Result<()> {
-    fn _child_expr(expr: &mut Expr, builder: &mut Builder, params: &mut Params<'_>) -> Result<()> {
+pub(super) fn child_expr(expr: &mut Expr, params: &mut super::Params) -> Result<()> {
+    impl VisitLast<()> for Expr {
+        fn visit_last(&mut self, params: &mut Params<'_>) -> Result<()> {
+            last_expr_mut(
+                self,
+                params,
+                Ok(()),
+                |expr, params| {
+                    if expr.any_empty_attr(REC) {
+                        params.rec = true;
+                    }
+                    !is_unreachable(expr, params)
+                },
+                |expr, params| match expr {
+                    Expr::Match(expr) => expr.visit_last(params),
+                    Expr::If(expr) => expr.visit_last(params),
+                    Expr::Loop(expr) => expr.visit_last(params),
+
+                    // Search recursively
+                    Expr::MethodCall(ExprMethodCall { receiver: expr, .. })
+                    | Expr::Paren(ExprParen { expr, .. })
+                    | Expr::Type(ExprType { expr, .. }) => expr.visit_last(params),
+
+                    _ => Ok(()),
+                },
+            )
+        }
+    }
+
+    expr.visit_last(&mut Params::from(params))
+}
+
+trait VisitLast<T> {
+    fn visit_last(&mut self, params: &mut Params<'_>) -> Result<T>;
+}
+
+impl VisitLast<bool> for Expr {
+    fn visit_last(&mut self, params: &mut Params<'_>) -> Result<bool> {
         last_expr_mut(
-            expr,
-            &mut (builder, params),
-            Ok(()),
-            |expr, (builder, params)| {
-                if expr.any_empty_attr(REC_ATTR) {
-                    params.rec = true;
-                }
-                !is_unreachable(expr, builder, params)
-            },
-            |expr, (builder, params)| match expr {
-                Expr::Match(expr) => expr_match(expr, builder, params),
-                Expr::If(expr) => expr_if(expr, builder, params),
-                Expr::Loop(expr) => expr_loop(expr, builder, params),
-
-                // Search recursively
-                Expr::MethodCall(ExprMethodCall { receiver: expr, .. })
-                | Expr::Paren(ExprParen { expr, .. })
-                | Expr::Type(ExprType { expr, .. }) => _child_expr(&mut **expr, builder, params),
-
-                _ => Ok(()),
+            self,
+            params,
+            Ok(true),
+            |expr, params| !is_unreachable(expr, params),
+            |expr, params| match expr {
+                Expr::Match(expr) => expr.visit_last(params).map(|_| true),
+                Expr::If(expr) => expr.visit_last(params).map(|_| true),
+                Expr::Loop(expr) => expr.visit_last(params).map(|_| true),
+                _ => Ok(false),
             },
         )
     }
-
-    _child_expr(expr, builder, &mut Params::from(params))
 }
 
-fn rec_attr(expr: &mut Expr, builder: &mut Builder, params: &Params<'_>) -> Result<bool> {
-    last_expr_mut(
-        expr,
-        builder,
-        Ok(true),
-        |expr, builder| !is_unreachable(expr, builder, params),
-        |expr, builder| match expr {
-            Expr::Match(expr) => expr_match(expr, builder, params).map(|_| true),
-            Expr::If(expr) => expr_if(expr, builder, params).map(|_| true),
-            Expr::Loop(expr) => expr_loop(expr, builder, params).map(|_| true),
-            _ => Ok(false),
-        },
-    )
-}
-
-fn expr_match(expr: &mut ExprMatch, builder: &mut Builder, params: &Params<'_>) -> Result<()> {
-    fn skip(arm: &mut Arm, builder: &mut Builder, params: &Params<'_>) -> Result<bool> {
-        Ok(arm.any_empty_attr(NEVER_ATTR)
-            || is_unreachable(&*arm.body, &builder, params)
-            || ((arm.any_empty_attr(REC_ATTR) || params.rec)
-                && rec_attr(&mut *arm.body, builder, params)?))
-    }
-
-    expr.arms.iter_mut().try_for_each(|arm| {
-        if !skip(arm, builder, params)? {
-            arm.comma = Some(default());
-            replace_expr(&mut *arm.body, |x| builder.next_expr(x));
+impl VisitLast<()> for ExprMatch {
+    fn visit_last(&mut self, params: &mut Params<'_>) -> Result<()> {
+        fn skip(arm: &mut Arm, params: &mut Params<'_>) -> Result<bool> {
+            Ok(arm.any_empty_attr(NEVER)
+                || is_unreachable(&*arm.body, params)
+                || ((arm.any_empty_attr(REC) || params.rec) && arm.body.visit_last(params)?))
         }
 
-        Ok(())
-    })
-}
-
-fn expr_if(expr: &mut ExprIf, builder: &mut Builder, params: &Params<'_>) -> Result<()> {
-    fn skip(last: Option<&mut Stmt>, builder: &mut Builder, params: &Params<'_>) -> Result<bool> {
-        Ok(match &last {
-            Some(Stmt::Expr(expr)) | Some(Stmt::Semi(expr, _)) => {
-                is_unreachable(expr, &builder, params)
-            }
-            _ => true,
-        } || match last {
-            Some(Stmt::Expr(expr)) => {
-                (expr.any_empty_attr(REC_ATTR) || params.rec) && rec_attr(expr, builder, params)?
-            }
-            _ => true,
-        })
-    }
-
-    if !skip(expr.then_branch.stmts.last_mut(), builder, params)? {
-        replace_block(&mut expr.then_branch, |b| builder.next_expr(expr_block(b)));
-    }
-
-    match expr.else_branch.as_mut().map(|(_, expr)| &mut **expr) {
-        Some(Expr::Block(expr)) => {
-            if !skip(expr.block.stmts.last_mut(), builder, params)? {
-                replace_block(&mut expr.block, |b| builder.next_expr(expr_block(b)));
+        self.arms.iter_mut().try_for_each(|arm| {
+            if !skip(arm, params)? {
+                arm.comma = Some(default());
+                replace_expr(&mut *arm.body, |x| params.builder.next_expr(x));
             }
 
             Ok(())
-        }
-        Some(Expr::If(expr)) => expr_if(expr, builder, params),
-        Some(_) => Err(invalid_expr("after of `else` required `{` or `if`"))?,
-        None => Err(invalid_expr("`if` expression missing an else clause"))?,
+        })
     }
 }
 
-fn expr_loop(expr: &mut ExprLoop, builder: &mut Builder, params: &Params<'_>) -> Result<()> {
-    LoopVisitor::new(params.marker, &expr, builder).visit_block_mut(&mut expr.body);
+impl VisitLast<()> for ExprIf {
+    fn visit_last(&mut self, params: &mut Params<'_>) -> Result<()> {
+        fn skip(last: Option<&mut Stmt>, params: &mut Params<'_>) -> Result<bool> {
+            Ok(match &last {
+                Some(Stmt::Expr(expr)) | Some(Stmt::Semi(expr, _)) => is_unreachable(expr, params),
+                _ => true,
+            } || match last {
+                Some(Stmt::Expr(expr)) => {
+                    (expr.any_empty_attr(REC) || params.rec) && expr.visit_last(params)?
+                }
+                _ => true,
+            })
+        }
 
-    Ok(())
+        if !skip(self.then_branch.stmts.last_mut(), params)? {
+            replace_block(&mut self.then_branch, |b| {
+                params.builder.next_expr(expr_block(b))
+            });
+        }
+
+        match self.else_branch.as_mut().map(|(_, expr)| &mut **expr) {
+            Some(Expr::Block(expr)) => {
+                if !skip(expr.block.stmts.last_mut(), params)? {
+                    replace_block(&mut expr.block, |b| params.builder.next_expr(expr_block(b)));
+                }
+
+                Ok(())
+            }
+            Some(Expr::If(expr)) => expr.visit_last(params),
+            Some(_) => Err(invalid_expr("after of `else` required `{` or `if`"))?,
+            None => Err(invalid_expr("`if` expression missing an else clause"))?,
+        }
+    }
+}
+
+impl VisitLast<()> for ExprLoop {
+    fn visit_last(&mut self, params: &mut Params<'_>) -> Result<()> {
+        LoopVisitor::new(params, &self).visit_block_mut(&mut self.body);
+
+        Ok(())
+    }
 }
 
 struct LoopVisitor<'a> {
-    marker: &'a Marker,
     builder: &'a mut Builder,
+    marker: &'a Marker,
     depth: usize,
     label: Option<Lifetime>,
 }
 
 impl<'a> LoopVisitor<'a> {
-    fn new(marker: &'a Marker, expr: &ExprLoop, builder: &'a mut Builder) -> Self {
+    fn new(
+        Params {
+            marker, builder, ..
+        }: &'a mut Params<'_>,
+        expr: &ExprLoop,
+    ) -> Self {
         Self {
             marker,
             builder,
@@ -278,7 +302,7 @@ impl<'a> LoopVisitor<'a> {
 
 impl VisitMut for LoopVisitor<'_> {
     fn visit_expr_mut(&mut self, expr: &mut Expr) {
-        if expr.any_empty_attr(NEVER_ATTR) {
+        if expr.any_empty_attr(NEVER) {
             return;
         }
 
