@@ -16,7 +16,8 @@
 //!
 //! ```rust
 //! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
-//! # use auto_enums::auto_enum;
+//! use auto_enums::auto_enum;
+//!
 //! #[auto_enum(Iterator)]
 //! fn foo(x: i32) -> impl Iterator<Item = i32> {
 //!     match x {
@@ -41,7 +42,7 @@
 //! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //! # use auto_enums::enum_derive;
 //! fn foo(x: i32) -> impl Iterator<Item = i32> {
-//!     #[enum_derive(Iterator)]
+//!     #[::auto_enums::enum_derive(Iterator)]
 //!     enum __Enum1<__T1, __T2> {
 //!         __T1(__T1),
 //!         __T2(__T2),
@@ -825,7 +826,7 @@
 //!
 
 #![recursion_limit = "256"]
-#![doc(html_root_url = "https://docs.rs/auto_enums/0.4.1")]
+#![doc(html_root_url = "https://docs.rs/auto_enums/0.5.0")]
 #![deny(unsafe_code)]
 #![deny(rust_2018_idioms, unreachable_pub)]
 #![no_std]

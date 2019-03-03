@@ -24,20 +24,18 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-auto_enums = "0.4"
+auto_enums = "0.5"
 ```
 
-Now, you can use auto_enums:
-
-```rust
-use auto_enums::auto_enum;
-```
+The current version of easytime requires Rust 1.31 or later.
 
 ## Examples
 
 `#[auto_enum]`'s basic feature is to wrap the value returned by the last if or match expression by an enum that implemented the specified traits.
 
 ```rust
+use auto_enums::auto_enum;
+
 #[auto_enum(Iterator)]
 fn foo(x: i32) -> impl Iterator<Item = i32> {
     match x {
@@ -59,7 +57,7 @@ Code like this will be generated:
 
 ```rust
 fn foo(x: i32) -> impl Iterator<Item = i32> {
-    #[enum_derive(Iterator)]
+    #[::auto_enums::enum_derive(Iterator)]
     enum __Enum1<__T1, __T2> {
         __T1(__T1),
         __T2(__T2),
@@ -185,10 +183,6 @@ You can add support for external library by activating the each crate feature.
 [`serde`](https://github.com/serde-rs/serde) *(requires `"serde"` crate feature)*
 
 * [`serde::Serialize`](https://docs.serde.rs/serde/trait.Serialize.html) - [generated code](docs/supported_traits/external/serde/serialize.md)
-
-## Rust Version
-
-The current minimum required Rust version is 1.31.
 
 ## License
 
