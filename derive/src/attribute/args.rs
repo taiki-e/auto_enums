@@ -1,4 +1,4 @@
-use proc_macro2::{token_stream::IntoIter, Ident, TokenStream as TokenStream2, TokenTree};
+use proc_macro2::{token_stream::IntoIter, Ident, TokenStream, TokenTree};
 use smallvec::smallvec;
 use syn::Path;
 
@@ -20,7 +20,7 @@ impl Arg {
 }
 
 impl ToTokens for Arg {
-    fn to_tokens(&self, tokens: &mut TokenStream2) {
+    fn to_tokens(&self, tokens: &mut TokenStream) {
         match self {
             Arg::Ident(i) => i.to_tokens(tokens),
             Arg::Path(p) => p.to_tokens(tokens),
@@ -55,7 +55,7 @@ impl PartialEq for Arg {
     }
 }
 
-pub(super) fn parse_args(args: TokenStream2) -> Result<Stack<(String, Arg)>> {
+pub(super) fn parse_args(args: TokenStream) -> Result<Stack<(String, Arg)>> {
     fn push(args: &mut Stack<(String, Arg)>, arg: Arg) {
         args.push((arg.to_trimed_string(), arg))
     }

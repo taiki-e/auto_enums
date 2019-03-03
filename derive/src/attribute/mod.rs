@@ -1,9 +1,11 @@
 use std::collections::HashMap;
 
 use lazy_static::lazy_static;
-use proc_macro::TokenStream;
-use proc_macro2::TokenStream as TokenStream2;
-use syn::ItemEnum;
+use proc_macro2::TokenStream;
+use syn::{
+    parse::{Parse, ParseStream},
+    Attribute, ItemEnum,
+};
 
 use crate::utils::*;
 
@@ -11,12 +13,11 @@ mod args;
 
 use self::args::*;
 
+/// The attribute name.
 const NAME: &str = "enum_derive";
 
 pub(crate) fn attribute(args: TokenStream, input: TokenStream) -> TokenStream {
-    expand(args.into(), input)
-        .unwrap_or_else(|e| compile_err(&e.to_string()))
-        .into()
+    expand(args, input).unwrap_or_else(|e| compile_err(&e.to_string()))
 }
 
 macro_rules! trait_map {
@@ -184,15 +185,15 @@ lazy_static! {
     };
 }
 
-fn expand(args: TokenStream2, input: TokenStream) -> Result<TokenStream2> {
+fn expand(args: TokenStream, input: TokenStream) -> Result<TokenStream> {
     fn alias_exists(s: &str, stack: &[(&str, Option<&Arg>)]) -> bool {
         ALIAS_MAP
             .get(s)
             .map_or(false, |x| stack.iter().any(|(s, _)| s == x))
     }
 
-    let item: ItemEnum =
-        syn::parse(input).map_err(|_| format!("`{}` may only be used on enums", NAME))?;
+    let mut item = syn::parse2::<ItemEnum>(input)
+        .map_err(|_| format!("`{}` may only be used on enums", NAME))?;
     let data = Data::new(&item).map_err(|e| format!("`{}` {}", NAME, e))?;
     let args = parse_args(args).map_err(|e| format!("`{}` {}", NAME, e))?;
     let mut stack = Stack::new();
@@ -225,11 +226,22 @@ fn expand(args: TokenStream2, input: TokenStream) -> Result<TokenStream2> {
         }
     }
 
-    let mut item = if derive.is_empty() {
-        item.into_token_stream()
-    } else {
-        quote!(#[derive(#(#derive),*)] #item)
-    };
+    if !derive.is_empty() {
+        let mut derive: Attributes = syn::parse_quote!(#[derive(#(#derive),*)]);
+        if let Some(derive) = derive.0.pop() {
+            item.attrs.push(derive);
+        }
+    }
+
+    let mut item = item.into_token_stream();
     item.extend(impls.into_iter().map(ToTokens::into_token_stream));
     Ok(item)
+}
+
+struct Attributes(Vec<Attribute>);
+
+impl Parse for Attributes {
+    fn parse(input: ParseStream<'_>) -> syn::Result<Self> {
+        input.call(Attribute::parse_outer).map(Attributes)
+    }
 }

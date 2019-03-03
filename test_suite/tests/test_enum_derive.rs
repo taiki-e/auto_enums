@@ -72,6 +72,13 @@ fn stable_1_30() {
         A(A),
         B(::core::ops::Range<B>),
     }
+
+    #[enum_derive(Iterator, Clone)]
+    #[enum_derive(Extend, Copy)]
+    enum Enum3<A, B> {
+        A(A),
+        B(B),
+    }
 }
 
 #[cfg(feature = "std")]

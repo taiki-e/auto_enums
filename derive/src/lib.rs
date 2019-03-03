@@ -19,5 +19,5 @@ use proc_macro::TokenStream;
 /// the supported traits and passing unsupported traits to `#[derive]`.
 #[proc_macro_attribute]
 pub fn enum_derive(args: TokenStream, input: TokenStream) -> TokenStream {
-    crate::attribute::attribute(args, input)
+    TokenStream::from(self::attribute::attribute(args.into(), input.into()))
 }
