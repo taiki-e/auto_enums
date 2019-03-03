@@ -66,9 +66,11 @@ pub(crate) fn invalid_expr<S: Into<String>>(s: S) -> Error {
 pub(crate) fn unsupported_expr<S: Into<String>>(s: S) -> Error {
     UnsupportedExpr(s.into())
 }
+
 pub(crate) fn unsupported_stmt<S: Into<String>>(s: S) -> Error {
     UnsupportedStmt(s.into())
 }
+
 pub(crate) fn unsupported_item<S: Into<String>>(s: S) -> Error {
     UnsupportedItem(s.into())
 }

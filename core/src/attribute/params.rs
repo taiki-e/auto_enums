@@ -87,24 +87,31 @@ impl Params {
     pub(super) fn args(&self) -> &[Arg] {
         &self.args
     }
+
     pub(super) fn builder(&self) -> &Builder {
         &self.builder
     }
+
     pub(super) fn marker(&self) -> &Marker {
         &self.marker
     }
+
     pub(super) fn double(&mut self) -> (&mut Builder, &Marker) {
         (&mut self.builder, &self.marker)
     }
+
     pub(super) fn never(&self) -> bool {
         self.never
     }
+
     pub(super) fn attr(&self) -> bool {
         self.attr
     }
+
     pub(super) fn root(&mut self) {
         self.marker.root();
     }
+
     pub(super) fn _is_root(&self) -> bool {
         self.marker.is_root()
     }
@@ -121,10 +128,10 @@ impl Params {
         F: FnOnce(&mut Visitor<'_>),
     {
         f(&mut Visitor::new(
+            &mut self.builder,
             &self.marker,
             &mut self.attr,
             option,
-            &mut self.builder,
         ));
     }
 

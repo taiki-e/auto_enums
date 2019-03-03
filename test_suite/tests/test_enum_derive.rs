@@ -17,6 +17,7 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 #![cfg_attr(all(not(feature = "std"), feature = "unstable"), feature(alloc))]
 #![deny(warnings)]
+#![deny(unsafe_code)]
 #![deny(rust_2018_idioms)]
 #![allow(unused_imports)]
 #![allow(dead_code)]

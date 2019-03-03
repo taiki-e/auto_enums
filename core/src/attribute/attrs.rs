@@ -37,11 +37,13 @@ impl<A: Attrs> Attrs for &A {
         (**self).attrs()
     }
 }
+
 impl<A: Attrs> Attrs for &mut A {
     fn attrs(&self) -> &[Attribute] {
         (**self).attrs()
     }
 }
+
 impl<A: AttrsMut> AttrsMut for &mut A {
     fn attrs_mut<T, F: FnOnce(&mut Vec<Attribute>) -> T>(&mut self, f: F) -> T {
         (**self).attrs_mut(f)
@@ -53,11 +55,13 @@ impl Attrs for [Attribute] {
         self
     }
 }
+
 impl Attrs for Vec<Attribute> {
     fn attrs(&self) -> &[Attribute] {
         self
     }
 }
+
 impl AttrsMut for Vec<Attribute> {
     fn attrs_mut<T, F: FnOnce(&mut Vec<Attribute>) -> T>(&mut self, f: F) -> T {
         f(self)
@@ -69,6 +73,7 @@ impl Attrs for Local {
         &self.attrs
     }
 }
+
 impl AttrsMut for Local {
     fn attrs_mut<T, F: FnOnce(&mut Vec<Attribute>) -> T>(&mut self, f: F) -> T {
         f(&mut self.attrs)
@@ -80,6 +85,7 @@ impl Attrs for Arm {
         &self.attrs
     }
 }
+
 impl AttrsMut for Arm {
     fn attrs_mut<T, F: FnOnce(&mut Vec<Attribute>) -> T>(&mut self, f: F) -> T {
         f(&mut self.attrs)
@@ -96,6 +102,7 @@ impl Attrs for Stmt {
         }
     }
 }
+
 impl AttrsMut for Stmt {
     fn attrs_mut<T, F: FnOnce(&mut Vec<Attribute>) -> T>(&mut self, f: F) -> T {
         match self {
@@ -108,7 +115,7 @@ impl AttrsMut for Stmt {
 }
 
 macro_rules! attrs_impl {
-    ($($Expr:ident),*) => {
+    ($($Expr:ident,)*) => {
         impl Attrs for Expr {
             fn attrs(&self) -> &[Attribute] {
                 match self {
@@ -117,6 +124,7 @@ macro_rules! attrs_impl {
                 }
             }
         }
+
         impl AttrsMut for Expr {
             fn attrs_mut<T, F: FnOnce(&mut Vec<Attribute>) -> T>(&mut self, f: F) -> T {
                 match self {
@@ -167,5 +175,5 @@ attrs_impl! {
     Try,
     Async,
     TryBlock,
-    Yield
+    Yield,
 }

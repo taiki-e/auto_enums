@@ -279,13 +279,13 @@ struct LoopVisitor<'a> {
 impl<'a> LoopVisitor<'a> {
     fn new(
         Params {
-            marker, builder, ..
+            builder, marker, ..
         }: &'a mut Params<'_>,
         expr: &ExprLoop,
     ) -> Self {
         Self {
-            marker,
             builder,
+            marker,
             depth: 0,
             label: expr.label.as_ref().map(|l| l.name.clone()),
         }

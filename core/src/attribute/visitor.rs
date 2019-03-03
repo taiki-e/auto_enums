@@ -80,10 +80,10 @@ pub(super) struct Visitor<'a> {
 
 impl<'a> Visitor<'a> {
     pub(super) fn new(
+        builder: &'a mut Builder,
         marker: &'a Marker,
         attr: &'a mut bool,
         visit_option: VisitOption,
-        builder: &'a mut Builder,
     ) -> Self {
         Self {
             builder,

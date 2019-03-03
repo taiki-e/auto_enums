@@ -144,7 +144,8 @@ impl Parent for Local {
             return Ok(());
         }
 
-        let mut expr = (self.init)
+        let mut expr = self
+            .init
             .take()
             .map(|(_, expr)| expr)
             .ok_or_else(|| unsupported_stmt("uninitialized let statement"))?;
@@ -178,8 +179,8 @@ impl Parent for ItemFn {
                 // `?` operator
                 Type::Path(TypePath { qself: None, path }) if !params.never() => {
                     let PathSegment { arguments, ident } = &path.segments[path.segments.len() - 1];
-                    // `Result<T, impl Trait>`
                     match arguments {
+                        // `Result<T, impl Trait>`
                         PathArguments::AngleBracketed(AngleBracketedGenericArguments {
                             colon2_token: None,
                             args,
