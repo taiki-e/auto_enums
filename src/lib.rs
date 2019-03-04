@@ -675,10 +675,10 @@
 //!
 //! `std::io` *(requires `"std"` crate feature)*
 //!
-//! * [`Read`](https://doc.rust-lang.org/std/io/trait.Read.html) (alias: `io::Read`)
-//! * [`BufRead`](https://doc.rust-lang.org/std/io/trait.BufRead.html) (alias: `io::BufRead`)
-//! * [`Write`](https://doc.rust-lang.org/std/io/trait.Write.html) (alias: `io::Write`)
-//! * [`Seek`](https://doc.rust-lang.org/std/io/trait.Seek.html) (alias: `io::Seek`)
+//! * [`Read`](https://doc.rust-lang.org/std/io/trait.Read.html) (alias: `io::Read`) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/io/read.md)
+//! * [`BufRead`](https://doc.rust-lang.org/std/io/trait.BufRead.html) (alias: `io::BufRead`) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/io/buf_read.md)
+//! * [`Write`](https://doc.rust-lang.org/std/io/trait.Write.html) (alias: `io::Write`) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/io/write.md)
+//! * [`Seek`](https://doc.rust-lang.org/std/io/trait.Seek.html) (alias: `io::Seek`) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/io/seek.md)
 //!
 //! `std::error` *(requires `"std"` crate feature)*
 //!

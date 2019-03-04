@@ -1,5 +1,7 @@
 # Unreleased
 
+* Add some generated code examples.
+
 # 0.5.1 - 2019-03-03
 
 * Fix examples and wrong name in README.md.

@@ -17,7 +17,7 @@ pub(crate) fn derive(data: &Data, stack: &mut Stack<ItemImpl>) -> Result<()> {
                 #[inline]
                 fn write_all(&mut self, buf: &[u8]) -> #io::Result<()>;
                 #[inline]
-                fn write_fmt(&mut self, fmt: ::std::fmt::Arguments) -> #io::Result<()>;
+                fn write_fmt(&mut self, fmt: ::std::fmt::Arguments<'_>) -> #io::Result<()>;
             }
         }?,
     )
