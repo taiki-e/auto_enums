@@ -8,6 +8,7 @@
         exact_size_is_empty,
         futures_api,
         generator_trait,
+        iovec,
         read_initializer,
         trusted_len,
         try_trait,
@@ -131,7 +132,7 @@ fn unstable() {
 #[cfg(all(feature = "std", feature = "unstable"))]
 #[test]
 fn unstable_std() {
-    #[enum_derive(Read)]
+    #[enum_derive(Read, Write)]
     enum Enum1<A, B> {
         A(A),
         B(B),

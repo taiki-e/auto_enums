@@ -9,6 +9,7 @@
         futures_api,
         generators,
         generator_trait,
+        iovec,
         read_initializer,
         trusted_len,
         try_trait,

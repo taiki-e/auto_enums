@@ -730,6 +730,7 @@
 //!     Examples:
 //!
 //!     ```rust
+//!     # #![cfg_attr(feature = "iovec", feature(iovec))]
 //!     # #[cfg(feature = "transpose_methods")]
 //!     # use auto_enums::auto_enum;
 //!     # #[cfg(feature = "transpose_methods")]
@@ -813,6 +814,8 @@
 //! For these features, you need to enable the unstable feature gate of the same name.
 //!
 //! * [`exact_size_is_empty`](https://github.com/rust-lang/rust/issues/35428) - Implements `ExactSizeIterator::is_empty`.
+//!
+//! * [`iovec`](https://github.com/rust-lang/rust/issues/58452) - Implements `io::Read::read_vectored` and `io::Write::write_vectored`.
 //!
 //! * [`read_initializer`](https://github.com/rust-lang/rust/issues/42788) - Implements `io::Read::read_initializer`.
 //!

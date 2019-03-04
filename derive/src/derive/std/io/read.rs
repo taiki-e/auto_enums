@@ -5,6 +5,14 @@ pub(crate) const NAME: &[&str] = &["Read", "io::Read"];
 pub(crate) fn derive(data: &Data, stack: &mut Stack<ItemImpl>) -> Result<()> {
     let io = quote!(::std::io);
 
+    #[cfg(not(feature = "iovec"))]
+    let vectored = quote!();
+    #[cfg(feature = "iovec")]
+    let vectored = quote! {
+        #[inline]
+        fn read_vectored(&mut self, bufs: &mut [#io::IoVecMut<'_>]) -> #io::Result<usize>;
+    };
+
     #[cfg(not(feature = "read_initializer"))]
     let initializer = quote!();
     #[cfg(feature = "read_initializer")]
@@ -26,6 +34,7 @@ pub(crate) fn derive(data: &Data, stack: &mut Stack<ItemImpl>) -> Result<()> {
                 fn read_to_string(&mut self, buf: &mut ::std::string::String) -> #io::Result<usize>;
                 #[inline]
                 fn read_exact(&mut self, buf: &mut [u8]) -> #io::Result<()>;
+                #vectored
                 #initializer
             }
         }?,

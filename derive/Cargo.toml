@@ -63,11 +63,13 @@ serde = []
 # ==============================================================================
 # Enable unstable features of [std|core] libraries.
 
-# ExactSizeIterator::is_empty
+# Implements `ExactSizeIterator::is_empty`.
 exact_size_is_empty = []
-# io::Read::read_initializer
+# Implements `io::Read::read_vectored` and `io::Write::write_vectored`.
+iovec = []
+# Implements `io::Read::read_initializer`.
 read_initializer = []
 # Make iterator implementation more effective.
 try_trait = []
-# Index<Idx: ?Sized> and IndexMut<Idx: ?Sized>
+# Allow `Index<Idx: ?Sized>` and `IndexMut<Idx: ?Sized>`.
 unsized_locals = []
