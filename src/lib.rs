@@ -832,9 +832,10 @@
 
 #![recursion_limit = "256"]
 #![doc(html_root_url = "https://docs.rs/auto_enums/0.5.1")]
+#![no_std]
 #![deny(unsafe_code)]
 #![deny(rust_2018_idioms, unreachable_pub)]
-#![no_std]
+#![deny(clippy::all, clippy::pedantic)]
 
 #[doc(hidden)]
 pub use auto_enums_core::auto_enum;

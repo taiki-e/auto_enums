@@ -5,7 +5,9 @@ use quote::quote;
 
 use crate::attribute::NAME;
 
-use self::Error::*;
+use self::Error::{
+    InvalidArgs, InvalidExpr, Other, UnsupportedExpr, UnsupportedItem, UnsupportedStmt,
+};
 
 pub(crate) type Result<T> = result::Result<T, Error>;
 

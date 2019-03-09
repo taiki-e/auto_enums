@@ -3,6 +3,7 @@
 #![doc(html_root_url = "https://docs.rs/auto_enums_derive/0.5.1")]
 #![deny(unsafe_code)]
 #![deny(rust_2018_idioms, unreachable_pub)]
+#![deny(clippy::all, clippy::pedantic)]
 
 extern crate proc_macro;
 

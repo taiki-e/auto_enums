@@ -39,6 +39,7 @@ pub(crate) trait VecExt<T> {
         P: FnMut(&T) -> bool;
 }
 
+#[allow(clippy::use_self)]
 impl<T> VecExt<T> for Vec<T> {
     fn find_remove<P>(&mut self, predicate: P) -> Option<T>
     where

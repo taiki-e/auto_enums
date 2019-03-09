@@ -170,7 +170,7 @@ impl Parent for ItemFn {
     fn visit_parent(&mut self, mut params: Params) -> Result<()> {
         let mut option = VisitOption::Default;
 
-        let ItemFn { decl, block, .. } = self;
+        let Self { decl, block, .. } = self;
         if let ReturnType::Type(_, ty) = &mut decl.output {
             match &**ty {
                 // `return`

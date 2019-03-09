@@ -68,18 +68,6 @@ impl AttrsMut for Vec<Attribute> {
     }
 }
 
-impl Attrs for Local {
-    fn attrs(&self) -> &[Attribute] {
-        &self.attrs
-    }
-}
-
-impl AttrsMut for Local {
-    fn attrs_mut<T, F: FnOnce(&mut Vec<Attribute>) -> T>(&mut self, f: F) -> T {
-        f(&mut self.attrs)
-    }
-}
-
 impl Attrs for Arm {
     fn attrs(&self) -> &[Attribute] {
         &self.attrs
@@ -87,6 +75,18 @@ impl Attrs for Arm {
 }
 
 impl AttrsMut for Arm {
+    fn attrs_mut<T, F: FnOnce(&mut Vec<Attribute>) -> T>(&mut self, f: F) -> T {
+        f(&mut self.attrs)
+    }
+}
+
+impl Attrs for Local {
+    fn attrs(&self) -> &[Attribute] {
+        &self.attrs
+    }
+}
+
+impl AttrsMut for Local {
     fn attrs_mut<T, F: FnOnce(&mut Vec<Attribute>) -> T>(&mut self, f: F) -> T {
         f(&mut self.attrs)
     }

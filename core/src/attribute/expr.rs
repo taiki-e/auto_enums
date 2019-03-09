@@ -228,6 +228,7 @@ impl VisitLast<()> for ExprMatch {
 
 impl VisitLast<()> for ExprIf {
     fn visit_last(&mut self, params: &mut Params<'_>) -> Result<()> {
+        #[allow(clippy::needless_pass_by_value)]
         fn skip(last: Option<&mut Stmt>, params: &mut Params<'_>) -> Result<bool> {
             Ok(match &last {
                 Some(Stmt::Expr(expr)) | Some(Stmt::Semi(expr, _)) => is_unreachable(expr, params),
