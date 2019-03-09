@@ -53,6 +53,12 @@ matrix:
             echo 'Skipping clippy';
           fi
 
+    - rust: stable
+      name: cargo fmt
+      script:
+        - rustup component add rustfmt
+        - cargo fmt --all -- --check
+
     - rust: nightly
       name: cargo doc
       script:
