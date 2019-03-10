@@ -19,13 +19,13 @@ travis-ci = { repository = "taiki-e/auto_enums" }
 proc-macro = true
 
 [dependencies]
-proc-macro2 = "^0.4.13"
-quote = "^0.6.8"
+proc-macro2 = "0.4.13"
+quote = "0.6.8"
 # It may be unnecessary if the next version of rand_xorshift is released.
 rand_core = ">=0.3.1, <0.5" # See https://github.com/rust-random/rand/issues/645
-rand_xorshift = "^0.1.1"
-smallvec = "^0.6.9"
-syn = { version = "^0.15.22", features = ["full", "visit-mut", "extra-traits"] }
+rand_xorshift = "0.1.1"
+smallvec = "0.6.9"
+syn = { version = "0.15.29", features = ["full", "visit-mut", "extra-traits"] }
 
 [features]
 # Default features.

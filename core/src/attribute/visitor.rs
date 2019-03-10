@@ -1,5 +1,4 @@
 use proc_macro2::Group;
-use quote::quote;
 use syn::{
     parse_quote,
     visit_mut::{self, VisitMut},

@@ -4,6 +4,8 @@
 
 * Add some generated code examples.
 
+* Update minimum syn version to 0.15.29.
+
 # 0.5.1 - 2019-03-03
 
 * Fix examples and wrong name in README.md.
