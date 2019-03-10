@@ -1,5 +1,7 @@
 # Unreleased
 
+# 0.5.2 - 2019-03-10
+
 * Add "iovec" crate feature.
 
 * Add some generated code examples.

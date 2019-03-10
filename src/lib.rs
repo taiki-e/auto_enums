@@ -831,7 +831,7 @@
 //!
 
 #![recursion_limit = "256"]
-#![doc(html_root_url = "https://docs.rs/auto_enums/0.5.1")]
+#![doc(html_root_url = "https://docs.rs/auto_enums/0.5.2")]
 #![no_std]
 #![deny(unsafe_code)]
 #![deny(rust_2018_idioms, unreachable_pub)]
