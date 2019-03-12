@@ -4,7 +4,7 @@ use syn::Path;
 
 use crate::utils::*;
 
-#[derive(Debug, Clone, Eq)]
+#[derive(Clone)]
 pub(super) enum Arg {
     Ident(Ident),
     Path(Path),
@@ -37,21 +37,6 @@ impl From<Ident> for Arg {
 impl From<Path> for Arg {
     fn from(path: Path) -> Self {
         Arg::Path(path)
-    }
-}
-
-impl PartialEq for Arg {
-    fn eq(&self, other: &Self) -> bool {
-        match self {
-            Arg::Ident(x) => match other {
-                Arg::Ident(y) => x.eq(y),
-                Arg::Path(y) => y.is_ident(x.to_string()),
-            },
-            Arg::Path(x) => match other {
-                Arg::Ident(y) => x.is_ident(y.to_string()),
-                Arg::Path(y) => x.eq(y),
-            },
-        }
     }
 }
 

@@ -1,16 +1,16 @@
 use proc_macro2::{token_stream::IntoIter, Delimiter, Ident, TokenStream, TokenTree};
 use quote::ToTokens;
 use smallvec::smallvec;
-use syn::{ItemEnum, Path};
+use syn::Path;
 
-use crate::utils::{Result, *};
+use crate::utils::{Result, Stack};
 
-use super::{builder::Builder, *};
+use super::context::*;
 
 // =============================================================================
 // Arg
 
-#[derive(Debug, Clone, Eq)]
+#[derive(Clone)]
 pub(super) enum Arg {
     Ident(Ident),
     Path(Path),
@@ -47,6 +47,7 @@ impl From<Path> for Arg {
     }
 }
 
+#[cfg(feature = "type_analysis")]
 impl PartialEq for Arg {
     fn eq(&self, other: &Self) -> bool {
         match self {
@@ -62,90 +63,13 @@ impl PartialEq for Arg {
     }
 }
 
+#[cfg(feature = "type_analysis")]
+impl Eq for Arg {}
+
 // =============================================================================
-// Params
+// Parse
 
-pub(super) struct Params {
-    args: Stack<Arg>,
-    builder: Builder,
-    marker: Marker,
-    attr: bool,
-    never: bool,
-}
-
-impl Params {
-    fn new(args: Stack<Arg>, marker: Marker, never: bool) -> Self {
-        Self {
-            args,
-            builder: Builder::new(),
-            marker,
-            attr: false,
-            never,
-        }
-    }
-
-    pub(super) fn args(&self) -> &[Arg] {
-        &self.args
-    }
-
-    pub(super) fn builder(&self) -> &Builder {
-        &self.builder
-    }
-
-    pub(super) fn marker(&self) -> &Marker {
-        &self.marker
-    }
-
-    pub(super) fn double(&mut self) -> (&mut Builder, &Marker) {
-        (&mut self.builder, &self.marker)
-    }
-
-    pub(super) fn never(&self) -> bool {
-        self.never
-    }
-
-    pub(super) fn attr(&self) -> bool {
-        self.attr
-    }
-
-    pub(super) fn root(&mut self) {
-        self.marker.root();
-    }
-
-    pub(super) fn _is_root(&self) -> bool {
-        self.marker.is_root()
-    }
-
-    pub(super) fn visitor<F>(&mut self, f: F)
-    where
-        F: FnOnce(&mut Visitor<'_>),
-    {
-        self._visitor(VisitOption::Default, f)
-    }
-
-    pub(super) fn _visitor<F>(&mut self, option: VisitOption, f: F)
-    where
-        F: FnOnce(&mut Visitor<'_>),
-    {
-        f(&mut Visitor::new(
-            &mut self.builder,
-            &self.marker,
-            &mut self.attr,
-            option,
-        ));
-    }
-
-    pub(super) fn build(&self) -> Result<ItemEnum> {
-        self.builder.build(&self.args)
-    }
-
-    #[cfg(feature = "type_analysis")]
-    pub(super) fn impl_traits(&mut self, ty: &mut Type) {
-        collect_impl_traits(&mut self.args, ty);
-    }
-}
-
-pub(super) fn parse_args(args: TokenStream) -> Result<Params> {
+pub(super) fn parse_args(args: TokenStream) -> Result<(Stack<Arg>, Marker, bool)> {
     const ERR: &str = "expected one of `,`, `::`, or identifier, found ";
 
     let mut iter = args.into_iter();
@@ -182,7 +106,7 @@ pub(super) fn parse_args(args: TokenStream) -> Result<Params> {
         }
     }
 
-    Ok(Params::new(args, Marker::new(marker), never))
+    Ok((args, Marker::new(marker), never))
 }
 
 fn parse_path(mut path: Stack<TokenTree>, iter: &mut IntoIter) -> Result<Arg> {

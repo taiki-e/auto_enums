@@ -2,101 +2,39 @@ use proc_macro2::Group;
 use syn::{
     parse_quote,
     visit_mut::{self, VisitMut},
-    Arm, Attribute, Expr, ExprMacro, ExprReturn, ExprTry, Item, Local, Macro, Stmt,
+    Arm, Attribute, Expr, ExprMacro, ExprReturn, ExprTry, Item, Local, Stmt,
 };
 
-use super::{builder::Builder, *};
-
-// =============================================================================
-// Expression level marker
-
-const DEFAULT_MARKER: &str = "marker";
-
-#[derive(Debug)]
-pub(super) struct Marker {
-    ident: Option<String>,
-    root: bool,
-}
-
-impl Marker {
-    pub(super) fn new(ident: Option<String>) -> Self {
-        Self { ident, root: false }
-    }
-
-    pub(super) fn root(&mut self) {
-        self.root = true;
-    }
-
-    pub(super) fn is_root(&self) -> bool {
-        self.root
-    }
-
-    fn is_unique(&self) -> bool {
-        self.ident.is_some()
-    }
-
-    fn ident(&self) -> &str {
-        self.ident.as_ref().map_or(DEFAULT_MARKER, |s| s)
-    }
-
-    pub(super) fn marker_macro(&self, Macro { path, .. }: &Macro) -> bool {
-        match &self.ident {
-            None => path.is_ident(DEFAULT_MARKER),
-            Some(marker) => {
-                path.is_ident(marker) || (!self.is_root() && path.is_ident(DEFAULT_MARKER))
-            }
-        }
-    }
-}
+use super::*;
 
 // =============================================================================
 // Visitor
 
-pub(super) enum VisitOption {
-    Default,
-    Return,
-    Try,
-}
-
-impl VisitOption {
-    pub(super) fn is_try(&self) -> bool {
-        match self {
-            VisitOption::Try => true,
-            _ => false,
-        }
-    }
+#[derive(Clone, Copy, Default)]
+struct Scope {
+    /// in closures
+    closure: bool,
+    /// in try blocks
+    try_block: bool,
+    /// in the other `auto_enum` attributes
+    foreign: bool,
 }
 
 pub(super) struct Visitor<'a> {
-    builder: &'a mut Builder,
-    marker: &'a Marker,
-    attr: &'a mut bool,
-    in_closure: bool,
-    in_try_block: bool,
-    foreign: bool,
-    visit_option: VisitOption,
+    cx: &'a mut Context,
+    scope: Scope,
 }
 
 impl<'a> Visitor<'a> {
-    pub(super) fn new(
-        builder: &'a mut Builder,
-        marker: &'a Marker,
-        attr: &'a mut bool,
-        visit_option: VisitOption,
-    ) -> Self {
+    pub(super) fn new(cx: &'a mut Context) -> Self {
         Self {
-            builder,
-            marker,
-            attr,
-            in_closure: false,
-            in_try_block: false,
-            foreign: false,
-            visit_option,
+            cx,
+            scope: Scope::default(),
         }
     }
 
     fn find_remove_empty_attrs<A: AttrsMut>(&self, attrs: &mut A) {
-        if !self.foreign {
+        if !self.scope.foreign {
             EMPTY_ATTRS.iter().for_each(|ident| {
                 attrs.find_remove_empty_attr(ident);
             });
@@ -105,29 +43,29 @@ impl<'a> Visitor<'a> {
 
     fn other_attr<A: Attrs>(&mut self, attrs: &A) {
         if attrs.any_attr(NAME) {
-            self.foreign = true;
+            self.scope.foreign = true;
             // Record whether other `auto_enum` exists.
-            *self.attr = true;
+            self.cx.attr = true;
         }
     }
 
     /// `return` in functions or closures
     fn visit_return(&mut self, expr: &mut Expr) {
         if let Expr::Closure(_) = &expr {
-            self.in_closure = true;
+            self.scope.closure = true;
         }
 
-        if !self.in_closure && !expr.any_empty_attr(NEVER) {
+        if !self.scope.closure && !expr.any_empty_attr(NEVER) {
             if let Expr::Return(ExprReturn { expr, .. }) = expr {
                 expr.replace_boxed_expr(|expr| match expr {
                     Expr::Macro(expr) => {
-                        if self.marker.marker_macro(&expr.mac) {
+                        if self.cx.marker_macro(&expr.mac) {
                             Expr::Macro(expr)
                         } else {
-                            self.builder.next_expr(Expr::Macro(expr))
+                            self.cx.next_expr(Expr::Macro(expr))
                         }
                     }
-                    expr => self.builder.next_expr(expr),
+                    expr => self.cx.next_expr(expr),
                 });
             }
         }
@@ -136,40 +74,40 @@ impl<'a> Visitor<'a> {
     /// `?` operator in functions or closures
     fn visit_try(&mut self, expr: &mut Expr) {
         match expr {
-            Expr::Closure(_) => self.in_closure = true,
+            Expr::Closure(_) => self.scope.closure = true,
             // `?` operator in try blocks are not supported.
-            Expr::TryBlock(_) => self.in_try_block = true,
+            Expr::TryBlock(_) => self.scope.try_block = true,
             _ => {}
         }
 
-        if !self.in_try_block && !self.in_closure && !expr.any_empty_attr(NEVER) {
+        if !self.scope.try_block && !self.scope.closure && !expr.any_empty_attr(NEVER) {
             *expr = match expr {
                 Expr::Try(ExprTry { expr, .. }) => {
                     if let Expr::Macro(ExprMacro { mac, .. }) = &**expr {
-                        if self.marker.marker_macro(mac) {
+                        if self.cx.marker_macro(mac) {
                             return;
                         }
                     }
 
-                    // https://github.com/rust-lang/rust/blob/master/src/librustc/hir/lowering.rs#L4436
-                    let err = self.builder.next_expr(parse_quote!(err));
+                    // https://github.com/rust-lang/rust/blob/1.33.0/src/librustc/hir/lowering.rs#L4416-L4514
+                    let err = self.cx.next_expr(parse_quote!(err));
                     #[cfg(feature = "try_trait")]
                     {
-                        parse_quote! {{
+                        parse_quote! {
                             match ::core::ops::Try::into_result(#expr) {
                                 ::core::result::Result::Ok(val) => val,
                                 ::core::result::Result::Err(err) => return ::core::ops::Try::from_error(#err),
                             }
-                        }}
+                        }
                     }
                     #[cfg(not(feature = "try_trait"))]
                     {
-                        parse_quote! {{
+                        parse_quote! {
                             match #expr {
                                 ::core::result::Result::Ok(val) => val,
                                 ::core::result::Result::Err(err) => return ::core::result::Result::Err(#err),
                             }
-                        }}
+                        }
                     }
                 }
                 _ => return,
@@ -179,17 +117,17 @@ impl<'a> Visitor<'a> {
 
     /// Expression level marker (`marker!` macro)
     fn visit_marker(&mut self, expr: &mut Expr) {
-        if self.foreign && !self.marker.is_unique() {
+        if self.scope.foreign && !self.cx.marker.is_unique() {
             return;
         }
 
         replace_expr(expr, |expr| match expr {
             Expr::Macro(expr) => {
-                if expr.mac.path.is_ident(self.marker.ident()) {
+                if expr.mac.path.is_ident(self.cx.marker.ident()) {
                     let args = syn::parse2(expr.mac.tts)
-                        .unwrap_or_else(|_| parse_failed(self.marker.ident()));
+                        .unwrap_or_else(|_| parse_failed(self.cx.marker.ident()));
 
-                    self.builder.next_expr_with_attrs(expr.attrs, args)
+                    self.cx.next_expr_with_attrs(expr.attrs, args)
                 } else {
                     Expr::Macro(expr)
                 }
@@ -201,42 +139,20 @@ impl<'a> Visitor<'a> {
     }
 }
 
-struct Tmp {
-    in_closure: bool,
-    in_try_block: bool,
-    foreign: bool,
-}
-
-impl Tmp {
-    fn store(visitor: &Visitor<'_>) -> Self {
-        Self {
-            in_closure: visitor.in_closure,
-            in_try_block: visitor.in_try_block,
-            foreign: visitor.foreign,
-        }
-    }
-
-    fn restore(self, visitor: &mut Visitor<'_>) {
-        visitor.in_closure = self.in_closure;
-        visitor.in_try_block = self.in_try_block;
-        visitor.foreign = self.foreign;
-    }
-}
-
 impl VisitMut for Visitor<'_> {
     fn visit_expr_mut(&mut self, expr: &mut Expr) {
-        let tmp = Tmp::store(self);
+        let tmp = self.scope;
         self.other_attr(expr);
 
-        match &self.visit_option {
-            VisitOption::Return => self.visit_return(expr),
-            VisitOption::Try => self.visit_try(expr),
+        match self.cx.mode() {
+            VisitMode::Return => self.visit_return(expr),
+            VisitMode::Try => self.visit_try(expr),
             _ => {}
         }
 
         visit_mut::visit_expr_mut(self, expr);
         self.visit_marker(expr);
-        tmp.restore(self);
+        self.scope = tmp;
     }
 
     fn visit_arm_mut(&mut self, arm: &mut Arm) {
@@ -245,12 +161,12 @@ impl VisitMut for Visitor<'_> {
     }
 
     fn visit_local_mut(&mut self, local: &mut Local) {
-        let tmp = self.foreign;
+        let tmp = self.scope;
         self.other_attr(local);
 
         visit_mut::visit_local_mut(self, local);
         self.find_remove_empty_attrs(local);
-        self.foreign = tmp;
+        self.scope = tmp;
     }
 
     fn visit_stmt_mut(&mut self, stmt: &mut Stmt) {
@@ -272,28 +188,17 @@ fn parse_failed(ident: &str) -> ! {
 }
 
 /// Find `?` operator.
-pub(super) fn find_try<F>(marker: &Marker, f: F) -> bool
-where
-    F: FnOnce(&mut FindTry<'_>),
-{
-    let mut find = FindTry::new(marker);
-    f(&mut find);
-    find.has
-}
-
 pub(super) struct FindTry<'a> {
-    marker: &'a Marker,
-    in_closure: bool,
-    foreign: bool,
-    has: bool,
+    cx: &'a Context,
+    scope: Scope,
+    pub(super) has: bool,
 }
 
 impl<'a> FindTry<'a> {
-    fn new(marker: &'a Marker) -> Self {
+    pub(super) fn new(cx: &'a Context) -> Self {
         Self {
-            marker,
-            in_closure: false,
-            foreign: false,
+            cx,
+            scope: Scope::default(),
             has: false,
         }
     }
@@ -301,18 +206,17 @@ impl<'a> FindTry<'a> {
 
 impl VisitMut for FindTry<'_> {
     fn visit_expr_mut(&mut self, expr: &mut Expr) {
-        let tmp_in_closure = self.in_closure;
-        let tmp_foreign = self.foreign;
+        let tmp = self.scope;
 
         if let Expr::Closure(_) = &expr {
-            self.in_closure = true;
+            self.scope.closure = true;
         }
 
-        if !self.in_closure && !expr.any_empty_attr(NEVER) {
+        if !self.scope.closure && !expr.any_empty_attr(NEVER) {
             if let Expr::Try(ExprTry { expr, .. }) = expr {
                 match &**expr {
                     Expr::Macro(expr) => {
-                        if !self.marker.marker_macro(&expr.mac) {
+                        if !self.cx.marker_macro(&expr.mac) {
                             self.has = true;
                         }
                     }
@@ -322,25 +226,24 @@ impl VisitMut for FindTry<'_> {
         }
 
         if expr.any_attr(NAME) {
-            self.foreign = true;
+            self.scope.foreign = true;
         }
         if !self.has {
             visit_mut::visit_expr_mut(self, expr);
         }
 
-        self.in_closure = tmp_in_closure;
-        self.foreign = tmp_foreign;
+        self.scope = tmp;
     }
 
     fn visit_local_mut(&mut self, local: &mut Local) {
-        let tmp = self.foreign;
+        let tmp = self.scope;
 
         if local.any_attr(NAME) {
-            self.foreign = true;
+            self.scope.foreign = true;
         }
 
         visit_mut::visit_local_mut(self, local);
-        self.foreign = tmp;
+        self.scope = tmp;
     }
 
     // Stop at item bounds
@@ -369,7 +272,9 @@ fn visit_stmt_mut(stmt: &mut Stmt) {
         syn::parse2(tts)
             .map_err(|e| invalid_args!(e))
             .and_then(|group: Group| parse_args(group.stream()))
-            .and_then(|params| stmt.visit_parent(params))
+            .and_then(|(args, marker, never)| {
+                stmt.visit_parent(Context::child(args, marker, never))
+            })
             .unwrap_or_else(|e| panic!("`{}` {}", NAME, e));
     }
 }

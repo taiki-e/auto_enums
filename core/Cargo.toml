@@ -25,14 +25,14 @@ quote = "0.6.8"
 rand_core = ">=0.3.1, <0.5" # See https://github.com/rust-random/rand/issues/645
 rand_xorshift = "0.1.1"
 smallvec = "0.6.9"
-syn = { version = "0.15.29", features = ["full", "visit-mut", "extra-traits"] }
+syn = { version = "0.15.29", features = ["full", "visit-mut"] }
 
 [features]
 # Default features.
 default = []
 
 # Analyze return type of function and `let` binding.
-type_analysis = []
+type_analysis = ["syn/extra-traits"]
 
 # Make `?` operator support more flexible.
 try_trait = []

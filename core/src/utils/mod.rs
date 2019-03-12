@@ -1,16 +1,13 @@
 use std::mem;
 
-use proc_macro2::{Ident, Span};
+use proc_macro2::{Ident, Span, TokenStream};
 use smallvec::SmallVec;
 use syn::{punctuated::Punctuated, *};
 
 #[macro_use]
 mod error;
 
-mod rand;
-
 pub(crate) use self::error::{Error, Result, *};
-pub(crate) use self::rand::*;
 
 pub(crate) type Stack<T> = SmallVec<[T; 4]>;
 
@@ -24,7 +21,7 @@ pub(crate) trait OptionExt {
 impl OptionExt for Option<Box<Expr>> {
     fn replace_boxed_expr<F: FnOnce(Expr) -> Expr>(&mut self, f: F) {
         if self.is_none() {
-            *self = Some(Box::new(unit()));
+            self.replace(Box::new(unit()));
         }
 
         if let Some(expr) = self {
@@ -34,26 +31,12 @@ impl OptionExt for Option<Box<Expr>> {
 }
 
 pub(crate) trait VecExt<T> {
-    fn find_remove<P>(&mut self, predicate: P) -> Option<T>
-    where
-        P: FnMut(&T) -> bool;
+    fn find_remove<P: FnMut(&T) -> bool>(&mut self, predicate: P) -> Option<T>;
 }
 
-#[allow(clippy::use_self)]
 impl<T> VecExt<T> for Vec<T> {
-    fn find_remove<P>(&mut self, predicate: P) -> Option<T>
-    where
-        P: FnMut(&T) -> bool,
-    {
-        fn remove<T>(v: &mut Vec<T>, index: usize) -> T {
-            match v.len() {
-                1 => v.pop().unwrap(),
-                2 => v.swap_remove(index),
-                _ => v.remove(index),
-            }
-        }
-
-        self.iter().position(predicate).map(|i| remove(self, i))
+    fn find_remove<P: FnMut(&T) -> bool>(&mut self, predicate: P) -> Option<T> {
+        self.iter().position(predicate).map(|i| self.remove(i))
     }
 }
 
@@ -64,7 +47,7 @@ pub(crate) fn default<T: Default>() -> T {
     T::default()
 }
 
-pub(crate) fn ident_call_site<S: AsRef<str>>(s: S) -> Ident {
+pub(crate) fn ident<S: AsRef<str>>(s: S) -> Ident {
     Ident::new(s.as_ref(), Span::call_site())
 }
 
@@ -98,26 +81,16 @@ pub(crate) fn unit() -> Expr {
     })
 }
 
-pub(crate) fn replace_expr<F>(this: &mut Expr, op: F)
-where
-    F: FnOnce(Expr) -> Expr,
-{
-    fn expr_continue() -> Expr {
-        // probably the lowest cost expression.
-        Expr::Continue(ExprContinue {
-            attrs: Vec::with_capacity(0),
-            continue_token: default(),
-            label: None,
-        })
-    }
-
-    *this = op(mem::replace(this, expr_continue()));
+pub(crate) fn replace_expr<F: FnOnce(Expr) -> Expr>(this: &mut Expr, op: F) {
+    *this = op(mem::replace(
+        this,
+        Expr::Verbatim(ExprVerbatim {
+            tts: TokenStream::new(),
+        }),
+    ));
 }
 
-pub(crate) fn replace_block<F>(this: &mut Block, op: F)
-where
-    F: FnOnce(Block) -> Expr,
-{
+pub(crate) fn replace_block<F: FnOnce(Block) -> Expr>(this: &mut Block, op: F) {
     *this = block(vec![Stmt::Expr(op(mem::replace(
         this,
         block(Vec::with_capacity(0)),

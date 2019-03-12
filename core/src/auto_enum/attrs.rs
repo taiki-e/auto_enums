@@ -1,6 +1,6 @@
 use syn::{Arm, Attribute, Expr, Local, Stmt};
 
-use crate::utils::*;
+use crate::utils::VecExt;
 
 pub(super) trait Attrs {
     fn attrs(&self) -> &[Attribute];

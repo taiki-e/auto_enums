@@ -3,25 +3,18 @@ use std::{fmt, result};
 use proc_macro2::TokenStream;
 use quote::quote;
 
-use crate::attribute::NAME;
+use crate::auto_enum::NAME;
 
-use self::Error::{
-    InvalidArgs, InvalidExpr, Other, UnsupportedExpr, UnsupportedItem, UnsupportedStmt,
-};
+use self::Error::{InvalidArgs, InvalidExpr, Other};
 
 pub(crate) type Result<T> = result::Result<T, Error>;
 
 #[derive(Debug)]
 pub(crate) enum Error {
     InvalidArgs(String),
-
+    // FIXME: This may not be necessary.
     /// An expression that is invalid also as expression of Rust.
     InvalidExpr(String),
-
-    UnsupportedExpr(String),
-    UnsupportedStmt(String),
-    UnsupportedItem(String),
-
     Other(String),
 }
 
@@ -38,9 +31,6 @@ impl fmt::Display for Error {
         match self {
             InvalidArgs(msg) => write!(f, "invalid attribute arguments: `{}` {}", NAME, msg),
             InvalidExpr(msg) => write!(f, "invalid expression: `{}` {}", NAME, msg),
-            UnsupportedExpr(msg) => write!(f, "unsupported expression: `{}` {}", NAME, msg),
-            UnsupportedStmt(msg) => write!(f, "unsupported statement: `{}` {}", NAME, msg),
-            UnsupportedItem(msg) => write!(f, "unsupported item: `{}` {}", NAME, msg),
             Other(msg) => write!(f, "`{}` {}", NAME, msg),
         }
     }
@@ -63,16 +53,4 @@ macro_rules! invalid_args {
 
 pub(crate) fn invalid_expr<S: Into<String>>(s: S) -> Error {
     InvalidExpr(s.into())
-}
-
-pub(crate) fn unsupported_expr<S: Into<String>>(s: S) -> Error {
-    UnsupportedExpr(s.into())
-}
-
-pub(crate) fn unsupported_stmt<S: Into<String>>(s: S) -> Error {
-    UnsupportedStmt(s.into())
-}
-
-pub(crate) fn unsupported_item<S: Into<String>>(s: S) -> Error {
-    UnsupportedItem(s.into())
 }
