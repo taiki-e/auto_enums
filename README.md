@@ -31,7 +31,7 @@ The current version of auto_enums requires Rust 1.31 or later.
 
 ## Examples
 
-`#[auto_enum]`'s basic feature is to wrap the value returned by the last if or match expression by an enum that implemented the specified traits.
+`#[auto_enum]`'s basic feature is to wrap the value returned by the obvious branches (`match`, `if`, `return`, etc..) by an enum that implemented the specified traits.
 
 ```rust
 use auto_enums::auto_enum;

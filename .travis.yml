@@ -68,8 +68,8 @@ before_script:
   - set -o errexit
 
 script:
-  - cargo test --all --no-default-features
-  - cargo test --all
+  - cargo test --all --tests --no-default-features
+  - cargo test --all --tests
 
 notifications:
   email:
