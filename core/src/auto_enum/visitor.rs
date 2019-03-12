@@ -141,37 +141,45 @@ impl<'a> Visitor<'a> {
 
 impl VisitMut for Visitor<'_> {
     fn visit_expr_mut(&mut self, expr: &mut Expr) {
-        let tmp = self.scope;
-        self.other_attr(expr);
+        if !self.cx.error {
+            let tmp = self.scope;
+            self.other_attr(expr);
 
-        match self.cx.mode() {
-            VisitMode::Return => self.visit_return(expr),
-            VisitMode::Try => self.visit_try(expr),
-            _ => {}
+            match self.cx.mode() {
+                VisitMode::Return => self.visit_return(expr),
+                VisitMode::Try => self.visit_try(expr),
+                _ => {}
+            }
+
+            visit_mut::visit_expr_mut(self, expr);
+            self.visit_marker(expr);
+            self.scope = tmp;
         }
-
-        visit_mut::visit_expr_mut(self, expr);
-        self.visit_marker(expr);
-        self.scope = tmp;
     }
 
     fn visit_arm_mut(&mut self, arm: &mut Arm) {
-        visit_mut::visit_arm_mut(self, arm);
-        self.find_remove_empty_attrs(arm);
+        if !self.cx.error {
+            visit_mut::visit_arm_mut(self, arm);
+            self.find_remove_empty_attrs(arm);
+        }
     }
 
     fn visit_local_mut(&mut self, local: &mut Local) {
-        let tmp = self.scope;
-        self.other_attr(local);
+        if !self.cx.error {
+            let tmp = self.scope;
+            self.other_attr(local);
 
-        visit_mut::visit_local_mut(self, local);
-        self.find_remove_empty_attrs(local);
-        self.scope = tmp;
+            visit_mut::visit_local_mut(self, local);
+            self.find_remove_empty_attrs(local);
+            self.scope = tmp;
+        }
     }
 
     fn visit_stmt_mut(&mut self, stmt: &mut Stmt) {
-        visit_mut::visit_stmt_mut(self, stmt);
-        visit_stmt_mut(stmt);
+        if !self.cx.error {
+            visit_mut::visit_stmt_mut(self, stmt);
+            visit_stmt_mut(stmt, self.cx);
+        }
     }
 
     // Stop at item bounds
@@ -250,19 +258,29 @@ impl VisitMut for FindTry<'_> {
     fn visit_item_mut(&mut self, _item: &mut Item) {}
 }
 
-pub(super) struct Dummy;
+pub(super) struct Dummy<'a> {
+    cx: &'a mut Context,
+}
 
-impl VisitMut for Dummy {
+impl<'a> Dummy<'a> {
+    pub(super) fn new(cx: &'a mut Context) -> Self {
+        Self { cx }
+    }
+}
+
+impl VisitMut for Dummy<'_> {
     fn visit_stmt_mut(&mut self, stmt: &mut Stmt) {
-        visit_mut::visit_stmt_mut(self, stmt);
-        visit_stmt_mut(stmt);
+        if !self.cx.error {
+            visit_mut::visit_stmt_mut(self, stmt);
+            visit_stmt_mut(stmt, self.cx);
+        }
     }
 
     // Stop at item bounds
     fn visit_item_mut(&mut self, _item: &mut Item) {}
 }
 
-fn visit_stmt_mut(stmt: &mut Stmt) {
+fn visit_stmt_mut(stmt: &mut Stmt, cx: &mut Context) {
     // Stop at item bounds
     if let Stmt::Item(_) = stmt {
         return;
@@ -270,11 +288,15 @@ fn visit_stmt_mut(stmt: &mut Stmt) {
 
     if let Some(Attribute { tts, .. }) = stmt.find_remove_attr(NAME) {
         syn::parse2(tts)
-            .map_err(|e| invalid_args!(e))
+            .map_err(|e| arg_err!(e))
             .and_then(|group: Group| parse_args(group.stream()))
             .and_then(|(args, marker, never)| {
                 stmt.visit_parent(Context::child(args, marker, never))
+                    .map_err(|e| e.set_span(span!(stmt)))
             })
-            .unwrap_or_else(|e| panic!("`{}` {}", NAME, e));
+            .unwrap_or_else(|e| {
+                cx.error = true;
+                *stmt = syn::parse2(e.to_compile_error()).unwrap_or_else(|_| unreachable!());
+            });
     }
 }

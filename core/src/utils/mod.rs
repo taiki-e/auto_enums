@@ -7,7 +7,7 @@ use syn::{punctuated::Punctuated, *};
 #[macro_use]
 mod error;
 
-pub(crate) use self::error::{Error, Result, *};
+pub(crate) use self::error::{Error, Result};
 
 pub(crate) type Stack<T> = SmallVec<[T; 4]>;
 

@@ -9,13 +9,6 @@ use crate::utils::{Result, *};
 
 use super::*;
 
-/// The annotation for recursively parsing.
-const REC: &str = "rec";
-/// The annotation for skipping branch.
-pub(super) const NEVER: &str = "never";
-/// The annotations used by `#[auto_enum]`.
-pub(super) const EMPTY_ATTRS: &[&str] = &[NEVER, REC];
-
 // =============================================================================
 // Context
 
@@ -46,7 +39,7 @@ impl<'a> From<&'a mut super::Context> for Context<'a> {
 }
 
 // =============================================================================
-// Functions and trait for visiting last expression
+// Visiting last expression
 
 fn last_expr<T, F, OP>(expr: &Expr, success: T, mut filter: F, op: OP) -> T
 where
@@ -257,8 +250,10 @@ impl VisitLast<()> for ExprIf {
                 Ok(())
             }
             Some(Expr::If(expr)) => expr.visit_last(cx),
-            Some(_) => Err(invalid_expr("after of `else` required `{` or `if`"))?,
-            None => Err(invalid_expr("`if` expression missing an else clause"))?,
+
+            None => Err(err!(self, "`if` expression missing an else clause")),
+            // FIXME: This may not be necessary.
+            Some(expr) => Err(err!(expr, "after of `else` required `{` or `if`")),
         }
     }
 }

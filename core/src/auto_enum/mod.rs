@@ -16,7 +16,7 @@ mod visitor;
 use self::args::{parse_args, Arg};
 use self::attrs::{Attrs, AttrsMut};
 use self::context::*;
-use self::expr::{child_expr, EMPTY_ATTRS, NEVER};
+use self::expr::child_expr;
 use self::visitor::{Dummy, FindTry, Visitor};
 
 #[cfg(feature = "type_analysis")]
@@ -25,21 +25,29 @@ mod traits;
 use self::traits::*;
 
 /// The attribute name.
-pub(crate) const NAME: &str = "auto_enum";
+const NAME: &str = "auto_enum";
+/// The annotation for recursively parsing.
+const REC: &str = "rec";
+/// The annotation for skipping branch.
+const NEVER: &str = "never";
+/// The annotations used by `#[auto_enum]`.
+const EMPTY_ATTRS: &[&str] = &[NEVER, REC];
 
 pub(crate) fn attribute(args: TokenStream, input: TokenStream) -> TokenStream {
-    expand(args, input).unwrap_or_else(|e| e.to_compile_err())
+    expand(args, input).unwrap_or_else(|e| e.to_compile_error())
 }
 
 fn expand(args: TokenStream, input: TokenStream) -> Result<TokenStream> {
     let cx = parse_args(args).map(|(args, marker, never)| Context::root(args, marker, never))?;
 
+    let span = span!(input);
     match syn::parse2::<Stmt>(input.clone()) {
         Ok(mut stmt) => stmt.visit_parent(cx).map(|()| stmt.into_token_stream()),
         Err(_) => syn::parse2::<Expr>(input)
             .map_err(|_| "may only be used on expression, statement, or function".into())
             .and_then(|mut expr| expr.visit_parent(cx).map(|()| expr.into_token_stream())),
     }
+    .map_err(|e| e.set_span(span))
 }
 
 fn visit_expr(expr: &mut Expr, cx: &mut Context) -> Result<()> {
@@ -56,12 +64,10 @@ fn visit_expr(expr: &mut Expr, cx: &mut Context) -> Result<()> {
     child_expr(expr, cx).map(|()| cx.visitor(|v| v.visit_expr_mut(expr)))
 }
 
-fn build_expr(expr: &mut Expr, cx: &Context) -> Result<()> {
-    cx.build().map(|item| {
-        replace_expr(expr, |expr| {
-            expr_block(block(vec![Stmt::Item(item.into()), Stmt::Expr(expr)]))
-        });
-    })
+fn build_expr(expr: &mut Expr, cx: &Context) {
+    replace_expr(expr, |expr| {
+        expr_block(block(vec![Stmt::Item(cx.build().into()), Stmt::Expr(expr)]))
+    });
 }
 
 /// The statement or expression in which `#[auto_enum]` was directly used.
@@ -87,14 +93,14 @@ impl Parent for Stmt {
 impl Parent for Expr {
     fn visit_parent(&mut self, mut cx: Context) -> Result<()> {
         if cx.args.is_empty() {
-            Dummy.visit_expr_mut(self);
+            cx.dummy(|v| v.visit_expr_mut(self));
             return Ok(());
         }
 
         visit_expr(self, &mut cx)?;
 
         if cx.buildable()? {
-            build_expr(self, &cx)?;
+            build_expr(self, &cx);
         }
         Ok(())
     }
@@ -110,20 +116,21 @@ impl Parent for Local {
         }
 
         if cx.args.is_empty() {
-            Dummy.visit_local_mut(self);
+            cx.dummy(|v| v.visit_local_mut(self));
             return Ok(());
         }
 
-        let mut expr = self
-            .init
-            .take()
-            .map(|(_, expr)| expr)
-            .ok_or_else(|| "is not supported uninitialized let statement")?;
+        let mut expr = self.init.take().map(|(_, expr)| expr).ok_or_else(|| {
+            err!(
+                self,
+                "the `#[auto_enum]` attribute is not supported uninitialized let statement"
+            )
+        })?;
 
         visit_expr(&mut *expr, &mut cx)?;
 
         if cx.buildable()? {
-            build_expr(&mut *expr, &cx)?;
+            build_expr(&mut *expr, &cx);
         }
 
         self.init = Some((default(), expr));
@@ -169,21 +176,23 @@ impl Parent for ItemFn {
         }
 
         if cx.args.is_empty() {
-            Dummy.visit_item_fn_mut(self);
+            cx.dummy(|v| v.visit_item_fn_mut(self));
             return Ok(());
         }
 
         match self.block.stmts.last_mut() {
             Some(Stmt::Expr(expr)) => child_expr(expr, &mut cx)?,
             Some(_) => {}
-            None => Err("is not supported empty functions")?,
+            None => Err(err!(
+                self.block,
+                "the `#[auto_enum]` attribute is not supported empty functions"
+            ))?,
         }
 
         cx.visitor(|v| v.visit_item_fn_mut(self));
 
         if cx.buildable()? {
-            cx.build()
-                .map(|i| self.block.stmts.insert(0, Stmt::Item(i.into())))?;
+            self.block.stmts.insert(0, Stmt::Item(cx.build().into()));
         }
         Ok(())
     }

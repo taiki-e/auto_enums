@@ -54,9 +54,12 @@ pub(super) struct Context {
     pub(super) attr: bool,
     mode: VisitMode,
     visit_last: VisitLastMode,
-    // pub(super) errors: SmallVec<[Error; 1]>,
+    /// This in `true` if error occurred in visiting.
+    pub(super) error: bool,
 }
 
+// This has been fixed in https://github.com/rust-lang/rust-clippy/pull/3869. Allow it temporarily until it lands.
+#[allow(clippy::use_self)]
 impl Context {
     fn new(args: Stack<Arg>, marker: Marker, never: bool, root: bool) -> Self {
         Self {
@@ -72,7 +75,7 @@ impl Context {
             } else {
                 VisitLastMode::Default
             },
-            // errors: SmallVec::new(),
+            error: false,
         }
     }
 
@@ -100,17 +103,15 @@ impl Context {
         self.visit_last != VisitLastMode::Never && self.mode != VisitMode::Try
     }
 
-    pub(super) fn visitor<F>(&mut self, f: F)
-    where
-        F: FnOnce(&mut Visitor<'_>),
-    {
+    pub(super) fn visitor<F: FnOnce(&mut Visitor<'_>)>(&mut self, f: F) {
         f(&mut Visitor::new(self));
     }
 
-    pub(super) fn find_try<F>(&mut self, f: F)
-    where
-        F: FnOnce(&mut FindTry<'_>),
-    {
+    pub(super) fn dummy<F: FnOnce(&mut Dummy<'_>)>(&mut self, f: F) {
+        f(&mut Dummy::new(self));
+    }
+
+    pub(super) fn find_try<F: FnOnce(&mut FindTry<'_>)>(&mut self, f: F) {
         let mut find = FindTry::new(self);
         f(&mut find);
         if find.has {
@@ -152,26 +153,36 @@ impl Context {
     */
 
     pub(super) fn buildable(&self) -> Result<bool> {
-        match self.builder.len() {
-            len @ 0 | len @ 1 if !self.attr => {
-                let diagnostic = match self.visit_last {
-                    VisitLastMode::Default | VisitLastMode::Closure => {
-                        "is required two or more branches or marker macros in total"
-                    }
-                    VisitLastMode::Never => "is required two or more marker macros",
-                };
-                Err(format!(
-                    "{}. There is {} marker macro in this statement.",
-                    diagnostic,
-                    if len == 0 { "no" } else { "only one" },
-                ))?
+        fn err(cx: &Context, len: usize) -> Result<bool> {
+            let (msg1, msg2) = match cx.visit_last {
+                VisitLastMode::Default | VisitLastMode::Closure => (
+                    "branches or marker macros in total",
+                    "branch or marker macro",
+                ),
+                VisitLastMode::Never => ("marker macros", "marker macro"),
+            };
+
+            Err(format!(
+                "the `#[auto_enum]` attribute is required two or more {}, there is {} {} in this statement",
+                msg1,
+                if len == 0 { "no" } else { "only one" },
+                msg2
+            ))?
+        }
+
+        if self.error {
+            Ok(false)
+        } else {
+            match self.builder.len() {
+                1 => err(self, 1),
+                0 if !self.attr => err(self, 0),
+                0 => Ok(false),
+                _ => Ok(true),
             }
-            0 => Ok(false),
-            _ => Ok(true),
         }
     }
 
-    pub(super) fn build(&self) -> Result<ItemEnum> {
+    pub(super) fn build(&self) -> ItemEnum {
         self.builder.build(&self.args)
     }
 
@@ -258,7 +269,7 @@ impl Builder {
         self.last_expr(attrs, expr)
     }
 
-    fn build(&self, args: &[Arg]) -> Result<ItemEnum> {
+    fn build(&self, args: &[Arg]) -> ItemEnum {
         assert!(self.len() >= 2);
 
         let ident = ident(&self.ident);
@@ -272,6 +283,6 @@ impl Builder {
                 #(#variants(#fields),)*
             }
         })
-        .map_err(|_| "failed generate an enum".into())
+        .unwrap_or_else(|_| unreachable!()) // If this fails, it's definitely a bug.
     }
 }
