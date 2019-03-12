@@ -10,7 +10,7 @@ pub(crate) fn derive(data: &Data, stack: &mut Stack<ItemImpl>) -> Result<()> {
 
     derive_trait!(
         data,
-        Some(ident_call_site("Output")),
+        Some(ident("Output")),
         parse_quote!(::core::ops::IndexMut)?,
         parse_quote! {
             trait IndexMut<__Idx #bounds>: ::core::ops::Index<__Idx> {

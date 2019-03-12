@@ -5,7 +5,7 @@ pub(crate) const NAME: &[&str] = &["DerefMut"];
 pub(crate) fn derive(data: &Data, stack: &mut Stack<ItemImpl>) -> Result<()> {
     derive_trait!(
         data,
-        Some(ident_call_site("Target")),
+        Some(ident("Target")),
         parse_quote!(::core::ops::DerefMut)?,
         parse_quote! {
             trait DerefMut: ::core::ops::Deref {

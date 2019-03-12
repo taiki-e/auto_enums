@@ -1,16 +1,16 @@
 use proc_macro2::{token_stream::IntoIter, Delimiter, Ident, TokenStream, TokenTree};
 use quote::ToTokens;
 use smallvec::smallvec;
-use syn::{ItemEnum, Path};
+use syn::Path;
 
-use crate::utils::{Result, *};
+use crate::utils::{Result, Stack};
 
-use super::{builder::Builder, *};
+use super::context::*;
 
 // =============================================================================
 // Arg
 
-#[derive(Debug, Clone, Eq)]
+#[derive(Clone)]
 pub(super) enum Arg {
     Ident(Ident),
     Path(Path),
@@ -47,6 +47,7 @@ impl From<Path> for Arg {
     }
 }
 
+#[cfg(feature = "type_analysis")]
 impl PartialEq for Arg {
     fn eq(&self, other: &Self) -> bool {
         match self {
@@ -62,90 +63,13 @@ impl PartialEq for Arg {
     }
 }
 
+#[cfg(feature = "type_analysis")]
+impl Eq for Arg {}
+
 // =============================================================================
-// Params
+// Parse
 
-pub(super) struct Params {
-    args: Stack<Arg>,
-    builder: Builder,
-    marker: Marker,
-    attr: bool,
-    never: bool,
-}
-
-impl Params {
-    fn new(args: Stack<Arg>, marker: Marker, never: bool) -> Self {
-        Self {
-            args,
-            builder: Builder::new(),
-            marker,
-            attr: false,
-            never,
-        }
-    }
-
-    pub(super) fn args(&self) -> &[Arg] {
-        &self.args
-    }
-
-    pub(super) fn builder(&self) -> &Builder {
-        &self.builder
-    }
-
-    pub(super) fn marker(&self) -> &Marker {
-        &self.marker
-    }
-
-    pub(super) fn double(&mut self) -> (&mut Builder, &Marker) {
-        (&mut self.builder, &self.marker)
-    }
-
-    pub(super) fn never(&self) -> bool {
-        self.never
-    }
-
-    pub(super) fn attr(&self) -> bool {
-        self.attr
-    }
-
-    pub(super) fn root(&mut self) {
-        self.marker.root();
-    }
-
-    pub(super) fn _is_root(&self) -> bool {
-        self.marker.is_root()
-    }
-
-    pub(super) fn visitor<F>(&mut self, f: F)
-    where
-        F: FnOnce(&mut Visitor<'_>),
-    {
-        self._visitor(VisitOption::Default, f)
-    }
-
-    pub(super) fn _visitor<F>(&mut self, option: VisitOption, f: F)
-    where
-        F: FnOnce(&mut Visitor<'_>),
-    {
-        f(&mut Visitor::new(
-            &mut self.builder,
-            &self.marker,
-            &mut self.attr,
-            option,
-        ));
-    }
-
-    pub(super) fn build(&self) -> Result<ItemEnum> {
-        self.builder.build(&self.args)
-    }
-
-    #[cfg(feature = "type_analysis")]
-    pub(super) fn impl_traits(&mut self, ty: &mut Type) {
-        collect_impl_traits(&mut self.args, ty);
-    }
-}
-
-pub(super) fn parse_args(args: TokenStream) -> Result<Params> {
+pub(super) fn parse_args(args: TokenStream) -> Result<(Stack<Arg>, Marker, bool)> {
     const ERR: &str = "expected one of `,`, `::`, or identifier, found ";
 
     let mut iter = args.into_iter();
@@ -167,7 +91,7 @@ pub(super) fn parse_args(args: TokenStream) -> Result<Params> {
                     }
 
                     if never {
-                        Err(invalid_args!("multiple `never` option"))?;
+                        Err(arg_err!(i, "multiple `never` option"))?;
                     }
                     never = true;
                 }
@@ -176,13 +100,13 @@ pub(super) fn parse_args(args: TokenStream) -> Result<Params> {
             TokenTree::Punct(p) => match p.as_char() {
                 ',' => {}
                 ':' => args.push(parse_path(smallvec![p.into()], &mut iter)?),
-                _ => Err(invalid_args!("{}`{}`", ERR, p))?,
+                _ => Err(arg_err!(p, "{}`{}`", ERR, p))?,
             },
-            _ => Err(invalid_args!("{}`{}`", ERR, tt))?,
+            _ => Err(arg_err!(tt, "{}`{}`", ERR, tt))?,
         }
     }
 
-    Ok(Params::new(args, Marker::new(marker), never))
+    Ok((args, Marker::new(marker), never))
 }
 
 fn parse_path(mut path: Stack<TokenTree>, iter: &mut IntoIter) -> Result<Arg> {
@@ -194,7 +118,7 @@ fn parse_path(mut path: Stack<TokenTree>, iter: &mut IntoIter) -> Result<Arg> {
     }
 
     syn::parse2(path.into_iter().collect())
-        .map_err(|e| invalid_args!(e))
+        .map_err(|e| arg_err!(e))
         .map(Arg::Path)
 }
 
@@ -206,9 +130,9 @@ fn path_or_ident(ident: Ident, tt: Option<TokenTree>, iter: &mut IntoIter) -> Re
         Some(TokenTree::Punct(p)) => match p.as_char() {
             ',' => Ok(ident.into()),
             ':' => parse_path(smallvec![ident.into(), p.into()], iter),
-            _ => Err(invalid_args!("{}`{}`", ERR, p)),
+            _ => Err(arg_err!(p, "{}`{}`", ERR, p)),
         },
-        Some(tt) => Err(invalid_args!("{}`{}`", ERR, tt)),
+        Some(tt) => Err(arg_err!(tt, "{}`{}`", ERR, tt)),
     }
 }
 
@@ -220,42 +144,41 @@ fn marker_opt(
 ) -> Result<()> {
     match iter.next() {
         Some(TokenTree::Group(ref g)) if g.delimiter() != Delimiter::Parenthesis => {
-            Err(invalid_args!("invalid delimiter"))?
+            Err(arg_err!(g, "invalid delimiter"))?
         }
         Some(TokenTree::Group(ref g)) => {
             let mut g = g.stream().into_iter();
             match g.next() {
-                Some(TokenTree::Ident(_)) if marker.is_some() => {
-                    Err(invalid_args!("multiple `marker` option"))?
+                Some(TokenTree::Ident(ref i)) if marker.is_some() => {
+                    Err(arg_err!(i, "multiple `marker` option"))?
                 }
                 Some(TokenTree::Ident(i)) => *marker = Some(i.to_string()),
-                Some(tt) => Err(invalid_args!("expected an identifier, found `{}`", tt))?,
-                None => Err(invalid_args!("empty `marker` option"))?,
+                Some(tt) => Err(arg_err!(tt, "expected an identifier, found `{}`", tt))?,
+                None => Err(arg_err!(ident, "empty `marker` option"))?,
             }
-
             match g.next() {
                 None => {}
                 Some(TokenTree::Punct(ref p)) if p.as_char() == ',' => {
-                    if g.next().is_some() {
-                        Err(invalid_args!("multiple identifier in `marker` option"))?;
+                    if let Some(tt) = g.next() {
+                        Err(arg_err!(tt, "multiple identifier in `marker` option"))?;
                     }
                 }
-                Some(_) => Err(invalid_args!("multiple identifier in `marker` option"))?,
+                Some(tt) => Err(arg_err!(tt, "multiple identifier in `marker` option"))?,
             }
         }
         Some(TokenTree::Punct(ref p)) if p.as_char() == '=' => {
             match iter.next() {
-                Some(TokenTree::Ident(_)) if marker.is_some() => {
-                    Err(invalid_args!("multiple `marker` option"))?
+                Some(TokenTree::Ident(ref i)) if marker.is_some() => {
+                    Err(arg_err!(i, "multiple `marker` option"))?
                 }
                 Some(TokenTree::Ident(i)) => *marker = Some(i.to_string()),
-                Some(tt) => Err(invalid_args!("expected an identifier, found `{}`", tt))?,
-                None => Err(invalid_args!("empty `marker` option"))?,
+                Some(tt) => Err(arg_err!(tt, "expected an identifier, found `{}`", tt))?,
+                None => Err(arg_err!(p, "empty `marker` option"))?,
             }
             match iter.next() {
                 None => {}
                 Some(TokenTree::Punct(ref p)) if p.as_char() == ',' => {}
-                Some(_) => Err(invalid_args!("multiple identifier in `marker` option"))?,
+                Some(tt) => Err(arg_err!(tt, "multiple identifier in `marker` option"))?,
             }
         }
         tt => args.push(path_or_ident(ident, tt, iter)?),

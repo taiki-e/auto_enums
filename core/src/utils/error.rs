@@ -1,78 +1,108 @@
 use std::{fmt, result};
 
 use proc_macro2::TokenStream;
-use quote::quote;
-
-use crate::attribute::NAME;
-
-use self::Error::{
-    InvalidArgs, InvalidExpr, Other, UnsupportedExpr, UnsupportedItem, UnsupportedStmt,
-};
+use quote::{quote, ToTokens};
 
 pub(crate) type Result<T> = result::Result<T, Error>;
 
-#[derive(Debug)]
 pub(crate) enum Error {
-    InvalidArgs(String),
-
-    /// An expression that is invalid also as expression of Rust.
-    InvalidExpr(String),
-
-    UnsupportedExpr(String),
-    UnsupportedStmt(String),
-    UnsupportedItem(String),
-
+    /// `syn::Error`.
+    Syn(syn::Error),
+    /// Other error.
     Other(String),
 }
 
 impl Error {
-    #[inline(never)]
-    pub(crate) fn to_compile_err(&self) -> TokenStream {
-        let msg = &format!("{}", self);
-        quote!(compile_error!(#msg);)
+    pub(crate) fn set_span<T: ToTokens>(self, tokens: T) -> Self {
+        match self {
+            Error::Syn(_) => self,
+            Error::Other(msg) => Error::Syn(syn::Error::new_spanned(tokens, msg)),
+        }
+    }
+
+    /// Render the error as an invocation of [`compile_error!`].
+    ///
+    /// [`compile_error!`]: https://doc.rust-lang.org/std/macro.compile_error.html
+    pub(crate) fn to_compile_error(&self) -> TokenStream {
+        if let Error::Syn(err) = self {
+            err.to_compile_error()
+        } else {
+            // TODO: use `unreachable!()` in this branch
+            let msg = &format!("{}", self);
+            quote!(compile_error!(#msg);)
+        }
     }
 }
 
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            InvalidArgs(msg) => write!(f, "invalid attribute arguments: `{}` {}", NAME, msg),
-            InvalidExpr(msg) => write!(f, "invalid expression: `{}` {}", NAME, msg),
-            UnsupportedExpr(msg) => write!(f, "unsupported expression: `{}` {}", NAME, msg),
-            UnsupportedStmt(msg) => write!(f, "unsupported statement: `{}` {}", NAME, msg),
-            UnsupportedItem(msg) => write!(f, "unsupported item: `{}` {}", NAME, msg),
-            Other(msg) => write!(f, "`{}` {}", NAME, msg),
+            Error::Syn(err) => err.fmt(f),
+            Error::Other(msg) => msg.fmt(f),
         }
     }
 }
 
-impl<S: Into<String>> From<S> for Error {
-    fn from(s: S) -> Self {
+impl From<String> for Error {
+    fn from(s: String) -> Self {
+        Error::Other(s)
+    }
+}
+
+impl From<&str> for Error {
+    fn from(s: &str) -> Self {
         Error::Other(s.into())
     }
 }
 
-macro_rules! invalid_args {
+impl From<syn::Error> for Error {
+    fn from(e: syn::Error) -> Self {
+        Error::Syn(e)
+    }
+}
+
+macro_rules! span {
     ($expr:expr) => {
-        $crate::utils::Error::InvalidArgs($expr.to_string())
-    };
-    ($($tt:tt)*) => {
-        $crate::utils::Error::InvalidArgs(format!($($tt)*))
+        $expr.clone()
     };
 }
 
-pub(crate) fn invalid_expr<S: Into<String>>(s: S) -> Error {
-    InvalidExpr(s.into())
+macro_rules! err {
+    ($msg:expr) => {{
+        $crate::utils::Error::from(
+            syn::Error::new_spanned(span!($msg), $msg)
+        )
+    }};
+    ($span:expr, $msg:expr) => {
+        $crate::utils::Error::from(
+            syn::Error::new_spanned(span!($span), $msg)
+        )
+    };
+    ($span:expr, $($tt:tt)*) => {
+        err!($span, format!($($tt)*))
+    };
 }
 
-pub(crate) fn unsupported_expr<S: Into<String>>(s: S) -> Error {
-    UnsupportedExpr(s.into())
-}
-
-pub(crate) fn unsupported_stmt<S: Into<String>>(s: S) -> Error {
-    UnsupportedStmt(s.into())
-}
-
-pub(crate) fn unsupported_item<S: Into<String>>(s: S) -> Error {
-    UnsupportedItem(s.into())
+macro_rules! arg_err {
+    ($msg:expr) => {{
+        #[allow(unused_imports)]
+        use syn::spanned::Spanned as _Spanned;
+        $crate::utils::Error::from(
+            syn::Error::new(
+                $msg.span(),
+                format!("invalid arguments: {}", $msg),
+            )
+        )
+    }};
+    ($span:expr, $msg:expr) => {
+        $crate::utils::Error::from(
+            syn::Error::new(
+                syn::spanned::Spanned::span(&$span),
+                format!("invalid arguments: {}", $msg),
+            )
+        )
+    };
+    ($span:expr, $($tt:tt)*) => {
+        arg_err!($span, format!($($tt)*))
+    };
 }

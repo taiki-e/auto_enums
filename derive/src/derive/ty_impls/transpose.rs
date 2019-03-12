@@ -52,7 +52,6 @@ fn transpose_option(data: &Data) -> Result<ItemImpl> {
 }
 
 fn transpose_result(data: &Data) -> Result<ItemImpl> {
-    let ident = data.ident();
     let fields = data.fields();
 
     let mut impls = data.impl_with_capacity(1)?;
@@ -61,10 +60,11 @@ fn transpose_result(data: &Data) -> Result<ItemImpl> {
         .map(|i| {
             let id = &format!("__E{}", i);
             impls.push_generic_param(param_ident(id));
-            ident_call_site(id)
+            ident(id)
         })
         .collect();
 
+    let ident = data.ident();
     let ty_generics = fields
         .iter()
         .zip(err_fields.iter())

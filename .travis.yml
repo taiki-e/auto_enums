@@ -25,10 +25,10 @@ matrix:
         - cargo test --all --all-features
 
     - rust: nightly
-      name: cargo test (minimal versions)
+      name: cargo check (minimal versions)
       script:
         - cargo update -Zminimal-versions
-        - cargo test --all-features -p auto_enums -p auto_enums_core -p auto_enums_derive
+        - cargo check --all --all-features
 
     - rust: nightly
       name: cargo tree
@@ -62,14 +62,14 @@ matrix:
     - rust: nightly
       name: cargo doc
       script:
-        - cargo doc --all-features --no-deps -p auto_enums -p auto_enums_core -p auto_enums_derive
+        - cargo doc --all --all-features --no-deps
 
 before_script:
   - set -o errexit
 
 script:
-  - cargo test --all --no-default-features
-  - cargo test --all
+  - cargo test --all --tests --no-default-features
+  - cargo test --all --tests
 
 notifications:
   email:

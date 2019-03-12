@@ -12,7 +12,7 @@
 //!
 //! ## `#[auto_enum]`
 //!
-//! `#[auto_enum]`'s most basic feature is to wrap the value returned by the last if or match expression by an enum that implemented the specified traits.
+//! `#[auto_enum]`'s basic feature is to wrap the value returned by the obvious branches (`match`, `if`, `return`, etc..) by an enum that implemented the specified traits.
 //!
 //! ```rust
 //! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
@@ -529,8 +529,7 @@
 //!
 //! When using `#[auto_enum]` for expressions and statements, `#[auto_enum]` for function is unnecessary.
 //!
-//! ```rust,ignore
-//! # #![cfg(feature = "unstable")]
+//! ```rust
 //! // Add this to your crate root:
 //! #![feature(proc_macro_hygiene, stmt_expr_attributes)]
 //! # fn main() {}
@@ -559,8 +558,7 @@
 //!
 //! You can also return closures.
 //!
-//! ```rust,ignore
-//! # #![cfg(feature = "unstable")]
+//! ```rust
 //! // Add this to your crate root:
 //! #![feature(fn_traits, unboxed_closures)]
 //! # fn main() {}
@@ -766,6 +764,8 @@
 //!   * Disabled by default.
 //!   * Analyze return type of function and `let` binding.
 //!
+//!     **Note that this feature is still experimental.**
+//!
 //!     Examples:
 //!
 //!     ```rust
@@ -836,6 +836,8 @@
 #![deny(unsafe_code)]
 #![deny(rust_2018_idioms, unreachable_pub)]
 #![deny(clippy::all, clippy::pedantic)]
+#![warn(single_use_lifetimes)]
+#![warn(clippy::nursery)]
 
 #[doc(hidden)]
 pub use auto_enums_core::auto_enum;

@@ -11,14 +11,14 @@ pub(crate) use syn::{parse2, ItemImpl};
 pub(crate) type Data = EnumData;
 pub(crate) type Stack<T> = SmallVec<[T; 4]>;
 
-pub(crate) fn ident_call_site(s: &str) -> Ident {
+pub(crate) fn ident(s: &str) -> Ident {
     Ident::new(s, Span::call_site())
 }
 
-pub(crate) fn param_ident(ident: &str) -> GenericParam {
+pub(crate) fn param_ident(s: &str) -> GenericParam {
     GenericParam::Type(TypeParam {
         attrs: Vec::with_capacity(0),
-        ident: ident_call_site(ident),
+        ident: ident(s),
         colon_token: None,
         bounds: Punctuated::new(),
         eq_token: None,
