@@ -1,5 +1,7 @@
 # Unreleased
 
+# 0.5.3 - 2019-03-12
+
 * The error message of `#[auto_enum]` attribute has been greatly improved.
 
 # 0.5.2 - 2019-03-10
