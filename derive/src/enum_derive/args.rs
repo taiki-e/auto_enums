@@ -8,7 +8,6 @@ use crate::utils::Stack;
 // =============================================================================
 // Arg
 
-#[derive(Clone)]
 pub(super) enum Arg {
     Ident(Ident),
     Path(Path),
@@ -29,18 +28,6 @@ impl ToTokens for Arg {
             Arg::Ident(i) => i.to_tokens(tokens),
             Arg::Path(p) => p.to_tokens(tokens),
         }
-    }
-}
-
-impl From<Ident> for Arg {
-    fn from(ident: Ident) -> Self {
-        Arg::Ident(ident)
-    }
-}
-
-impl From<Path> for Arg {
-    fn from(path: Path) -> Self {
-        Arg::Path(path)
     }
 }
 
@@ -100,9 +87,9 @@ fn path_or_ident(ident: Ident, tt: Option<TokenTree>, iter: &mut IntoIter) -> Re
     const ERR: &str = "expected one of `,`, or `::`, found ";
 
     match tt {
-        None => Ok(ident.into()),
+        None => Ok(Arg::Ident(ident)),
         Some(TokenTree::Punct(p)) => match p.as_char() {
-            ',' => Ok(ident.into()),
+            ',' => Ok(Arg::Ident(ident)),
             ':' => parse_path(smallvec![ident.into(), p.into()], iter),
             _ => Err(arg_err!(p, "{}`{}`", ERR, p)),
         },

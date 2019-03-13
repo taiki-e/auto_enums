@@ -191,7 +191,7 @@ impl Context {
             // As we know that an error will occur, it does not matter if there are not enough variants.
             Ok(true)
         } else {
-            match self.builder.len() {
+            match self.builder.variants.len() {
                 1 => err(self, 1),
                 0 if !self.attr => err(self, 0),
                 0 => Ok(false),
@@ -253,26 +253,17 @@ impl Builder {
         }
     }
 
-    fn len(&self) -> usize {
-        self.variants.len()
-    }
-
     fn iter(&self) -> impl Iterator<Item = Ident> + '_ {
         self.variants.iter().map(ident)
     }
 
-    fn push_variant(&mut self) {
-        let variant = format!("___Variant{}", self.len());
+    fn next_expr(&mut self, attrs: Vec<Attribute>, expr: Expr) -> Expr {
+        let variant = format!("___Variant{}", self.variants.len());
+
+        let segments: SmallVec<[_; 2]> =
+            smallvec![ident(&self.ident).into(), ident(&variant).into()];
+
         self.variants.push(variant);
-    }
-
-    fn last_expr(&self, attrs: Vec<Attribute>, expr: Expr) -> Expr {
-        assert!(!self.variants.is_empty());
-
-        let segments: SmallVec<[_; 2]> = smallvec![
-            ident(&self.ident).into(),
-            ident(self.variants.last().unwrap()).into()
-        ];
 
         Expr::Call(ExprCall {
             attrs,
@@ -284,11 +275,6 @@ impl Builder {
             paren_token: default(),
             args: Some(expr).into_iter().collect(),
         })
-    }
-
-    fn next_expr(&mut self, attrs: Vec<Attribute>, expr: Expr) -> Expr {
-        self.push_variant();
-        self.last_expr(attrs, expr)
     }
 
     fn build(&self, args: &[Arg]) -> ItemEnum {
