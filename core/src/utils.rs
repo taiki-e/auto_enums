@@ -2,12 +2,10 @@ use std::mem;
 
 use proc_macro2::{Ident, Span, TokenStream};
 use smallvec::SmallVec;
-use syn::{punctuated::Punctuated, *};
-
-#[macro_use]
-mod error;
-
-pub(crate) use self::error::{Error, Result};
+use syn::{
+    punctuated::Punctuated, Block, Expr, ExprBlock, ExprTuple, ExprVerbatim, Path, PathSegment,
+    Stmt,
+};
 
 pub(crate) type Stack<T> = SmallVec<[T; 4]>;
 
@@ -95,4 +93,25 @@ pub(crate) fn replace_block<F: FnOnce(Block) -> Expr>(this: &mut Block, op: F) {
         this,
         block(Vec::with_capacity(0)),
     )))]);
+}
+
+// =============================================================================
+// Macros
+
+macro_rules! span {
+    ($expr:expr) => {
+        $expr.clone()
+    };
+}
+
+macro_rules! err {
+    ($msg:expr) => {
+        syn::Error::new_spanned(span!($msg), $msg)
+    };
+    ($span:expr, $msg:expr) => {
+        syn::Error::new_spanned(span!($span), $msg)
+    };
+    ($span:expr, $($tt:tt)*) => {
+        err!($span, format!($($tt)*))
+    };
 }

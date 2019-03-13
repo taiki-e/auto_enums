@@ -1,13 +1,18 @@
 use std::cell::RefCell;
 
-use proc_macro2::Ident;
-use quote::quote;
+use proc_macro2::{Ident, TokenStream};
+use quote::{quote, ToTokens};
 use rand_core::{RngCore, SeedableRng};
 use rand_xorshift::XorShiftRng;
 use smallvec::{smallvec, SmallVec};
-use syn::{Attribute, Expr, ExprCall, ExprPath, ItemEnum, Macro};
+use syn::{Attribute, Expr, ExprCall, ExprPath, ItemEnum, Macro, Result};
 
-use super::*;
+use crate::utils::{default, ident, path, Stack};
+
+use super::{
+    visitor::{Dummy, FindTry, Visitor},
+    *,
+};
 
 fn xorshift_rng() -> XorShiftRng {
     const SEED: [u8; 16] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
@@ -46,6 +51,8 @@ pub(super) enum VisitLastMode {
 }
 
 pub(super) struct Context {
+    /// Span passed to `syn::Error::new_spanned`.
+    span: Option<TokenStream>,
     pub(super) args: Stack<Arg>,
     builder: Builder,
     pub(super) marker: Marker,
@@ -61,11 +68,12 @@ pub(super) struct Context {
 // This has been fixed in https://github.com/rust-lang/rust-clippy/pull/3869. Allow it temporarily until it lands.
 #[allow(clippy::use_self)]
 impl Context {
-    fn new(args: Stack<Arg>, marker: Marker, never: bool, root: bool) -> Self {
+    fn new(args: Stack<Arg>, marker: Option<String>, never: bool, root: bool) -> Self {
         Self {
+            span: None,
             args,
             builder: Builder::new(),
-            marker,
+            marker: Marker::new(marker),
             // depth: 0,
             root,
             attr: false,
@@ -79,12 +87,21 @@ impl Context {
         }
     }
 
-    pub(super) fn root(args: Stack<Arg>, marker: Marker, never: bool) -> Self {
+    pub(super) fn root((args, marker, never): (Stack<Arg>, Option<String>, bool)) -> Self {
         Self::new(args, marker, never, true)
     }
 
-    pub(super) fn child(args: Stack<Arg>, marker: Marker, never: bool) -> Self {
+    pub(super) fn child((args, marker, never): (Stack<Arg>, Option<String>, bool)) -> Self {
         Self::new(args, marker, never, false)
+    }
+
+    pub(super) fn set_span<T: ToTokens>(&mut self, span: T) {
+        self.span.replace(span.into_token_stream());
+    }
+
+    // If this is called more than once, it is a bug.
+    pub(super) fn span(&mut self) -> TokenStream {
+        self.span.take().unwrap_or_else(|| unreachable!())
     }
 
     pub(super) const fn mode(&self) -> VisitMode {
@@ -152,8 +169,8 @@ impl Context {
     }
     */
 
-    pub(super) fn buildable(&self) -> Result<bool> {
-        fn err(cx: &Context, len: usize) -> Result<bool> {
+    fn buildable(&mut self) -> Result<bool> {
+        fn err(cx: &mut Context, len: usize) -> Result<bool> {
             let (msg1, msg2) = match cx.visit_last {
                 VisitLastMode::Default | VisitLastMode::Closure => (
                     "branches or marker macros in total",
@@ -162,7 +179,7 @@ impl Context {
                 VisitLastMode::Never => ("marker macros", "marker macro"),
             };
 
-            Err(format!(
+            Err(err!(cx.span(),
                 "the `#[auto_enum]` attribute is required two or more {}, there is {} {} in this statement",
                 msg1,
                 if len == 0 { "no" } else { "only one" },
@@ -171,7 +188,8 @@ impl Context {
         }
 
         if self.error {
-            Ok(false)
+            // As we know that an error will occur, it does not matter if there are not enough variants.
+            Ok(true)
         } else {
             match self.builder.len() {
                 1 => err(self, 1),
@@ -182,8 +200,12 @@ impl Context {
         }
     }
 
-    pub(super) fn build(&self) -> ItemEnum {
-        self.builder.build(&self.args)
+    pub(super) fn build<F: FnOnce(ItemEnum)>(&mut self, f: F) -> Result<()> {
+        self.buildable().map(|buildable| {
+            if buildable {
+                f(self.builder.build(&self.args))
+            }
+        })
     }
 
     #[cfg(feature = "type_analysis")]
@@ -202,7 +224,7 @@ pub(super) struct Marker {
 }
 
 impl Marker {
-    pub(super) const fn new(ident: Option<String>) -> Self {
+    const fn new(ident: Option<String>) -> Self {
         Self { ident }
     }
 
@@ -270,8 +292,6 @@ impl Builder {
     }
 
     fn build(&self, args: &[Arg]) -> ItemEnum {
-        assert!(self.len() >= 2);
-
         let ident = ident(&self.ident);
         let ty_generics = self.iter();
         let variants = self.iter();

@@ -2,10 +2,10 @@ use proc_macro2::TokenStream;
 use quote::ToTokens;
 use syn::{
     visit_mut::VisitMut, AngleBracketedGenericArguments, Expr, ExprClosure, GenericArgument, Item,
-    ItemFn, Local, PathArguments, PathSegment, ReturnType, Stmt, Type, TypePath,
+    ItemEnum, ItemFn, Local, PathArguments, PathSegment, Result, ReturnType, Stmt, Type, TypePath,
 };
 
-use crate::utils::{Result, *};
+use crate::utils::*;
 
 mod args;
 mod attrs;
@@ -13,11 +13,10 @@ mod context;
 mod expr;
 mod visitor;
 
-use self::args::{parse_args, Arg};
+use self::args::{parse_args, parse_group, Arg};
 use self::attrs::{Attrs, AttrsMut};
 use self::context::*;
 use self::expr::child_expr;
-use self::visitor::{Dummy, FindTry, Visitor};
 
 #[cfg(feature = "type_analysis")]
 mod traits;
@@ -38,16 +37,15 @@ pub(crate) fn attribute(args: TokenStream, input: TokenStream) -> TokenStream {
 }
 
 fn expand(args: TokenStream, input: TokenStream) -> Result<TokenStream> {
-    let cx = parse_args(args).map(|(args, marker, never)| Context::root(args, marker, never))?;
+    let mut cx = parse_args(args).map(Context::root)?;
+    cx.set_span(span!(input));
 
-    let span = span!(input);
     match syn::parse2::<Stmt>(input.clone()) {
-        Ok(mut stmt) => stmt.visit_parent(cx).map(|()| stmt.into_token_stream()),
+        Ok(mut stmt) => stmt.visit_parent(&mut cx).map(|()| stmt.into_token_stream()),
         Err(_) => syn::parse2::<Expr>(input)
-            .map_err(|_| "may only be used on expression, statement, or function".into())
-            .and_then(|mut expr| expr.visit_parent(cx).map(|()| expr.into_token_stream())),
+            .map_err(|_| err!(cx.span(), "the `#[auto_enum]` attribute may only be used on expression, statement, or function"))
+            .and_then(|mut expr| expr.visit_parent(&mut cx).map(|()| expr.into_token_stream())),
     }
-    .map_err(|e| e.set_span(span))
 }
 
 fn visit_expr(expr: &mut Expr, cx: &mut Context) -> Result<()> {
@@ -64,19 +62,19 @@ fn visit_expr(expr: &mut Expr, cx: &mut Context) -> Result<()> {
     child_expr(expr, cx).map(|()| cx.visitor(|v| v.visit_expr_mut(expr)))
 }
 
-fn build_expr(expr: &mut Expr, cx: &Context) {
+fn build_expr(expr: &mut Expr, item: ItemEnum) {
     replace_expr(expr, |expr| {
-        expr_block(block(vec![Stmt::Item(cx.build().into()), Stmt::Expr(expr)]))
+        expr_block(block(vec![Stmt::Item(item.into()), Stmt::Expr(expr)]))
     });
 }
 
 /// The statement or expression in which `#[auto_enum]` was directly used.
 trait Parent {
-    fn visit_parent(&mut self, cx: Context) -> Result<()>;
+    fn visit_parent(&mut self, cx: &mut Context) -> Result<()>;
 }
 
 impl Parent for Stmt {
-    fn visit_parent(&mut self, mut cx: Context) -> Result<()> {
+    fn visit_parent(&mut self, cx: &mut Context) -> Result<()> {
         if let Stmt::Semi(_, _) = &self {
             cx.visit_last_mode(VisitLastMode::Never);
         }
@@ -85,29 +83,29 @@ impl Parent for Stmt {
             Stmt::Expr(expr) | Stmt::Semi(expr, _) => expr.visit_parent(cx),
             Stmt::Local(local) => local.visit_parent(cx),
             Stmt::Item(Item::Fn(item)) => item.visit_parent(cx),
-            Stmt::Item(_) => Err("may only be used on expression, statement, or function".into()),
+            Stmt::Item(item) => Err(err!(
+                item,
+                "may only be used on expression, statement, or function"
+            )),
         }
     }
 }
 
 impl Parent for Expr {
-    fn visit_parent(&mut self, mut cx: Context) -> Result<()> {
+    fn visit_parent(&mut self, cx: &mut Context) -> Result<()> {
         if cx.args.is_empty() {
             cx.dummy(|v| v.visit_expr_mut(self));
             return Ok(());
         }
 
-        visit_expr(self, &mut cx)?;
+        visit_expr(self, cx)?;
 
-        if cx.buildable()? {
-            build_expr(self, &cx);
-        }
-        Ok(())
+        cx.build(|item| build_expr(self, item))
     }
 }
 
 impl Parent for Local {
-    fn visit_parent(&mut self, mut cx: Context) -> Result<()> {
+    fn visit_parent(&mut self, cx: &mut Context) -> Result<()> {
         #[cfg(feature = "type_analysis")]
         {
             if let Some((_, ty)) = &mut self.ty {
@@ -127,19 +125,15 @@ impl Parent for Local {
             )
         })?;
 
-        visit_expr(&mut *expr, &mut cx)?;
+        visit_expr(&mut *expr, cx)?;
 
-        if cx.buildable()? {
-            build_expr(&mut *expr, &cx);
-        }
-
-        self.init = Some((default(), expr));
-        Ok(())
+        cx.build(|item| build_expr(&mut *expr, item))
+            .map(|()| self.init = Some((default(), expr)))
     }
 }
 
 impl Parent for ItemFn {
-    fn visit_parent(&mut self, mut cx: Context) -> Result<()> {
+    fn visit_parent(&mut self, cx: &mut Context) -> Result<()> {
         let Self { decl, block, .. } = self;
         if let ReturnType::Type(_, ty) = &mut decl.output {
             match &**ty {
@@ -181,7 +175,7 @@ impl Parent for ItemFn {
         }
 
         match self.block.stmts.last_mut() {
-            Some(Stmt::Expr(expr)) => child_expr(expr, &mut cx)?,
+            Some(Stmt::Expr(expr)) => child_expr(expr, cx)?,
             Some(_) => {}
             None => Err(err!(
                 self.block,
@@ -191,9 +185,6 @@ impl Parent for ItemFn {
 
         cx.visitor(|v| v.visit_item_fn_mut(self));
 
-        if cx.buildable()? {
-            self.block.stmts.insert(0, Stmt::Item(cx.build().into()));
-        }
-        Ok(())
+        cx.build(|item| self.block.stmts.insert(0, Stmt::Item(item.into())))
     }
 }

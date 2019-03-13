@@ -1,8 +1,10 @@
 # Unreleased
 
-# 0.5.3 - 2019-03-12
+* Fixed the problem that `"failed to resolve: use of undeclared type or module"` (E0433) error is shown in other variants when one or more compilation errors occur when multiple `#[auto_enum]` attributes are used.
 
-* Greatly improved the error message of #[auto_enum] attribute.
+# 0.5.3 - 2019-03-13
+
+* Greatly improved the error message of `#[auto_enum]` attribute.
 
 # 0.5.2 - 2019-03-10
 
@@ -68,7 +70,7 @@
 
 # 0.3.4 - 2019-01-06
 
-* Added support futures::AsyncRead and futures::AsyncWrite.
+* Added support for futures::AsyncRead and futures::AsyncWrite.
 
 # 0.3.3 - 2019-01-04
 
@@ -100,7 +102,7 @@
 
 # 0.2.0 - 2018-12-20
 
-* Added support `return` in function and closure.
+* Added support for `return` in function and closure.
 
 * Added `"fmt"` crate feature. Made `[std|core]::fmt`'s traits other than `Debug`, `Display` and `Write` optional.
 

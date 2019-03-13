@@ -1,9 +1,10 @@
-use proc_macro2::Group;
 use syn::{
     parse_quote,
     visit_mut::{self, VisitMut},
     Arm, Attribute, Expr, ExprMacro, ExprReturn, ExprTry, Item, Local, Stmt,
 };
+
+use crate::utils::{replace_expr, OptionExt};
 
 use super::*;
 
@@ -124,10 +125,16 @@ impl<'a> Visitor<'a> {
         replace_expr(expr, |expr| match expr {
             Expr::Macro(expr) => {
                 if expr.mac.path.is_ident(self.cx.marker.ident()) {
-                    let args = syn::parse2(expr.mac.tts)
-                        .unwrap_or_else(|_| parse_failed(self.cx.marker.ident()));
+                    let args = syn::parse2(expr.mac.tts).unwrap_or_else(|e| {
+                        self.cx.error = true;
+                        syn::parse2(e.to_compile_error()).unwrap_or_else(|_| unreachable!())
+                    });
 
-                    self.cx.next_expr_with_attrs(expr.attrs, args)
+                    if self.cx.error {
+                        args
+                    } else {
+                        self.cx.next_expr_with_attrs(expr.attrs, args)
+                    }
                 } else {
                     Expr::Macro(expr)
                 }
@@ -186,14 +193,8 @@ impl VisitMut for Visitor<'_> {
     fn visit_item_mut(&mut self, _item: &mut Item) {}
 }
 
-#[inline(never)]
-#[cold]
-fn parse_failed(ident: &str) -> ! {
-    panic!(
-        "`{}` invalid tokens: the arguments of `{}!` macro must be an expression",
-        NAME, ident
-    )
-}
+// =============================================================================
+// FindTry
 
 /// Find `?` operator.
 pub(super) struct FindTry<'a> {
@@ -258,6 +259,9 @@ impl VisitMut for FindTry<'_> {
     fn visit_item_mut(&mut self, _item: &mut Item) {}
 }
 
+// =============================================================================
+// Dummy visitor
+
 pub(super) struct Dummy<'a> {
     cx: &'a mut Context,
 }
@@ -287,12 +291,11 @@ fn visit_stmt_mut(stmt: &mut Stmt, cx: &mut Context) {
     }
 
     if let Some(Attribute { tts, .. }) = stmt.find_remove_attr(NAME) {
-        syn::parse2(tts)
-            .map_err(|e| arg_err!(e))
-            .and_then(|group: Group| parse_args(group.stream()))
-            .and_then(|(args, marker, never)| {
-                stmt.visit_parent(Context::child(args, marker, never))
-                    .map_err(|e| e.set_span(span!(stmt)))
+        parse_group(tts)
+            .map(Context::child)
+            .and_then(|mut cx| {
+                cx.set_span(span!(stmt));
+                stmt.visit_parent(&mut cx)
             })
             .unwrap_or_else(|e| {
                 cx.error = true;

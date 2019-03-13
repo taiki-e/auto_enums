@@ -5,7 +5,7 @@ use syn::{
     *,
 };
 
-use crate::utils::{Result, *};
+use crate::utils::{default, expr_block, replace_block, replace_expr, OptionExt};
 
 use super::*;
 
