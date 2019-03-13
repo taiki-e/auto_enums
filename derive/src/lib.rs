@@ -12,8 +12,8 @@ extern crate proc_macro;
 #[macro_use]
 mod utils;
 
-mod attribute;
 mod derive;
+mod enum_derive;
 
 use proc_macro::TokenStream;
 
@@ -21,5 +21,5 @@ use proc_macro::TokenStream;
 /// the supported traits and passing unsupported traits to `#[derive]`.
 #[proc_macro_attribute]
 pub fn enum_derive(args: TokenStream, input: TokenStream) -> TokenStream {
-    TokenStream::from(self::attribute::attribute(args.into(), input.into()))
+    TokenStream::from(self::enum_derive::attribute(args.into(), input.into()))
 }

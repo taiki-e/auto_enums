@@ -620,7 +620,7 @@
 //! # fn main() { let _: Foo<i32, i32> = Foo::A(0); }
 //! ```
 //!
-//! [derive_utils]: https://crates.io/crates/derive_utils
+//! [derive_utils]: https://github.com/taiki-e/derive_utils
 //!
 //! ## Supported traits
 //!

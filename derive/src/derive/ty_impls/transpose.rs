@@ -6,23 +6,27 @@ pub(crate) const NAME: &[&str] = &["Transpose"];
 
 // Implementing this with `Into` requires many type annotations.
 pub(crate) fn derive(data: &Data, stack: &mut Stack<ItemImpl>) -> Result<()> {
-    {
-        let generics = data.generics();
-        let fields = data.fields();
-        let comma = if generics.params.empty_or_trailing() {
-            quote!(,)
-        } else {
-            TokenStream::new()
-        };
-        if quote!(#generics).to_string() != quote!(<#(#fields),*#comma>).to_string() {
-            Err("all fields need to be generics")?;
-        }
-    }
+    check_fields(data)?;
 
     stack.push(transpose_option(data)?);
     stack.push(transpose_result(data)?);
     stack.push(transpose_ok(data)?);
     stack.push(transpose_err(data)?);
+
+    Ok(())
+}
+
+fn check_fields(data: &Data) -> Result<()> {
+    let generics = data.generics();
+    let fields = data.fields();
+    let comma = if generics.params.empty_or_trailing() {
+        quote!(,)
+    } else {
+        TokenStream::new()
+    };
+    if quote!(#generics).to_string() != quote!(<#(#fields),*#comma>).to_string() {
+        Err(err!(data.span, "all fields need to be generics"))?;
+    }
 
     Ok(())
 }

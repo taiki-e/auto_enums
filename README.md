@@ -95,7 +95,7 @@ enum Foo<A, B> {
 }
 ```
 
-[derive_utils]: https://crates.io/crates/derive_utils
+[derive_utils]: https://github.com/taiki-e/derive_utils
 
 ### [std|core] libraries
 

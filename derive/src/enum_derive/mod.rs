@@ -8,13 +8,10 @@ use crate::utils::*;
 
 mod args;
 
-use self::args::*;
-
-/// The attribute name.
-const NAME: &str = "enum_derive";
+use self::args::{parse_args, Arg};
 
 pub(crate) fn attribute(args: TokenStream, input: TokenStream) -> TokenStream {
-    expand(args, input).unwrap_or_else(|e| compile_err(&e.to_string()))
+    expand(args, input).unwrap_or_else(|e| e.to_compile_error())
 }
 
 macro_rules! trait_map {
@@ -89,7 +86,7 @@ macro_rules! derive_map {
         $(#[$meta])*
         crate::derive::$($arm)::*::NAME.iter().for_each(|name| {
             if $map.insert(*name, (&crate::derive::$($arm)::*::derive) as DeriveFn).is_some() {
-                panic!("`{}` internal error: there are multiple `{}`", NAME, name);
+                panic!("`#[enum_derive]` internal error: there are multiple `{}`", name);
             }
         });
     )*};
@@ -189,10 +186,16 @@ fn expand(args: TokenStream, input: TokenStream) -> Result<TokenStream> {
             .map_or(false, |x| stack.iter().any(|(s, _)| s == x))
     }
 
-    let mut item = syn::parse2::<ItemEnum>(input)
-        .map_err(|_| format!("`{}` may only be used on enums", NAME))?;
-    let data = Data::new(&item).map_err(|e| format!("`{}` {}", NAME, e))?;
-    let args = parse_args(args).map_err(|e| format!("`{}` {}", NAME, e))?;
+    let span = span!(input);
+    let mut item = syn::parse2::<ItemEnum>(input).map_err(|_| {
+        err!(
+            span,
+            "the `#[enum_derive]` attribute may only be used on enums",
+        )
+    })?;
+    let data = EnumData::new(&item)?;
+    let data = Data { data, span };
+    let args = parse_args(args)?;
     let mut stack = Stack::new();
     args.iter().for_each(|(s, arg)| {
         if let Some(traits) = TRAIT_DEPENDENCIES.get(&&**s) {
@@ -215,9 +218,8 @@ fn expand(args: TokenStream, input: TokenStream) -> Result<TokenStream> {
     let mut impls = Stack::new();
     for (s, arg) in stack {
         match (DERIVE_MAP.get(&s), arg) {
-            (Some(f), _) => {
-                (&**f)(&data, &mut impls).map_err(|e| format!("`{}({})` {}", NAME, s, e))?
-            }
+            (Some(f), _) => (&**f)(&data, &mut impls)
+                .map_err(|e| err!(data.span, "`enum_derive({})` {}", s, e))?,
             (_, Some(arg)) => derive.push(arg),
             _ => {}
         }
