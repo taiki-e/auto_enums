@@ -2,11 +2,11 @@
 
 # 0.5.4 - 2019-03-14
 
-* Fixed the problem that `"failed to resolve: use of undeclared type or module"` (E0433) error is shown in other variants when one or more compilation errors occur when multiple `#[auto_enum]` attributes are used.
+* Fixed the problem that `"failed to resolve: use of undeclared type or module"` (E0433) error is shown when one or more compilation errors occur when multiple `#[auto_enum]` attributes are used.
 
 * Improved the error message of `#[enum_derive]` attribute.
 
-* Updated minimum derive_utils version to 0.7.0. This improves the error message.
+* Updated minimum `derive_utils` version to 0.7.0. This improves the error message.
 
 # 0.5.3 - 2019-03-13
 
@@ -18,7 +18,7 @@
 
 * Added `"iovec"` crate feature. This supports the unstable `iovec` feature ([rust-lang/rust#58452](https://github.com/rust-lang/rust/issues/58452)).
 
-* Updated minimum syn version to 0.15.29. This fixes some warnings.
+* Updated minimum `syn` version to 0.15.29. This fixes some warnings.
 
 # 0.5.1 - 2019-03-03
 
@@ -42,11 +42,11 @@
 
 * Added some generated code examples.
 
-* Updated minimum derive_utils version to 0.6.3.
+* Updated minimum `derive_utils` version to 0.6.3.
 
-* Updated minimum syn version to 0.15.22.
+* Updated minimum `syn` version to 0.15.22.
 
-* Updated minimum smallvec version to 0.6.9.
+* Updated minimum `smallvec` version to 0.6.9.
 
 # 0.4.0 - 2019-01-30
 
@@ -56,9 +56,9 @@
 
 # 0.3.8 - 2019-01-26
 
-* Updated minimum derive_utils version to 0.6.1.
+* Updated minimum `derive_utils` version to 0.6.1.
 
-* Updated minimum smallvec version to 0.6.8.
+* Updated minimum `smallvec` version to 0.6.8.
 
 # 0.3.7 - 2019-01-26
 
@@ -72,25 +72,25 @@
 
 * Improved performance of `#[auto_enum]` attribute.
 
-* Updated minimum derive_utils version to 0.6.0.
+* Updated minimum `derive_utils` version to 0.6.0.
 
 # 0.3.4 - 2019-01-06
 
-* Added support for futures::AsyncRead and futures::AsyncWrite.
+* Added support for `futures::AsyncRead` and `futures::AsyncWrite`.
 
 # 0.3.3 - 2019-01-04
 
-* Updated minimum derive_utils version to 0.5.4.
+* Updated minimum `derive_utils` version to 0.5.4.
 
 # 0.3.2 - 2018-12-27
 
 * Improved error messages.
 
-* Updated minimum derive_utils version to 0.5.3.
+* Updated minimum `derive_utils` version to 0.5.3.
 
 # 0.3.1 - 2018-12-26
 
-* Updated minimum derive_utils version to 0.5.1. This includes support to stable Pin API.
+* Updated minimum `derive_utils` version to 0.5.1. This includes support to stable Pin API.
 
 # 0.3.0 - 2018-12-24
 
@@ -100,11 +100,11 @@
 
 * Removed `"error_cause"` crate feature.
 
-* Updated minimum derive_utils version to 0.5.0.
+* Updated minimum `derive_utils` version to 0.5.0.
 
 # 0.2.1 - 2018-12-22
 
-* Updated minimum derive_utils version to 0.4.0.
+* Updated minimum `derive_utils` version to 0.4.0.
 
 # 0.2.0 - 2018-12-20
 
