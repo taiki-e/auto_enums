@@ -1,5 +1,7 @@
 # Unreleased
 
+# 0.5.4 - 2019-03-14
+
 * Fixed the problem that `"failed to resolve: use of undeclared type or module"` (E0433) error is shown in other variants when one or more compilation errors occur when multiple `#[auto_enum]` attributes are used.
 
 * Improved the error message of `#[enum_derive]` attribute.
