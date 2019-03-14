@@ -37,8 +37,7 @@ pub(crate) fn attribute(args: TokenStream, input: TokenStream) -> TokenStream {
 }
 
 fn expand(args: TokenStream, input: TokenStream) -> Result<TokenStream> {
-    let mut cx = parse_args(args).map(Context::root)?;
-    cx.set_span(span!(input));
+    let mut cx = parse_args(args).map(|x| Context::root(span!(input), x))?;
 
     match syn::parse2::<Stmt>(input.clone()) {
         Ok(mut stmt) => stmt.visit_parent(&mut cx).map(|()| stmt.into_token_stream()),
@@ -118,17 +117,17 @@ impl Parent for Local {
             return Ok(());
         }
 
-        let mut expr = self.init.take().map(|(_, expr)| expr).ok_or_else(|| {
-            err!(
+        let expr = match self.init.as_mut().map(|(_, expr)| &mut **expr) {
+            Some(expr) => expr,
+            None => Err(err!(
                 self,
                 "the `#[auto_enum]` attribute is not supported uninitialized let statement"
-            )
-        })?;
+            ))?,
+        };
 
-        visit_expr(&mut *expr, cx)?;
+        visit_expr(expr, cx)?;
 
-        cx.build(|item| build_expr(&mut *expr, item))
-            .map(|()| self.init = Some((default(), expr)))
+        cx.build(|item| build_expr(expr, item))
     }
 }
 

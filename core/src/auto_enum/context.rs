@@ -68,9 +68,15 @@ pub(super) struct Context {
 // This has been fixed in https://github.com/rust-lang/rust-clippy/pull/3869. Allow it temporarily until it lands.
 #[allow(clippy::use_self)]
 impl Context {
-    fn new(args: Stack<Arg>, marker: Option<String>, never: bool, root: bool) -> Self {
+    fn new<T: ToTokens>(
+        span: T,
+        args: Stack<Arg>,
+        marker: Option<String>,
+        never: bool,
+        root: bool,
+    ) -> Self {
         Self {
-            span: None,
+            span: Some(span.into_token_stream()),
             args,
             builder: Builder::new(),
             marker: Marker::new(marker),
@@ -87,16 +93,18 @@ impl Context {
         }
     }
 
-    pub(super) fn root((args, marker, never): (Stack<Arg>, Option<String>, bool)) -> Self {
-        Self::new(args, marker, never, true)
+    pub(super) fn root<T: ToTokens>(
+        span: T,
+        (args, marker, never): (Stack<Arg>, Option<String>, bool),
+    ) -> Self {
+        Self::new(span, args, marker, never, true)
     }
 
-    pub(super) fn child((args, marker, never): (Stack<Arg>, Option<String>, bool)) -> Self {
-        Self::new(args, marker, never, false)
-    }
-
-    pub(super) fn set_span<T: ToTokens>(&mut self, span: T) {
-        self.span.replace(span.into_token_stream());
+    pub(super) fn child<T: ToTokens>(
+        span: T,
+        (args, marker, never): (Stack<Arg>, Option<String>, bool),
+    ) -> Self {
+        Self::new(span, args, marker, never, false)
     }
 
     // If this is called more than once, it is a bug.

@@ -108,8 +108,14 @@ macro_rules! err {
     ($msg:expr) => {
         syn::Error::new_spanned(span!($msg), $msg)
     };
+    ($span:ident .span(), $msg:expr) => {
+        syn::Error::new_spanned($span.span(), $msg)
+    };
     ($span:expr, $msg:expr) => {
         syn::Error::new_spanned(span!($span), $msg)
+    };
+    ($span:ident .span(), $($tt:tt)*) => {
+        err!($span.span(), format!($($tt)*))
     };
     ($span:expr, $($tt:tt)*) => {
         err!($span, format!($($tt)*))

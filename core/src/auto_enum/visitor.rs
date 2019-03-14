@@ -292,11 +292,8 @@ fn visit_stmt_mut(stmt: &mut Stmt, cx: &mut Context) {
 
     if let Some(Attribute { tts, .. }) = stmt.find_remove_attr(NAME) {
         parse_group(tts)
-            .map(Context::child)
-            .and_then(|mut cx| {
-                cx.set_span(span!(stmt));
-                stmt.visit_parent(&mut cx)
-            })
+            .map(|x| Context::child(span!(stmt), x))
+            .and_then(|mut cx| stmt.visit_parent(&mut cx))
             .unwrap_or_else(|e| {
                 cx.error = true;
                 *stmt = syn::parse2(e.to_compile_error()).unwrap_or_else(|_| unreachable!());
