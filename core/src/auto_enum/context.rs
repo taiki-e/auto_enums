@@ -65,8 +65,6 @@ pub(super) struct Context {
     pub(super) error: bool,
 }
 
-// This has been fixed in https://github.com/rust-lang/rust-clippy/pull/3869. Allow it temporarily until it lands.
-#[allow(clippy::use_self)]
 impl Context {
     fn new<T: ToTokens>(
         span: T,
