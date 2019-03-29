@@ -64,8 +64,10 @@ lazy_static! {
         let mut map = HashMap::new();
         alias_map! {
             map,
-            std::fmt::debug,
-            std::fmt::display,
+            // core
+            core::fmt::debug,
+            core::fmt::display,
+            // std
             #[cfg(feature = "std")]
             std::io::read,
             #[cfg(feature = "std")]
@@ -97,41 +99,43 @@ lazy_static! {
         let mut map = HashMap::new();
         derive_map!(
             map,
-            std::iter::iterator,
-            std::iter::double_ended_iterator,
-            std::iter::exact_size_iterator,
-            std::iter::fused_iterator,
-            std::iter::trusted_len,
-            std::iter::extend,
-            std::ops::deref,
-            std::ops::deref_mut,
-            std::ops::index,
-            std::ops::index_mut,
-            std::ops::range_bounds,
-            std::ops::fn_,
-            std::ops::fn_mut,
-            std::ops::fn_once,
-            std::ops::generator,
-            std::convert::as_mut,
-            std::convert::as_ref,
-            std::fmt::debug,
-            std::fmt::display,
+            // core
+            core::convert::as_mut,
+            core::convert::as_ref,
+            core::fmt::debug,
+            core::fmt::display,
             #[cfg(feature = "fmt")]
-            std::fmt::pointer,
+            core::fmt::pointer,
             #[cfg(feature = "fmt")]
-            std::fmt::binary,
+            core::fmt::binary,
             #[cfg(feature = "fmt")]
-            std::fmt::octal,
+            core::fmt::octal,
             #[cfg(feature = "fmt")]
-            std::fmt::upper_hex,
+            core::fmt::upper_hex,
             #[cfg(feature = "fmt")]
-            std::fmt::lower_hex,
+            core::fmt::lower_hex,
             #[cfg(feature = "fmt")]
-            std::fmt::upper_exp,
+            core::fmt::upper_exp,
             #[cfg(feature = "fmt")]
-            std::fmt::lower_exp,
-            std::fmt::write,
-            std::future,
+            core::fmt::lower_exp,
+            core::fmt::write,
+            core::iter::iterator,
+            core::iter::double_ended_iterator,
+            core::iter::exact_size_iterator,
+            core::iter::fused_iterator,
+            core::iter::trusted_len,
+            core::iter::extend,
+            core::ops::deref,
+            core::ops::deref_mut,
+            core::ops::index,
+            core::ops::index_mut,
+            core::ops::range_bounds,
+            core::ops::fn_,
+            core::ops::fn_mut,
+            core::ops::fn_once,
+            core::ops::generator,
+            core::future,
+            // std
             #[cfg(feature = "std")]
             std::io::read,
             #[cfg(feature = "std")]
@@ -142,9 +146,11 @@ lazy_static! {
             std::io::write,
             #[cfg(feature = "std")]
             std::error,
+
             // type impls
             #[cfg(feature = "transpose_methods")]
             ty_impls::transpose,
+
             // futures
             #[cfg(feature = "futures")]
             external::futures::stream,

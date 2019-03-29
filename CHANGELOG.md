@@ -1,5 +1,7 @@
 # Unreleased
 
+* Fixed trait support in `"type_analysis"` feature.
+
 * Added a description of unstable feature support.
 
 * Removed `"unsized_locals"` crate feature.
