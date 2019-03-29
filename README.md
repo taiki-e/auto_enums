@@ -8,6 +8,8 @@
 
 A library for to allow multiple return types by automatically generated enum.
 
+This crate is a procedural macro implementation of the features discussions in <https://github.com/rust-lang/rfcs/issues/2414>.
+
 This library provides the following attribute macros:
 
 * `#[auto_enum]`
