@@ -6,15 +6,13 @@ macro_rules! fmt_impl {
             pub(crate) const NAME: &[&str] = &[$($name),*];
 
             pub(crate) fn derive(data: &Data, stack: &mut Stack<ItemImpl>) -> Result<()> {
-                let fmt = quote!(::core::fmt);
-
                 derive_trait!(
                     data,
-                    parse_quote!(#fmt::$Trait)?,
+                    parse_quote!(::core::fmt::$Trait)?,
                     parse_quote! {
                         trait $Trait {
                             #[inline]
-                            fn fmt(&self, f: &mut #fmt::Formatter<'_>) -> #fmt::Result;
+                            fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result;
                         }
                     }?,
                 )
