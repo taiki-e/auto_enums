@@ -1,5 +1,9 @@
 # Unreleased
 
+* Added a description of unstable feature support.
+
+* Removed `"unsized_locals"` crate feature.
+
 # 0.5.4 - 2019-03-14
 
 * Fixed the problem that `"failed to resolve: use of undeclared type or module"` (E0433) error is shown when one or more compilation errors occur when multiple `#[auto_enum]` attributes are used.

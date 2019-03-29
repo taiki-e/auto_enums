@@ -13,7 +13,6 @@
         read_initializer,
         trusted_len,
         try_trait,
-        unsized_locals,
         type_ascription,
     )
 )]

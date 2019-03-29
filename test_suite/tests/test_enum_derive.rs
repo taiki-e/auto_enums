@@ -12,7 +12,6 @@
         read_initializer,
         trusted_len,
         try_trait,
-        unsized_locals,
     )
 )]
 #![cfg_attr(not(feature = "std"), no_std)]

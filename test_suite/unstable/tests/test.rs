@@ -11,7 +11,6 @@
         trusted_len,
         exact_size_is_empty,
         try_trait,
-        unsized_locals,
     )
 )]
 #![deny(warnings)]

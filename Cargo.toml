@@ -83,5 +83,3 @@ exact_size_is_empty = ["auto_enums_derive/exact_size_is_empty"]
 iovec = ["auto_enums_derive/iovec"]
 # Implements `io::Read::read_initializer`.
 read_initializer = ["auto_enums_derive/read_initializer"]
-# Allow `Index<Idx: ?Sized>` and `IndexMut<Idx: ?Sized>`.
-unsized_locals = ["auto_enums_derive/unsized_locals"]

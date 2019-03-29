@@ -43,5 +43,4 @@ unstable = [
     "auto_enums/read_initializer",
     "auto_enums/exact_size_is_empty",
     "auto_enums/try_trait",
-    "auto_enums/unsized_locals",
 ]

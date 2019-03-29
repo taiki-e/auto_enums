@@ -813,6 +813,8 @@
 //!
 //! For these features, you need to enable the unstable feature gate of the same name.
 //!
+//! Note that support for these features are unstable and may cause incompatible changes between patch versions.
+//!
 //! * [`exact_size_is_empty`](https://github.com/rust-lang/rust/issues/35428) - Implements `ExactSizeIterator::is_empty`.
 //!
 //! * [`iovec`](https://github.com/rust-lang/rust/issues/58452) - Implements `io::Read::read_vectored` and `io::Write::write_vectored`.
@@ -820,8 +822,6 @@
 //! * [`read_initializer`](https://github.com/rust-lang/rust/issues/42788) - Implements `io::Read::read_initializer`.
 //!
 //! * [`try_trait`](https://github.com/rust-lang/rust/issues/42327) - Make iterator implementation more effective.
-//!
-//! * [`unsized_locals`](https://github.com/rust-lang/rust/issues/48055) - Allow `Index<Idx: ?Sized>` and `IndexMut<Idx: ?Sized>`.
 //!
 //! ## Known limitations
 //!

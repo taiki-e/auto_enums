@@ -71,5 +71,3 @@ iovec = []
 read_initializer = []
 # Make iterator implementation more effective.
 try_trait = []
-# Allow `Index<Idx: ?Sized>` and `IndexMut<Idx: ?Sized>`.
-unsized_locals = []
