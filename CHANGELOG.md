@@ -1,10 +1,12 @@
 # Unreleased
 
+# 0.5.5 - 2019-03-29
+
 * Fixed trait support in `"type_analysis"` feature.
 
 * Added a description of unstable feature support.
 
-* Removed `"unsized_locals"` crate feature.
+* Removed some unstable crate features.
 
 # 0.5.4 - 2019-03-14
 

@@ -1,6 +1,6 @@
 #![crate_type = "proc-macro"]
 #![recursion_limit = "256"]
-#![doc(html_root_url = "https://docs.rs/auto_enums_core/0.5.4")]
+#![doc(html_root_url = "https://docs.rs/auto_enums_core/0.5.5")]
 #![deny(unsafe_code)]
 #![deny(rust_2018_idioms, unreachable_pub)]
 #![deny(clippy::all, clippy::pedantic)]
