@@ -9,10 +9,8 @@ pub(crate) fn derive(data: &Data, stack: &mut Stack<ItemImpl>) -> Result<()> {
 
     let mut impls = data.impl_with_capacity(1)?;
 
-    *impls.trait_() = Some(Trait::new(
-        syn::parse2(trait_path.clone())?,
-        parse_quote!(#trait_path<(__T,)>)?,
-    ));
+    *impls.trait_() =
+        Some(Trait::new(syn::parse2(trait_path.clone())?, parse_quote!(#trait_path<(__T,)>)?));
     impls.push_generic_param(param_ident("__T"));
     impls.push_generic_param(param_ident("__U"));
 

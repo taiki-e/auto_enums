@@ -28,10 +28,7 @@ pub(super) struct Visitor<'a> {
 
 impl<'a> Visitor<'a> {
     pub(super) fn new(cx: &'a mut Context) -> Self {
-        Self {
-            cx,
-            scope: Scope::default(),
-        }
+        Self { cx, scope: Scope::default() }
     }
 
     fn find_remove_empty_attrs<A: AttrsMut>(&self, attrs: &mut A) {
@@ -205,11 +202,7 @@ pub(super) struct FindTry<'a> {
 
 impl<'a> FindTry<'a> {
     pub(super) fn new(cx: &'a Context) -> Self {
-        Self {
-            cx,
-            scope: Scope::default(),
-            has: false,
-        }
+        Self { cx, scope: Scope::default(), has: false }
     }
 }
 

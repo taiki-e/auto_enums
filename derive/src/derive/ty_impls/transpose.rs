@@ -19,11 +19,7 @@ pub(crate) fn derive(data: &Data, stack: &mut Stack<ItemImpl>) -> Result<()> {
 fn check_fields(data: &Data) -> Result<()> {
     let generics = data.generics();
     let fields = data.fields();
-    let comma = if generics.params.empty_or_trailing() {
-        quote!(,)
-    } else {
-        TokenStream::new()
-    };
+    let comma = if generics.params.empty_or_trailing() { quote!(,) } else { TokenStream::new() };
     if quote!(#generics).to_string() != quote!(<#(#fields),*#comma>).to_string() {
         Err(err!(data.span, "all fields need to be generics"))?;
     }
@@ -40,10 +36,7 @@ fn transpose_option(data: &Data) -> Result<ItemImpl> {
     let ty_generics = fields.iter().map(|f| quote!(::core::option::Option<#f>));
     *impls.self_ty() = parse_quote!(#ident<#(#ty_generics),*>)?;
 
-    let transpose = data
-        .variants()
-        .iter()
-        .map(|v| quote!(#ident::#v(x) => x.map(#ident::#v)));
+    let transpose = data.variants().iter().map(|v| quote!(#ident::#v(x) => x.map(#ident::#v)));
 
     impls.push_item(parse_quote! {
         #[inline]
@@ -69,10 +62,8 @@ fn transpose_result(data: &Data) -> Result<ItemImpl> {
         .collect();
 
     let ident = data.ident();
-    let ty_generics = fields
-        .iter()
-        .zip(err_fields.iter())
-        .map(|(f, ef)| quote!(::core::result::Result<#f, #ef>));
+    let ty_generics =
+        fields.iter().zip(err_fields.iter()).map(|(f, ef)| quote!(::core::result::Result<#f, #ef>));
     *impls.self_ty() = parse_quote!(#ident<#(#ty_generics),*>)?;
 
     let transpose = data
@@ -98,15 +89,10 @@ fn transpose_ok(data: &Data) -> Result<ItemImpl> {
 
     impls.push_generic_param(param_ident("__E"));
 
-    let ty_generics = fields
-        .iter()
-        .map(|f| quote!(::core::result::Result<#f, __E>));
+    let ty_generics = fields.iter().map(|f| quote!(::core::result::Result<#f, __E>));
     *impls.self_ty() = parse_quote!(#ident<#(#ty_generics),*>)?;
 
-    let transpose = data
-        .variants()
-        .iter()
-        .map(|v| quote!(#ident::#v(x) => x.map(#ident::#v)));
+    let transpose = data.variants().iter().map(|v| quote!(#ident::#v(x) => x.map(#ident::#v)));
     impls.push_item(parse_quote! {
         #[inline]
         fn transpose_ok(self) -> ::core::result::Result<#ident<#(#fields),*>, __E> {
@@ -125,15 +111,10 @@ fn transpose_err(data: &Data) -> Result<ItemImpl> {
 
     impls.push_generic_param(param_ident("__T"));
 
-    let ty_generics = fields
-        .iter()
-        .map(|f| quote!(::core::result::Result<__T, #f>));
+    let ty_generics = fields.iter().map(|f| quote!(::core::result::Result<__T, #f>));
     *impls.self_ty() = parse_quote!(#ident<#(#ty_generics),*>)?;
 
-    let transpose = data
-        .variants()
-        .iter()
-        .map(|v| quote!(#ident::#v(x) => x.map_err(#ident::#v)));
+    let transpose = data.variants().iter().map(|v| quote!(#ident::#v(x) => x.map_err(#ident::#v)));
     impls.push_item(parse_quote! {
         #[inline]
         fn transpose_err(self) -> ::core::result::Result<__T, #ident<#(#fields),*>> {

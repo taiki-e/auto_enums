@@ -187,32 +187,23 @@ lazy_static! {
 
 fn expand(args: TokenStream, input: TokenStream) -> Result<TokenStream> {
     fn alias_exists(s: &str, stack: &[(&str, Option<&Arg>)]) -> bool {
-        ALIAS_MAP
-            .get(s)
-            .map_or(false, |x| stack.iter().any(|(s, _)| s == x))
+        ALIAS_MAP.get(s).map_or(false, |x| stack.iter().any(|(s, _)| s == x))
     }
 
     let span = span!(input);
-    let mut item = syn::parse2::<ItemEnum>(input).map_err(|_| {
-        err!(
-            span,
-            "the `#[enum_derive]` attribute may only be used on enums",
-        )
-    })?;
+    let mut item = syn::parse2::<ItemEnum>(input)
+        .map_err(|_| err!(span, "the `#[enum_derive]` attribute may only be used on enums"))?;
     let data = EnumData::new(&item)?;
     let data = Data { data, span };
     let args = parse_args(args)?;
     let mut stack = Stack::new();
     args.iter().for_each(|(s, arg)| {
         if let Some(traits) = TRAIT_DEPENDENCIES.get(&&**s) {
-            traits
-                .iter()
-                .filter(|&x| !args.iter().any(|(s, _)| s == x))
-                .for_each(|s| {
-                    if !alias_exists(s, &stack) {
-                        stack.push((s, None))
-                    }
-                });
+            traits.iter().filter(|&x| !args.iter().any(|(s, _)| s == x)).for_each(|s| {
+                if !alias_exists(s, &stack) {
+                    stack.push((s, None))
+                }
+            });
         }
 
         if !alias_exists(s, &stack) {

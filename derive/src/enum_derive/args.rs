@@ -78,9 +78,7 @@ fn parse_path(mut path: Stack<TokenTree>, iter: &mut IntoIter) -> Result<Arg> {
         }
     }
 
-    syn::parse2(path.into_iter().collect())
-        .map_err(|e| arg_err!(e))
-        .map(Arg::Path)
+    syn::parse2(path.into_iter().collect()).map_err(|e| arg_err!(e)).map(Arg::Path)
 }
 
 fn path_or_ident(ident: Ident, tt: Option<TokenTree>, iter: &mut IntoIter) -> Result<Arg> {
