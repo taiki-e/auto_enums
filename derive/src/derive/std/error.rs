@@ -4,10 +4,8 @@ pub(crate) const NAME: &[&str] = &["Error"];
 
 pub(crate) fn derive(data: &Data, stack: &mut Stack<ItemImpl>) -> Result<()> {
     let ident = data.ident();
-    let source = data
-        .variants()
-        .iter()
-        .map(|v| quote!(#ident::#v(x) => ::std::option::Option::Some(x)));
+    let source =
+        data.variants().iter().map(|v| quote!(#ident::#v(x) => ::std::option::Option::Some(x)));
 
     let source = parse_quote! {
         fn source(&self) -> ::std::option::Option<&(dyn (::std::error::Error) + 'static)> {

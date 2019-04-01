@@ -122,19 +122,15 @@ fn is_unreachable(expr: &Expr, cx: &Context<'_>) -> bool {
             // Assigned.
             Expr::Call(expr) => cx.assigned_enum(expr),
             */
-            Expr::Match(ExprMatch { arms, .. }) => arms
-                .iter()
-                .all(|arm| arm.any_empty_attr(NEVER) || is_unreachable(&*arm.body, cx)),
+            Expr::Match(ExprMatch { arms, .. }) => {
+                arms.iter().all(|arm| arm.any_empty_attr(NEVER) || is_unreachable(&*arm.body, cx))
+            }
 
             // `Err(expr)?` or `None?`.
             Expr::Try(ExprTry { expr, .. }) => match &**expr {
-                Expr::Path(ExprPath {
-                    path, qself: None, ..
-                }) => path.is_ident("None"),
+                Expr::Path(ExprPath { path, qself: None, .. }) => path.is_ident("None"),
                 Expr::Call(ExprCall { args, func, .. }) if args.len() == 1 => match &**func {
-                    Expr::Path(ExprPath {
-                        path, qself: None, ..
-                    }) => path.is_ident("Err"),
+                    Expr::Path(ExprPath { path, qself: None, .. }) => path.is_ident("Err"),
                     _ => false,
                 },
                 _ => false,
@@ -274,11 +270,7 @@ struct LoopVisitor<'a> {
 
 impl<'a> LoopVisitor<'a> {
     fn new(expr: &ExprLoop, cx: &'a mut super::Context) -> Self {
-        Self {
-            cx,
-            label: expr.label.as_ref().map(|l| l.name.clone()),
-            nested: false,
-        }
+        Self { cx, label: expr.label.as_ref().map(|l| l.name.clone()), nested: false }
     }
 
     fn compare_labels(&self, other: Option<&Lifetime>) -> bool {

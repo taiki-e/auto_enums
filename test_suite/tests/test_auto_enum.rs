@@ -515,23 +515,14 @@ fn stable_1_30_std() {
 
     #[auto_enum(Transpose, Write)]
     fn transpose_ok(file: Option<&Path>) -> io::Result<impl io::Write> {
-        if let Some(file) = file {
-            fs::File::create(file)
-        } else {
-            Ok(io::stdout())
-        }
-        .transpose_ok()
+        if let Some(file) = file { fs::File::create(file) } else { Ok(io::stdout()) }.transpose_ok()
     }
     assert!(transpose_ok(None).is_ok());
 
     #[auto_enum(Transpose, Write)]
     fn transpose_option(file: Option<&Path>) -> Option<impl io::Write> {
-        if let Some(file) = file {
-            fs::File::create(file).ok()
-        } else {
-            Some(io::stdout())
-        }
-        .transpose()
+        if let Some(file) = file { fs::File::create(file).ok() } else { Some(io::stdout()) }
+            .transpose()
     }
     assert!(transpose_option(None).is_some());
 

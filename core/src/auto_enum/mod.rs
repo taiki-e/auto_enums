@@ -62,9 +62,7 @@ fn visit_expr(expr: &mut Expr, cx: &mut Context) -> Result<()> {
 }
 
 fn build_expr(expr: &mut Expr, item: ItemEnum) {
-    replace_expr(expr, |expr| {
-        expr_block(block(vec![Stmt::Item(item.into()), Stmt::Expr(expr)]))
-    });
+    replace_expr(expr, |expr| expr_block(block(vec![Stmt::Item(item.into()), Stmt::Expr(expr)])));
 }
 
 /// The statement or expression in which `#[auto_enum]` was directly used.
@@ -82,10 +80,9 @@ impl Parent for Stmt {
             Stmt::Expr(expr) | Stmt::Semi(expr, _) => expr.visit_parent(cx),
             Stmt::Local(local) => local.visit_parent(cx),
             Stmt::Item(Item::Fn(item)) => item.visit_parent(cx),
-            Stmt::Item(item) => Err(err!(
-                item,
-                "may only be used on expression, statement, or function"
-            )),
+            Stmt::Item(item) => {
+                Err(err!(item, "may only be used on expression, statement, or function"))
+            }
         }
     }
 }

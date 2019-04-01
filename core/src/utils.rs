@@ -50,25 +50,15 @@ pub(crate) fn ident<S: AsRef<str>>(s: S) -> Ident {
 }
 
 pub(crate) fn path<I: IntoIterator<Item = PathSegment>>(segments: I) -> Path {
-    Path {
-        leading_colon: None,
-        segments: segments.into_iter().collect(),
-    }
+    Path { leading_colon: None, segments: segments.into_iter().collect() }
 }
 
 pub(crate) fn block(stmts: Vec<Stmt>) -> Block {
-    Block {
-        brace_token: default(),
-        stmts,
-    }
+    Block { brace_token: default(), stmts }
 }
 
 pub(crate) fn expr_block(block: Block) -> Expr {
-    Expr::Block(ExprBlock {
-        attrs: Vec::with_capacity(0),
-        label: None,
-        block,
-    })
+    Expr::Block(ExprBlock { attrs: Vec::with_capacity(0), label: None, block })
 }
 
 pub(crate) fn unit() -> Expr {
@@ -80,19 +70,11 @@ pub(crate) fn unit() -> Expr {
 }
 
 pub(crate) fn replace_expr<F: FnOnce(Expr) -> Expr>(this: &mut Expr, op: F) {
-    *this = op(mem::replace(
-        this,
-        Expr::Verbatim(ExprVerbatim {
-            tts: TokenStream::new(),
-        }),
-    ));
+    *this = op(mem::replace(this, Expr::Verbatim(ExprVerbatim { tts: TokenStream::new() })));
 }
 
 pub(crate) fn replace_block<F: FnOnce(Block) -> Expr>(this: &mut Block, op: F) {
-    *this = block(vec![Stmt::Expr(op(mem::replace(
-        this,
-        block(Vec::with_capacity(0)),
-    )))]);
+    *this = block(vec![Stmt::Expr(op(mem::replace(this, block(Vec::with_capacity(0)))))]);
 }
 
 // =============================================================================

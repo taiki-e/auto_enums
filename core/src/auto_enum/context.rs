@@ -82,11 +82,7 @@ impl Context {
             root,
             attr: false,
             mode: VisitMode::Default,
-            visit_last: if never {
-                VisitLastMode::Never
-            } else {
-                VisitLastMode::Default
-            },
+            visit_last: if never { VisitLastMode::Never } else { VisitLastMode::Default },
             error: false,
         }
     }
@@ -178,10 +174,9 @@ impl Context {
     fn buildable(&mut self) -> Result<bool> {
         fn err(cx: &mut Context, len: usize) -> Result<bool> {
             let (msg1, msg2) = match cx.visit_last {
-                VisitLastMode::Default | VisitLastMode::Closure => (
-                    "branches or marker macros in total",
-                    "branch or marker macro",
-                ),
+                VisitLastMode::Default | VisitLastMode::Closure => {
+                    ("branches or marker macros in total", "branch or marker macro")
+                }
                 VisitLastMode::Never => ("marker macros", "marker macro"),
             };
 

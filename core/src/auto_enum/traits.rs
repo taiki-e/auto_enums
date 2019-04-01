@@ -48,9 +48,7 @@ impl VisitMut for ImplTraits<'_> {
 
         ty.bounds.iter().for_each(|ty| {
             if let TypeParamBound::Trait(ty) = ty {
-                self.traits.push(path(
-                    ty.path.segments.iter().map(|ty| ty.ident.clone().into()),
-                ));
+                self.traits.push(path(ty.path.segments.iter().map(|ty| ty.ident.clone().into())));
             }
         });
     }
