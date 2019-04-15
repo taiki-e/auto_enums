@@ -1,4 +1,3 @@
-#![crate_type = "proc-macro"]
 #![recursion_limit = "256"]
 #![doc(html_root_url = "https://docs.rs/auto_enums_derive/0.5.5")]
 #![deny(unsafe_code)]
