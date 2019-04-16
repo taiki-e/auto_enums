@@ -1,5 +1,9 @@
 # Unreleased
 
+# 0.5.6 - 2019-04-16
+
+* Updated to new nightly.
+
 # 0.5.5 - 2019-03-29
 
 * Fixed trait support in `"type_analysis"` feature.

@@ -1,5 +1,5 @@
 #![recursion_limit = "256"]
-#![doc(html_root_url = "https://docs.rs/auto_enums_derive/0.5.5")]
+#![doc(html_root_url = "https://docs.rs/auto_enums_derive/0.5.6")]
 #![deny(unsafe_code)]
 #![deny(rust_2018_idioms, unreachable_pub)]
 #![deny(clippy::all, clippy::pedantic)]
