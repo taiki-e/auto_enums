@@ -7,28 +7,27 @@ pub(crate) fn derive(data: &Data, stack: &mut Stack<ItemImpl>) -> Result<()> {
         data,
         parse_quote!(::futures::sink::Sink)?,
         parse_quote! {
-            trait Sink {
-                type SinkItem;
+            trait Sink<Item> {
                 type SinkError;
                 #[inline]
                 fn poll_ready(
                     self: ::core::pin::Pin<&mut Self>,
-                    waker: &::core::task::Waker,
+                    cx: &mut ::core::task::Context<'_>,
                 ) -> ::core::task::Poll<::core::result::Result<(), Self::SinkError>>;
                 #[inline]
                 fn start_send(
                     self: ::core::pin::Pin<&mut Self>,
-                    item: Self::SinkItem,
+                    item: Item,
                 ) -> ::core::result::Result<(), Self::SinkError>;
                 #[inline]
                 fn poll_flush(
                     self: ::core::pin::Pin<&mut Self>,
-                    waker: &::core::task::Waker,
+                    cx: &mut ::core::task::Context<'_>,
                 ) -> ::core::task::Poll<::core::result::Result<(), Self::SinkError>>;
                 #[inline]
                 fn poll_close(
                     self: ::core::pin::Pin<&mut Self>,
-                    waker: &::core::task::Waker,
+                    cx: &mut ::core::task::Context<'_>,
                 ) -> ::core::task::Poll<::core::result::Result<(), Self::SinkError>>;
             }
         }?,

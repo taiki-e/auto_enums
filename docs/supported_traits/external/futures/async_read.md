@@ -1,4 +1,4 @@
-## [`AsyncRead`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.13/futures/io/trait.AsyncRead.html)
+## [`AsyncRead`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.14/futures/io/trait.AsyncRead.html)
 
 When deriving for enum like the following:
 
@@ -34,25 +34,25 @@ where
 
     #[inline]
     fn poll_read(
-        &mut self,
-        waker: &::core::task::Waker,
+        self: ::core::pin::Pin<&mut Self>,
+        cx: &mut ::core::task::Context<'_>,
         buf: &mut [u8],
     ) -> ::core::task::Poll<::core::result::Result<usize, ::futures::io::Error>> {
         match self {
-            Enum::A(x) => ::futures::io::AsyncRead::poll_read(x, waker, buf),
-            Enum::B(x) => ::futures::io::AsyncRead::poll_read(x, waker, buf),
+            Enum::A(x) => ::futures::io::AsyncRead::poll_read(x, cx, buf),
+            Enum::B(x) => ::futures::io::AsyncRead::poll_read(x, cx, buf),
         }
     }
 
     #[inline]
     fn poll_vectored_read(
-        &mut self,
-        waker: &::core::task::Waker,
+        self: ::core::pin::Pin<&mut Self>,
+        cx: &mut ::core::task::Context<'_>,
         vec: &mut [&mut ::futures::io::IoVec],
     ) -> ::core::task::Poll<::core::result::Result<usize, ::futures::io::Error>> {
         match self {
-            Enum::A(x) => ::futures::io::AsyncRead::poll_vectored_read(x, waker, vec),
-            Enum::B(x) => ::futures::io::AsyncRead::poll_vectored_read(x, waker, vec),
+            Enum::A(x) => ::futures::io::AsyncRead::poll_vectored_read(x, cx, vec),
+            Enum::B(x) => ::futures::io::AsyncRead::poll_vectored_read(x, cx, vec),
         }
     }
 }

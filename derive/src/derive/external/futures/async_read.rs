@@ -14,14 +14,14 @@ pub(crate) fn derive(data: &Data, stack: &mut Stack<ItemImpl>) -> Result<()> {
                 unsafe fn initializer(&self) -> #io::Initializer;
                 #[inline]
                 fn poll_read(
-                    &mut self,
-                    waker: &::core::task::Waker,
+                    self: ::core::pin::Pin<&mut Self>,
+                    cx: &mut ::core::task::Context<'_>,
                     buf: &mut [u8],
                 ) -> ::core::task::Poll<::core::result::Result<usize, #io::Error>>;
                 #[inline]
                 fn poll_vectored_read(
-                    &mut self,
-                    waker: &::core::task::Waker,
+                    self: ::core::pin::Pin<&mut Self>,
+                    cx: &mut ::core::task::Context<'_>,
                     vec: &mut [&mut #io::IoVec],
                 ) -> ::core::task::Poll<::core::result::Result<usize, #io::Error>>;
             }

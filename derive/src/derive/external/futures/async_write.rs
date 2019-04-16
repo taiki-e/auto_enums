@@ -12,25 +12,25 @@ pub(crate) fn derive(data: &Data, stack: &mut Stack<ItemImpl>) -> Result<()> {
             trait AsyncWrite {
                 #[inline]
                 fn poll_write(
-                    &mut self,
-                    waker: &::core::task::Waker,
+                    self: ::core::pin::Pin<&mut Self>,
+                    cx: &mut ::core::task::Context<'_>,
                     buf: &[u8],
                 ) -> ::core::task::Poll<::core::result::Result<usize, #io::Error>>;
                 #[inline]
                 fn poll_vectored_write(
-                    &mut self,
-                    waker: &::core::task::Waker,
+                    self: ::core::pin::Pin<&mut Self>,
+                    cx: &mut ::core::task::Context<'_>,
                     vec: &[&#io::IoVec],
                 ) -> ::core::task::Poll<::core::result::Result<usize, #io::Error>>;
                 #[inline]
                 fn poll_flush(
-                    &mut self,
-                    waker: &::core::task::Waker,
+                    self: ::core::pin::Pin<&mut Self>,
+                    cx: &mut ::core::task::Context<'_>,
                 ) -> ::core::task::Poll<::core::result::Result<(), #io::Error>>;
                 #[inline]
                 fn poll_close(
-                    &mut self,
-                    waker: &::core::task::Waker,
+                    self: ::core::pin::Pin<&mut Self>,
+                    cx: &mut ::core::task::Context<'_>,
                 ) -> ::core::task::Poll<::core::result::Result<(), #io::Error>>;
             }
         }?,

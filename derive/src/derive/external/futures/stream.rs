@@ -12,7 +12,7 @@ pub(crate) fn derive(data: &Data, stack: &mut Stack<ItemImpl>) -> Result<()> {
                 #[inline]
                 fn poll_next(
                     self: ::core::pin::Pin<&mut Self>,
-                    waker: &::core::task::Waker,
+                    cx: &mut ::core::task::Context<'_>,
                 ) -> ::core::task::Poll<::core::option::Option<Self::Item>>;
             }
         }?,

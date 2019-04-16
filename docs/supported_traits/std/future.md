@@ -29,12 +29,12 @@ where
     #[inline]
     fn poll(
         self: ::core::pin::Pin<&mut Self>,
-        waker: &::core::task::Waker
+        cx: &mut ::core::task::Context<'_>,
     ) -> ::core::task::Poll<Self::Output> {
         unsafe {
             match ::core::pin::Pin::get_unchecked_mut(self) {
-                Enum::A(x) => ::core::future::Future::poll(::core::pin::Pin::new_unchecked(x), waker),
-                Enum::B(x) => ::core::future::Future::poll(::core::pin::Pin::new_unchecked(x), waker),
+                Enum::A(x) => ::core::future::Future::poll(::core::pin::Pin::new_unchecked(x), cx),
+                Enum::B(x) => ::core::future::Future::poll(::core::pin::Pin::new_unchecked(x), cx),
             }
         }
     }
