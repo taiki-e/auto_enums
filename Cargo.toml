@@ -24,15 +24,9 @@ members = [
 [badges]
 travis-ci = { repository = "taiki-e/auto_enums" }
 
-[dependencies.auto_enums_core]
-version = "0.5.5"
-path = "core"
-default-features = false
-
-[dependencies.auto_enums_derive]
-version = "0.5.5"
-path = "derive"
-default-features = false
+[dependencies]
+auto_enums_core = { version = "0.5.5", path = "core", default-features = false }
+auto_enums_derive = { version = "0.5.5", path = "derive", default-features = false }
 
 [features]
 # Default features.

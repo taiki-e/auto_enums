@@ -139,7 +139,7 @@ impl Context {
     }
 
     pub(super) fn next_expr(&mut self, expr: Expr) -> Expr {
-        self.next_expr_with_attrs(Vec::with_capacity(0), expr)
+        self.next_expr_with_attrs(Vec::new(), expr)
     }
 
     pub(super) fn next_expr_with_attrs(&mut self, attrs: Vec<Attribute>, expr: Expr) -> Expr {
@@ -269,7 +269,7 @@ impl Builder {
         Expr::Call(ExprCall {
             attrs,
             func: Box::new(Expr::Path(ExprPath {
-                attrs: Vec::with_capacity(0),
+                attrs: Vec::new(),
                 qself: None,
                 path: path(segments),
             })),

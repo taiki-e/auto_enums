@@ -91,7 +91,7 @@ impl AttrsMut for Stmt {
             Stmt::Expr(expr) | Stmt::Semi(expr, _) => expr.attrs_mut(f),
             Stmt::Local(local) => local.attrs_mut(f),
             // Stop at item bounds
-            Stmt::Item(_) => f(&mut Vec::with_capacity(0)),
+            Stmt::Item(_) => f(&mut Vec::new()),
         }
     }
 }
@@ -111,7 +111,7 @@ macro_rules! attrs_impl {
             fn attrs_mut<T, F: FnOnce(&mut Vec<Attribute>) -> T>(&mut self, f: F) -> T {
                 match self {
                     $(Expr::$Expr(expr) => f(&mut expr.attrs),)*
-                    Expr::Verbatim(_) => f(&mut Vec::with_capacity(0)),
+                    Expr::Verbatim(_) => f(&mut Vec::new()),
                 }
             }
         }

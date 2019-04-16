@@ -58,15 +58,11 @@ pub(crate) fn block(stmts: Vec<Stmt>) -> Block {
 }
 
 pub(crate) fn expr_block(block: Block) -> Expr {
-    Expr::Block(ExprBlock { attrs: Vec::with_capacity(0), label: None, block })
+    Expr::Block(ExprBlock { attrs: Vec::new(), label: None, block })
 }
 
 pub(crate) fn unit() -> Expr {
-    Expr::Tuple(ExprTuple {
-        attrs: Vec::with_capacity(0),
-        paren_token: default(),
-        elems: Punctuated::new(),
-    })
+    Expr::Tuple(ExprTuple { attrs: Vec::new(), paren_token: default(), elems: Punctuated::new() })
 }
 
 pub(crate) fn replace_expr<F: FnOnce(Expr) -> Expr>(this: &mut Expr, op: F) {
@@ -74,7 +70,7 @@ pub(crate) fn replace_expr<F: FnOnce(Expr) -> Expr>(this: &mut Expr, op: F) {
 }
 
 pub(crate) fn replace_block<F: FnOnce(Block) -> Expr>(this: &mut Block, op: F) {
-    *this = block(vec![Stmt::Expr(op(mem::replace(this, block(Vec::with_capacity(0)))))]);
+    *this = block(vec![Stmt::Expr(op(mem::replace(this, block(Vec::new()))))]);
 }
 
 // =============================================================================

@@ -19,7 +19,7 @@ travis-ci = { repository = "taiki-e/auto_enums" }
 proc-macro = true
 
 [dependencies]
-derive_utils = { version ="0.7.0" }
+derive_utils = { version = "0.7.0" }
 lazy_static = "1.2"
 proc-macro2 = "0.4.13"
 quote = "0.6.8"

@@ -29,7 +29,7 @@ pub(crate) fn ident<S: AsRef<str>>(s: S) -> Ident {
 
 pub(crate) fn param_ident(s: &str) -> GenericParam {
     GenericParam::Type(TypeParam {
-        attrs: Vec::with_capacity(0),
+        attrs: Vec::new(),
         ident: ident(s),
         colon_token: None,
         bounds: Punctuated::new(),
