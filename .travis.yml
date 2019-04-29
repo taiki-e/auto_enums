@@ -59,10 +59,16 @@ matrix:
         - rustup component add rustfmt
         - cargo fmt --all -- --check
 
+    # Allow build fail until ICE is fixed.
     - rust: nightly
       name: cargo doc
+      env: ALLOW_FAILURES=true
       script:
         - cargo doc --all --all-features --no-deps
+
+  allow_failures:
+    - rust: nightly
+      env: ALLOW_FAILURES=true
 
 before_script:
   - set -o errexit
