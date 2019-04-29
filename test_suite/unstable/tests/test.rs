@@ -5,7 +5,6 @@
         stmt_expr_attributes,
         fn_traits,
         unboxed_closures,
-        futures_api,
         iovec,
         read_initializer,
         trusted_len,

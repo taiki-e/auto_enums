@@ -6,7 +6,6 @@
         fn_traits,
         unboxed_closures,
         exact_size_is_empty,
-        futures_api,
         generator_trait,
         iovec,
         read_initializer,
