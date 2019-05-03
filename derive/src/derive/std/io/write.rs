@@ -3,12 +3,12 @@ use crate::utils::*;
 pub(crate) const NAME: &[&str] = &["Write", "io::Write"];
 
 pub(crate) fn derive(data: &Data, stack: &mut Stack<ItemImpl>) -> Result<()> {
-    #[cfg(not(feature = "iovec"))]
+    #[cfg(not(stable_1_36))]
     let vectored = quote!();
-    #[cfg(feature = "iovec")]
+    #[cfg(stable_1_36)]
     let vectored = quote! {
         #[inline]
-        fn write_vectored(&mut self, bufs: &[::std::io::IoVec<'_>]) -> ::std::io::Result<usize>;
+        fn write_vectored(&mut self, bufs: &[::std::io::IoSlice<'_>]) -> ::std::io::Result<usize>;
     };
 
     derive_trait!(

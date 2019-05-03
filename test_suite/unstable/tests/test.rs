@@ -5,7 +5,6 @@
         stmt_expr_attributes,
         fn_traits,
         unboxed_closures,
-        iovec,
         read_initializer,
         trusted_len,
         exact_size_is_empty,

@@ -73,7 +73,11 @@ serde = ["auto_enums_derive/serde"]
 
 # Implements `ExactSizeIterator::is_empty`.
 exact_size_is_empty = ["auto_enums_derive/exact_size_is_empty"]
-# Implements `io::Read::read_vectored` and `io::Write::write_vectored`.
-iovec = ["auto_enums_derive/iovec"]
 # Implements `io::Read::read_initializer`.
 read_initializer = ["auto_enums_derive/read_initializer"]
+
+# ==============================================================================
+# no-op (it is left to maintain compatibility)
+
+# Implements `io::Read::read_vectored` and `io::Write::write_vectored`.
+iovec = ["auto_enums_derive/iovec"]

@@ -8,7 +8,6 @@
         exact_size_is_empty,
         generators,
         generator_trait,
-        iovec,
         read_initializer,
         trusted_len,
         try_trait,
