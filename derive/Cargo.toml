@@ -10,7 +10,7 @@ repository = "https://github.com/taiki-e/auto_enums"
 documentation = "https://docs.rs/auto_enums_derive/"
 keywords = ["enum", "macros", "derive", "attribute"]
 categories = ["rust-patterns"]
-include = ["Cargo.toml", "src/**/*.rs", "LICENSE-APACHE", "LICENSE-MIT"]
+include = ["Cargo.toml", "build.rs", "src/**/*.rs", "LICENSE-APACHE", "LICENSE-MIT"]
 
 [badges]
 travis-ci = { repository = "taiki-e/auto_enums" }
@@ -65,9 +65,13 @@ serde = []
 
 # Implements `ExactSizeIterator::is_empty`.
 exact_size_is_empty = []
-# Implements `io::Read::read_vectored` and `io::Write::write_vectored`.
-iovec = []
 # Implements `io::Read::read_initializer`.
 read_initializer = []
 # Make iterator implementation more effective.
 try_trait = []
+
+# ==============================================================================
+# no-op (it is left to maintain compatibility)
+
+# Implements `io::Read::read_vectored` and `io::Write::write_vectored`.
+iovec = []

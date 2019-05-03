@@ -3,12 +3,12 @@ use crate::utils::*;
 pub(crate) const NAME: &[&str] = &["Read", "io::Read"];
 
 pub(crate) fn derive(data: &Data, stack: &mut Stack<ItemImpl>) -> Result<()> {
-    #[cfg(not(feature = "iovec"))]
+    #[cfg(not(stable_1_36))]
     let vectored = quote!();
-    #[cfg(feature = "iovec")]
+    #[cfg(stable_1_36)]
     let vectored = quote! {
         #[inline]
-        fn read_vectored(&mut self, bufs: &mut [::std::io::IoVecMut<'_>]) -> ::std::io::Result<usize>;
+        fn read_vectored(&mut self, bufs: &mut [::std::io::IoSliceMut<'_>]) -> ::std::io::Result<usize>;
     };
 
     #[cfg(not(feature = "read_initializer"))]

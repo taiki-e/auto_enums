@@ -7,7 +7,6 @@
         unboxed_closures,
         exact_size_is_empty,
         generator_trait,
-        iovec,
         read_initializer,
         trusted_len,
         try_trait,

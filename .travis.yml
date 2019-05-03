@@ -59,12 +59,12 @@ matrix:
         - rustup component add rustfmt
         - cargo fmt --all -- --check
 
-    # Allow build fail until ICE is fixed.
+    # Allow build fail until ICE(https://github.com/rust-lang/rust/issues/60482) is fixed.
     - rust: nightly
       name: cargo doc
       env: ALLOW_FAILURES=true
       script:
-        - cargo doc --all --all-features --no-deps
+        - RUSTDOCFLAGS=-Dwarnings cargo doc --all --all-features --no-deps
 
   allow_failures:
     - rust: nightly
