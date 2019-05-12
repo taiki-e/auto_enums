@@ -4,7 +4,7 @@
 
 * Updated to new nightly. `iovec` stabilized. `#[enum_derive]` automatically detects the rustc version and supports `Read::read_vectored` and `Write::write_vectored` as the part of `Read` and `Write`.
 
-* Support latest futures 0.3.
+* Supported for latest `futures` 0.3.0-alpha.16.
 
 # 0.5.6 - 2019-04-16
 
