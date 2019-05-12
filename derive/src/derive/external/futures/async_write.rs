@@ -17,10 +17,10 @@ pub(crate) fn derive(data: &Data, stack: &mut Stack<ItemImpl>) -> Result<()> {
                     buf: &[u8],
                 ) -> ::core::task::Poll<::core::result::Result<usize, #io::Error>>;
                 #[inline]
-                fn poll_vectored_write(
+                fn poll_write_vectored(
                     self: ::core::pin::Pin<&mut Self>,
                     cx: &mut ::core::task::Context<'_>,
-                    vec: &[&#io::IoVec],
+                    bufs: &[::std::io::IoSlice<'_>],
                 ) -> ::core::task::Poll<::core::result::Result<usize, #io::Error>>;
                 #[inline]
                 fn poll_flush(

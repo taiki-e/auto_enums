@@ -1,4 +1,4 @@
-## [`AsyncWrite`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.14/futures/io/trait.AsyncWrite.html)
+## [`AsyncWrite`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.16/futures/io/trait.AsyncWrite.html)
 
 When deriving for enum like the following:
 
@@ -37,14 +37,14 @@ where
     }
 
     #[inline]
-    fn poll_vectored_write(
+    fn poll_write_vectored(
         self: ::core::pin::Pin<&mut Self>,
         cx: &mut ::core::task::Context<'_>,
-        vec: &[&::futures::io::IoVec],
+        bufs: &[::std::io::IoSlice<'_>],
     ) -> ::core::task::Poll<::core::result::Result<usize, ::futures::io::Error>> {
         match self {
-            Enum::A(x) => ::futures::io::AsyncWrite::poll_vectored_write(x, cx, vec),
-            Enum::B(x) => ::futures::io::AsyncWrite::poll_vectored_write(x, cx, vec),
+            Enum::A(x) => ::futures::io::AsyncWrite::poll_write_vectored(x, cx, bufs),
+            Enum::B(x) => ::futures::io::AsyncWrite::poll_write_vectored(x, cx, bufs),
         }
     }
 

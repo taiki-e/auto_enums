@@ -19,10 +19,10 @@ pub(crate) fn derive(data: &Data, stack: &mut Stack<ItemImpl>) -> Result<()> {
                     buf: &mut [u8],
                 ) -> ::core::task::Poll<::core::result::Result<usize, #io::Error>>;
                 #[inline]
-                fn poll_vectored_read(
+                fn poll_read_vectored(
                     self: ::core::pin::Pin<&mut Self>,
                     cx: &mut ::core::task::Context<'_>,
-                    vec: &mut [&mut #io::IoVec],
+                    bufs: &mut [::std::io::IoSliceMut<'_>],
                 ) -> ::core::task::Poll<::core::result::Result<usize, #io::Error>>;
             }
         }?,

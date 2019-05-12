@@ -75,7 +75,8 @@ mod enum_derive {
             futures::Stream,
             futures::Sink,
             futures::AsyncRead,
-            futures::AsyncWrite
+            futures::AsyncWrite,
+            // futures::AsyncBufRead TODO
         )]
         enum Enum1<A, B> {
             A(A),

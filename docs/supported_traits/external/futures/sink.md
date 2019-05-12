@@ -1,4 +1,4 @@
-## [`Sink`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.14/futures/sink/trait.Sink.html)
+## [`Sink`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.16/futures/sink/trait.Sink.html)
 
 When deriving for enum like the following:
 
