@@ -48,7 +48,7 @@ matrix:
       script:
         - if rustup component add clippy;
           then
-            cargo clippy --all --all-features -- -Dwarnings;
+            cargo clippy --all --all-features;
           else
             echo 'Skipping clippy';
           fi
@@ -69,6 +69,9 @@ matrix:
   allow_failures:
     - rust: nightly
       env: ALLOW_FAILURES=true
+
+env:
+  - RUSTFLAGS="-D warnings"
 
 before_script:
   - set -o errexit

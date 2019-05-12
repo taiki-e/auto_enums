@@ -1,9 +1,7 @@
 use std::cell::RefCell;
 
 use proc_macro2::{Ident, TokenStream};
-use quote::{quote, ToTokens};
-use rand_core::{RngCore, SeedableRng};
-use rand_xorshift::XorShiftRng;
+use quote::ToTokens;
 use smallvec::{smallvec, SmallVec};
 use syn::{Attribute, Expr, ExprCall, ExprPath, ItemEnum, Macro, Result};
 
@@ -13,15 +11,6 @@ use super::{
     visitor::{Dummy, FindTry, Visitor},
     *,
 };
-
-fn xorshift_rng() -> XorShiftRng {
-    const SEED: [u8; 16] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
-    XorShiftRng::from_seed(SEED)
-}
-
-thread_local! {
-    static RNG: RefCell<XorShiftRng> = RefCell::new(xorshift_rng());
-}
 
 // =============================================================================
 // Context
@@ -249,7 +238,7 @@ struct Builder {
 impl Builder {
     fn new() -> Self {
         Self {
-            ident: format!("___Enum{}", RNG.with(|rng| rng.borrow_mut().next_u32())),
+            ident: format!("___Enum{}", RNG.with(|rng| rng.borrow_mut().next())),
             variants: Stack::new(),
         }
     }
@@ -284,12 +273,60 @@ impl Builder {
         let variants = self.iter();
         let fields = self.iter();
 
-        syn::parse2(quote! {
+        syn::parse_quote! {
             #[::auto_enums::enum_derive(#(#args),*)]
             enum #ident<#(#ty_generics),*> {
                 #(#variants(#fields),)*
             }
-        })
-        .unwrap_or_else(|_| unreachable!()) // If this fails, it's definitely a bug.
+        }
+    }
+}
+
+// =============================================================================
+// RNG
+
+thread_local! {
+    static RNG: RefCell<XorShift64Star> = RefCell::new(XorShift64Star::new());
+}
+
+// https://github.com/rayon-rs/rayon/blob/rayon-core-v1.4.1/rayon-core/src/registry.rs#L712-L750
+
+use std::{
+    cell::Cell,
+    collections::hash_map::DefaultHasher,
+    hash::Hasher,
+    sync::atomic::{AtomicUsize, Ordering},
+};
+
+/// [xorshift*] is a fast pseudorandom number generator which will
+/// even tolerate weak seeding, as long as it's not zero.
+///
+/// [xorshift*]: https://en.wikipedia.org/wiki/Xorshift#xorshift*
+struct XorShift64Star {
+    state: Cell<u64>,
+}
+
+impl XorShift64Star {
+    fn new() -> Self {
+        // Any non-zero seed will do -- this uses the hash of a global counter.
+        let mut seed = 0;
+        while seed == 0 {
+            static COUNTER: AtomicUsize = AtomicUsize::new(0);
+            let mut hasher = DefaultHasher::new();
+            hasher.write_usize(COUNTER.fetch_add(1, Ordering::Relaxed));
+            seed = hasher.finish();
+        }
+
+        Self { state: Cell::new(seed) }
+    }
+
+    fn next(&self) -> u64 {
+        let mut x = self.state.get();
+        debug_assert_ne!(x, 0);
+        x ^= x >> 12;
+        x ^= x << 25;
+        x ^= x >> 27;
+        self.state.set(x);
+        x.wrapping_mul(0x2545_f491_4f6c_dd1d)
     }
 }
