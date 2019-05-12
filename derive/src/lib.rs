@@ -5,6 +5,7 @@
 #![deny(clippy::all, clippy::pedantic)]
 #![warn(single_use_lifetimes)]
 #![warn(clippy::nursery)]
+#![allow(clippy::identity_conversion)] // https://github.com/rust-lang/rust-clippy/issues/4081
 
 extern crate proc_macro;
 
