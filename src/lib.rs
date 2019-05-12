@@ -830,9 +830,9 @@
 #![recursion_limit = "256"]
 #![doc(html_root_url = "https://docs.rs/auto_enums/0.5.6")]
 #![no_std]
-#![deny(unsafe_code)]
-#![deny(rust_2018_idioms, unreachable_pub)]
-#![deny(clippy::all, clippy::pedantic)]
+#![warn(unsafe_code)]
+#![warn(rust_2018_idioms, unreachable_pub)]
+#![warn(clippy::all, clippy::pedantic)]
 #![warn(single_use_lifetimes)]
 #![warn(clippy::nursery)]
 

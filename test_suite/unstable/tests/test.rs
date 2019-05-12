@@ -11,8 +11,7 @@
         try_trait,
     )
 )]
-#![deny(warnings)]
-#![deny(rust_2018_idioms)]
+#![warn(rust_2018_idioms)]
 #![allow(unused_imports)]
 
 #[cfg(feature = "unstable")]
