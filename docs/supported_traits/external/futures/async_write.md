@@ -30,9 +30,11 @@ where
         cx: &mut ::core::task::Context<'_>,
         buf: &[u8],
     ) -> ::core::task::Poll<::core::result::Result<usize, ::futures::io::Error>> {
-        match self {
-            Enum::A(x) => ::futures::io::AsyncWrite::poll_write(x, cx, buf),
-            Enum::B(x) => ::futures::io::AsyncWrite::poll_write(x, cx, buf),
+        unsafe {
+            match ::core::pin::Pin::get_unchecked_mut(self) {
+                Enum::A(x) => ::futures::io::AsyncWrite::poll_write(x, cx, buf),
+                Enum::B(x) => ::futures::io::AsyncWrite::poll_write(x, cx, buf),
+            }
         }
     }
 
@@ -42,9 +44,11 @@ where
         cx: &mut ::core::task::Context<'_>,
         bufs: &[::std::io::IoSlice<'_>],
     ) -> ::core::task::Poll<::core::result::Result<usize, ::futures::io::Error>> {
-        match self {
-            Enum::A(x) => ::futures::io::AsyncWrite::poll_write_vectored(x, cx, bufs),
-            Enum::B(x) => ::futures::io::AsyncWrite::poll_write_vectored(x, cx, bufs),
+        unsafe {
+            match ::core::pin::Pin::get_unchecked_mut(self) {
+                Enum::A(x) => ::futures::io::AsyncWrite::poll_write_vectored(x, cx, bufs),
+                Enum::B(x) => ::futures::io::AsyncWrite::poll_write_vectored(x, cx, bufs),
+            }
         }
     }
 
@@ -53,9 +57,11 @@ where
         self: ::core::pin::Pin<&mut Self>,
         cx: &mut ::core::task::Context<'_>,
     ) -> ::core::task::Poll<::core::result::Result<(), ::futures::io::Error>> {
-        match self {
-            Enum::A(x) => ::futures::io::AsyncWrite::poll_flush(x, cx),
-            Enum::B(x) => ::futures::io::AsyncWrite::poll_flush(x, cx),
+        unsafe {
+            match ::core::pin::Pin::get_unchecked_mut(self) {
+                Enum::A(x) => ::futures::io::AsyncWrite::poll_flush(x, cx),
+                Enum::B(x) => ::futures::io::AsyncWrite::poll_flush(x, cx),
+            }
         }
     }
 
@@ -64,9 +70,11 @@ where
         self: ::core::pin::Pin<&mut Self>,
         cx: &mut ::core::task::Context<'_>,
     ) -> ::core::task::Poll<::core::result::Result<(), ::futures::io::Error>> {
-        match self {
-            Enum::A(x) => ::futures::io::AsyncWrite::poll_close(x, cx),
-            Enum::B(x) => ::futures::io::AsyncWrite::poll_close(x, cx),
+        unsafe {
+            match ::core::pin::Pin::get_unchecked_mut(self) {
+                Enum::A(x) => ::futures::io::AsyncWrite::poll_close(x, cx),
+                Enum::B(x) => ::futures::io::AsyncWrite::poll_close(x, cx),
+            }
         }
     }
 }

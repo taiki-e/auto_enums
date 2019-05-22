@@ -12,7 +12,7 @@ pub(crate) fn derive(data: &Data, stack: &mut Stack<ItemImpl>) -> Result<()> {
             trait AsyncBufRead {
                 #[inline]
                 fn poll_fill_buf<'__a>(
-                    self: Pin<&'__a mut Self>,
+                    self: ::core::pin::Pin<&'__a mut Self>,
                     cx: &mut ::core::task::Context<'_>,
                 ) -> ::core::task::Poll<::core::result::Result<&'__a [u8], #io::Error>>;
                 #[inline]

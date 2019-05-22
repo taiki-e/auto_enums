@@ -1,5 +1,7 @@
 # Unreleased
 
+* Added support for `futures::io::{AsyncSeek, AsyncBufRead}`.
+
 # 0.5.7 - 2019-05-12
 
 * Updated to new nightly. `iovec` stabilized. `#[enum_derive]` automatically detects the rustc version and supports `Read::read_vectored` and `Write::write_vectored` as the part of `Read` and `Write`.
@@ -90,7 +92,7 @@
 
 # 0.3.4 - 2019-01-06
 
-* Added support for `futures::AsyncRead` and `futures::AsyncWrite`.
+* Added support for `futures::{AsyncRead, AsyncWrite}`.
 
 # 0.3.3 - 2019-01-04
 

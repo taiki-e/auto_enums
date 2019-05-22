@@ -38,9 +38,11 @@ where
         cx: &mut ::core::task::Context<'_>,
         buf: &mut [u8],
     ) -> ::core::task::Poll<::core::result::Result<usize, ::futures::io::Error>> {
-        match ::core::pin::Pin::get_unchecked_mut(self) {
-            Enum::A(x) => ::futures::io::AsyncRead::poll_read(::core::pin::Pin::new_unchecked(x), cx, buf),
-            Enum::B(x) => ::futures::io::AsyncRead::poll_read(::core::pin::Pin::new_unchecked(x), cx, buf),
+        unsafe {
+            match ::core::pin::Pin::get_unchecked_mut(self) {
+                Enum::A(x) => ::futures::io::AsyncRead::poll_read(::core::pin::Pin::new_unchecked(x), cx, buf),
+                Enum::B(x) => ::futures::io::AsyncRead::poll_read(::core::pin::Pin::new_unchecked(x), cx, buf),
+            }
         }
     }
 
@@ -50,9 +52,11 @@ where
         cx: &mut ::core::task::Context<'_>,
         bufs: &mut [::std::io::IoSliceMut<'_>],
     ) -> ::core::task::Poll<::core::result::Result<usize, ::futures::io::Error>> {
-        match ::core::pin::Pin::get_unchecked_mut(self) {
-            Enum::A(x) => ::futures::io::AsyncRead::poll_read_vectored(::core::pin::Pin::new_unchecked(x), cx, bufs),
-            Enum::B(x) => ::futures::io::AsyncRead::poll_read_vectored(::core::pin::Pin::new_unchecked(x), cx, bufs),
+        unsafe {
+            match ::core::pin::Pin::get_unchecked_mut(self) {
+                Enum::A(x) => ::futures::io::AsyncRead::poll_read_vectored(::core::pin::Pin::new_unchecked(x), cx, bufs),
+                Enum::B(x) => ::futures::io::AsyncRead::poll_read_vectored(::core::pin::Pin::new_unchecked(x), cx, bufs),
+            }
         }
     }
 }

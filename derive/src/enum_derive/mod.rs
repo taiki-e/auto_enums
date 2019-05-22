@@ -160,9 +160,10 @@ lazy_static! {
             external::futures::async_read,
             #[cfg(feature = "futures")]
             external::futures::async_write,
-            // TODO
-            // #[cfg(feature = "futures")]
-            // external::futures::async_buf_read,
+            #[cfg(feature = "futures")]
+            external::futures::async_seek,
+            #[cfg(feature = "futures")]
+            external::futures::async_buf_read,
             // futures01
             #[cfg(feature = "futures01")]
             external::futures01::future,
