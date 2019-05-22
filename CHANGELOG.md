@@ -1,5 +1,7 @@
 # Unreleased
 
+# 0.5.8 - 2019-05-22
+
 * Added support for `futures::io::{AsyncSeek, AsyncBufRead}`.
 
 # 0.5.7 - 2019-05-12
