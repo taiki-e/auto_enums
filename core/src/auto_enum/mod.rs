@@ -26,11 +26,11 @@ use self::traits::*;
 /// The attribute name.
 const NAME: &str = "auto_enum";
 /// The annotation for recursively parsing.
-const REC: &str = "rec";
+const NESTED: &str = "nested";
 /// The annotation for skipping branch.
 const NEVER: &str = "never";
 /// The annotations used by `#[auto_enum]`.
-const EMPTY_ATTRS: &[&str] = &[NEVER, REC];
+const EMPTY_ATTRS: &[&str] = &[NEVER, NESTED];
 
 pub(crate) fn attribute(args: TokenStream, input: TokenStream) -> TokenStream {
     expand(args, input).unwrap_or_else(|e| e.to_compile_error())

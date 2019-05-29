@@ -389,7 +389,7 @@ fn stable_1_30() {
     fn rec_match_in_match(x: usize) -> impl Iterator<Item = i32> {
         match x {
             0 => 1..8,
-            #[rec]
+            #[nested]
             n if n > 3 => match x {
                 2..=10 => (1..x as _).map(|x| x - 1),
                 _ => 2..=10,
@@ -408,7 +408,7 @@ fn stable_1_30() {
         {{{ unsafe {{{ unsafe { unsafe {{
             match x {
                 0 => 1..8,
-                #[rec]
+                #[nested]
                 n if n > 3 => {{{ unsafe {{
                     if x > 10 {
                         (-10..=x as _).map(|x| x - 4)
@@ -429,7 +429,7 @@ fn stable_1_30() {
         if x == 0 {
             1..8
         } else if x > 3 {
-            #[rec]
+            #[nested]
             match x {
                 1..=4 => 2..=10,
                 _ => (11..20).map(|x| x - 1),
@@ -447,7 +447,7 @@ fn stable_1_30() {
         if x == 0 {
             1..8
         } else if x > 3 {
-            #[rec]
+            #[nested]
             {
                 if x > 4 {
                     2..=10
@@ -468,7 +468,7 @@ fn stable_1_30() {
         if x == 0 {
             1..8
         } else if x > 3 {
-            #[rec]
+            #[nested]
             2..=10
         } else {
             (0..2).map(|x| x + 1)
@@ -482,7 +482,7 @@ fn stable_1_30() {
     fn rec_no_return(x: usize) -> impl Iterator<Item = i32> {
         match x {
             0 => 1..8,
-            #[rec]
+            #[nested]
             3 => panic!(),
             _ => (0..2).map(|x| x + 1),
         }
@@ -638,7 +638,7 @@ fn nightly() {
     for i in 0..2 {
         #[auto_enum(Iterator)]
         let iter = if i > 3 {
-            #[rec]
+            #[nested]
             match i {
                 1..=10 => (1..3).map(|x| x + 1),
                 11..=20 => 4..=5,

@@ -419,7 +419,7 @@
 //!
 //! ### Parse nested branches
 //!
-//! You can parse nested branches by `#[rec]` attribute.
+//! You can parse nested branches by `#[nested]` attribute.
 //!
 //! ```rust
 //! # #![deny(warnings)]
@@ -429,7 +429,7 @@
 //! fn foo(x: i32) -> impl Iterator<Item = i32> {
 //!     match x {
 //!         0 => 1..10,
-//!         #[rec]
+//!         #[nested]
 //!         _ => match x {
 //!             1 => vec![5, 10].into_iter(),
 //!             _ => 0..=x,

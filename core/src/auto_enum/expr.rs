@@ -150,7 +150,7 @@ pub(super) fn child_expr(expr: &mut Expr, cx: &mut super::Context) -> Result<()>
                 cx,
                 Ok(()),
                 |expr, cx| {
-                    if expr.any_empty_attr(REC) {
+                    if expr.any_empty_attr(NESTED) {
                         cx.rec = true;
                     }
                     !is_unreachable(expr, cx)
@@ -204,7 +204,7 @@ impl VisitLast<()> for ExprMatch {
         fn skip(arm: &mut Arm, cx: &mut Context<'_>) -> Result<bool> {
             Ok(arm.any_empty_attr(NEVER)
                 || is_unreachable(&*arm.body, cx)
-                || ((arm.any_empty_attr(REC) || cx.rec) && arm.body.visit_last(cx)?))
+                || ((arm.any_empty_attr(NESTED) || cx.rec) && arm.body.visit_last(cx)?))
         }
 
         self.arms.iter_mut().try_for_each(|arm| {
@@ -227,7 +227,7 @@ impl VisitLast<()> for ExprIf {
                 _ => true,
             } || match last {
                 Some(Stmt::Expr(expr)) => {
-                    (expr.any_empty_attr(REC) || cx.rec) && expr.visit_last(cx)?
+                    (expr.any_empty_attr(NESTED) || cx.rec) && expr.visit_last(cx)?
                 }
                 _ => true,
             })
