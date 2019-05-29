@@ -5,7 +5,7 @@ use syn::{
     *,
 };
 
-use crate::utils::{default, expr_block, replace_block, replace_expr, OptionExt};
+use crate::utils::{expr_block, replace_block, replace_expr, OptionExt};
 
 use super::*;
 
@@ -209,7 +209,7 @@ impl VisitLast<()> for ExprMatch {
 
         self.arms.iter_mut().try_for_each(|arm| {
             if !skip(arm, cx)? {
-                arm.comma = Some(default());
+                arm.comma = Some(token::Comma::default());
                 replace_expr(&mut *arm.body, |x| cx.next_expr(x));
             }
 

@@ -3,8 +3,8 @@ use std::mem;
 use proc_macro2::{Ident, Span, TokenStream};
 use smallvec::SmallVec;
 use syn::{
-    punctuated::Punctuated, Block, Expr, ExprBlock, ExprTuple, ExprVerbatim, Path, PathSegment,
-    Stmt,
+    punctuated::Punctuated, token, Block, Expr, ExprBlock, ExprTuple, ExprVerbatim, Path,
+    PathSegment, Stmt,
 };
 
 pub(crate) type Stack<T> = SmallVec<[T; 4]>;
@@ -41,10 +41,6 @@ impl<T> VecExt<T> for Vec<T> {
 // =============================================================================
 // Functions
 
-pub(crate) fn default<T: Default>() -> T {
-    T::default()
-}
-
 pub(crate) fn ident<S: AsRef<str>>(s: S) -> Ident {
     Ident::new(s.as_ref(), Span::call_site())
 }
@@ -54,7 +50,7 @@ pub(crate) fn path<I: IntoIterator<Item = PathSegment>>(segments: I) -> Path {
 }
 
 pub(crate) fn block(stmts: Vec<Stmt>) -> Block {
-    Block { brace_token: default(), stmts }
+    Block { brace_token: token::Brace::default(), stmts }
 }
 
 pub(crate) fn expr_block(block: Block) -> Expr {
@@ -62,7 +58,11 @@ pub(crate) fn expr_block(block: Block) -> Expr {
 }
 
 pub(crate) fn unit() -> Expr {
-    Expr::Tuple(ExprTuple { attrs: Vec::new(), paren_token: default(), elems: Punctuated::new() })
+    Expr::Tuple(ExprTuple {
+        attrs: Vec::new(),
+        paren_token: token::Paren::default(),
+        elems: Punctuated::new(),
+    })
 }
 
 pub(crate) fn replace_expr<F: FnOnce(Expr) -> Expr>(this: &mut Expr, op: F) {

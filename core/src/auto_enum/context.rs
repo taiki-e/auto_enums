@@ -3,9 +3,9 @@ use std::cell::RefCell;
 use proc_macro2::{Ident, TokenStream};
 use quote::ToTokens;
 use smallvec::{smallvec, SmallVec};
-use syn::{Attribute, Expr, ExprCall, ExprPath, ItemEnum, Macro, Result};
+use syn::{token, Attribute, Expr, ExprCall, ExprPath, ItemEnum, Macro, Result};
 
-use crate::utils::{default, ident, path, Stack};
+use crate::utils::{ident, path, Stack};
 
 use super::{
     visitor::{Dummy, FindTry, Visitor},
@@ -262,7 +262,7 @@ impl Builder {
                 qself: None,
                 path: path(segments),
             })),
-            paren_token: default(),
+            paren_token: token::Paren::default(),
             args: Some(expr).into_iter().collect(),
         })
     }
