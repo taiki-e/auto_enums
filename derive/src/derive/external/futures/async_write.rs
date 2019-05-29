@@ -2,7 +2,7 @@ use crate::utils::*;
 
 pub(crate) const NAME: &[&str] = &["futures::AsyncWrite"];
 
-pub(crate) fn derive(data: &Data, stack: &mut Stack<ItemImpl>) -> Result<()> {
+pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
     let io = quote!(::futures::io);
 
     derive_trait!(
@@ -35,5 +35,5 @@ pub(crate) fn derive(data: &Data, stack: &mut Stack<ItemImpl>) -> Result<()> {
             }
         }?,
     )
-    .map(|item| stack.push(item))
+    .map(|item| items.push(item))
 }

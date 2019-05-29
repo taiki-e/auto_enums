@@ -2,7 +2,7 @@ use crate::utils::*;
 
 pub(crate) const NAME: &[&str] = &["BufRead", "io::BufRead"];
 
-pub(crate) fn derive(data: &Data, stack: &mut Stack<ItemImpl>) -> Result<()> {
+pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
     derive_trait!(
         data,
         parse_quote!(::std::io::BufRead)?,
@@ -19,5 +19,5 @@ pub(crate) fn derive(data: &Data, stack: &mut Stack<ItemImpl>) -> Result<()> {
             }
         }?,
     )
-    .map(|item| stack.push(item))
+    .map(|item| items.push(item))
 }

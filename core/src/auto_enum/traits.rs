@@ -7,14 +7,14 @@ use crate::utils::*;
 
 use super::Arg;
 
-pub(super) fn collect_impl_traits(args: &mut Stack<Arg>, ty: &mut Type) {
+pub(super) fn collect_impl_traits(args: &mut Vec<Arg>, ty: &mut Type) {
     if let Some(traits) = collect(ty) {
         parse(args, traits);
     }
 }
 
-fn collect(ty: &mut Type) -> Option<Stack<Path>> {
-    let mut traits = Stack::new();
+fn collect(ty: &mut Type) -> Option<Vec<Path>> {
+    let mut traits = Vec::new();
     ImplTraits::new(&mut traits).visit_type_mut(ty);
 
     if traits.is_empty() {
@@ -24,7 +24,7 @@ fn collect(ty: &mut Type) -> Option<Stack<Path>> {
     }
 }
 
-fn parse(args: &mut Stack<Arg>, traits: Stack<Path>) {
+fn parse(args: &mut Vec<Arg>, traits: Vec<Path>) {
     traits.into_iter().map(Arg::from).for_each(|t| {
         if !args.contains(&t) && TRAITS.contains(&&*t.to_trimed_string()) {
             args.push(t);
@@ -33,11 +33,11 @@ fn parse(args: &mut Stack<Arg>, traits: Stack<Path>) {
 }
 
 struct ImplTraits<'a> {
-    traits: &'a mut Stack<Path>,
+    traits: &'a mut Vec<Path>,
 }
 
 impl<'a> ImplTraits<'a> {
-    fn new(traits: &'a mut Stack<Path>) -> Self {
+    fn new(traits: &'a mut Vec<Path>) -> Self {
         Self { traits }
     }
 }

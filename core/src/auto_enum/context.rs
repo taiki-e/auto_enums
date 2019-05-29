@@ -2,10 +2,9 @@ use std::cell::RefCell;
 
 use proc_macro2::{Ident, TokenStream};
 use quote::ToTokens;
-use smallvec::{smallvec, SmallVec};
 use syn::{token, Attribute, Expr, ExprCall, ExprPath, ItemEnum, Macro, Result};
 
-use crate::utils::{ident, path, Stack};
+use crate::utils::{ident, path};
 
 use super::{
     visitor::{Dummy, FindTry, Visitor},
@@ -42,7 +41,7 @@ pub(super) enum VisitLastMode {
 pub(super) struct Context {
     /// Span passed to `syn::Error::new_spanned`.
     span: Option<TokenStream>,
-    pub(super) args: Stack<Arg>,
+    pub(super) args: Vec<Arg>,
     builder: Builder,
     pub(super) marker: Marker,
     // pub(super) depth: usize,
@@ -57,7 +56,7 @@ pub(super) struct Context {
 impl Context {
     fn new<T: ToTokens>(
         span: T,
-        args: Stack<Arg>,
+        args: Vec<Arg>,
         marker: Option<String>,
         never: bool,
         root: bool,
@@ -78,14 +77,14 @@ impl Context {
 
     pub(super) fn root<T: ToTokens>(
         span: T,
-        (args, marker, never): (Stack<Arg>, Option<String>, bool),
+        (args, marker, never): (Vec<Arg>, Option<String>, bool),
     ) -> Self {
         Self::new(span, args, marker, never, true)
     }
 
     pub(super) fn child<T: ToTokens>(
         span: T,
-        (args, marker, never): (Stack<Arg>, Option<String>, bool),
+        (args, marker, never): (Vec<Arg>, Option<String>, bool),
     ) -> Self {
         Self::new(span, args, marker, never, false)
     }
@@ -232,14 +231,14 @@ impl Marker {
 
 struct Builder {
     ident: String,
-    variants: Stack<String>,
+    variants: Vec<String>,
 }
 
 impl Builder {
     fn new() -> Self {
         Self {
             ident: format!("___Enum{}", RNG.with(|rng| rng.borrow_mut().next())),
-            variants: Stack::new(),
+            variants: Vec::new(),
         }
     }
 
@@ -250,8 +249,8 @@ impl Builder {
     fn next_expr(&mut self, attrs: Vec<Attribute>, expr: Expr) -> Expr {
         let variant = format!("___Variant{}", self.variants.len());
 
-        let segments: SmallVec<[_; 2]> =
-            smallvec![ident(&self.ident).into(), ident(&variant).into()];
+        let segments =
+            Some(ident(&self.ident).into()).into_iter().chain(Some(ident(&variant).into()));
 
         self.variants.push(variant);
 

@@ -1,14 +1,11 @@
 use std::ops::Deref;
 
 use proc_macro2::{Ident, Span, TokenStream};
-use smallvec::SmallVec;
 use syn::{punctuated::Punctuated, *};
 
 pub(crate) use derive_utils::{derive_trait_internal as derive_trait, EnumData, Trait};
 pub(crate) use quote::{quote, ToTokens};
 pub(crate) use syn::{parse2, ItemImpl, Result};
-
-pub(crate) type Stack<T> = SmallVec<[T; 4]>;
 
 pub(crate) struct Data {
     pub(crate) data: EnumData,

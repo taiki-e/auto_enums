@@ -1,13 +1,10 @@
 use std::mem;
 
 use proc_macro2::{Ident, Span, TokenStream};
-use smallvec::SmallVec;
 use syn::{
     punctuated::Punctuated, token, Block, Expr, ExprBlock, ExprTuple, ExprVerbatim, Path,
     PathSegment, Stmt,
 };
-
-pub(crate) type Stack<T> = SmallVec<[T; 4]>;
 
 // =============================================================================
 // Extension traits

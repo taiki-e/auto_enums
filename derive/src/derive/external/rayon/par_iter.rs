@@ -2,7 +2,7 @@ use crate::utils::*;
 
 pub(crate) const NAME: &[&str] = &["rayon::ParallelIterator"];
 
-pub(crate) fn derive(data: &Data, stack: &mut Stack<ItemImpl>) -> Result<()> {
+pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
     let iter = quote!(::rayon::iter);
 
     derive_trait!(
@@ -20,5 +20,5 @@ pub(crate) fn derive(data: &Data, stack: &mut Stack<ItemImpl>) -> Result<()> {
             }
         }?,
     )
-    .map(|item| stack.push(item))
+    .map(|item| items.push(item))
 }

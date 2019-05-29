@@ -2,7 +2,7 @@ use crate::utils::*;
 
 pub(crate) const NAME: &[&str] = &["quote::ToTokens"];
 
-pub(crate) fn derive(data: &Data, stack: &mut Stack<ItemImpl>) -> Result<()> {
+pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
     let crate_ = quote!(::quote);
 
     derive_trait!(
@@ -17,5 +17,5 @@ pub(crate) fn derive(data: &Data, stack: &mut Stack<ItemImpl>) -> Result<()> {
             }
         }?,
     )
-    .map(|item| stack.push(item))
+    .map(|item| items.push(item))
 }

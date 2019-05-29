@@ -2,7 +2,7 @@ use crate::utils::*;
 
 pub(crate) const NAME: &[&str] = &["Iterator"];
 
-pub(crate) fn derive(data: &Data, stack: &mut Stack<ItemImpl>) -> Result<()> {
+pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
     #[cfg(feature = "try_trait")]
     let try_trait = quote! {
         #[inline]
@@ -68,5 +68,5 @@ pub(crate) fn derive(data: &Data, stack: &mut Stack<ItemImpl>) -> Result<()> {
             }
         }?,
     )
-    .map(|item| stack.push(item))
+    .map(|item| items.push(item))
 }

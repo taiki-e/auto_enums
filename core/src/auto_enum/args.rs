@@ -1,9 +1,6 @@
 use proc_macro2::{token_stream::IntoIter, Delimiter, Group, Ident, TokenStream, TokenTree};
 use quote::ToTokens;
-use smallvec::smallvec;
 use syn::{Path, Result};
-
-use crate::utils::Stack;
 
 // =============================================================================
 // Arg
@@ -80,17 +77,17 @@ macro_rules! arg_err {
     };
 }
 
-pub(super) fn parse_group(group: TokenStream) -> Result<(Stack<Arg>, Option<String>, bool)> {
+pub(super) fn parse_group(group: TokenStream) -> Result<(Vec<Arg>, Option<String>, bool)> {
     syn::parse2::<Group>(group)
         .map_err(|e| arg_err!(e))
         .and_then(|group| parse_args(group.stream()))
 }
 
-pub(super) fn parse_args(args: TokenStream) -> Result<(Stack<Arg>, Option<String>, bool)> {
+pub(super) fn parse_args(args: TokenStream) -> Result<(Vec<Arg>, Option<String>, bool)> {
     const ERR: &str = "expected one of `,`, `::`, or identifier, found ";
 
     let mut iter = args.into_iter();
-    let mut args = Stack::new();
+    let mut args = Vec::new();
     let mut marker = None;
     let mut never = false;
     while let Some(tt) = iter.next() {
@@ -116,7 +113,7 @@ pub(super) fn parse_args(args: TokenStream) -> Result<(Stack<Arg>, Option<String
             },
             TokenTree::Punct(p) => match p.as_char() {
                 ',' => {}
-                ':' => args.push(parse_path(smallvec![p.into()], &mut iter)?),
+                ':' => args.push(parse_path(vec![p.into()], &mut iter)?),
                 _ => arg_err!(p, "{}`{}`", ERR, p)?,
             },
             _ => arg_err!(tt, "{}`{}`", ERR, tt)?,
@@ -126,7 +123,7 @@ pub(super) fn parse_args(args: TokenStream) -> Result<(Stack<Arg>, Option<String
     Ok((args, marker, never))
 }
 
-fn parse_path(mut path: Stack<TokenTree>, iter: &mut IntoIter) -> Result<Arg> {
+fn parse_path(mut path: Vec<TokenTree>, iter: &mut IntoIter) -> Result<Arg> {
     for tt in iter {
         match tt {
             TokenTree::Punct(ref p) if p.as_char() == ',' => break,
@@ -144,7 +141,7 @@ fn path_or_ident(ident: Ident, tt: Option<TokenTree>, iter: &mut IntoIter) -> Re
         None => Ok(Arg::Ident(ident)),
         Some(TokenTree::Punct(p)) => match p.as_char() {
             ',' => Ok(Arg::Ident(ident)),
-            ':' => parse_path(smallvec![ident.into(), p.into()], iter),
+            ':' => parse_path(vec![ident.into(), p.into()], iter),
             _ => arg_err!(p, "{}`{}`", ERR, p),
         },
         Some(tt) => arg_err!(tt, "{}`{}`", ERR, tt),
@@ -154,7 +151,7 @@ fn path_or_ident(ident: Ident, tt: Option<TokenTree>, iter: &mut IntoIter) -> Re
 fn marker_opt(
     ident: Ident,
     iter: &mut IntoIter,
-    args: &mut Stack<Arg>,
+    args: &mut Vec<Arg>,
     marker: &mut Option<String>,
 ) -> Result<()> {
     match iter.next() {

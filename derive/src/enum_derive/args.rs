@@ -1,9 +1,6 @@
 use proc_macro2::{token_stream::IntoIter, Ident, TokenStream, TokenTree};
 use quote::ToTokens;
-use smallvec::smallvec;
 use syn::{Path, Result};
-
-use crate::utils::Stack;
 
 // =============================================================================
 // Arg
@@ -46,21 +43,21 @@ macro_rules! arg_err {
     };
 }
 
-pub(super) fn parse_args(args: TokenStream) -> Result<Stack<(String, Arg)>> {
-    fn push(args: &mut Stack<(String, Arg)>, arg: Arg) {
+pub(super) fn parse_args(args: TokenStream) -> Result<Vec<(String, Arg)>> {
+    fn push(args: &mut Vec<(String, Arg)>, arg: Arg) {
         args.push((arg.to_trimed_string(), arg))
     }
 
     const ERR: &str = "expected one of `,`, `::`, or identifier, found ";
 
     let mut iter = args.into_iter();
-    let mut args = Stack::new();
+    let mut args = Vec::new();
     while let Some(tt) = iter.next() {
         match tt {
             TokenTree::Ident(i) => push(&mut args, path_or_ident(i, iter.next(), &mut iter)?),
             TokenTree::Punct(p) => match p.as_char() {
                 ',' => {}
-                ':' => push(&mut args, parse_path(smallvec![p.into()], &mut iter)?),
+                ':' => push(&mut args, parse_path(vec![p.into()], &mut iter)?),
                 _ => Err(arg_err!(p, "{}`{}`", ERR, p))?,
             },
             _ => Err(arg_err!(tt, "{}`{}`", ERR, tt))?,
@@ -70,7 +67,7 @@ pub(super) fn parse_args(args: TokenStream) -> Result<Stack<(String, Arg)>> {
     Ok(args)
 }
 
-fn parse_path(mut path: Stack<TokenTree>, iter: &mut IntoIter) -> Result<Arg> {
+fn parse_path(mut path: Vec<TokenTree>, iter: &mut IntoIter) -> Result<Arg> {
     for tt in iter {
         match tt {
             TokenTree::Punct(ref p) if p.as_char() == ',' => break,
@@ -88,7 +85,7 @@ fn path_or_ident(ident: Ident, tt: Option<TokenTree>, iter: &mut IntoIter) -> Re
         None => Ok(Arg::Ident(ident)),
         Some(TokenTree::Punct(p)) => match p.as_char() {
             ',' => Ok(Arg::Ident(ident)),
-            ':' => parse_path(smallvec![ident.into(), p.into()], iter),
+            ':' => parse_path(vec![ident.into(), p.into()], iter),
             _ => Err(arg_err!(p, "{}`{}`", ERR, p)),
         },
         Some(tt) => Err(arg_err!(tt, "{}`{}`", ERR, tt)),

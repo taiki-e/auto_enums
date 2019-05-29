@@ -2,7 +2,7 @@ use crate::utils::*;
 
 pub(crate) const NAME: &[&str] = &["FusedIterator"];
 
-pub(crate) fn derive(data: &Data, stack: &mut Stack<ItemImpl>) -> Result<()> {
+pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
     derive_trait!(
         data,
         Some(ident("Item")),
@@ -11,5 +11,5 @@ pub(crate) fn derive(data: &Data, stack: &mut Stack<ItemImpl>) -> Result<()> {
             trait FusedIterator: ::core::iter::Iterator {}
         }?,
     )
-    .map(|item| stack.push(item))
+    .map(|item| items.push(item))
 }
