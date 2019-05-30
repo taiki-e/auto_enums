@@ -17,8 +17,9 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 #![cfg_attr(all(not(feature = "std"), feature = "unstable"), feature(alloc))]
 #![warn(rust_2018_idioms)]
+#![warn(clippy::all)]
 #![allow(ellipsis_inclusive_range_patterns)] // syn generates both as `...`.
-#![allow(unused_imports)]
+#![allow(clippy::cognitive_complexity, clippy::needless_return, clippy::never_loop)]
 
 #[cfg(all(not(feature = "std"), feature = "unstable"))]
 #[macro_use]
@@ -38,8 +39,8 @@ fn stable_1_30() {
             _ => (0..2).map(|x| x + 1),
         }
     }
-    for i in 0..2 {
-        assert_eq!(match_(i).fold(0, |sum, x| sum + x), ANS[i]);
+    for (i, x) in ANS.iter().enumerate() {
+        assert_eq!(match_(i).sum::<i32>(), *x);
     }
 
     // block + unsafe block + parentheses
@@ -55,8 +56,8 @@ fn stable_1_30() {
             }
         }}}})}}})}}
     }
-    for i in 0..2 {
-        assert_eq!(block(i).fold(0, |sum, x| sum + x), ANS[i]);
+    for (i, x) in ANS.iter().enumerate() {
+        assert_eq!(block(i).sum::<i32>(), *x);
     }
 
     #[auto_enum(Iterator)]
@@ -69,8 +70,8 @@ fn stable_1_30() {
             (0..2).map(|x| x + 1)
         }
     }
-    for i in 0..2 {
-        assert_eq!(if_(i).fold(0, |sum, x| sum + x), ANS[i]);
+    for (i, x) in ANS.iter().enumerate() {
+        assert_eq!(if_(i).sum::<i32>(), *x);
     }
 
     #[auto_enum(Iterator)]
@@ -85,8 +86,8 @@ fn stable_1_30() {
         .map(|x| x + 1)
         .map(|x| x - 1)
     }
-    for i in 0..2 {
-        assert_eq!(method_call(i).fold(0, |sum, x| sum + x), ANS[i]);
+    for (i, x) in ANS.iter().enumerate() {
+        assert_eq!(method_call(i).sum::<i32>(), *x);
     }
 
     #[auto_enum(Iterator)]
@@ -97,8 +98,8 @@ fn stable_1_30() {
             _ => (0..2).map(|x| x + 1),
         }
     }
-    for i in 0..2 {
-        assert_eq!(no_return(i).fold(0, |sum, x| sum + x), ANS[i]);
+    for (i, x) in ANS.iter().enumerate() {
+        assert_eq!(no_return(i).sum::<i32>(), *x);
     }
 
     #[auto_enum(Iterator)]
@@ -113,8 +114,8 @@ fn stable_1_30() {
             _ => (0..2).map(|x| x + 1),
         }
     }
-    for i in 0..2 {
-        assert_eq!(no_return2(i).fold(0, |sum, x| sum + x), ANS[i]);
+    for (i, x) in ANS.iter().enumerate() {
+        assert_eq!(no_return2(i).sum::<i32>(), *x);
     }
 
     #[auto_enum(Iterator)]
@@ -129,8 +130,8 @@ fn stable_1_30() {
             _ => (0..2).map(|x| x + 1),
         }
     }
-    for i in 0..2 {
-        assert_eq!(no_return3(i).fold(0, |sum, x| sum + x), ANS[i]);
+    for (i, x) in ANS.iter().enumerate() {
+        assert_eq!(no_return3(i).sum::<i32>(), *x);
     }
     #[auto_enum(Iterator)]
     fn no_return4(x: usize) -> impl Iterator<Item = i32> {
@@ -142,8 +143,8 @@ fn stable_1_30() {
             (0..2).map(|x| x + 1)
         }
     }
-    for i in 0..2 {
-        assert_eq!(no_return4(i).fold(0, |sum, x| sum + x), ANS[i]);
+    for (i, x) in ANS.iter().enumerate() {
+        assert_eq!(no_return4(i).sum::<i32>(), *x);
     }
 
     #[auto_enum(Iterator)]
@@ -159,8 +160,8 @@ fn stable_1_30() {
             (0..2).map(|x| x + 1)
         }
     }
-    for i in 0..2 {
-        assert_eq!(return1(i).fold(0, |sum, x| sum + x), ANS[i]);
+    for (i, x) in ANS.iter().enumerate() {
+        assert_eq!(return1(i).sum::<i32>(), *x);
     }
 
     #[auto_enum(Iterator)]
@@ -174,8 +175,8 @@ fn stable_1_30() {
             x -= 1;
         }
     }
-    assert_eq!(break_in_loop(14).fold(0, |sum, x| sum + x), 55);
-    assert_eq!(break_in_loop(-5).fold(0, |sum, x| sum + x), -15);
+    assert_eq!(break_in_loop(14).sum::<i32>(), 55);
+    assert_eq!(break_in_loop(-5).sum::<i32>(), -15);
 
     #[auto_enum(Iterator)]
     fn break2(mut x: i32) -> impl Iterator<Item = i32> {
@@ -188,8 +189,8 @@ fn stable_1_30() {
             x -= 1;
         }
     }
-    assert_eq!(break2(14).fold(0, |sum, x| sum + x), 55);
-    assert_eq!(break2(-5).fold(0, |sum, x| sum + x), -15);
+    assert_eq!(break2(14).sum::<i32>(), 55);
+    assert_eq!(break2(-5).sum::<i32>(), -15);
 
     #[auto_enum(Iterator)]
     fn break3(mut x: i32) -> impl Iterator<Item = i32> {
@@ -206,8 +207,8 @@ fn stable_1_30() {
             x -= 1;
         }
     }
-    assert_eq!(break3(14).fold(0, |sum, x| sum + x), 55);
-    assert_eq!(break3(-5).fold(0, |sum, x| sum + x), -15);
+    assert_eq!(break3(14).sum::<i32>(), 55);
+    assert_eq!(break3(-5).sum::<i32>(), -15);
 
     #[auto_enum(Iterator)]
     fn return_in_loop(mut x: i32) -> impl Iterator<Item = i32> {
@@ -220,8 +221,8 @@ fn stable_1_30() {
             x -= 1;
         }
     }
-    assert_eq!(return_in_loop(14).fold(0, |sum, x| sum + x), 55);
-    assert_eq!(return_in_loop(-5).fold(0, |sum, x| sum + x), -15);
+    assert_eq!(return_in_loop(14).sum::<i32>(), 55);
+    assert_eq!(return_in_loop(-5).sum::<i32>(), -15);
 
     #[auto_enum(Iterator)]
     fn return2(x: i32, y: i32) -> impl Iterator<Item = i32> {
@@ -237,7 +238,7 @@ fn stable_1_30() {
             _ => iter.map(|x| x + 1),
         }
     }
-    assert_eq!(return2(10, 10).fold(0, |sum, x| sum + x), 63);
+    assert_eq!(return2(10, 10).sum::<i32>(), 63);
 
     #[auto_enum]
     fn return3(x: i32) -> Option<impl Iterator<Item = i32>> {
@@ -253,7 +254,7 @@ fn stable_1_30() {
 
         Some(iter)
     }
-    assert_eq!(return3(10).unwrap().fold(0, |sum, x| sum + x), 54);
+    assert_eq!(return3(10).unwrap().sum::<i32>(), 54);
 
     #[auto_enum(Debug, Display)]
     fn try_operator1(x: i32) -> Result<impl Iterator<Item = i32>, impl core::fmt::Debug> {
@@ -268,7 +269,7 @@ fn stable_1_30() {
 
         Ok(iter)
     }
-    assert_eq!(try_operator1(10).unwrap().fold(0, |sum, x| sum + x), 54);
+    assert_eq!(try_operator1(10).unwrap().sum::<i32>(), 54);
 
     #[auto_enum(Debug)]
     fn try_operator2(x: i32) -> Result<impl Iterator<Item = i32>, impl core::fmt::Debug> {
@@ -281,7 +282,7 @@ fn stable_1_30() {
             _ => Ok(2..=10),
         }
     }
-    assert_eq!(try_operator2(10).unwrap().fold(0, |sum, x| sum + x), 54);
+    assert_eq!(try_operator2(10).unwrap().sum::<i32>(), 54);
 
     #[auto_enum(Iterator)]
     fn marker3(x: i32, y: i32) -> impl Iterator<Item = i32> {
@@ -305,7 +306,7 @@ fn stable_1_30() {
             }),
         }
     }
-    assert_eq!(marker3(10, 10).fold(0, |sum, x| sum + x), 63);
+    assert_eq!(marker3(10, 10).sum::<i32>(), 63);
 
     #[auto_enum(marker(marker_a), Iterator)]
     fn marker4(x: i32, y: i32) -> impl Iterator<Item = i32> {
@@ -322,7 +323,7 @@ fn stable_1_30() {
             _ => iter.map(|x| x + 1),
         }
     }
-    assert_eq!(marker4(10, 10).fold(0, |sum, x| sum + x), 63);
+    assert_eq!(marker4(10, 10).sum::<i32>(), 63);
 
     #[auto_enum(Iterator)]
     fn marker5(x: i32, y: i32) -> impl Iterator<Item = i32> {
@@ -339,7 +340,7 @@ fn stable_1_30() {
             _ => iter.map(|x| x + 1),
         }
     }
-    assert_eq!(marker5(10, 10).fold(0, |sum, x| sum + x), 63);
+    assert_eq!(marker5(10, 10).sum::<i32>(), 63);
 
     #[auto_enum]
     fn closure() {
@@ -357,8 +358,8 @@ fn stable_1_30() {
             }
         };
 
-        for i in 0..2 {
-            assert_eq!(f(i).fold(0, |sum, x| sum + x), ANS[i]);
+        for (i, x) in ANS.iter().enumerate() {
+            assert_eq!(f(i).sum::<i32>(), *x);
         }
 
         let f = {
@@ -379,8 +380,8 @@ fn stable_1_30() {
             }
         };
 
-        for i in 0..2 {
-            assert_eq!(f(i).fold(0, |sum, x| sum + x), ANS[i]);
+        for (i, x) in ANS.iter().enumerate() {
+            assert_eq!(f(i).sum::<i32>(), *x);
         }
     }
     closure();
@@ -397,8 +398,8 @@ fn stable_1_30() {
             _ => (0..2).map(|x| x + 1),
         }
     }
-    for i in 0..2 {
-        assert_eq!(rec_match_in_match(i).fold(0, |sum, x| sum + x), ANS[i]);
+    for (i, x) in ANS.iter().enumerate() {
+        assert_eq!(rec_match_in_match(i).sum::<i32>(), *x);
     }
 
     #[cfg_attr(feature = "rustfmt", rustfmt_skip)]
@@ -420,8 +421,8 @@ fn stable_1_30() {
             }
         }}}}}}}}}
     }
-    for i in 0..2 {
-        assert_eq!(rec_in_block(i).fold(0, |sum, x| sum + x), ANS[i]);
+    for (i, x) in ANS.iter().enumerate() {
+        assert_eq!(rec_in_block(i).sum::<i32>(), *x);
     }
 
     #[auto_enum(Iterator)]
@@ -438,8 +439,8 @@ fn stable_1_30() {
             (0..2).map(|x| x + 1)
         }
     }
-    for i in 0..2 {
-        assert_eq!(rec_match_in_if(i).fold(0, |sum, x| sum + x), ANS[i]);
+    for (i, x) in ANS.iter().enumerate() {
+        assert_eq!(rec_match_in_if(i).sum::<i32>(), *x);
     }
 
     #[auto_enum(Iterator)]
@@ -459,8 +460,8 @@ fn stable_1_30() {
             (0..2).map(|x| x + 1)
         }
     }
-    for i in 0..2 {
-        assert_eq!(rec_if_in_if(i).fold(0, |sum, x| sum + x), ANS[i]);
+    for (i, x) in ANS.iter().enumerate() {
+        assert_eq!(rec_if_in_if(i).sum::<i32>(), *x);
     }
 
     #[auto_enum(Iterator)]
@@ -474,8 +475,8 @@ fn stable_1_30() {
             (0..2).map(|x| x + 1)
         }
     }
-    for i in 0..2 {
-        assert_eq!(rec_nop(i).fold(0, |sum, x| sum + x), ANS[i]);
+    for (i, x) in ANS.iter().enumerate() {
+        assert_eq!(rec_nop(i).sum::<i32>(), *x);
     }
 
     #[auto_enum(Iterator)]
@@ -487,8 +488,8 @@ fn stable_1_30() {
             _ => (0..2).map(|x| x + 1),
         }
     }
-    for i in 0..2 {
-        assert_eq!(rec_no_return(i).fold(0, |sum, x| sum + x), ANS[i]);
+    for (i, x) in ANS.iter().enumerate() {
+        assert_eq!(rec_no_return(i).sum::<i32>(), *x);
     }
 
     #[auto_enum(Transpose, Iterator, Clone)]
@@ -501,7 +502,7 @@ fn stable_1_30() {
         .transpose()
         .map(|i| i.map(|x| x + 1).map(|x| x - 1))
     }
-    assert_eq!(transpose(0).unwrap().fold(0, |sum, x| sum + x), 28);
+    assert_eq!(transpose(0).unwrap().sum::<i32>(), 28);
 }
 
 #[cfg(feature = "std")]
@@ -543,7 +544,7 @@ fn stable_1_30_std() {
 
     #[auto_enum(Transpose, Debug, Display, Error)]
     fn transpose_err(file: Option<&Path>) -> Result<(), impl Error> {
-        if let Some(_) = file {
+        if let Some(_f) = file {
             Err(io::Error::from(io::ErrorKind::NotFound)).map_err(IoError::Io2)
         } else {
             Err(io::Error::from(io::ErrorKind::NotFound))
@@ -554,7 +555,7 @@ fn stable_1_30_std() {
 
     #[auto_enum(Debug, Display, Error)]
     fn try_operator(file: Option<&Path>) -> Result<(), impl Error> {
-        if let Some(_) = file {
+        if let Some(_f) = file {
             Err(io::Error::from(io::ErrorKind::NotFound)).map_err(IoError::Io2)?
         } else {
             Err(io::Error::from(io::ErrorKind::NotFound))?
@@ -571,17 +572,17 @@ fn nightly() {
     const ANS: &[i32] = &[28, 3];
 
     // let match
-    for i in 0..2 {
+    for (i, x) in ANS.iter().enumerate() {
         #[auto_enum(Iterator)]
         let iter = match i {
             0 => 1..8,
             _ => vec![1, 2, 0].into_iter(),
         };
-        assert_eq!(iter.fold(0, |sum, x| sum + x), ANS[i]);
+        assert_eq!(iter.sum::<i32>(), *x);
     }
 
     // let if
-    for i in 0..2 {
+    for (i, x) in ANS.iter().enumerate() {
         #[auto_enum(Iterator)]
         let iter = if i == 0 {
             1..8
@@ -590,11 +591,11 @@ fn nightly() {
         } else {
             vec![1, 2, 0].into_iter()
         };
-        assert_eq!(iter.fold(0, |sum, x| sum + x), ANS[i]);
+        assert_eq!(iter.sum::<i32>(), *x);
     }
 
     // no return
-    for i in 0..2 {
+    for (i, x) in ANS.iter().enumerate() {
         #[auto_enum(Iterator)]
         let iter = match i {
             0 => 1..8,
@@ -604,9 +605,9 @@ fn nightly() {
             },
             _ => vec![1, 2, 0].into_iter(),
         };
-        assert_eq!(iter.fold(0, |sum, x| sum + x), ANS[i]);
+        assert_eq!(iter.sum::<i32>(), *x);
     }
-    for i in 0..2 {
+    for (i, x) in ANS.iter().enumerate() {
         #[auto_enum(Iterator)]
         let iter = match i {
             0 => 1..8,
@@ -617,9 +618,9 @@ fn nightly() {
             41..=50 => return,
             _ => vec![1, 2, 0].into_iter(),
         };
-        assert_eq!(iter.fold(0, |sum, x| sum + x), ANS[i]);
+        assert_eq!(iter.sum::<i32>(), *x);
     }
-    for i in 0..2 {
+    for (i, x) in ANS.iter().enumerate() {
         #[auto_enum(Iterator)]
         let iter = if i > 3 {
             #[never]
@@ -631,11 +632,11 @@ fn nightly() {
         } else {
             vec![1, 2, 0].into_iter()
         };
-        assert_eq!(iter.fold(0, |sum, x| sum + x), ANS[i]);
+        assert_eq!(iter.sum::<i32>(), *x);
     }
 
     // rec
-    for i in 0..2 {
+    for (i, x) in ANS.iter().enumerate() {
         #[auto_enum(Iterator)]
         let iter = if i > 3 {
             #[nested]
@@ -649,11 +650,11 @@ fn nightly() {
         } else {
             vec![1, 2, 0].into_iter()
         };
-        assert_eq!(iter.fold(0, |sum, x| sum + x), ANS[i]);
+        assert_eq!(iter.sum::<i32>(), *x);
     }
 
     // never opt
-    for i in 0..2 {
+    for (i, x) in ANS.iter().enumerate() {
         #[auto_enum(never, Iterator)]
         let iter = match i {
             0 => marker!(1..8),
@@ -662,11 +663,11 @@ fn nightly() {
             },
             _ => marker!(vec![1, 2, 0].into_iter()),
         };
-        assert_eq!(iter.fold(0, |sum, x| sum + x), ANS[i]);
+        assert_eq!(iter.sum::<i32>(), *x);
     }
 
     // never attr
-    for i in 0..2 {
+    for (i, x) in ANS.iter().enumerate() {
         #[cfg_attr(feature = "rustfmt", rustfmt_skip)]
         #[auto_enum(Iterator)]
         let iter = match i {
@@ -689,9 +690,9 @@ fn nightly() {
                 }
             }
         };
-        assert_eq!(iter.fold(0, |sum, x| sum + x), ANS[i]);
+        assert_eq!(iter.sum::<i32>(), *x);
     }
-    for i in 0..2 {
+    for (i, x) in ANS.iter().enumerate() {
         #[cfg_attr(feature = "rustfmt", rustfmt_skip)]
         #[auto_enum(Iterator)]
         let iter = match i {
@@ -715,7 +716,7 @@ fn nightly() {
                 }
             }
         };
-        assert_eq!(iter.fold(0, |sum, x| sum + x), ANS[i]);
+        assert_eq!(iter.sum::<i32>(), *x);
     }
 
     #[auto_enum(Debug)]
@@ -732,7 +733,7 @@ fn nightly() {
 
         Ok(iter)
     }
-    assert_eq!(try_operator(10).unwrap().fold(0, |sum, x| sum + x), 54);
+    assert_eq!(try_operator(10).unwrap().sum::<i32>(), 54);
 
     fn marker1(x: usize) -> impl Iterator<Item = i32> + Clone {
         #[auto_enum(Iterator, Clone)]
@@ -744,8 +745,8 @@ fn nightly() {
             }
         })
     }
-    for i in 0..2 {
-        let _ = marker1(i).clone().fold(0, |sum, x| sum + x);
+    for (i, _x) in ANS.iter().enumerate() {
+        let _ = marker1(i).clone().sum::<i32>();
     }
 
     fn marker2(x: usize) -> impl Iterator<Item = i32> + Clone {
@@ -759,8 +760,8 @@ fn nightly() {
         };
         a
     }
-    for i in 0..2 {
-        assert_eq!(marker2(i).clone().fold(0, |sum, x| sum + x), ANS[i] - 1);
+    for (i, x) in ANS.iter().enumerate() {
+        assert_eq!(marker2(i).clone().sum::<i32>(), *x - 1);
     }
 
     /*
@@ -784,8 +785,8 @@ fn nightly() {
         };
         a
     }
-    for i in 0..2 {
-        assert_eq!(assign(i).fold(0, |sum, x| sum + x), ANS[i] - 1);
+    for (i, x) in ANS.iter().enumerate() {
+        assert_eq!(assign(i).sum::<i32>(), *x - 1);
     }
 
     #[auto_enum(Fn)]

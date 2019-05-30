@@ -47,7 +47,7 @@ matrix:
       name: cargo clippy
       script:
         - rustup component add clippy || travis_terminate 0
-        - cargo clippy --all --all-features
+        - cargo clippy --all --all-features --tests
 
     - rust: stable
       name: cargo fmt
