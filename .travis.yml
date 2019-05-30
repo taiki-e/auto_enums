@@ -34,7 +34,7 @@ matrix:
       name: cargo tree
       script:
         - if [[ ! -x "$(command -v cargo-tree)" ]]; then
-            cargo install --debug cargo-tree || exit 1;
+            cargo install --debug cargo-tree || travis_terminate 1;
           fi
         - cargo update
         - cargo tree
@@ -46,12 +46,8 @@ matrix:
     - rust: nightly
       name: cargo clippy
       script:
-        - if rustup component add clippy;
-          then
-            cargo clippy --all --all-features;
-          else
-            echo 'Skipping clippy';
-          fi
+        - rustup component add clippy || travis_terminate 0
+        - cargo clippy --all --all-features
 
     - rust: stable
       name: cargo fmt
