@@ -51,6 +51,10 @@ pub(crate) fn expr_call(attrs: Vec<Attribute>, path: Path, arg: Expr) -> Expr {
     })
 }
 
+pub(super) fn expr_compile_error(e: &syn::Error) -> Expr {
+    syn::parse2(e.to_compile_error()).unwrap()
+}
+
 pub(crate) fn unit() -> Expr {
     Expr::Tuple(ExprTuple {
         attrs: Vec::new(),
@@ -77,17 +81,15 @@ macro_rules! span {
 }
 
 macro_rules! error {
+    // FIXME: syntax
+    (span => $span:expr, $msg:expr) => {
+        syn::Error::new($span, $msg)
+    };
     ($msg:expr) => {
         syn::Error::new_spanned(span!($msg), $msg)
     };
-    ($span:ident .span(), $msg:expr) => {
-        syn::Error::new_spanned($span.span(), $msg)
-    };
     ($span:expr, $msg:expr) => {
         syn::Error::new_spanned(span!($span), $msg)
-    };
-    ($span:ident .span(), $($tt:tt)*) => {
-        error!($span.span(), format!($($tt)*))
     };
     ($span:expr, $($tt:tt)*) => {
         error!($span, format!($($tt)*))

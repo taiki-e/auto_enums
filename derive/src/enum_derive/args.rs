@@ -32,9 +32,6 @@ impl ToTokens for Arg {
 // Parse
 
 macro_rules! error {
-    ($msg:expr) => {
-        syn::Error::new($msg.span(), $msg)
-    };
     ($span:expr, $msg:expr) => {
         return Err(syn::Error::new($span.span(), $msg))
     };
@@ -75,7 +72,7 @@ fn parse_path(mut path: Vec<TokenTree>, iter: &mut IntoIter) -> Result<Arg> {
         }
     }
 
-    syn::parse2(path.into_iter().collect()).map_err(|e| error!(e)).map(Arg::Path)
+    syn::parse2(path.into_iter().collect()).map(Arg::Path)
 }
 
 fn path_or_ident(ident: Ident, tt: Option<TokenTree>, iter: &mut IntoIter) -> Result<Arg> {

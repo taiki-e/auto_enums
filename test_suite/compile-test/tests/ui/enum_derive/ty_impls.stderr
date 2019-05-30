@@ -1,0 +1,11 @@
+error: `enum_derive(Transpose)` all fields need to be generics
+  --> $DIR/ty_impls.rs:10:1
+   |
+10 | / enum Enum1<A, B> {
+11 | |     A(Foo<A>),
+12 | |     B(B),
+13 | | }
+   | |_^
+
+error: aborting due to previous error
+

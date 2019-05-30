@@ -6,7 +6,7 @@ use syn::{
 
 #[cfg(feature = "try_trait")]
 use crate::utils::expr_call;
-use crate::utils::replace_expr;
+use crate::utils::{expr_compile_error, replace_expr};
 
 use super::{parse_group, Attrs, AttrsMut, Context, Parent, VisitMode, EMPTY_ATTRS, NAME, NEVER};
 
@@ -140,7 +140,7 @@ impl<'a> Visitor<'a> {
                     let expr = if let Expr::Macro(expr) = expr { expr } else { unreachable!() };
                     let args = syn::parse2(expr.mac.tts).unwrap_or_else(|e| {
                         self.cx.error = true;
-                        syn::parse2(e.to_compile_error()).unwrap_or_else(|_| unreachable!())
+                        expr_compile_error(&e)
                     });
 
                     if self.cx.error {
@@ -309,7 +309,7 @@ fn visit_stmt_mut(stmt: &mut Stmt, cx: &mut Context) {
             .and_then(|mut cx| stmt.visit_parent(&mut cx))
             .unwrap_or_else(|e| {
                 cx.error = true;
-                *stmt = syn::parse2(e.to_compile_error()).unwrap_or_else(|_| unreachable!());
+                *stmt = Stmt::Expr(expr_compile_error(&e));
             });
     }
 }

@@ -22,13 +22,19 @@ matrix:
       script:
         - cargo test --all --no-default-features
         - cargo test --all
-        - cargo test --all --all-features
+        - cargo test --all --all-features --exclude auto_enums_ui_tests
+
+    - rust: nightly
+      name: cargo test (ui tests)
+      script:
+        - cargo clean
+        - cargo test -p auto_enums_ui_tests --all-features
 
     - rust: nightly
       name: cargo check (minimal versions)
       script:
         - cargo update -Zminimal-versions
-        - cargo check --all --all-features
+        - cargo check --all --all-features --exclude auto_enums_ui_tests
 
     - rust: nightly
       name: cargo tree

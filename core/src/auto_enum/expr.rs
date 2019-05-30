@@ -1,6 +1,7 @@
 use std::ops::{Deref, DerefMut};
 
 use syn::{
+    spanned::Spanned,
     visit_mut::{self, VisitMut},
     *,
 };
@@ -247,7 +248,7 @@ impl VisitLast<()> for ExprIf {
             }
             Some(Expr::If(expr)) => expr.visit_last(cx),
 
-            None => Err(error!(self, "`if` expression missing an else clause")),
+            None => Err(error!(span => self.span(), "`if` expression missing an else clause")),
             // FIXME: This may not be necessary.
             Some(expr) => Err(error!(expr, "after of `else` required `{` or `if`")),
         }
