@@ -21,7 +21,7 @@ fn check_fields(data: &Data) -> Result<()> {
     let fields = data.fields();
     let comma = if generics.params.empty_or_trailing() { quote!(,) } else { TokenStream::new() };
     if quote!(#generics).to_string() != quote!(<#(#fields),*#comma>).to_string() {
-        Err(err!(data.span, "all fields need to be generics"))?;
+        Err(error!(data.span, "all fields need to be generics"))?;
     }
 
     Ok(())

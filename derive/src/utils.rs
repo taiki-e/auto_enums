@@ -50,7 +50,7 @@ macro_rules! span {
     };
 }
 
-macro_rules! err {
+macro_rules! error {
     ($msg:expr) => {
         syn::Error::new_spanned(span!($msg), $msg)
     };
@@ -58,6 +58,6 @@ macro_rules! err {
         syn::Error::new_spanned(span!($span), $msg)
     };
     ($span:expr, $($tt:tt)*) => {
-        err!($span, format!($($tt)*))
+        error!($span, format!($($tt)*))
     };
 }

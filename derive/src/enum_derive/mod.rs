@@ -195,10 +195,10 @@ fn expand(args: TokenStream, input: TokenStream) -> Result<TokenStream> {
     }
 
     let span = span!(input);
-    let mut item = syn::parse2::<ItemEnum>(input)
-        .map_err(|_| err!(span, "the `#[enum_derive]` attribute may only be used on enums"))?;
-    let data = EnumData::new(&item)?;
-    let data = Data { data, span };
+    let mut item = syn::parse2::<ItemEnum>(input).map_err(|e| {
+        error!(span, "the `#[enum_derive]` attribute may only be used on enums: {}", e)
+    })?;
+    let data = Data { data: EnumData::new(&item)?, span };
     let args = parse_args(args)?;
     let args = args.iter().fold(Vec::new(), |mut v, (s, arg)| {
         if let Some(traits) = TRAIT_DEPENDENCIES.get(&&**s) {
@@ -219,7 +219,7 @@ fn expand(args: TokenStream, input: TokenStream) -> Result<TokenStream> {
     for (s, arg) in args {
         match (DERIVE_MAP.get(&s), arg) {
             (Some(f), _) => (&*f)(&data, &mut items)
-                .map_err(|e| err!(data.span, "`enum_derive({})` {}", s, e))?,
+                .map_err(|e| error!(data.span, "`enum_derive({})` {}", s, e))?,
             (_, Some(arg)) => derive.push(arg),
             _ => {}
         }

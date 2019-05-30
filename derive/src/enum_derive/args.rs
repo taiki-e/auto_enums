@@ -31,15 +31,15 @@ impl ToTokens for Arg {
 // =============================================================================
 // Parse
 
-macro_rules! arg_err {
+macro_rules! error {
     ($msg:expr) => {
-        syn::Error::new($msg.span(), format!("invalid arguments: {}", $msg))
+        syn::Error::new($msg.span(), $msg)
     };
     ($span:expr, $msg:expr) => {
-        syn::Error::new($span.span(), format!("invalid arguments: {}", $msg))
+        return Err(syn::Error::new($span.span(), $msg))
     };
     ($span:expr, $($tt:tt)*) => {
-        arg_err!($span, format!($($tt)*))
+        error!($span, format!($($tt)*))
     };
 }
 
@@ -58,9 +58,9 @@ pub(super) fn parse_args(args: TokenStream) -> Result<Vec<(String, Arg)>> {
             TokenTree::Punct(p) => match p.as_char() {
                 ',' => {}
                 ':' => push(&mut args, parse_path(vec![p.into()], &mut iter)?),
-                _ => Err(arg_err!(p, "{}`{}`", ERR, p))?,
+                _ => error!(p, "{}`{}`", ERR, p),
             },
-            _ => Err(arg_err!(tt, "{}`{}`", ERR, tt))?,
+            _ => error!(tt, "{}`{}`", ERR, tt),
         }
     }
 
@@ -75,7 +75,7 @@ fn parse_path(mut path: Vec<TokenTree>, iter: &mut IntoIter) -> Result<Arg> {
         }
     }
 
-    syn::parse2(path.into_iter().collect()).map_err(|e| arg_err!(e)).map(Arg::Path)
+    syn::parse2(path.into_iter().collect()).map_err(|e| error!(e)).map(Arg::Path)
 }
 
 fn path_or_ident(ident: Ident, tt: Option<TokenTree>, iter: &mut IntoIter) -> Result<Arg> {
@@ -86,8 +86,8 @@ fn path_or_ident(ident: Ident, tt: Option<TokenTree>, iter: &mut IntoIter) -> Re
         Some(TokenTree::Punct(p)) => match p.as_char() {
             ',' => Ok(Arg::Ident(ident)),
             ':' => parse_path(vec![ident.into(), p.into()], iter),
-            _ => Err(arg_err!(p, "{}`{}`", ERR, p)),
+            _ => error!(p, "{}`{}`", ERR, p),
         },
-        Some(tt) => Err(arg_err!(tt, "{}`{}`", ERR, tt)),
+        Some(tt) => error!(tt, "{}`{}`", ERR, tt),
     }
 }
