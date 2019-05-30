@@ -11,8 +11,9 @@
         try_trait,
     )
 )]
+#![warn(unsafe_code)]
 #![warn(rust_2018_idioms)]
-#![allow(unused_imports)]
+#![warn(clippy::all)]
 
 #[cfg(feature = "unstable")]
 mod test_futures {
@@ -61,12 +62,12 @@ mod test_futures {
     }
 }
 
+#[cfg(feature = "unstable")]
 mod enum_derive {
     #![allow(dead_code)]
 
     use auto_enums::enum_derive;
 
-    #[cfg(feature = "unstable")]
     #[test]
     fn unstable() {
         #[enum_derive(

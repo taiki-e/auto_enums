@@ -1,11 +1,16 @@
-use std::cell::RefCell;
+use std::{
+    cell::{Cell, RefCell},
+    collections::hash_map::DefaultHasher,
+    hash::Hasher,
+    iter,
+    sync::atomic::{AtomicUsize, Ordering},
+};
 
 use proc_macro2::{Ident, TokenStream};
 use quote::ToTokens;
-use smallvec::{smallvec, SmallVec};
-use syn::{Attribute, Expr, ExprCall, ExprPath, ItemEnum, Macro, Result};
+use syn::{Attribute, Expr, ItemEnum, Macro, Result};
 
-use crate::utils::{default, ident, path, Stack};
+use crate::utils::{expr_call, ident, path};
 
 use super::{
     visitor::{Dummy, FindTry, Visitor},
@@ -35,29 +40,30 @@ pub(super) enum VisitLastMode {
     item_fn `fn _() -> Fn*() { || {} }`
     */
     Closure,
-    /// `Stmt::Semi(_, _)` or `never` option - never visit last expr
+    /// `Stmt::Semi(..)` or `never` option - never visit last expr
     Never,
 }
 
 pub(super) struct Context {
     /// Span passed to `syn::Error::new_spanned`.
     span: Option<TokenStream>,
-    pub(super) args: Stack<Arg>,
+    pub(super) args: Vec<Arg>,
     builder: Builder,
     pub(super) marker: Marker,
     // pub(super) depth: usize,
     root: bool,
-    pub(super) attr: bool,
-    mode: VisitMode,
-    visit_last: VisitLastMode,
-    /// This in `true` if error occurred in visiting.
+    visit_mode: VisitMode,
+    visit_last_mode: VisitLastMode,
+    /// This is `true` if other `auto_enum` attribute exists in this attribute's scope.
+    pub(super) other_attr: bool,
+    /// This is `true` if an error occurred in visiting.
     pub(super) error: bool,
 }
 
 impl Context {
     fn new<T: ToTokens>(
         span: T,
-        args: Stack<Arg>,
+        args: Vec<Arg>,
         marker: Option<String>,
         never: bool,
         root: bool,
@@ -69,47 +75,49 @@ impl Context {
             marker: Marker::new(marker),
             // depth: 0,
             root,
-            attr: false,
-            mode: VisitMode::Default,
-            visit_last: if never { VisitLastMode::Never } else { VisitLastMode::Default },
+            visit_mode: VisitMode::Default,
+            visit_last_mode: if never { VisitLastMode::Never } else { VisitLastMode::Default },
+            other_attr: false,
             error: false,
         }
     }
 
     pub(super) fn root<T: ToTokens>(
         span: T,
-        (args, marker, never): (Stack<Arg>, Option<String>, bool),
+        (args, marker, never): (Vec<Arg>, Option<String>, bool),
     ) -> Self {
         Self::new(span, args, marker, never, true)
     }
 
     pub(super) fn child<T: ToTokens>(
         span: T,
-        (args, marker, never): (Stack<Arg>, Option<String>, bool),
+        (args, marker, never): (Vec<Arg>, Option<String>, bool),
     ) -> Self {
         Self::new(span, args, marker, never, false)
     }
 
-    // If this is called more than once, it is a bug.
     pub(super) fn span(&mut self) -> TokenStream {
+        // If this is called more than once, it is a bug.
         self.span.take().unwrap_or_else(|| unreachable!())
     }
 
-    pub(super) const fn mode(&self) -> VisitMode {
-        self.mode
+    pub(super) const fn visit_mode(&self) -> VisitMode {
+        self.visit_mode
     }
 
-    pub(super) fn visit_mode(&mut self, mode: VisitMode) {
-        self.mode = mode;
+    pub(super) fn set_visit_mode(&mut self, mode: VisitMode) {
+        self.visit_mode = mode;
     }
 
-    pub(super) fn visit_last_mode(&mut self, visit_last: VisitLastMode) {
-        self.visit_last = visit_last;
+    pub(super) fn set_visit_last_mode(&mut self, mode: VisitLastMode) {
+        self.visit_last_mode = mode;
     }
 
     pub(super) fn visit_last(&self) -> bool {
-        self.visit_last != VisitLastMode::Never && self.mode != VisitMode::Try
+        self.visit_last_mode != VisitLastMode::Never && self.visit_mode != VisitMode::Try
     }
+
+    // visitors
 
     pub(super) fn visitor<F: FnOnce(&mut Visitor<'_>)>(&mut self, f: F) {
         f(&mut Visitor::new(self));
@@ -123,9 +131,11 @@ impl Context {
         let mut find = FindTry::new(self);
         f(&mut find);
         if find.has {
-            self.mode = VisitMode::Try;
+            self.visit_mode = VisitMode::Try;
         }
     }
+
+    // utils
 
     pub(super) fn next_expr(&mut self, expr: Expr) -> Expr {
         self.next_expr_with_attrs(Vec::new(), expr)
@@ -135,10 +145,34 @@ impl Context {
         self.builder.next_expr(attrs, expr)
     }
 
-    pub(super) fn marker_macro(&self, Macro { path, .. }: &Macro) -> bool {
+    pub(super) fn is_marker_expr(&self, expr: &Expr) -> bool {
+        match expr {
+            Expr::Macro(expr) => self.is_marker_macro(&expr.mac),
+            _ => false,
+        }
+    }
+
+    pub(super) fn is_marker_macro(&self, Macro { path, .. }: &Macro) -> bool {
         match &self.marker.ident {
-            None => path.is_ident(DEFAULT_MARKER),
-            Some(marker) => path.is_ident(marker) || (!self.root && path.is_ident(DEFAULT_MARKER)),
+            None => path.is_ident(Marker::DEFAULT),
+            Some(marker) => path.is_ident(marker) || (!self.root && path.is_ident(Marker::DEFAULT)),
+        }
+    }
+
+    pub(super) fn replace_boxed_expr(&mut self, expr: &mut Option<Box<Expr>>) {
+        if expr.is_none() {
+            expr.replace(Box::new(unit()));
+        }
+
+        if let Some(expr) = expr {
+            replace_expr(&mut **expr, |expr| {
+                if self.is_marker_expr(&expr) {
+                    // Skip if `<expr>` is a marker macro.
+                    expr
+                } else {
+                    self.next_expr(expr)
+                }
+            });
         }
     }
 
@@ -160,16 +194,18 @@ impl Context {
     }
     */
 
+    // build
+
     fn buildable(&mut self) -> Result<bool> {
         fn err(cx: &mut Context, len: usize) -> Result<bool> {
-            let (msg1, msg2) = match cx.visit_last {
+            let (msg1, msg2) = match cx.visit_last_mode {
                 VisitLastMode::Default | VisitLastMode::Closure => {
                     ("branches or marker macros in total", "branch or marker macro")
                 }
                 VisitLastMode::Never => ("marker macros", "marker macro"),
             };
 
-            Err(err!(cx.span(),
+            Err(error!(cx.span(),
                 "the `#[auto_enum]` attribute is required two or more {}, there is {} {} in this statement",
                 msg1,
                 if len == 0 { "no" } else { "only one" },
@@ -183,7 +219,7 @@ impl Context {
         } else {
             match self.builder.variants.len() {
                 1 => err(self, 1),
-                0 if !self.attr => err(self, 0),
+                0 if !self.other_attr => err(self, 0),
                 0 => Ok(false),
                 _ => Ok(true),
             }
@@ -198,6 +234,8 @@ impl Context {
         })
     }
 
+    // type_analysis feature
+
     #[cfg(feature = "type_analysis")]
     pub(super) fn impl_traits(&mut self, ty: &mut Type) {
         collect_impl_traits(&mut self.args, ty);
@@ -207,13 +245,13 @@ impl Context {
 // =============================================================================
 // Expression level marker
 
-pub(super) const DEFAULT_MARKER: &str = "marker";
-
 pub(super) struct Marker {
     ident: Option<String>,
 }
 
 impl Marker {
+    const DEFAULT: &'static str = "marker";
+
     const fn new(ident: Option<String>) -> Self {
         Self { ident }
     }
@@ -223,7 +261,7 @@ impl Marker {
     }
 
     pub(super) fn ident(&self) -> &str {
-        self.ident.as_ref().map_or(DEFAULT_MARKER, |s| s)
+        self.ident.as_ref().map_or(Self::DEFAULT, |s| s)
     }
 }
 
@@ -232,14 +270,14 @@ impl Marker {
 
 struct Builder {
     ident: String,
-    variants: Stack<String>,
+    variants: Vec<String>,
 }
 
 impl Builder {
     fn new() -> Self {
         Self {
             ident: format!("___Enum{}", RNG.with(|rng| rng.borrow_mut().next())),
-            variants: Stack::new(),
+            variants: Vec::new(),
         }
     }
 
@@ -250,21 +288,12 @@ impl Builder {
     fn next_expr(&mut self, attrs: Vec<Attribute>, expr: Expr) -> Expr {
         let variant = format!("___Variant{}", self.variants.len());
 
-        let segments: SmallVec<[_; 2]> =
-            smallvec![ident(&self.ident).into(), ident(&variant).into()];
+        let path =
+            path(iter::once(ident(&self.ident).into()).chain(iter::once(ident(&variant).into())));
 
         self.variants.push(variant);
 
-        Expr::Call(ExprCall {
-            attrs,
-            func: Box::new(Expr::Path(ExprPath {
-                attrs: Vec::new(),
-                qself: None,
-                path: path(segments),
-            })),
-            paren_token: default(),
-            args: Some(expr).into_iter().collect(),
-        })
+        expr_call(attrs, path, expr)
     }
 
     fn build(&self, args: &[Arg]) -> ItemEnum {
@@ -290,13 +319,6 @@ thread_local! {
 }
 
 // https://github.com/rayon-rs/rayon/blob/rayon-core-v1.4.1/rayon-core/src/registry.rs#L712-L750
-
-use std::{
-    cell::Cell,
-    collections::hash_map::DefaultHasher,
-    hash::Hasher,
-    sync::atomic::{AtomicUsize, Ordering},
-};
 
 /// [xorshift*] is a fast pseudorandom number generator which will
 /// even tolerate weak seeding, as long as it's not zero.

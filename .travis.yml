@@ -22,19 +22,25 @@ matrix:
       script:
         - cargo test --all --no-default-features
         - cargo test --all
-        - cargo test --all --all-features
+        - cargo test --all --all-features --exclude auto_enums_ui_tests
+
+    - rust: nightly
+      name: cargo test (ui tests)
+      script:
+        - cargo clean
+        - cargo test -p auto_enums_ui_tests --all-features
 
     - rust: nightly
       name: cargo check (minimal versions)
       script:
         - cargo update -Zminimal-versions
-        - cargo check --all --all-features
+        - cargo check --all --all-features --exclude auto_enums_ui_tests
 
     - rust: nightly
       name: cargo tree
       script:
         - if [[ ! -x "$(command -v cargo-tree)" ]]; then
-            cargo install --debug cargo-tree || exit 1;
+            cargo install --debug cargo-tree || travis_terminate 1;
           fi
         - cargo update
         - cargo tree
@@ -46,12 +52,8 @@ matrix:
     - rust: nightly
       name: cargo clippy
       script:
-        - if rustup component add clippy;
-          then
-            cargo clippy --all --all-features;
-          else
-            echo 'Skipping clippy';
-          fi
+        - rustup component add clippy || travis_terminate 0
+        - cargo clippy --all --all-features --tests
 
     - rust: stable
       name: cargo fmt

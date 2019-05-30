@@ -2,7 +2,7 @@ use crate::utils::*;
 
 pub(crate) const NAME: &[&str] = &["Error"];
 
-pub(crate) fn derive(data: &Data, stack: &mut Stack<ItemImpl>) -> Result<()> {
+pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
     let ident = data.ident();
     let source =
         data.variants().iter().map(|v| quote!(#ident::#v(x) => ::std::option::Option::Some(x)));
@@ -13,7 +13,7 @@ pub(crate) fn derive(data: &Data, stack: &mut Stack<ItemImpl>) -> Result<()> {
         }
     }?;
 
-    let mut impls = data.impl_trait_with_capacity(
+    let mut impl_ = data.impl_trait_with_capacity(
         2,
         parse_quote!(::std::error::Error)?,
         None,
@@ -26,9 +26,9 @@ pub(crate) fn derive(data: &Data, stack: &mut Stack<ItemImpl>) -> Result<()> {
 
     data.fields()
         .iter()
-        .try_for_each(|f| parse_quote!(#f: 'static).map(|f| impls.push_where_predicate(f)))?;
-    impls.push_item(source);
+        .try_for_each(|f| parse_quote!(#f: 'static).map(|f| impl_.push_where_predicate(f)))?;
+    impl_.push_item(source);
 
-    stack.push(impls.build_item());
+    items.push(impl_.build_item());
     Ok(())
 }

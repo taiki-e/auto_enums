@@ -81,13 +81,13 @@ lazy_static! {
     };
 }
 
-type DeriveFn = &'static (dyn Fn(&'_ Data, &'_ mut Stack<ItemImpl>) -> Result<()> + Send + Sync);
+type DeriveFn = fn(&'_ Data, &'_ mut Vec<ItemImpl>) -> Result<()>;
 
 macro_rules! derive_map {
     ($map:expr, $($(#[$meta:meta])* $($arm:ident)::*,)*) => {$(
         $(#[$meta])*
         crate::derive::$($arm)::*::NAME.iter().for_each(|name| {
-            if $map.insert(*name, (&crate::derive::$($arm)::*::derive) as DeriveFn).is_some() {
+            if $map.insert(*name, crate::derive::$($arm)::*::derive as DeriveFn).is_some() {
                 panic!("`#[enum_derive]` internal error: there are multiple `{}`", name);
             }
         });
@@ -190,37 +190,36 @@ lazy_static! {
 }
 
 fn expand(args: TokenStream, input: TokenStream) -> Result<TokenStream> {
-    fn alias_exists(s: &str, stack: &[(&str, Option<&Arg>)]) -> bool {
-        ALIAS_MAP.get(s).map_or(false, |x| stack.iter().any(|(s, _)| s == x))
+    fn alias_exists(s: &str, v: &[(&str, Option<&Arg>)]) -> bool {
+        ALIAS_MAP.get(s).map_or(false, |x| v.iter().any(|(s, _)| s == x))
     }
 
     let span = span!(input);
-    let mut item = syn::parse2::<ItemEnum>(input)
-        .map_err(|_| err!(span, "the `#[enum_derive]` attribute may only be used on enums"))?;
-    let data = EnumData::new(&item)?;
-    let data = Data { data, span };
+    let mut item = syn::parse2::<ItemEnum>(input).map_err(|e| {
+        error!(span, "the `#[enum_derive]` attribute may only be used on enums: {}", e)
+    })?;
+    let data = Data { data: EnumData::new(&item)?, span };
     let args = parse_args(args)?;
-    let mut stack = Stack::new();
-    args.iter().for_each(|(s, arg)| {
+    let args = args.iter().fold(Vec::new(), |mut v, (s, arg)| {
         if let Some(traits) = TRAIT_DEPENDENCIES.get(&&**s) {
             traits.iter().filter(|&x| !args.iter().any(|(s, _)| s == x)).for_each(|s| {
-                if !alias_exists(s, &stack) {
-                    stack.push((s, None))
+                if !alias_exists(s, &v) {
+                    v.push((s, None))
                 }
             });
         }
-
-        if !alias_exists(s, &stack) {
-            stack.push((s, Some(arg)));
+        if !alias_exists(s, &v) {
+            v.push((s, Some(arg)));
         }
+        v
     });
 
-    let mut derive = Stack::new();
-    let mut impls = Stack::new();
-    for (s, arg) in stack {
+    let mut derive = Vec::new();
+    let mut items = Vec::new();
+    for (s, arg) in args {
         match (DERIVE_MAP.get(&s), arg) {
-            (Some(f), _) => (&**f)(&data, &mut impls)
-                .map_err(|e| err!(data.span, "`enum_derive({})` {}", s, e))?,
+            (Some(f), _) => (&*f)(&data, &mut items)
+                .map_err(|e| error!(data.span, "`enum_derive({})` {}", s, e))?,
             (_, Some(arg)) => derive.push(arg),
             _ => {}
         }
@@ -231,6 +230,6 @@ fn expand(args: TokenStream, input: TokenStream) -> Result<TokenStream> {
     }
 
     let mut item = item.into_token_stream();
-    item.extend(impls.into_iter().map(ToTokens::into_token_stream));
+    item.extend(items.into_iter().map(ToTokens::into_token_stream));
     Ok(item)
 }

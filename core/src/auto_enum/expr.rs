@@ -1,13 +1,14 @@
 use std::ops::{Deref, DerefMut};
 
 use syn::{
+    spanned::Spanned,
     visit_mut::{self, VisitMut},
     *,
 };
 
-use crate::utils::{default, expr_block, replace_block, replace_expr, OptionExt};
+use crate::utils::{expr_block, replace_block, replace_expr};
 
-use super::*;
+use super::{Attrs, NAME, NESTED, NEVER};
 
 // =============================================================================
 // Context
@@ -113,9 +114,9 @@ fn is_unreachable(expr: &Expr, cx: &Context<'_>) -> bool {
         |expr| match expr {
             Expr::Break(_) | Expr::Continue(_) | Expr::Return(_) => true,
 
-            // `unreachable!`, `panic!` or Expression level marker (`marker!` macro).
+            // `unreachable!`, `panic!` or an expression level marker (`marker!` macro).
             Expr::Macro(ExprMacro { mac, .. }) => {
-                UNREACHABLE_MACROS.iter().any(|i| mac.path.is_ident(i)) || cx.marker_macro(mac)
+                UNREACHABLE_MACROS.iter().any(|i| mac.path.is_ident(i)) || cx.is_marker_macro(mac)
             }
 
             /* FIXME: This may not be necessary.
@@ -209,7 +210,7 @@ impl VisitLast<()> for ExprMatch {
 
         self.arms.iter_mut().try_for_each(|arm| {
             if !skip(arm, cx)? {
-                arm.comma = Some(default());
+                arm.comma = Some(token::Comma::default());
                 replace_expr(&mut *arm.body, |x| cx.next_expr(x));
             }
 
@@ -247,9 +248,9 @@ impl VisitLast<()> for ExprIf {
             }
             Some(Expr::If(expr)) => expr.visit_last(cx),
 
-            None => Err(err!(self, "`if` expression missing an else clause")),
+            None => Err(error!(span => self.span(), "`if` expression missing an else clause")),
             // FIXME: This may not be necessary.
-            Some(expr) => Err(err!(expr, "after of `else` required `{` or `if`")),
+            Some(expr) => Err(error!(expr, "after of `else` required `{` or `if`")),
         }
     }
 }
@@ -301,19 +302,10 @@ impl VisitMut for LoopVisitor<'_> {
                 self.nested = true;
             }
 
-            // `break` in loop
+            // Desugar `break <expr>` into `break Enum::VariantN(<expr>)`.
             Expr::Break(ExprBreak { label, expr, .. }) => {
                 if (!self.nested && label.is_none()) || self.compare_labels(label.as_ref()) {
-                    expr.replace_boxed_expr(|expr| match expr {
-                        Expr::Macro(expr) => {
-                            if self.cx.marker_macro(&expr.mac) {
-                                Expr::Macro(expr)
-                            } else {
-                                self.cx.next_expr(Expr::Macro(expr))
-                            }
-                        }
-                        expr => self.cx.next_expr(expr),
-                    });
+                    self.cx.replace_boxed_expr(expr);
                 }
             }
 

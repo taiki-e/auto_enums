@@ -8,14 +8,12 @@ use syn::{
 use crate::utils::*;
 
 mod args;
-mod attrs;
 mod context;
 mod expr;
 mod visitor;
 
 use self::args::{parse_args, parse_group, Arg};
-use self::attrs::{Attrs, AttrsMut};
-use self::context::*;
+use self::context::{Context, VisitLastMode, VisitMode};
 use self::expr::child_expr;
 
 #[cfg(feature = "type_analysis")]
@@ -42,7 +40,7 @@ fn expand(args: TokenStream, input: TokenStream) -> Result<TokenStream> {
     match syn::parse2::<Stmt>(input.clone()) {
         Ok(mut stmt) => stmt.visit_parent(&mut cx).map(|()| stmt.into_token_stream()),
         Err(_) => syn::parse2::<Expr>(input)
-            .map_err(|_| err!(cx.span(), "the `#[auto_enum]` attribute may only be used on expression, statement, or function"))
+            .map_err(|_| error!(cx.span(), "the `#[auto_enum]` attribute may only be used on expression, statement, or function"))
             .and_then(|mut expr| expr.visit_parent(&mut cx).map(|()| expr.into_token_stream())),
     }
 }
@@ -50,8 +48,8 @@ fn expand(args: TokenStream, input: TokenStream) -> Result<TokenStream> {
 fn visit_expr(expr: &mut Expr, cx: &mut Context) -> Result<()> {
     let expr = match expr {
         Expr::Closure(ExprClosure { body, .. }) if cx.visit_last() => {
-            cx.visit_mode(VisitMode::Return);
-            cx.visit_last_mode(VisitLastMode::Closure);
+            cx.set_visit_mode(VisitMode::Return);
+            cx.set_visit_last_mode(VisitLastMode::Closure);
             cx.find_try(|v| v.visit_expr_mut(body));
             &mut **body
         }
@@ -72,8 +70,8 @@ trait Parent {
 
 impl Parent for Stmt {
     fn visit_parent(&mut self, cx: &mut Context) -> Result<()> {
-        if let Stmt::Semi(_, _) = &self {
-            cx.visit_last_mode(VisitLastMode::Never);
+        if let Stmt::Semi(..) = &self {
+            cx.set_visit_last_mode(VisitLastMode::Never);
         }
 
         match self {
@@ -81,7 +79,7 @@ impl Parent for Stmt {
             Stmt::Local(local) => local.visit_parent(cx),
             Stmt::Item(Item::Fn(item)) => item.visit_parent(cx),
             Stmt::Item(item) => {
-                Err(err!(item, "may only be used on expression, statement, or function"))
+                Err(error!(item, "may only be used on expression, statement, or function"))
             }
         }
     }
@@ -116,7 +114,7 @@ impl Parent for Local {
 
         let expr = match self.init.as_mut().map(|(_, expr)| &mut **expr) {
             Some(expr) => expr,
-            None => Err(err!(
+            None => Err(error!(
                 self,
                 "the `#[auto_enum]` attribute is not supported uninitialized let statement"
             ))?,
@@ -134,7 +132,7 @@ impl Parent for ItemFn {
         if let ReturnType::Type(_, ty) = &mut decl.output {
             match &**ty {
                 // `return`
-                Type::ImplTrait(_) if cx.visit_last() => cx.visit_mode(VisitMode::Return),
+                Type::ImplTrait(_) if cx.visit_last() => cx.set_visit_mode(VisitMode::Return),
 
                 // `?` operator
                 Type::Path(TypePath { qself: None, path }) if cx.visit_last() => {
@@ -173,7 +171,7 @@ impl Parent for ItemFn {
         match self.block.stmts.last_mut() {
             Some(Stmt::Expr(expr)) => child_expr(expr, cx)?,
             Some(_) => {}
-            None => Err(err!(
+            None => Err(error!(
                 self.block,
                 "the `#[auto_enum]` attribute is not supported empty functions"
             ))?,

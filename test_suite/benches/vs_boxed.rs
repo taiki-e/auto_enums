@@ -1,23 +1,15 @@
 #![feature(test)]
 #![feature(box_syntax)]
 #![cfg_attr(feature = "unstable", feature(try_trait))]
+#![warn(unsafe_code)]
 #![warn(rust_2018_idioms)]
+#![warn(clippy::all)]
 
 extern crate test;
 
 use auto_enums::auto_enum;
 use rand::Rng;
 use test::Bencher;
-
-/*
-This code will fail to compile(E0308).
-fn iter(x: u32) -> impl Iterator<Item = i64> {
-    match x {
-        0 => (0..).map(|x| x + 1),
-        _ => (0..).map(|x| x + 1),
-    }
-}
-*/
 
 fn iter_no_branch(_x: u32) -> impl Iterator<Item = i64> {
     (0..).map(|x| x + 2 - 1)

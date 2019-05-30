@@ -1,0 +1,32 @@
+error: an enum with units variant is not supported
+ --> $DIR/variant.rs:9:5
+  |
+9 |     A,
+  |     ^
+
+error: an enum with discriminants is not supported
+  --> $DIR/variant.rs:15:9
+   |
+15 |     A = 2,
+   |         ^
+
+error: an enum with named fields variant is not supported
+  --> $DIR/variant.rs:21:5
+   |
+21 |     A { x: A },
+   |     ^^^^^^^^^^
+
+error: a variant with zero fields is not supported
+  --> $DIR/variant.rs:27:6
+   |
+27 |     A(),
+   |      ^^
+
+error: a variant with multiple fields is not supported
+  --> $DIR/variant.rs:34:6
+   |
+34 |     B(A, B),
+   |      ^^^^^^
+
+error: aborting due to 5 previous errors
+

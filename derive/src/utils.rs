@@ -1,14 +1,11 @@
 use std::ops::Deref;
 
 use proc_macro2::{Ident, Span, TokenStream};
-use smallvec::SmallVec;
 use syn::{punctuated::Punctuated, *};
 
 pub(crate) use derive_utils::{derive_trait_internal as derive_trait, EnumData, Trait};
 pub(crate) use quote::{quote, ToTokens};
 pub(crate) use syn::{parse2, ItemImpl, Result};
-
-pub(crate) type Stack<T> = SmallVec<[T; 4]>;
 
 pub(crate) struct Data {
     pub(crate) data: EnumData,
@@ -53,7 +50,7 @@ macro_rules! span {
     };
 }
 
-macro_rules! err {
+macro_rules! error {
     ($msg:expr) => {
         syn::Error::new_spanned(span!($msg), $msg)
     };
@@ -61,6 +58,6 @@ macro_rules! err {
         syn::Error::new_spanned(span!($span), $msg)
     };
     ($span:expr, $($tt:tt)*) => {
-        err!($span, format!($($tt)*))
+        error!($span, format!($($tt)*))
     };
 }

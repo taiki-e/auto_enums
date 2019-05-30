@@ -5,7 +5,7 @@ macro_rules! fmt_impl {
 
             pub(crate) const NAME: &[&str] = &[$($name),*];
 
-            pub(crate) fn derive(data: &Data, stack: &mut Stack<ItemImpl>) -> Result<()> {
+            pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
                 derive_trait!(
                     data,
                     parse_quote!(::core::fmt::$Trait)?,
@@ -16,7 +16,7 @@ macro_rules! fmt_impl {
                         }
                     }?,
                 )
-                .map(|item| stack.push(item))
+                .map(|item| items.push(item))
             }
         }
     };
