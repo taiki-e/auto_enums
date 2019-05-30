@@ -1,8 +1,8 @@
 use syn::{Arm, Attribute, Expr, Local, Stmt};
 
-use crate::utils::VecExt;
+use super::VecExt;
 
-pub(super) trait Attrs {
+pub(crate) trait Attrs {
     fn attrs(&self) -> &[Attribute];
 
     fn any_attr(&self, ident: &str) -> bool {
@@ -16,7 +16,7 @@ pub(super) trait Attrs {
     }
 }
 
-pub(super) trait AttrsMut: Attrs {
+pub(crate) trait AttrsMut: Attrs {
     fn attrs_mut<T, F: FnOnce(&mut Vec<Attribute>) -> T>(&mut self, f: F) -> T;
 
     fn find_remove_attr(&mut self, ident: &str) -> Option<Attribute> {

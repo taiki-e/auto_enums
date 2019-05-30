@@ -1,12 +1,14 @@
 use syn::{
-    parse_quote,
+    token,
     visit_mut::{self, VisitMut},
-    Arm, Attribute, Expr, ExprMacro, ExprReturn, ExprTry, Item, Local, Stmt,
+    Arm, Attribute, Expr, ExprMacro, ExprMatch, ExprReturn, ExprTry, Item, Local, Stmt,
 };
 
-use crate::utils::{replace_expr, OptionExt};
+#[cfg(feature = "try_trait")]
+use crate::utils::expr_call;
+use crate::utils::replace_expr;
 
-use super::*;
+use super::{parse_group, Attrs, AttrsMut, Context, Parent, VisitMode, EMPTY_ATTRS, NAME, NEVER};
 
 // =============================================================================
 // Visitor
@@ -39,89 +41,103 @@ impl<'a> Visitor<'a> {
         }
     }
 
-    fn other_attr<A: Attrs>(&mut self, attrs: &A) {
+    fn check_other_attr<A: Attrs>(&mut self, attrs: &A) {
         if attrs.any_attr(NAME) {
             self.scope.foreign = true;
-            // Record whether other `auto_enum` exists.
-            self.cx.attr = true;
+            // Record whether other `auto_enum` attribute exists.
+            self.cx.other_attr = true;
         }
     }
 
     /// `return` in functions or closures
     fn visit_return(&mut self, expr: &mut Expr) {
-        if let Expr::Closure(_) = &expr {
-            self.scope.closure = true;
-        }
+        debug_assert!(self.cx.visit_mode() == VisitMode::Return);
 
         if !self.scope.closure && !expr.any_empty_attr(NEVER) {
+            // Desugar `return <expr>` into `return Enum::VariantN(<expr>)`.
             if let Expr::Return(ExprReturn { expr, .. }) = expr {
-                expr.replace_boxed_expr(|expr| match expr {
-                    Expr::Macro(expr) => {
-                        if self.cx.marker_macro(&expr.mac) {
-                            Expr::Macro(expr)
-                        } else {
-                            self.cx.next_expr(Expr::Macro(expr))
-                        }
-                    }
-                    expr => self.cx.next_expr(expr),
-                });
+                self.cx.replace_boxed_expr(expr);
             }
         }
     }
 
     /// `?` operator in functions or closures
     fn visit_try(&mut self, expr: &mut Expr) {
-        match expr {
-            Expr::Closure(_) => self.scope.closure = true,
-            // `?` operator in try blocks are not supported.
-            Expr::TryBlock(_) => self.scope.try_block = true,
-            _ => {}
-        }
+        debug_assert!(self.cx.visit_mode() == VisitMode::Try);
 
         if !self.scope.try_block && !self.scope.closure && !expr.any_empty_attr(NEVER) {
-            *expr = match expr {
-                Expr::Try(ExprTry { expr, .. }) => {
-                    if let Expr::Macro(ExprMacro { mac, .. }) = &**expr {
-                        if self.cx.marker_macro(mac) {
-                            return;
-                        }
-                    }
+            match &expr {
+                // https://github.com/rust-lang/rust/blob/1.35.0/src/librustc/hir/lowering.rs#L4578-L4682
 
-                    // https://github.com/rust-lang/rust/blob/1.33.0/src/librustc/hir/lowering.rs#L4416-L4514
-                    let err = self.cx.next_expr(parse_quote!(err));
-                    #[cfg(feature = "try_trait")]
-                    {
-                        parse_quote! {
-                            match ::core::ops::Try::into_result(#expr) {
-                                ::core::result::Result::Ok(val) => val,
-                                ::core::result::Result::Err(err) => return ::core::ops::Try::from_error(#err),
-                            }
-                        }
-                    }
-                    #[cfg(not(feature = "try_trait"))]
-                    {
-                        parse_quote! {
-                            match #expr {
-                                ::core::result::Result::Ok(val) => val,
-                                ::core::result::Result::Err(err) => return ::core::result::Result::Err(#err),
-                            }
-                        }
-                    }
+                // Desugar `ExprKind::Try`
+                // from: `<expr>?`
+                Expr::Try(ExprTry { expr: e, .. })
+                    // Skip if `<expr>` is a marker macro.
+                    if !self.cx.is_marker_expr(&**e) =>
+                {
+                    // into:
+                    //
+                    // match // If "try_trait" feature enabled
+                    //       Try::into_result(<expr>)
+                    //       // Otherwise
+                    //       <expr>
+                    // {
+                    //     Ok(val) => val,
+                    //     Err(err) => // If "try_trait" feature enabled
+                    //                 return Try::from_error(Enum::VariantN(err)),
+                    //                 // Otherwise
+                    //                 return Err(Enum::VariantN(err)),
+                    // }
+
+                    replace_expr(expr, |expr| {
+                        #[allow(unused_mut)]
+                        let ExprTry { attrs, mut expr, .. } =
+                            if let Expr::Try(expr) = expr { expr } else { unreachable!() };
+
+                        #[cfg(feature = "try_trait")]
+                        replace_expr(&mut *expr, |expr| {
+                            expr_call(
+                                Vec::new(),
+                                syn::parse_quote!(::core::ops::Try::into_result),
+                                expr,
+                            )
+                        });
+
+                        let mut arms = Vec::with_capacity(2);
+                        arms.push(syn::parse_quote!(::core::result::Result::Ok(val) => val,));
+
+                        let err = self.cx.next_expr(syn::parse_quote!(err));
+                        #[cfg(feature = "try_trait")]
+                        arms.push(syn::parse_quote!(::core::result::Result::Err(err) => return ::core::ops::Try::from_error(#err),));
+                        #[cfg(not(feature = "try_trait"))]
+                        arms.push(syn::parse_quote!(::core::result::Result::Err(err) => return ::core::result::Result::Err(#err),));
+
+                        Expr::Match(ExprMatch {
+                            attrs,
+                            match_token: token::Match::default(),
+                            expr,
+                            brace_token: token::Brace::default(),
+                            arms,
+                        })
+                    })
                 }
-                _ => return,
-            };
+                _ => {}
+            }
         }
     }
 
     /// Expression level marker (`marker!` macro)
-    fn visit_marker(&mut self, expr: &mut Expr) {
-        if self.scope.foreign && !self.cx.marker.is_unique() {
-            return;
-        }
+    fn visit_marker_macro(&mut self, expr: &mut Expr) {
+        debug_assert!(!self.scope.foreign || self.cx.marker.is_unique());
 
-        replace_expr(expr, |expr| match expr {
-            Expr::Macro(expr) => {
-                if expr.mac.path.is_ident(self.cx.marker.ident()) {
+        match &expr {
+            // Desugar `marker!(<expr>)` into `Enum::VariantN(<expr>)`.
+            Expr::Macro(ExprMacro { mac, .. })
+                // Skip if `marker!` is not a marker macro.
+                if mac.path.is_ident(self.cx.marker.ident()) =>
+            {
+                replace_expr(expr, |expr| {
+                    let expr = if let Expr::Macro(expr) = expr { expr } else { unreachable!() };
                     let args = syn::parse2(expr.mac.tts).unwrap_or_else(|e| {
                         self.cx.error = true;
                         syn::parse2(e.to_compile_error()).unwrap_or_else(|_| unreachable!())
@@ -132,14 +148,10 @@ impl<'a> Visitor<'a> {
                     } else {
                         self.cx.next_expr_with_attrs(expr.attrs, args)
                     }
-                } else {
-                    Expr::Macro(expr)
-                }
+                })
             }
-            expr => expr,
-        });
-
-        self.find_remove_empty_attrs(expr);
+            _ => {}
+        }
     }
 }
 
@@ -147,16 +159,28 @@ impl VisitMut for Visitor<'_> {
     fn visit_expr_mut(&mut self, expr: &mut Expr) {
         if !self.cx.error {
             let tmp = self.scope;
-            self.other_attr(expr);
+            self.check_other_attr(expr);
 
-            match self.cx.mode() {
-                VisitMode::Return => self.visit_return(expr),
-                VisitMode::Try => self.visit_try(expr),
+            match expr {
+                Expr::Closure(_) => self.scope.closure = true,
+                // `?` operator in try blocks are not supported.
+                Expr::TryBlock(_) => self.scope.try_block = true,
                 _ => {}
             }
 
+            match self.cx.visit_mode() {
+                VisitMode::Return => self.visit_return(expr),
+                VisitMode::Try => self.visit_try(expr),
+                VisitMode::Default => {}
+            }
+
             visit_mut::visit_expr_mut(self, expr);
-            self.visit_marker(expr);
+
+            if !self.scope.foreign || self.cx.marker.is_unique() {
+                self.visit_marker_macro(expr);
+                self.find_remove_empty_attrs(expr);
+            }
+
             self.scope = tmp;
         }
     }
@@ -171,7 +195,7 @@ impl VisitMut for Visitor<'_> {
     fn visit_local_mut(&mut self, local: &mut Local) {
         if !self.cx.error {
             let tmp = self.scope;
-            self.other_attr(local);
+            self.check_other_attr(local);
 
             visit_mut::visit_local_mut(self, local);
             self.find_remove_empty_attrs(local);
@@ -216,13 +240,9 @@ impl VisitMut for FindTry<'_> {
 
         if !self.scope.closure && !expr.any_empty_attr(NEVER) {
             if let Expr::Try(ExprTry { expr, .. }) = expr {
-                match &**expr {
-                    Expr::Macro(expr) => {
-                        if !self.cx.marker_macro(&expr.mac) {
-                            self.has = true;
-                        }
-                    }
-                    _ => self.has = true,
+                // Skip if `<expr>` is a marker macro.
+                if !self.cx.is_marker_expr(&**expr) {
+                    self.has = true;
                 }
             }
         }

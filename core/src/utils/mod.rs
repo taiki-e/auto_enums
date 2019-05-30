@@ -1,29 +1,17 @@
-use std::mem;
+use std::{iter, mem};
 
 use proc_macro2::{Ident, Span, TokenStream};
 use syn::{
-    punctuated::Punctuated, token, Block, Expr, ExprBlock, ExprTuple, ExprVerbatim, Path,
-    PathSegment, Stmt,
+    punctuated::Punctuated, token, Attribute, Block, Expr, ExprBlock, ExprCall, ExprPath,
+    ExprTuple, ExprVerbatim, Path, PathSegment, Stmt,
 };
+
+mod attrs;
+
+pub(crate) use self::attrs::{Attrs, AttrsMut};
 
 // =============================================================================
 // Extension traits
-
-pub(crate) trait OptionExt {
-    fn replace_boxed_expr<F: FnOnce(Expr) -> Expr>(&mut self, f: F);
-}
-
-impl OptionExt for Option<Box<Expr>> {
-    fn replace_boxed_expr<F: FnOnce(Expr) -> Expr>(&mut self, f: F) {
-        if self.is_none() {
-            self.replace(Box::new(unit()));
-        }
-
-        if let Some(expr) = self {
-            replace_expr(&mut **expr, f);
-        }
-    }
-}
 
 pub(crate) trait VecExt<T> {
     fn find_remove<P: FnMut(&T) -> bool>(&mut self, predicate: P) -> Option<T>;
@@ -54,6 +42,15 @@ pub(crate) fn expr_block(block: Block) -> Expr {
     Expr::Block(ExprBlock { attrs: Vec::new(), label: None, block })
 }
 
+pub(crate) fn expr_call(attrs: Vec<Attribute>, path: Path, arg: Expr) -> Expr {
+    Expr::Call(ExprCall {
+        attrs,
+        func: Box::new(Expr::Path(ExprPath { attrs: Vec::new(), qself: None, path })),
+        paren_token: token::Paren::default(),
+        args: iter::once(arg).collect(),
+    })
+}
+
 pub(crate) fn unit() -> Expr {
     Expr::Tuple(ExprTuple {
         attrs: Vec::new(),
@@ -79,7 +76,7 @@ macro_rules! span {
     };
 }
 
-macro_rules! err {
+macro_rules! error {
     ($msg:expr) => {
         syn::Error::new_spanned(span!($msg), $msg)
     };
@@ -90,9 +87,9 @@ macro_rules! err {
         syn::Error::new_spanned(span!($span), $msg)
     };
     ($span:ident .span(), $($tt:tt)*) => {
-        err!($span.span(), format!($($tt)*))
+        error!($span.span(), format!($($tt)*))
     };
     ($span:expr, $($tt:tt)*) => {
-        err!($span, format!($($tt)*))
+        error!($span, format!($($tt)*))
     };
 }
