@@ -67,14 +67,14 @@ matrix:
         - RUSTDOCFLAGS=-Dwarnings cargo doc --all --all-features --no-deps
 
 env:
-  - RUSTFLAGS="-D warnings"
+  - RUSTFLAGS=-Dwarnings
 
 before_script:
   - set -o errexit
 
 script:
-  - cargo test --all --tests --no-default-features
-  - cargo test --all --tests
+  - cargo check --all --no-default-features
+  - cargo check --all
 
 notifications:
   email:

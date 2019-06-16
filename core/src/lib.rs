@@ -3,8 +3,9 @@
 #![doc(test(attr(deny(warnings), allow(dead_code, unused_assignments, unused_variables))))]
 #![warn(unsafe_code)]
 #![warn(rust_2018_idioms, unreachable_pub)]
+// It cannot be included in the published code because these lints have false positives in the minimum required version.
+#![cfg_attr(test, warn(single_use_lifetimes))]
 #![warn(clippy::all, clippy::pedantic)]
-// #![warn(single_use_lifetimes)]
 #![warn(clippy::nursery)]
 
 extern crate proc_macro;
