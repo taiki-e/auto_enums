@@ -10,7 +10,6 @@ repository = "https://github.com/taiki-e/auto_enums"
 documentation = "https://docs.rs/auto_enums_core/"
 keywords = ["enum", "macros", "derive", "attribute"]
 categories = ["rust-patterns"]
-include = ["Cargo.toml", "build.rs", "src/**/*.rs", "LICENSE-APACHE", "LICENSE-MIT"]
 
 [badges]
 travis-ci = { repository = "taiki-e/auto_enums" }
