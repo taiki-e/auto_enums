@@ -674,12 +674,12 @@
 //!
 //! `[std|core]::iter`
 //!
-//! * [`Iterator`](https://doc.rust-lang.org/std/iter/trait.Iterator.html)
-//! * [`DoubleEndedIterator`](https://doc.rust-lang.org/std/iter/trait.DoubleEndedIterator.html)
-//! * [`ExactSizeIterator`](https://doc.rust-lang.org/std/iter/trait.ExactSizeIterator.html)
-//! * [`FusedIterator`](https://doc.rust-lang.org/std/iter/trait.FusedIterator.html)
-//! * [`TrustedLen`](https://doc.rust-lang.org/std/iter/trait.TrustedLen.html) (*nightly-only*)
-//! * [`Extend`](https://doc.rust-lang.org/std/iter/trait.Extend.html)
+//! * [`Iterator`](https://doc.rust-lang.org/std/iter/trait.Iterator.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/iter/iterator.md)
+//! * [`DoubleEndedIterator`](https://doc.rust-lang.org/std/iter/trait.DoubleEndedIterator.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/iter/double_ended_iterator.md)
+//! * [`ExactSizeIterator`](https://doc.rust-lang.org/std/iter/trait.ExactSizeIterator.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/iter/exact_size_iterator.md)
+//! * [`FusedIterator`](https://doc.rust-lang.org/std/iter/trait.FusedIterator.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/iter/fused_iterator.md)
+//! * [`TrustedLen`](https://doc.rust-lang.org/std/iter/trait.TrustedLen.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/iter/trusted_len.md) (*nightly-only*)
+//! * [`Extend`](https://doc.rust-lang.org/std/iter/trait.Extend.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/iter/extend.md)
 //!
 //! `[std|core]::fmt`
 //!
@@ -696,7 +696,7 @@
 //!
 //! `[std|core]::future`
 //!
-//! * [`Future`](https://doc.rust-lang.org/nightly/std/future/trait.Future.html) - *nightly-only* - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/future.md)
+//! * [`Future`](https://doc.rust-lang.org/nightly/std/future/trait.Future.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/future.md)
 //!
 //! `std::io` *(requires `"std"` crate feature)*
 //!
