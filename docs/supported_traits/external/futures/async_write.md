@@ -29,7 +29,7 @@ where
         self: ::core::pin::Pin<&mut Self>,
         cx: &mut ::core::task::Context<'_>,
         buf: &[u8],
-    ) -> ::core::task::Poll<::core::result::Result<usize, ::futures::io::Error>> {
+    ) -> ::core::task::Poll<::std::io::Result<usize>> {
         unsafe {
             match ::core::pin::Pin::get_unchecked_mut(self) {
                 Enum::A(x) => ::futures::io::AsyncWrite::poll_write(x, cx, buf),
@@ -43,7 +43,7 @@ where
         self: ::core::pin::Pin<&mut Self>,
         cx: &mut ::core::task::Context<'_>,
         bufs: &[::std::io::IoSlice<'_>],
-    ) -> ::core::task::Poll<::core::result::Result<usize, ::futures::io::Error>> {
+    ) -> ::core::task::Poll<::std::io::Result<usize>> {
         unsafe {
             match ::core::pin::Pin::get_unchecked_mut(self) {
                 Enum::A(x) => ::futures::io::AsyncWrite::poll_write_vectored(x, cx, bufs),
@@ -56,7 +56,7 @@ where
     fn poll_flush(
         self: ::core::pin::Pin<&mut Self>,
         cx: &mut ::core::task::Context<'_>,
-    ) -> ::core::task::Poll<::core::result::Result<(), ::futures::io::Error>> {
+    ) -> ::core::task::Poll<::std::io::Result<()>> {
         unsafe {
             match ::core::pin::Pin::get_unchecked_mut(self) {
                 Enum::A(x) => ::futures::io::AsyncWrite::poll_flush(x, cx),
@@ -69,7 +69,7 @@ where
     fn poll_close(
         self: ::core::pin::Pin<&mut Self>,
         cx: &mut ::core::task::Context<'_>,
-    ) -> ::core::task::Poll<::core::result::Result<(), ::futures::io::Error>> {
+    ) -> ::core::task::Poll<::std::io::Result<()>> {
         unsafe {
             match ::core::pin::Pin::get_unchecked_mut(self) {
                 Enum::A(x) => ::futures::io::AsyncWrite::poll_close(x, cx),
