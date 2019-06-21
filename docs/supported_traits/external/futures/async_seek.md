@@ -29,7 +29,7 @@ where
         self: ::core::pin::Pin<&mut Self>,
         cx: &mut ::core::task::Context<'_>,
         pos: ::std::io::SeekFrom,
-    ) -> ::core::task::Poll<::core::result::Result<u64, ::futures::io::Error>> {
+    ) -> ::core::task::Poll<::std::io::Result<u64>> {
         unsafe {
             match ::core::pin::Pin::get_unchecked_mut(self) {
                 Enum::A(x) => ::futures::io::AsyncSeek::poll_seek(x, cx, pos),

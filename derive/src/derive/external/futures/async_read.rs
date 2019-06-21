@@ -17,13 +17,13 @@ pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
                     self: ::core::pin::Pin<&mut Self>,
                     cx: &mut ::core::task::Context<'_>,
                     buf: &mut [u8],
-                ) -> ::core::task::Poll<::core::result::Result<usize, #io::Error>>;
+                ) -> ::core::task::Poll<::std::io::Result<usize>>;
                 #[inline]
                 fn poll_read_vectored(
                     self: ::core::pin::Pin<&mut Self>,
                     cx: &mut ::core::task::Context<'_>,
                     bufs: &mut [::std::io::IoSliceMut<'_>],
-                ) -> ::core::task::Poll<::core::result::Result<usize, #io::Error>>;
+                ) -> ::core::task::Poll<::std::io::Result<usize>>;
             }
         }?,
     )

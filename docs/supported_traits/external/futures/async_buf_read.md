@@ -1,4 +1,4 @@
-## [`AsyncRead`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.16/futures/io/trait.AsyncRead.html)
+## [`AsyncBufRead`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.16/futures/io/trait.AsyncBufRead.html)
 
 When deriving for enum like the following:
 
@@ -28,7 +28,7 @@ where
       fn poll_fill_buf<'__a>(
         self: ::core::pin::Pin<&'__a mut Self>,
         cx: &mut ::core::task::Context<'_>,
-    ) -> ::core::task::Poll<::core::result::Result<&'__a [u8], ::futures::io::Error>>;
+    ) -> ::core::task::Poll<::std::io::Result<&'__a [u8]>>;
         match ::core::pin::Pin::get_unchecked_mut(self) {
             Enum::A(x) => ::futures::io::AsyncBufRead::poll_fill_buf(::core::pin::Pin::new_unchecked(x), cx),
             Enum::B(x) => ::futures::io::AsyncBufRead::poll_fill_buf(::core::pin::Pin::new_unchecked(x), cx),

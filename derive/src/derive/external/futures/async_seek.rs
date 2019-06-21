@@ -15,7 +15,7 @@ pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
                     self: ::core::pin::Pin<&mut Self>,
                     cx: &mut ::core::task::Context<'_>,
                     pos: ::std::io::SeekFrom,
-                ) -> ::core::task::Poll<::core::result::Result<u64, #io::Error>>;
+                ) -> ::core::task::Poll<::std::io::Result<u64>>;
             }
         }?,
     )
