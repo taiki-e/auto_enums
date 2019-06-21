@@ -4,6 +4,8 @@
 
 * Improved error messages.
 
+* Added some generated code examples.
+
 # 0.5.8 - 2019-05-22
 
 * Added support for `futures::io::{AsyncSeek, AsyncBufRead}`.
