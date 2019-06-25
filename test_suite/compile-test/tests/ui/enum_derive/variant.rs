@@ -34,4 +34,12 @@ enum Enum6<A> {
     B(A, B),
 }
 
+#[enum_derive(Clone)]
+enum Enum7<A> {
+    A(A),
+}
+
+#[enum_derive(Clone)]
+enum Enum8 {}
+
 fn main() {}

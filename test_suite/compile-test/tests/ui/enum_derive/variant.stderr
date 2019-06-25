@@ -28,5 +28,19 @@ error: a variant with multiple fields is not supported
 34 |     B(A, B),
    |      ^^^^^^
 
-error: aborting due to 5 previous errors
+error: cannot be implemented for enums with less than two variants
+  --> $DIR/variant.rs:38:1
+   |
+38 | / enum Enum7<A> {
+39 | |     A(A),
+40 | | }
+   | |_^
+
+error: cannot be implemented for enums with less than two variants
+  --> $DIR/variant.rs:43:1
+   |
+43 | enum Enum8 {}
+   | ^^^^^^^^^^^^^
+
+error: aborting due to 7 previous errors
 
