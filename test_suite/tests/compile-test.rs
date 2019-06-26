@@ -1,3 +1,4 @@
+#![cfg(ui_tests)]
 #![cfg(feature = "unstable")]
 
 use std::{env, path::PathBuf};

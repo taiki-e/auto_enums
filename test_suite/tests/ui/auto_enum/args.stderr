@@ -1,0 +1,74 @@
+error: expected one of `,`, or `::`, found `;`
+ --> $DIR/args.rs:8:21
+  |
+8 | #[auto_enum(Iterator;)] //~ ERROR expected one of `,`, or `::`, found `;`
+  |                     ^
+
+error: expected one of `,`, `::`, or identifier, found `;`
+  --> $DIR/args.rs:16:22
+   |
+16 | #[auto_enum(Iterator,;)] //~ ERROR expected one of `,`, `::`, or identifier, found `;`
+   |                      ^
+
+error: multiple `never` option
+  --> $DIR/args.rs:27:24
+   |
+27 |     #[auto_enum(never, never, Iterator)] //~ ERROR multiple `never` option
+   |                        ^^^^^
+
+error: invalid delimiter
+  --> $DIR/args.rs:35:23
+   |
+35 |     #[auto_enum(marker{f}, Iterator)] //~ ERROR invalid delimiter
+   |                       ^^^
+
+error: invalid delimiter
+  --> $DIR/args.rs:43:23
+   |
+43 |     #[auto_enum(marker[f], Iterator)] //~ ERROR invalid delimiter
+   |                       ^^^
+
+error: multiple `marker` option
+  --> $DIR/args.rs:51:35
+   |
+51 |     #[auto_enum(marker(f), marker(g), Iterator)] //~ ERROR multiple `marker` option
+   |                                   ^
+
+error: empty `marker` option
+  --> $DIR/args.rs:59:23
+   |
+59 |     #[auto_enum(marker(), Iterator)] //~ ERROR empty `marker` option
+   |                       ^^
+
+error: multiple identifier in `marker` option
+  --> $DIR/args.rs:67:27
+   |
+67 |     #[auto_enum(marker(f, g), Iterator)] //~ ERROR multiple identifier in `marker` option
+   |                           ^
+
+error: multiple identifier in `marker` option
+  --> $DIR/args.rs:75:26
+   |
+75 |     #[auto_enum(marker(f t), Iterator)] //~ ERROR multiple identifier in `marker` option
+   |                          ^
+
+error: multiple `marker` option
+  --> $DIR/args.rs:83:34
+   |
+83 |     #[auto_enum(marker=f, marker=g, Iterator)] //~ ERROR multiple `marker` option
+   |                                  ^
+
+error: expected an identifier, found `,`
+  --> $DIR/args.rs:91:24
+   |
+91 |     #[auto_enum(marker=, Iterator)] //~ ERROR empty `marker` option
+   |                        ^
+
+error: expected `,`, found `t`
+  --> $DIR/args.rs:99:26
+   |
+99 |     #[auto_enum(marker=f t, Iterator)] //~ ERROR expected `,`, found `t`
+   |                          ^
+
+error: aborting due to 12 previous errors
+

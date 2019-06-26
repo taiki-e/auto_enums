@@ -1,13 +1,13 @@
 error: expected one of `,`, `::`, or identifier, found `=`
  --> $DIR/args.rs:7:22
   |
-7 | #[enum_derive(Clone, =>)]
+7 | #[enum_derive(Clone, =>)] //~ ERROR expected one of `,`, `::`, or identifier, found `=`
   |                      ^^
 
 error: expected identifier
   --> $DIR/args.rs:13:25
    |
-13 | #[enum_derive(foo::bar::!)]
+13 | #[enum_derive(foo::bar::!)] //~ ERROR expected identifier
    |                         ^
 
 error: aborting due to 2 previous errors
