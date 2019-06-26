@@ -18,7 +18,6 @@ members = [
     "core",
     "derive",
     "test_suite",
-    "test_suite/compile-test",
     "test_suite/unstable",
 ]
 
