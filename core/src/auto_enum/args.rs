@@ -66,10 +66,6 @@ impl Eq for Arg {}
 // Parse
 
 macro_rules! error {
-    // FIXME: syntax
-    (span => $span:expr, $msg:expr) => {
-        return Err(syn::Error::new($span, $msg))
-    };
     ($span:expr, $msg:expr) => {
         return Err(syn::Error::new($span.span(), $msg))
     };

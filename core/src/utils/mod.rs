@@ -85,9 +85,6 @@ macro_rules! error {
     (span => $span:expr, $msg:expr) => {
         syn::Error::new($span, $msg)
     };
-    ($msg:expr) => {
-        syn::Error::new_spanned(span!($msg), $msg)
-    };
     ($span:expr, $msg:expr) => {
         syn::Error::new_spanned(span!($span), $msg)
     };
