@@ -248,9 +248,11 @@ impl VisitLast<()> for ExprIf {
             }
             Some(Expr::If(expr)) => expr.visit_last(cx),
 
+            // TODO: https://docs.rs/proc-macro2/0.4/proc_macro2/struct.Span.html#method.join
+            // `self.span().join(self.then_branch.span()).unwrap_or_else(|| self.span())``
             None => Err(error!(span => self.span(), "`if` expression missing an else clause")),
-            // FIXME: This may not be necessary.
-            Some(expr) => Err(error!(expr, "after of `else` required `{` or `if`")),
+
+            Some(_) => unreachable!("wrong_if"),
         }
     }
 }

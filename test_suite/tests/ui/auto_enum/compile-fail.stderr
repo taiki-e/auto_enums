@@ -1,7 +1,20 @@
+error: expected `{`, found keyword `return`
+  --> $DIR/compile-fail.rs:30:12
+   |
+30 |       } else return {
+   |              -^^^^^
+   |              |
+   |  ____________expected `{`
+   | |
+31 | |         //~^ ERROR expected `{`, found keyword `return`
+32 | |         2..=10
+33 | |     }
+   | |_____- help: try placing this code inside a block: `{ return { 2..=10 }; }`
+
 error: expected one of `)`, `,`, `.`, `?`, or an operator, found `..`
   --> $DIR/compile-fail.rs:11:26
    |
-11 |         0 => marker!(1..8..),
+11 |         0 => marker!(1..8..), //~ ERROR expected one of `)`, `,`, `.`, `?`, or an operator, found `..`
    |                          ^^ expected one of `)`, `,`, `.`, `?`, or an operator here
 
 error: `if` expression missing an else clause
@@ -10,25 +23,28 @@ error: `if` expression missing an else clause
 20 |     } else if x > 3 {
    |            ^^
 
+error: the `#[auto_enum]` attribute is required two or more branches or marker macros in total, there is no branch or marker macro in this statement
+
 error: the `#[auto_enum]` attribute is required two or more branches or marker macros in total, there is only one branch or marker macro in this statement
-  --> $DIR/compile-fail.rs:28:5
+  --> $DIR/compile-fail.rs:39:5
    |
-28 | /     let iter = match x {
-29 | |         _ if y < 0 => return y..=0,
-30 | |         _ => 2..=10,
-31 | |     };
+39 | /     let iter = match x {
+40 | |         //~^ ERROR the `#[auto_enum]` attribute is required two or more branches or marker macros in total, there is only one branch or marker macro in this statement
+41 | |         _ if y < 0 => return y..=0,
+42 | |         _ => 2..=10,
+43 | |     };
    | |______^
 
 error[E0425]: cannot find value `iter` in this scope
-  --> $DIR/compile-fail.rs:34:14
+  --> $DIR/compile-fail.rs:46:14
    |
-34 |         0 => iter.flat_map(|x| 0..x),
+46 |         0 => iter.flat_map(|x| 0..x),
    |              ^^^^ not found in this scope
 
 error[E0425]: cannot find value `iter` in this scope
-  --> $DIR/compile-fail.rs:35:14
+  --> $DIR/compile-fail.rs:47:14
    |
-35 |         _ => iter.map(|x| x + 1),
+47 |         _ => iter.map(|x| x + 1),
    |              ^^^^ not found in this scope
 
 error[E0061]: this function takes 1 parameter but 2 parameters were supplied
@@ -40,7 +56,7 @@ error[E0061]: this function takes 1 parameter but 2 parameters were supplied
   | defined here
   | expected 1 parameter
 
-error: aborting due to 6 previous errors
+error: aborting due to 8 previous errors
 
 Some errors have detailed explanations: E0061, E0425.
 For more information about an error, try `rustc --explain E0061`.
