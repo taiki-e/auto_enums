@@ -18,7 +18,6 @@
 #![cfg_attr(all(not(feature = "std"), feature = "unstable"), feature(alloc))]
 #![warn(rust_2018_idioms)]
 #![warn(clippy::all)]
-#![allow(ellipsis_inclusive_range_patterns)] // syn generates both as `...`.
 #![allow(clippy::cognitive_complexity, clippy::needless_return, clippy::never_loop)]
 
 #[cfg(all(not(feature = "std"), feature = "unstable"))]
