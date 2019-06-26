@@ -137,7 +137,7 @@ fn unstable_std() {
 
 #[test]
 fn unfmt() {
-    #[cfg_attr(feature = "rustfmt", rustfmt_skip)]
+    #[rustfmt::skip]
     #[enum_derive(Transpose, Iterator)]
     enum Enum1<A, B,> {
         A(A),
@@ -145,7 +145,7 @@ fn unfmt() {
     }
 
     #[cfg(feature = "std")]
-    #[cfg_attr(feature = "rustfmt", rustfmt_skip)]
+    #[rustfmt::skip]
     #[enum_derive(Iterator)]
     enum Enum2<> {
         A(::core::ops::Range<i32>),

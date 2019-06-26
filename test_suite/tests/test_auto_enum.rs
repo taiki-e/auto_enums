@@ -44,7 +44,7 @@ fn stable_1_30() {
     }
 
     // block + unsafe block + parentheses
-    #[cfg_attr(feature = "rustfmt", rustfmt_skip)]
+    #[rustfmt::skip]
     #[allow(unused_unsafe)]
     #[auto_enum(Iterator)]
     fn block(x: usize) -> impl Iterator<Item = i32> {
@@ -402,7 +402,7 @@ fn stable_1_30() {
         assert_eq!(rec_match_in_match(i).sum::<i32>(), *x);
     }
 
-    #[cfg_attr(feature = "rustfmt", rustfmt_skip)]
+    #[rustfmt::skip]
     #[allow(unused_unsafe)]
     #[auto_enum(Iterator)]
     fn rec_in_block(x: usize) -> impl Iterator<Item = i32> {
@@ -668,7 +668,7 @@ fn nightly() {
 
     // never attr
     for (i, x) in ANS.iter().enumerate() {
-        #[cfg_attr(feature = "rustfmt", rustfmt_skip)]
+        #[rustfmt::skip]
         #[auto_enum(Iterator)]
         let iter = match i {
             0 => 1..8,
@@ -693,7 +693,7 @@ fn nightly() {
         assert_eq!(iter.sum::<i32>(), *x);
     }
     for (i, x) in ANS.iter().enumerate() {
-        #[cfg_attr(feature = "rustfmt", rustfmt_skip)]
+        #[rustfmt::skip]
         #[auto_enum(Iterator)]
         let iter = match i {
             0 => 1..8,
