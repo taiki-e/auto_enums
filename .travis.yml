@@ -7,6 +7,7 @@ branches:
     - master
     - staging
     - trying
+    - v0.5
 
 matrix:
   fast_finish: true
