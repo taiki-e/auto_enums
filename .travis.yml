@@ -36,19 +36,6 @@ matrix:
         - cargo check --all --all-features
 
     - rust: nightly
-      name: cargo tree
-      script:
-        - if [[ ! -x "$(command -v cargo-tree)" ]]; then
-            cargo install --debug cargo-tree || travis_terminate 1;
-          fi
-        - cargo update
-        - cargo tree
-        - cargo tree --duplicate
-        - cargo update -Zminimal-versions
-        - cargo tree
-        - cargo tree --duplicate
-
-    - rust: nightly
       name: cargo clippy
       script:
         - rustup component add clippy || travis_terminate 0
