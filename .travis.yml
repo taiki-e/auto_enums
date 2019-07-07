@@ -1,6 +1,5 @@
 language: rust
 sudo: false
-cache: cargo
 
 branches:
   only:
