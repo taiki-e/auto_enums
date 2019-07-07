@@ -2,13 +2,15 @@
 
 * Renamed `#[rec]` to `#[nested]`.
 
-* Updated to support `futures-preview` 0.3.0-alpha.17.
-
 * Improved error messages.
 
-* Added some generated code examples.
-
 * Updated minimum `derive_utils` version to 0.8.0. This improves the error message.
+
+# 0.5.9 - 2019-07-07
+
+* Updated to support `futures-preview` 0.3.0-alpha.17.
+
+* Added some generated code examples.
 
 # 0.5.8 - 2019-05-22
 
