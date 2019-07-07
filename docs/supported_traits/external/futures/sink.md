@@ -1,4 +1,4 @@
-## [`Sink`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.16/futures/sink/trait.Sink.html)
+## [`Sink`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.17/futures/sink/trait.Sink.html)
 
 When deriving for enum like the following:
 
@@ -22,15 +22,15 @@ enum Enum<A, B> {
 impl<A, B> ::futures::sink::Sink<Item> for Enum<A, B>
 where
     A: ::futures::sink::Sink<Item>,
-    B: ::futures::sink::Sink<Item, SinkError = <A as ::futures::sink::Sink>::SinkError>,
+    B: ::futures::sink::Sink<Item, Error = <A as ::futures::sink::Sink>::Error>,
 {
-    type SinkError = <A as ::futures::sink::Sink>::SinkError;
+    type Error = <A as ::futures::sink::Sink>::Error;
 
     #[inline]
     fn poll_ready(
         self: ::core::pin::Pin<&mut Self>,
         cx: &mut ::core::task::Context<'_>,
-    ) -> ::core::task::Poll<::core::result::Result<(), Self::SinkError>> {
+    ) -> ::core::task::Poll<::core::result::Result<(), Self::Error>> {
         unsafe {
             match ::core::pin::Pin::get_unchecked_mut(self) {
                 Enum::A(x) => ::futures::sink::Sink::poll_ready(::core::pin::Pin::new_unchecked(x), cx),
@@ -43,7 +43,7 @@ where
     fn start_send(
         self: ::core::pin::Pin<&mut Self>,
         item: Item,
-    ) -> ::core::result::Result<(), Self::SinkError> {
+    ) -> ::core::result::Result<(), Self::Error> {
         unsafe {
             match ::core::pin::Pin::get_unchecked_mut(self) {
                 Enum::A(x) => ::futures::sink::Sink::start_send(::core::pin::Pin::new_unchecked(x), item),
@@ -56,7 +56,7 @@ where
     fn poll_flush(
         self: ::core::pin::Pin<&mut Self>,
         cx: &mut ::core::task::Context<'_>,
-    ) -> ::core::task::Poll<::core::result::Result<(), Self::SinkError>> {
+    ) -> ::core::task::Poll<::core::result::Result<(), Self::Error>> {
         unsafe {
             match ::core::pin::Pin::get_unchecked_mut(self) {
                 Enum::A(x) => ::futures::sink::Sink::poll_flush(::core::pin::Pin::new_unchecked(x), cx),
@@ -69,7 +69,7 @@ where
     fn poll_close(
         self: ::core::pin::Pin<&mut Self>,
         cx: &mut ::core::task::Context<'_>,
-    ) -> ::core::task::Poll<::core::result::Result<(), Self::SinkError>> {
+    ) -> ::core::task::Poll<::core::result::Result<(), Self::Error>> {
         unsafe {
             match ::core::pin::Pin::get_unchecked_mut(self) {
                 Enum::A(x) => ::futures::sink::Sink::poll_close(::core::pin::Pin::new_unchecked(x), cx),

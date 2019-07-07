@@ -29,7 +29,7 @@ Add this to your `Cargo.toml`:
 auto_enums = "0.5"
 ```
 
-The current version of auto_enums requires Rust 1.31 or later.
+The current auto_enums requires Rust 1.31 or later.
 
 ## Examples
 
@@ -122,12 +122,12 @@ Note that some traits have aliases.
 
 `[std|core]::iter`
 
-* [`Iterator`](https://doc.rust-lang.org/std/iter/trait.Iterator.html)
-* [`DoubleEndedIterator`](https://doc.rust-lang.org/std/iter/trait.DoubleEndedIterator.html)
-* [`ExactSizeIterator`](https://doc.rust-lang.org/std/iter/trait.ExactSizeIterator.html)
-* [`FusedIterator`](https://doc.rust-lang.org/std/iter/trait.FusedIterator.html)
-* [`TrustedLen`](https://doc.rust-lang.org/std/iter/trait.TrustedLen.html) (*nightly-only*)
-* [`Extend`](https://doc.rust-lang.org/std/iter/trait.Extend.html)
+* [`Iterator`](https://doc.rust-lang.org/std/iter/trait.Iterator.html) - [generated code](docs/supported_traits/std/iter/iterator.md)
+* [`DoubleEndedIterator`](https://doc.rust-lang.org/std/iter/trait.DoubleEndedIterator.html) - [generated code](docs/supported_traits/std/iter/double_ended_iterator.md)
+* [`ExactSizeIterator`](https://doc.rust-lang.org/std/iter/trait.ExactSizeIterator.html) - [generated code](docs/supported_traits/std/iter/exact_size_iterator.md)
+* [`FusedIterator`](https://doc.rust-lang.org/std/iter/trait.FusedIterator.html) - [generated code](docs/supported_traits/std/iter/fused_iterator.md)
+* [`TrustedLen`](https://doc.rust-lang.org/std/iter/trait.TrustedLen.html) - [generated code](docs/supported_traits/std/iter/trusted_len.md) (*nightly-only*)
+* [`Extend`](https://doc.rust-lang.org/std/iter/trait.Extend.html) - [generated code](docs/supported_traits/std/iter/extend.md)
 
 `[std|core]::fmt`
 
@@ -144,7 +144,7 @@ Note that some traits have aliases.
 
 `[std|core]::future`
 
-* [`Future`](https://doc.rust-lang.org/nightly/std/future/trait.Future.html) - *nightly-only* - [generated code](docs/supported_traits/std/future.md)
+* [`Future`](https://doc.rust-lang.org/nightly/std/future/trait.Future.html) - [generated code](docs/supported_traits/std/future.md)
 
 `std::io`
 
@@ -163,10 +163,12 @@ You can add support for external library by activating the each crate feature.
 
 [`futures(v0.3)`](https://github.com/rust-lang-nursery/futures-rs) *(requires `"futures"` crate feature)*
 
-* [`futures::Stream`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.16/futures/stream/trait.Stream.html) - [generated code](docs/supported_traits/external/futures/stream.md)
-* [`futures::Sink`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.16/futures/sink/trait.Sink.html) - [generated code](docs/supported_traits/external/futures/sink.md)
-* [`futures::AsyncRead`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.16/futures/io/trait.AsyncRead.html) - [generated code](docs/supported_traits/external/futures/async_read.md)
-* [`futures::AsyncWrite`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.16/futures/io/trait.AsyncWrite.html) - [generated code](docs/supported_traits/external/futures/async_write.md)
+* [`futures::Stream`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.17/futures/stream/trait.Stream.html) - [generated code](docs/supported_traits/external/futures/stream.md)
+* [`futures::Sink`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.17/futures/sink/trait.Sink.html) - [generated code](docs/supported_traits/external/futures/sink.md)
+* [`futures::AsyncRead`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.17/futures/io/trait.AsyncRead.html) - [generated code](docs/supported_traits/external/futures/async_read.md)
+* [`futures::AsyncWrite`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.17/futures/io/trait.AsyncWrite.html) - [generated code](docs/supported_traits/external/futures/async_write.md)
+* [`futures::AsyncSeek`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.17/futures/io/trait.AsyncSeek.html) - [generated code](docs/supported_traits/external/futures/async_seek.md)
+* [`futures::AsyncBufRead`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.17/futures/io/trait.AsyncBufRead.html) - [generated code](docs/supported_traits/external/futures/async_buf_read.md)
 
 [`futures(v0.1)`](https://github.com/rust-lang-nursery/futures-rs) *(requires `"futures01"` crate feature)*
 

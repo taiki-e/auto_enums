@@ -15,23 +15,23 @@ pub(crate) fn derive(data: &Data, stack: &mut Stack<ItemImpl>) -> Result<()> {
                     self: ::core::pin::Pin<&mut Self>,
                     cx: &mut ::core::task::Context<'_>,
                     buf: &[u8],
-                ) -> ::core::task::Poll<::core::result::Result<usize, #io::Error>>;
+                ) -> ::core::task::Poll<::std::io::Result<usize>>;
                 #[inline]
                 fn poll_write_vectored(
                     self: ::core::pin::Pin<&mut Self>,
                     cx: &mut ::core::task::Context<'_>,
                     bufs: &[::std::io::IoSlice<'_>],
-                ) -> ::core::task::Poll<::core::result::Result<usize, #io::Error>>;
+                ) -> ::core::task::Poll<::std::io::Result<usize>>;
                 #[inline]
                 fn poll_flush(
                     self: ::core::pin::Pin<&mut Self>,
                     cx: &mut ::core::task::Context<'_>,
-                ) -> ::core::task::Poll<::core::result::Result<(), #io::Error>>;
+                ) -> ::core::task::Poll<::std::io::Result<()>>;
                 #[inline]
                 fn poll_close(
                     self: ::core::pin::Pin<&mut Self>,
                     cx: &mut ::core::task::Context<'_>,
-                ) -> ::core::task::Poll<::core::result::Result<(), #io::Error>>;
+                ) -> ::core::task::Poll<::std::io::Result<()>>;
             }
         }?,
     )

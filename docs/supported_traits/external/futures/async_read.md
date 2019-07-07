@@ -1,4 +1,4 @@
-## [`AsyncRead`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.16/futures/io/trait.AsyncRead.html)
+## [`AsyncRead`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.17/futures/io/trait.AsyncRead.html)
 
 When deriving for enum like the following:
 
@@ -37,7 +37,7 @@ where
         self: ::core::pin::Pin<&mut Self>,
         cx: &mut ::core::task::Context<'_>,
         buf: &mut [u8],
-    ) -> ::core::task::Poll<::core::result::Result<usize, ::futures::io::Error>> {
+    ) -> ::core::task::Poll<::std::io::Result<usize>> {
         unsafe {
             match ::core::pin::Pin::get_unchecked_mut(self) {
                 Enum::A(x) => ::futures::io::AsyncRead::poll_read(::core::pin::Pin::new_unchecked(x), cx, buf),
@@ -51,7 +51,7 @@ where
         self: ::core::pin::Pin<&mut Self>,
         cx: &mut ::core::task::Context<'_>,
         bufs: &mut [::std::io::IoSliceMut<'_>],
-    ) -> ::core::task::Poll<::core::result::Result<usize, ::futures::io::Error>> {
+    ) -> ::core::task::Poll<::std::io::Result<usize>> {
         unsafe {
             match ::core::pin::Pin::get_unchecked_mut(self) {
                 Enum::A(x) => ::futures::io::AsyncRead::poll_read_vectored(::core::pin::Pin::new_unchecked(x), cx, bufs),
