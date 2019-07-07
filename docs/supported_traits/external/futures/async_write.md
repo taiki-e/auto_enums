@@ -1,4 +1,4 @@
-## [`AsyncWrite`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.16/futures/io/trait.AsyncWrite.html)
+## [`AsyncWrite`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.17/futures/io/trait.AsyncWrite.html)
 
 When deriving for enum like the following:
 
@@ -32,8 +32,8 @@ where
     ) -> ::core::task::Poll<::std::io::Result<usize>> {
         unsafe {
             match ::core::pin::Pin::get_unchecked_mut(self) {
-                Enum::A(x) => ::futures::io::AsyncWrite::poll_write(x, cx, buf),
-                Enum::B(x) => ::futures::io::AsyncWrite::poll_write(x, cx, buf),
+                Enum::A(x) => ::futures::io::AsyncWrite::poll_write(::core::pin::Pin::new_unchecked(x), cx, buf),
+                Enum::B(x) => ::futures::io::AsyncWrite::poll_write(::core::pin::Pin::new_unchecked(x), cx, buf),
             }
         }
     }
@@ -46,8 +46,8 @@ where
     ) -> ::core::task::Poll<::std::io::Result<usize>> {
         unsafe {
             match ::core::pin::Pin::get_unchecked_mut(self) {
-                Enum::A(x) => ::futures::io::AsyncWrite::poll_write_vectored(x, cx, bufs),
-                Enum::B(x) => ::futures::io::AsyncWrite::poll_write_vectored(x, cx, bufs),
+                Enum::A(x) => ::futures::io::AsyncWrite::poll_write_vectored(::core::pin::Pin::new_unchecked(x), cx, bufs),
+                Enum::B(x) => ::futures::io::AsyncWrite::poll_write_vectored(::core::pin::Pin::new_unchecked(x), cx, bufs),
             }
         }
     }
@@ -59,8 +59,8 @@ where
     ) -> ::core::task::Poll<::std::io::Result<()>> {
         unsafe {
             match ::core::pin::Pin::get_unchecked_mut(self) {
-                Enum::A(x) => ::futures::io::AsyncWrite::poll_flush(x, cx),
-                Enum::B(x) => ::futures::io::AsyncWrite::poll_flush(x, cx),
+                Enum::A(x) => ::futures::io::AsyncWrite::poll_flush(::core::pin::Pin::new_unchecked(x), cx),
+                Enum::B(x) => ::futures::io::AsyncWrite::poll_flush(::core::pin::Pin::new_unchecked(x), cx),
             }
         }
     }
@@ -72,8 +72,8 @@ where
     ) -> ::core::task::Poll<::std::io::Result<()>> {
         unsafe {
             match ::core::pin::Pin::get_unchecked_mut(self) {
-                Enum::A(x) => ::futures::io::AsyncWrite::poll_close(x, cx),
-                Enum::B(x) => ::futures::io::AsyncWrite::poll_close(x, cx),
+                Enum::A(x) => ::futures::io::AsyncWrite::poll_close(::core::pin::Pin::new_unchecked(x), cx),
+                Enum::B(x) => ::futures::io::AsyncWrite::poll_close(::core::pin::Pin::new_unchecked(x), cx),
             }
         }
     }

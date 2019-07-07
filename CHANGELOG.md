@@ -1,5 +1,7 @@
 # Unreleased
 
+* Updated to support `futures-preview` 0.3.0-alpha.17.
+
 * Added some generated code examples.
 
 # 0.5.8 - 2019-05-22
