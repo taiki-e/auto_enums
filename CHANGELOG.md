@@ -2,6 +2,8 @@
 
 * Renamed `#[rec]` to `#[nested]`.
 
+* Updated to support `futures-preview` 0.3.0-alpha.17.
+
 * Improved error messages.
 
 * Added some generated code examples.

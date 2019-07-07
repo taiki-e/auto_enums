@@ -21,8 +21,10 @@ mod test_futures {
 
     #[test]
     fn stream() {
-        use futures::executor::block_on;
-        use futures::stream::{self, StreamExt};
+        use futures::{
+            executor::block_on,
+            stream::{self, StreamExt},
+        };
 
         let x = 0;
 
@@ -40,10 +42,7 @@ mod test_futures {
 
     #[test]
     fn sink() {
-        use futures::channel::mpsc;
-        use futures::executor::block_on;
-        use futures::sink::SinkExt;
-        use futures::stream::StreamExt;
+        use futures::{channel::mpsc, executor::block_on, sink::SinkExt, stream::StreamExt};
         use std::collections::VecDeque;
 
         let x = 0;
