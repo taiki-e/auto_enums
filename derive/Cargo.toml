@@ -67,9 +67,3 @@ exact_size_is_empty = []
 read_initializer = []
 # Make iterator implementation more effective.
 try_trait = []
-
-# ==============================================================================
-# no-op (it is left to maintain compatibility)
-
-# Implements `io::Read::read_vectored` and `io::Write::write_vectored`.
-iovec = []
