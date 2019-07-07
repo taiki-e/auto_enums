@@ -1,4 +1,4 @@
-## [`AsyncSeek`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.16/futures/io/trait.AsyncSeek.html)
+## [`AsyncSeek`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.17/futures/io/trait.AsyncSeek.html)
 
 When deriving for enum like the following:
 
@@ -32,8 +32,8 @@ where
     ) -> ::core::task::Poll<::std::io::Result<u64>> {
         unsafe {
             match ::core::pin::Pin::get_unchecked_mut(self) {
-                Enum::A(x) => ::futures::io::AsyncSeek::poll_seek(x, cx, pos),
-                Enum::B(x) => ::futures::io::AsyncSeek::poll_seek(x, cx, pos),
+                Enum::A(x) => ::futures::io::AsyncSeek::poll_seek(::core::pin::Pin::new_unchecked(x), cx, pos),
+                Enum::B(x) => ::futures::io::AsyncSeek::poll_seek(::core::pin::Pin::new_unchecked(x), cx, pos),
             }
         }
     }
