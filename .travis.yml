@@ -27,7 +27,7 @@ matrix:
       name: cargo test (ui tests)
       script:
         - cargo clean
-        - RUSTFLAGS='--cfg ui_tests' cargo test -p auto_enums_test_suite --all-features --test compile-test
+        - RUSTFLAGS='--cfg ui_tests' cargo test -p auto_enums --all-features --test compile-test
 
     - rust: nightly
       name: cargo check (minimal versions)

@@ -28,6 +28,9 @@ travis-ci = { repository = "taiki-e/auto_enums" }
 auto_enums_core = { version = "0.5.8", path = "core", default-features = false }
 auto_enums_derive = { version = "0.5.8", path = "derive", default-features = false }
 
+[dev-dependencies]
+compiletest = { version = "0.3.21", package = "compiletest_rs", features = ["stable", "tmp"] }
+
 [features]
 # Default features.
 default = ["std"]
