@@ -114,10 +114,12 @@ impl Parent for Local {
 
         let expr = match self.init.as_mut().map(|(_, expr)| &mut **expr) {
             Some(expr) => expr,
-            None => Err(error!(
-                self,
-                "the `#[auto_enum]` attribute is not supported uninitialized let statement"
-            ))?,
+            None => {
+                return Err(error!(
+                    self,
+                    "the `#[auto_enum]` attribute is not supported uninitialized let statement"
+                ))
+            }
         };
 
         visit_expr(expr, cx)?;
@@ -171,10 +173,12 @@ impl Parent for ItemFn {
         match self.block.stmts.last_mut() {
             Some(Stmt::Expr(expr)) => child_expr(expr, cx)?,
             Some(_) => {}
-            None => Err(error!(
-                self.block,
-                "the `#[auto_enum]` attribute is not supported empty functions"
-            ))?,
+            None => {
+                return Err(error!(
+                    self.block,
+                    "the `#[auto_enum]` attribute is not supported empty functions"
+                ))
+            }
         }
 
         cx.visitor(|v| v.visit_item_fn_mut(self));
