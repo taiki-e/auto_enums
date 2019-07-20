@@ -1,15 +1,15 @@
 error: expected `{`, found keyword `return`
   --> $DIR/compile-fail.rs:30:12
    |
-30 |       } else return {
-   |              -^^^^^
-   |              |
-   |  ____________expected `{`
-   | |
-31 | |         //~^ ERROR expected `{`, found keyword `return`
-32 | |         2..=10
-33 | |     }
-   | |_____- help: try placing this code inside a block: `{ return { 2..=10 }; }`
+30 |     } else return {
+   |            ^^^^^^ expected `{`
+help: try placing this code inside a block
+   |
+30 |     } else { return {
+31 |         //~^ ERROR expected `{`, found keyword `return`
+32 |         2..=10
+33 |     } }
+   |
 
 error: expected one of `)`, `,`, `.`, `?`, or an operator, found `..`
   --> $DIR/compile-fail.rs:11:26
