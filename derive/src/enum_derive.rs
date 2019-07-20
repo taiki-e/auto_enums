@@ -2,13 +2,12 @@ use std::collections::HashMap;
 
 use lazy_static::lazy_static;
 use proc_macro2::TokenStream;
-use syn::ItemEnum;
+use syn::{
+    parse::{Parse, ParseStream},
+    token, ItemEnum, Path,
+};
 
 use crate::utils::*;
-
-mod args;
-
-use self::args::{parse_args, Arg};
 
 pub(crate) fn attribute(args: TokenStream, input: TokenStream) -> TokenStream {
     expand(args, input).unwrap_or_else(|e| e.to_compile_error())
@@ -189,8 +188,40 @@ lazy_static! {
     };
 }
 
+struct Args {
+    inner: Vec<(String, Path)>,
+}
+
+impl Parse for Args {
+    fn parse(input: ParseStream<'_>) -> Result<Self> {
+        fn parse_terminated_with(input: ParseStream<'_>) -> Result<Vec<(String, Path)>> {
+            let mut punctuated = Vec::new();
+
+            loop {
+                if input.is_empty() {
+                    break;
+                }
+                let value = input.parse()?;
+                punctuated.push((to_trimed_string(&value), value));
+                if input.is_empty() {
+                    break;
+                }
+                let _punct: token::Comma = input.parse()?;
+            }
+
+            Ok(punctuated)
+        }
+
+        fn to_trimed_string(p: &Path) -> String {
+            p.clone().into_token_stream().to_string().replace(" ", "")
+        }
+
+        parse_terminated_with(input).map(|inner| Self { inner })
+    }
+}
+
 fn expand(args: TokenStream, input: TokenStream) -> Result<TokenStream> {
-    fn alias_exists(s: &str, v: &[(&str, Option<&Arg>)]) -> bool {
+    fn alias_exists(s: &str, v: &[(&str, Option<&Path>)]) -> bool {
         ALIAS_MAP.get(s).map_or(false, |x| v.iter().any(|(s, _)| s == x))
     }
 
@@ -199,7 +230,7 @@ fn expand(args: TokenStream, input: TokenStream) -> Result<TokenStream> {
         error!(span, "the `#[enum_derive]` attribute may only be used on enums: {}", e)
     })?;
     let data = Data { data: EnumData::new(&item)?, span };
-    let args = parse_args(args)?;
+    let args = syn::parse2::<Args>(args)?.inner;
     let args = args.iter().fold(Vec::new(), |mut v, (s, arg)| {
         if let Some(traits) = TRAIT_DEPENDENCIES.get(&&**s) {
             traits.iter().filter(|&x| !args.iter().any(|(s, _)| s == x)).for_each(|s| {
