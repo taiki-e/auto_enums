@@ -12,7 +12,6 @@
     )
 )]
 #![warn(rust_2018_idioms)]
-#![allow(unused_imports)]
 
 #[cfg(feature = "unstable")]
 mod test_futures {

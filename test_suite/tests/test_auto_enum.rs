@@ -17,8 +17,6 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 #![cfg_attr(all(not(feature = "std"), feature = "unstable"), feature(alloc))]
 #![warn(rust_2018_idioms)]
-#![allow(ellipsis_inclusive_range_patterns)] // syn generates both as `...`.
-#![allow(unused_imports)]
 
 #[cfg(all(not(feature = "std"), feature = "unstable"))]
 #[macro_use]
