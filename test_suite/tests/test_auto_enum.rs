@@ -17,8 +17,6 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 #![cfg_attr(all(not(feature = "std"), feature = "unstable"), feature(alloc))]
 #![warn(rust_2018_idioms)]
-#![warn(clippy::all)]
-#![allow(clippy::cognitive_complexity, clippy::needless_return, clippy::never_loop)]
 
 #[cfg(all(not(feature = "std"), feature = "unstable"))]
 #[macro_use]

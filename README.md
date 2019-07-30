@@ -1,10 +1,21 @@
 # auto_enums
 
-[![Build Status](https://travis-ci.org/taiki-e/auto_enums.svg?branch=master)](https://travis-ci.org/taiki-e/auto_enums)
-[![version](https://img.shields.io/crates/v/auto_enums.svg)](https://crates.io/crates/auto_enums/)
-[![documentation](https://docs.rs/auto_enums/badge.svg)](https://docs.rs/auto_enums/)
-[![license](https://img.shields.io/crates/l/auto_enums.svg)](https://crates.io/crates/auto_enums/)
-[![Rustc Version](https://img.shields.io/badge/rustc-1.31+-lightgray.svg)](https://blog.rust-lang.org/2018/12/06/Rust-1.31-and-rust-2018.html)
+[![Build Status][azure-badge]][azure-url]
+[![Crates.io][crates-version-badge]][crates-url]
+[![Docs.rs][docs-badge]][docs-url]
+[![License][crates-license-badge]][crates-url]
+[![Minimum supported Rust version][rustc-badge]][rustc-url]
+
+[azure-badge]: https://dev.azure.com/taiki-e/taiki-e/_apis/build/status/taiki-e.auto_enums?branchName=master
+[azure-url]: https://dev.azure.com/taiki-e/taiki-e/_build/latest?definitionId=3&branchName=master
+[crates-version-badge]: https://img.shields.io/crates/v/auto_enums.svg
+[crates-license-badge]: https://img.shields.io/crates/l/auto_enums.svg
+[crates-badge]: https://img.shields.io/crates/v/auto_enums.svg
+[crates-url]: https://crates.io/crates/auto_enums/
+[docs-badge]: https://docs.rs/auto_enums/badge.svg
+[docs-url]: https://docs.rs/auto_enums/
+[rustc-badge]: https://img.shields.io/badge/rustc-1.31+-lightgray.svg
+[rustc-url]: https://blog.rust-lang.org/2018/12/06/Rust-1.31-and-rust-2018.html
 
 A library for to allow multiple return types by automatically generated enum.
 

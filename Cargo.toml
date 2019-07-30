@@ -11,7 +11,6 @@ documentation = "https://docs.rs/auto_enums/"
 readme = "README.md"
 keywords = ["enum", "macros", "derive", "attribute"]
 categories = ["rust-patterns"]
-exclude = ["/.travis.yml", "/bors.toml"]
 
 [workspace]
 members = [
@@ -20,9 +19,6 @@ members = [
     "test_suite",
     "test_suite/unstable",
 ]
-
-[badges]
-travis-ci = { repository = "taiki-e/auto_enums" }
 
 [dependencies]
 auto_enums_core = { version = "0.5.8", path = "core", default-features = false }

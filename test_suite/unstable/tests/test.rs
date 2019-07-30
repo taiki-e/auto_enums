@@ -13,7 +13,6 @@
 )]
 #![warn(unsafe_code)]
 #![warn(rust_2018_idioms)]
-#![warn(clippy::all)]
 
 #[cfg(feature = "unstable")]
 mod test_futures {
