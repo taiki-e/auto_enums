@@ -11,9 +11,6 @@ documentation = "https://docs.rs/auto_enums_derive/"
 keywords = ["enum", "macros", "derive", "attribute"]
 categories = ["rust-patterns"]
 
-[badges]
-travis-ci = { repository = "taiki-e/auto_enums" }
-
 [lib]
 proc-macro = true
 

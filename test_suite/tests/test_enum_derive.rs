@@ -16,7 +16,6 @@
 #![cfg_attr(all(not(feature = "std"), feature = "unstable"), feature(alloc))]
 #![warn(unsafe_code)]
 #![warn(rust_2018_idioms)]
-#![warn(clippy::all)]
 #![allow(dead_code)]
 
 #[cfg(all(not(feature = "std"), feature = "unstable"))]

@@ -3,7 +3,6 @@
 #![cfg_attr(feature = "unstable", feature(try_trait))]
 #![warn(unsafe_code)]
 #![warn(rust_2018_idioms)]
-#![warn(clippy::all)]
 
 extern crate test;
 
