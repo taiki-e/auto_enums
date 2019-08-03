@@ -14,5 +14,5 @@ jobs:
         cargo clippy --version
       displayName: rustup component add clippy
 
-    - script: cargo clippy --all
+    - script: cargo clippy --all --all-features
       displayName: cargo clippy --all --all-features
