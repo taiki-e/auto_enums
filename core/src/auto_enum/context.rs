@@ -101,7 +101,7 @@ impl Context {
         self.span.take().unwrap_or_else(|| unreachable!())
     }
 
-    pub(super) const fn visit_mode(&self) -> VisitMode {
+    pub(super) fn visit_mode(&self) -> VisitMode {
         self.visit_mode
     }
 
@@ -252,7 +252,7 @@ pub(super) struct Marker {
 impl Marker {
     const DEFAULT: &'static str = "marker";
 
-    const fn new(ident: Option<String>) -> Self {
+    fn new(ident: Option<String>) -> Self {
         Self { ident }
     }
 
