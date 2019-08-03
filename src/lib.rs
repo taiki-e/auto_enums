@@ -865,8 +865,6 @@
 #![warn(unsafe_code)]
 #![warn(rust_2018_idioms, unreachable_pub)]
 #![warn(clippy::all, clippy::pedantic)]
-#![warn(single_use_lifetimes)]
-#![warn(clippy::nursery)]
 
 #[doc(hidden)]
 pub use auto_enums_core::auto_enum;
