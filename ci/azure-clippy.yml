@@ -10,7 +10,20 @@ jobs:
         rust: ${{ parameters.rust }}
 
     - script: |
-        rustup component add clippy
+        set +e
+        if rustup component add clippy; then
+          set -e
+        else
+          set -e
+          target=`curl https://rust-lang.github.io/rustup-components-history/x86_64-unknown-linux-gnu/clippy`
+          echo "'clippy' is unavailable on the toolchain '${{ parameters.rust }}', use the toolchain 'nightly-$target' instead"
+          rustup toolchain install nightly-$target
+          rustup default nightly-$target
+          rustup component add clippy
+          rustup toolchain list
+          rustc -Vv
+          cargo -V
+        fi
         cargo clippy --version
       displayName: rustup component add clippy
 
