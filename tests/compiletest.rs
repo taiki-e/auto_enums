@@ -1,4 +1,4 @@
-#![cfg(ui_tests)]
+#![cfg(compiletest)]
 #![cfg(all(
     feature = "std",
     feature = "type_analysis",
@@ -19,7 +19,6 @@ fn run_mode(mode: &'static str) {
         "--edition=2018 \
          -Z unstable-options \
          --extern auto_enums \
-         --cfg procmacro2_semver_exempt \
          -L {}",
         me.display()
     ));
@@ -33,6 +32,6 @@ fn run_mode(mode: &'static str) {
 }
 
 #[test]
-fn compile_test() {
+fn compiletest() {
     run_mode("ui");
 }
