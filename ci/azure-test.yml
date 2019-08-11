@@ -25,11 +25,12 @@ jobs:
     - script: |
         cargo ${{ parameters.cmd }} --all --no-default-features
         cargo ${{ parameters.cmd }} --all
-      displayName: cargo ${{ parameters.cmd }} --all
+      displayName: cargo ${{ parameters.cmd }}
 
     - ${{ if eq(parameters.rust, 'nightly') }}:
-      - script: cargo ${{ parameters.cmd }} --all --all-features
-        displayName: cargo ${{ parameters.cmd }} --all --all-features
+      - script: |
+          cargo ${{ parameters.cmd }} --all --all-features
+        displayName: cargo ${{ parameters.cmd }} --all-features
 
       - script: |
           cargo update -Zminimal-versions
