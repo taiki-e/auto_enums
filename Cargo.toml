@@ -1,16 +1,17 @@
 [package]
 name = "auto_enums"
-# NB: When modifying, also modify html_root_url in lib.rs
 version = "0.5.9"
 authors = ["Taiki Endo <te316e89@gmail.com>"]
 edition = "2018"
 license = "Apache-2.0/MIT"
-description = "A library for to allow multiple return types by automatically generated enum."
 repository = "https://github.com/taiki-e/auto_enums"
 documentation = "https://docs.rs/auto_enums/"
 readme = "README.md"
 keywords = ["enum", "macros", "derive", "attribute"]
 categories = ["rust-patterns"]
+description = """
+A library for to allow multiple return types by automatically generated enum.
+"""
 
 [workspace]
 members = [
@@ -21,8 +22,8 @@ members = [
 ]
 
 [dependencies]
-auto_enums_core = { version = "0.5.9", path = "core", default-features = false }
-auto_enums_derive = { version = "0.5.9", path = "derive", default-features = false }
+auto_enums_core = { version = "=0.5.9", path = "core", default-features = false }
+auto_enums_derive = { version = "=0.5.9", path = "derive", default-features = false }
 
 [features]
 # Default features.

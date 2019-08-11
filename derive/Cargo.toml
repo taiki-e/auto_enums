@@ -1,16 +1,16 @@
 [package]
 name = "auto_enums_derive"
-# NB: When modifying, also modify html_root_url in lib.rs
 version = "0.5.9"
 authors = ["Taiki Endo <te316e89@gmail.com>"]
 edition = "2018"
 license = "Apache-2.0/MIT"
-description = "This library provides an attribute macro like a wrapper of `#[derive]`, implementing the supported traits and passing unsupported traits to `#[derive]`."
 repository = "https://github.com/taiki-e/auto_enums"
 documentation = "https://docs.rs/auto_enums_derive/"
 keywords = ["enum", "macros", "derive", "attribute"]
 categories = ["rust-patterns"]
-include = ["Cargo.toml", "build.rs", "src/**/*.rs", "LICENSE-APACHE", "LICENSE-MIT"]
+description = """
+This library provides an attribute macro like a wrapper of `#[derive]`, implementing the supported traits and passing unsupported traits to `#[derive]`.
+"""
 
 [lib]
 proc-macro = true
