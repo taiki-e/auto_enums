@@ -3,6 +3,7 @@
 #![warn(unsafe_code)]
 #![warn(rust_2018_idioms, unreachable_pub)]
 #![warn(clippy::all, clippy::pedantic)]
+#![allow(clippy::use_self)]
 
 extern crate proc_macro;
 
