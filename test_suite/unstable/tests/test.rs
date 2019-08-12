@@ -1,15 +1,12 @@
-#![cfg_attr(
-    feature = "unstable",
-    feature(
-        proc_macro_hygiene,
-        stmt_expr_attributes,
-        fn_traits,
-        unboxed_closures,
-        read_initializer,
-        trusted_len,
-        exact_size_is_empty,
-        try_trait,
-    )
+#![feature(
+    proc_macro_hygiene,
+    stmt_expr_attributes,
+    fn_traits,
+    unboxed_closures,
+    read_initializer,
+    trusted_len,
+    exact_size_is_empty,
+    try_trait
 )]
 #![warn(unsafe_code)]
 #![warn(rust_2018_idioms)]

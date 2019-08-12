@@ -1,31 +1,26 @@
-#![cfg_attr(
-    feature = "unstable",
-    feature(
-        proc_macro_hygiene,
-        stmt_expr_attributes,
-        fn_traits,
-        unboxed_closures,
-        exact_size_is_empty,
-        generators,
-        generator_trait,
-        read_initializer,
-        trusted_len,
-        try_trait,
-        type_ascription,
-    )
+#![feature(
+    proc_macro_hygiene,
+    stmt_expr_attributes,
+    fn_traits,
+    unboxed_closures,
+    exact_size_is_empty,
+    generators,
+    generator_trait,
+    read_initializer,
+    trusted_len,
+    try_trait,
+    type_ascription
 )]
 #![cfg_attr(not(feature = "std"), no_std)]
-#![cfg_attr(all(not(feature = "std"), feature = "unstable"), feature(alloc))]
 #![warn(rust_2018_idioms)]
 
-#[cfg(all(not(feature = "std"), feature = "unstable"))]
 #[macro_use]
 extern crate alloc;
 
 use auto_enums::auto_enum;
 
 #[test]
-fn stable_1_30() {
+fn stable() {
     const ANS: &[i32] = &[28, 3];
 
     #[auto_enum(Iterator)]
@@ -489,6 +484,7 @@ fn stable_1_30() {
         assert_eq!(rec_no_return(i).sum::<i32>(), *x);
     }
 
+    #[cfg(feature = "transpose_methods")]
     #[auto_enum(Transpose, Iterator, Clone)]
     fn transpose(x: isize) -> Option<impl Iterator<Item = i32> + Clone> {
         match x {
@@ -499,12 +495,14 @@ fn stable_1_30() {
         .transpose()
         .map(|i| i.map(|x| x + 1).map(|x| x - 1))
     }
+    #[cfg(feature = "transpose_methods")]
     assert_eq!(transpose(0).unwrap().sum::<i32>(), 28);
 }
 
+#[cfg(feature = "transpose_methods")]
 #[cfg(feature = "std")]
 #[test]
-fn stable_1_30_std() {
+fn stable_std() {
     use auto_enums::enum_derive;
     use std::{error::Error, fs, io, path::Path};
 
@@ -563,7 +561,6 @@ fn stable_1_30_std() {
     assert!(try_operator(None).unwrap_err().source().is_some());
 }
 
-#[cfg(feature = "unstable")]
 #[test]
 fn nightly() {
     const ANS: &[i32] = &[28, 3];
@@ -716,22 +713,6 @@ fn nightly() {
         assert_eq!(iter.sum::<i32>(), *x);
     }
 
-    #[auto_enum(Debug)]
-    fn try_operator(x: i32) -> Result<impl Iterator<Item = i32>, impl core::fmt::Debug> {
-        if x < 0 {
-            Err(1i32)?;
-        }
-
-        let iter = match x {
-            0 => Err(())?,
-            1 => None?,
-            _ => 2..=10,
-        };
-
-        Ok(iter)
-    }
-    assert_eq!(try_operator(10).unwrap().sum::<i32>(), 54);
-
     fn marker1(x: usize) -> impl Iterator<Item = i32> + Clone {
         #[auto_enum(Iterator, Clone)]
         (0..x as i32).map(|x| x + 1).flat_map(|x| {
@@ -841,4 +822,24 @@ fn nightly() {
         GeneratorState::Complete("bar") => {}
         _ => panic!("unexpected return from resume"),
     }
+}
+
+#[cfg(feature = "try_trait")]
+#[test]
+fn nightly_try_trait() {
+    #[auto_enum(Debug)]
+    fn try_operator(x: i32) -> Result<impl Iterator<Item = i32>, impl core::fmt::Debug> {
+        if x < 0 {
+            Err(1i32)?;
+        }
+
+        let iter = match x {
+            0 => Err(())?,
+            1 => None?,
+            _ => 2..=10,
+        };
+
+        Ok(iter)
+    }
+    assert_eq!(try_operator(10).unwrap().sum::<i32>(), 54);
 }
