@@ -74,19 +74,13 @@ pub(crate) fn replace_block<F: FnOnce(Block) -> Expr>(this: &mut Block, op: F) {
 // =============================================================================
 // Macros
 
-macro_rules! span {
-    ($expr:expr) => {
-        $expr.clone()
-    };
-}
-
 macro_rules! error {
     // FIXME: syntax
     (span => $span:expr, $msg:expr) => {
         syn::Error::new($span, $msg)
     };
     ($span:expr, $msg:expr) => {
-        syn::Error::new_spanned(span!($span), $msg)
+        syn::Error::new_spanned(&$span, $msg)
     };
     ($span:expr, $($tt:tt)*) => {
         error!($span, format!($($tt)*))

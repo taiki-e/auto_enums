@@ -35,7 +35,7 @@ pub(crate) fn attribute(args: TokenStream, input: TokenStream) -> TokenStream {
 }
 
 fn expand(args: TokenStream, input: TokenStream) -> Result<TokenStream> {
-    let mut cx = parse_args(args).map(|x| Context::root(span!(input), x))?;
+    let mut cx = parse_args(args).map(|x| Context::root(&input, x))?;
 
     match syn::parse2::<Stmt>(input.clone()) {
         Ok(mut stmt) => stmt.visit_parent(&mut cx).map(|()| stmt.into_token_stream()),

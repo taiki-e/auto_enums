@@ -305,7 +305,7 @@ fn visit_stmt_mut(stmt: &mut Stmt, cx: &mut Context) {
 
     if let Some(Attribute { tts, .. }) = stmt.find_remove_attr(NAME) {
         parse_group(tts)
-            .map(|x| Context::child(span!(stmt), x))
+            .map(|x| Context::child(&stmt, x))
             .and_then(|mut cx| stmt.visit_parent(&mut cx))
             .unwrap_or_else(|e| {
                 cx.error = true;

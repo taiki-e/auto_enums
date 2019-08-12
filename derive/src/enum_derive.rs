@@ -225,7 +225,7 @@ fn expand(args: TokenStream, input: TokenStream) -> Result<TokenStream> {
         ALIAS_MAP.get(s).map_or(false, |x| v.iter().any(|(s, _)| s == x))
     }
 
-    let span = span!(input);
+    let span = input.clone();
     let mut item = syn::parse2::<ItemEnum>(input).map_err(|e| {
         error!(span, "the `#[enum_derive]` attribute may only be used on enums: {}", e)
     })?;
