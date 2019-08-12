@@ -1,9 +1,14 @@
+#[cfg(feature = "ops")]
 pub(crate) mod deref;
+#[cfg(feature = "ops")]
 pub(crate) mod deref_mut;
 pub(crate) mod fn_;
 pub(crate) mod fn_mut;
 pub(crate) mod fn_once;
 pub(crate) mod generator;
+#[cfg(feature = "ops")]
 pub(crate) mod index;
+#[cfg(feature = "ops")]
 pub(crate) mod index_mut;
+#[cfg(feature = "ops")]
 pub(crate) mod range_bounds;

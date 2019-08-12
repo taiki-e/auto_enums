@@ -113,23 +113,7 @@ enum Foo<A, B> {
 ### [std|core] libraries
 
 Note that some traits have aliases.
-
-`[std|core]::ops`
-
-* [`Deref`](https://doc.rust-lang.org/std/ops/trait.Deref.html)
-* [`DerefMut`](https://doc.rust-lang.org/std/ops/trait.DerefMut.html)
-* [`Index`](https://doc.rust-lang.org/std/ops/trait.Index.html)
-* [`IndexMut`](https://doc.rust-lang.org/std/ops/trait.IndexMut.html)
-* [`RangeBounds`](https://doc.rust-lang.org/std/ops/trait.RangeBounds.html)
-* [`Fn`](https://doc.rust-lang.org/std/ops/trait.Fn.html) (*nightly-only*)
-* [`FnMut`](https://doc.rust-lang.org/std/ops/trait.FnMut.html) (*nightly-only*)
-* [`FnOnce`](https://doc.rust-lang.org/std/ops/trait.FnOnce.html) (*nightly-only*)
-* [`Generator`](https://doc.rust-lang.org/nightly/std/ops/trait.Generator.html) (*nightly-only*)
-
-`[std|core]::convert`
-
-* [`AsRef`](https://doc.rust-lang.org/std/convert/trait.AsRef.html)
-* [`AsMut`](https://doc.rust-lang.org/std/convert/trait.AsMut.html)
+Also, some traits support is disabled by default.
 
 `[std|core]::iter`
 
@@ -139,6 +123,34 @@ Note that some traits have aliases.
 * [`FusedIterator`](https://doc.rust-lang.org/std/iter/trait.FusedIterator.html) - [generated code](docs/supported_traits/std/iter/fused_iterator.md)
 * [`TrustedLen`](https://doc.rust-lang.org/std/iter/trait.TrustedLen.html) - [generated code](docs/supported_traits/std/iter/trusted_len.md) (*nightly-only*)
 * [`Extend`](https://doc.rust-lang.org/std/iter/trait.Extend.html) - [generated code](docs/supported_traits/std/iter/extend.md)
+
+`[std|core]::future`
+
+* [`Future`](https://doc.rust-lang.org/nightly/std/future/trait.Future.html) - [generated code](docs/supported_traits/std/future.md)
+
+`std::io`
+
+* [`Read`](https://doc.rust-lang.org/std/io/trait.Read.html) (alias: `io::Read`) - [generated code](docs/supported_traits/std/io/read.md)
+* [`BufRead`](https://doc.rust-lang.org/std/io/trait.BufRead.html) (alias: `io::BufRead`) - [generated code](docs/supported_traits/std/io/buf_read.md)
+* [`Write`](https://doc.rust-lang.org/std/io/trait.Write.html) (alias: `io::Write`) - [generated code](docs/supported_traits/std/io/write.md)
+* [`Seek`](https://doc.rust-lang.org/std/io/trait.Seek.html) (alias: `io::Seek`) - [generated code](docs/supported_traits/std/io/seek.md)
+
+`[std|core]::ops`
+
+* [`Deref`](https://doc.rust-lang.org/std/ops/trait.Deref.html) *(requires `"ops"` crate feature)*
+* [`DerefMut`](https://doc.rust-lang.org/std/ops/trait.DerefMut.html) *(requires `"ops"` crate feature)*
+* [`Index`](https://doc.rust-lang.org/std/ops/trait.Index.html) *(requires `"ops"` crate feature)*
+* [`IndexMut`](https://doc.rust-lang.org/std/ops/trait.IndexMut.html) *(requires `"ops"` crate feature)*
+* [`RangeBounds`](https://doc.rust-lang.org/std/ops/trait.RangeBounds.html) *(requires `"ops"` crate feature)*
+* [`Fn`](https://doc.rust-lang.org/std/ops/trait.Fn.html) (*nightly-only*)
+* [`FnMut`](https://doc.rust-lang.org/std/ops/trait.FnMut.html) (*nightly-only*)
+* [`FnOnce`](https://doc.rust-lang.org/std/ops/trait.FnOnce.html) (*nightly-only*)
+* [`Generator`](https://doc.rust-lang.org/nightly/std/ops/trait.Generator.html) (*nightly-only*)
+
+`[std|core]::convert`
+
+* [`AsRef`](https://doc.rust-lang.org/std/convert/trait.AsRef.html) *(requires `"convert"` crate feature)*
+* [`AsMut`](https://doc.rust-lang.org/std/convert/trait.AsMut.html) *(requires `"convert"` crate feature)*
 
 `[std|core]::fmt`
 
@@ -152,17 +164,6 @@ Note that some traits have aliases.
 * [`fmt::UpperExp`](https://doc.rust-lang.org/std/fmt/trait.UpperExp.html) *(requires `"fmt"` crate feature)*
 * [`fmt::UpperHex`](https://doc.rust-lang.org/std/fmt/trait.UpperHex.html) *(requires `"fmt"` crate feature)*
 * [`fmt::Write`](https://doc.rust-lang.org/std/fmt/trait.Write.html)
-
-`[std|core]::future`
-
-* [`Future`](https://doc.rust-lang.org/nightly/std/future/trait.Future.html) - [generated code](docs/supported_traits/std/future.md)
-
-`std::io`
-
-* [`Read`](https://doc.rust-lang.org/std/io/trait.Read.html) (alias: `io::Read`) - [generated code](docs/supported_traits/std/io/read.md)
-* [`BufRead`](https://doc.rust-lang.org/std/io/trait.BufRead.html) (alias: `io::BufRead`) - [generated code](docs/supported_traits/std/io/buf_read.md)
-* [`Write`](https://doc.rust-lang.org/std/io/trait.Write.html) (alias: `io::Write`) - [generated code](docs/supported_traits/std/io/write.md)
-* [`Seek`](https://doc.rust-lang.org/std/io/trait.Seek.html) (alias: `io::Seek`) - [generated code](docs/supported_traits/std/io/seek.md)
 
 `std::error`
 

@@ -2,6 +2,10 @@
 
 * Renamed `#[rec]` to `#[nested]`.
 
+* Added `"ops"` crate feature, and made `[std|core]::ops`'s `Deref`, `DerefMut`, `Index`, `IndexMut`, and `RangeBounds` traits optional.
+
+* Added `"convert"` crate feature, and made `[std|core]::convert`'s `AsRef` and `AsMut` traits optional.
+
 * Improved error messages.
 
 * Updated minimum `derive_utils` version to 0.8.0. This improves the error message.
@@ -140,7 +144,7 @@
 
 * Added support for `return` in function and closure.
 
-* Added `"fmt"` crate feature. Made `[std|core]::fmt`'s traits other than `Debug`, `Display` and `Write` optional.
+* Added `"fmt"` crate feature, and made `[std|core]::fmt`'s traits other than `Debug`, `Display` and `Write` optional.
 
 # 0.1.3 - 2018-12-15
 

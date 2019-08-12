@@ -99,7 +99,9 @@ lazy_static! {
         derive_map!(
             map,
             // core
+            #[cfg(feature = "convert")]
             core::convert::as_mut,
+            #[cfg(feature = "convert")]
             core::convert::as_ref,
             core::fmt::debug,
             core::fmt::display,
@@ -124,10 +126,15 @@ lazy_static! {
             core::iter::fused_iterator,
             core::iter::trusted_len,
             core::iter::extend,
+            #[cfg(feature = "ops")]
             core::ops::deref,
+            #[cfg(feature = "ops")]
             core::ops::deref_mut,
+            #[cfg(feature = "ops")]
             core::ops::index,
+            #[cfg(feature = "ops")]
             core::ops::index_mut,
+            #[cfg(feature = "ops")]
             core::ops::range_bounds,
             core::ops::fn_,
             core::ops::fn_mut,
