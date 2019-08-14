@@ -7,10 +7,10 @@ use std::{
 };
 
 use proc_macro2::{Ident, TokenStream};
-use quote::ToTokens;
+use quote::{format_ident, ToTokens};
 use syn::{Attribute, Expr, ItemEnum, Macro, Result};
 
-use crate::utils::{expr_call, ident, path};
+use crate::utils::{expr_call, path};
 
 use super::{
     visitor::{Dummy, FindTry, Visitor},
@@ -269,27 +269,27 @@ impl Marker {
 // Enum builder
 
 struct Builder {
-    ident: String,
-    variants: Vec<String>,
+    ident: Ident,
+    variants: Vec<Ident>,
 }
 
 impl Builder {
     fn new() -> Self {
         Self {
-            ident: format!("___Enum{}", RNG.with(|rng| rng.borrow_mut().next())),
+            ident: format_ident!("___Enum{}", RNG.with(|rng| rng.borrow_mut().next())),
             variants: Vec::new(),
         }
     }
 
-    fn iter(&self) -> impl Iterator<Item = Ident> + '_ {
-        self.variants.iter().map(ident)
+    fn iter(&self) -> impl Iterator<Item = &Ident> + '_ {
+        self.variants.iter()
     }
 
     fn next_expr(&mut self, attrs: Vec<Attribute>, expr: Expr) -> Expr {
-        let variant = format!("___Variant{}", self.variants.len());
+        let variant = format_ident!("___Variant{}", self.variants.len());
 
         let path =
-            path(iter::once(ident(&self.ident).into()).chain(iter::once(ident(&variant).into())));
+            path(iter::once(self.ident.clone().into()).chain(iter::once(variant.clone().into())));
 
         self.variants.push(variant);
 
@@ -297,7 +297,7 @@ impl Builder {
     }
 
     fn build(&self, args: &[Arg]) -> ItemEnum {
-        let ident = ident(&self.ident);
+        let ident = &self.ident;
         let ty_generics = self.iter();
         let variants = self.iter();
         let fields = self.iter();

@@ -1,7 +1,6 @@
 use std::ops::{Deref, DerefMut};
 
 use syn::{
-    spanned::Spanned,
     visit_mut::{self, VisitMut},
     *,
 };
@@ -250,7 +249,7 @@ impl VisitLast<()> for ExprIf {
 
             // TODO: https://docs.rs/proc-macro2/0.4/proc_macro2/struct.Span.html#method.join
             // `self.span().join(self.then_branch.span()).unwrap_or_else(|| self.span())``
-            None => Err(error!(span => self.span(), "`if` expression missing an else clause")),
+            None => Err(error!(self.if_token, "`if` expression missing an else clause")),
 
             Some(_) => unreachable!("wrong_if"),
         }

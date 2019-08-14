@@ -204,23 +204,20 @@ impl Parse for Args {
         fn parse_terminated_with(input: ParseStream<'_>) -> Result<Vec<(String, Path)>> {
             let mut punctuated = Vec::new();
 
-            loop {
-                if input.is_empty() {
-                    break;
-                }
+            while !input.is_empty() {
                 let value = input.parse()?;
                 punctuated.push((to_trimed_string(&value), value));
-                if input.is_empty() {
-                    break;
+
+                if !input.is_empty() {
+                    let _: token::Comma = input.parse()?;
                 }
-                let _punct: token::Comma = input.parse()?;
             }
 
             Ok(punctuated)
         }
 
         fn to_trimed_string(p: &Path) -> String {
-            p.clone().into_token_stream().to_string().replace(" ", "")
+            p.to_token_stream().to_string().replace(" ", "")
         }
 
         parse_terminated_with(input).map(|inner| Self { inner })
