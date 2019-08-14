@@ -1,9 +1,9 @@
 use std::{iter, mem};
 
-use proc_macro2::{Ident, Span, TokenStream};
+use proc_macro2::TokenStream;
 use syn::{
     punctuated::Punctuated, token, Attribute, Block, Expr, ExprBlock, ExprCall, ExprPath,
-    ExprTuple, ExprVerbatim, Path, PathSegment, Stmt,
+    ExprTuple, Path, PathSegment, Stmt,
 };
 
 mod attrs;
@@ -25,10 +25,6 @@ impl<T> VecExt<T> for Vec<T> {
 
 // =============================================================================
 // Functions
-
-pub(crate) fn ident<S: AsRef<str>>(s: S) -> Ident {
-    Ident::new(s.as_ref(), Span::call_site())
-}
 
 pub(crate) fn path<I: IntoIterator<Item = PathSegment>>(segments: I) -> Path {
     Path { leading_colon: None, segments: segments.into_iter().collect() }
@@ -64,7 +60,7 @@ pub(crate) fn unit() -> Expr {
 }
 
 pub(crate) fn replace_expr<F: FnOnce(Expr) -> Expr>(this: &mut Expr, op: F) {
-    *this = op(mem::replace(this, Expr::Verbatim(ExprVerbatim { tts: TokenStream::new() })));
+    *this = op(mem::replace(this, Expr::Verbatim(TokenStream::new())));
 }
 
 pub(crate) fn replace_block<F: FnOnce(Block) -> Expr>(this: &mut Block, op: F) {
@@ -75,10 +71,6 @@ pub(crate) fn replace_block<F: FnOnce(Block) -> Expr>(this: &mut Block, op: F) {
 // Macros
 
 macro_rules! error {
-    // FIXME: syntax
-    (span => $span:expr, $msg:expr) => {
-        syn::Error::new($span, $msg)
-    };
     ($span:expr, $msg:expr) => {
         syn::Error::new_spanned(&$span, $msg)
     };

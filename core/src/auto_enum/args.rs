@@ -15,7 +15,7 @@ impl Arg {
     pub(super) fn to_trimed_string(&self) -> String {
         match self {
             Arg::Ident(i) => i.to_string(),
-            Arg::Path(p) => p.clone().into_token_stream().to_string().replace(" ", ""),
+            Arg::Path(p) => p.to_token_stream().to_string().replace(" ", ""),
         }
     }
 }
@@ -49,10 +49,10 @@ impl PartialEq for Arg {
         match self {
             Arg::Ident(x) => match other {
                 Arg::Ident(y) => x.eq(y),
-                Arg::Path(y) => y.is_ident(x.to_string()),
+                Arg::Path(y) => y.is_ident(x),
             },
             Arg::Path(x) => match other {
-                Arg::Ident(y) => x.is_ident(y.to_string()),
+                Arg::Ident(y) => x.is_ident(y),
                 Arg::Path(y) => x.eq(y),
             },
         }
@@ -154,8 +154,8 @@ fn marker_opt(
             error!(g, "invalid delimiter")
         }
         Some(TokenTree::Group(g)) => {
-            let mut tts = g.stream().into_iter();
-            let i = match tts.next() {
+            let mut tokens = g.stream().into_iter();
+            let i = match tokens.next() {
                 Some(TokenTree::Ident(ref i)) if marker.is_some() => {
                     error!(i, "multiple `marker` option")
                 }
@@ -164,10 +164,10 @@ fn marker_opt(
                 None => error!(g, "empty `marker` option"),
             };
             *marker = Some(i.to_string());
-            match tts.next() {
+            match tokens.next() {
                 None => {}
                 Some(TokenTree::Punct(ref p)) if p.as_char() == ',' => {
-                    if let Some(tt) = tts.next() {
+                    if let Some(tt) = tokens.next() {
                         // TODO: https://docs.rs/proc-macro2/0.4/proc_macro2/struct.Span.html#method.join
                         // `i.span().join(tt.span()).unwrap_or_else(|| tt.span())`
                         error!(tt, "multiple identifier in `marker` option")

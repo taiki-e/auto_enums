@@ -6,9 +6,11 @@
 
 * Added `"convert"` crate feature, and made `[std|core]::convert`'s `AsRef` and `AsMut` traits optional.
 
-* Improved error messages.
+* Updated `proc-macro2`, `syn`, and `quote` to 1.0.
 
-* Updated minimum `derive_utils` version to 0.8.0. This improves the error message.
+* Updated `derive_utils` to 0.9. This improves the error message.
+
+* Improved error messages.
 
 # 0.5.9 - 2019-07-07
 
