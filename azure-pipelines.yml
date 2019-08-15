@@ -33,11 +33,6 @@ jobs:
     rust: nightly
     cmd: test
 
-- template: ci/azure-compile-test.yml
-  parameters:
-    name: compile_test
-    rust: nightly
-
 - template: ci/azure-clippy.yml
   parameters:
     name: clippy
