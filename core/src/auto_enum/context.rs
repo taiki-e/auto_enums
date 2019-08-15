@@ -174,7 +174,7 @@ impl Context {
                 msg1,
                 if len == 0 { "no" } else { "only one" },
                 msg2
-            ))?
+            ))
         }
 
         if self.error {

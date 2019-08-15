@@ -73,7 +73,7 @@ macro_rules! arg_err {
         syn::Error::new($msg.span(), format!("invalid arguments: {}", $msg))
     };
     ($span:expr, $msg:expr) => {
-        Err(syn::Error::new($span.span(), format!("invalid arguments: {}", $msg)))
+        return Err(syn::Error::new($span.span(), format!("invalid arguments: {}", $msg)))
     };
     ($span:expr, $($tt:tt)*) => {
         arg_err!($span, format!($($tt)*))
@@ -108,7 +108,7 @@ pub(super) fn parse_args(args: TokenStream) -> Result<(Stack<Arg>, Option<String
                     }
 
                     if never {
-                        arg_err!(i, "multiple `never` option")?;
+                        arg_err!(i, "multiple `never` option");
                     }
                     never = true;
                 }
@@ -117,9 +117,9 @@ pub(super) fn parse_args(args: TokenStream) -> Result<(Stack<Arg>, Option<String
             TokenTree::Punct(p) => match p.as_char() {
                 ',' => {}
                 ':' => args.push(parse_path(smallvec![p.into()], &mut iter)?),
-                _ => arg_err!(p, "{}`{}`", ERR, p)?,
+                _ => arg_err!(p, "{}`{}`", ERR, p),
             },
-            _ => arg_err!(tt, "{}`{}`", ERR, tt)?,
+            _ => arg_err!(tt, "{}`{}`", ERR, tt),
         }
     }
 
@@ -159,41 +159,41 @@ fn marker_opt(
 ) -> Result<()> {
     match iter.next() {
         Some(TokenTree::Group(ref g)) if g.delimiter() != Delimiter::Parenthesis => {
-            arg_err!(g, "invalid delimiter")?
+            arg_err!(g, "invalid delimiter")
         }
         Some(TokenTree::Group(ref g)) => {
             let mut g = g.stream().into_iter();
             match g.next() {
                 Some(TokenTree::Ident(ref i)) if marker.is_some() => {
-                    arg_err!(i, "multiple `marker` option")?
+                    arg_err!(i, "multiple `marker` option")
                 }
                 Some(TokenTree::Ident(i)) => *marker = Some(i.to_string()),
-                Some(tt) => arg_err!(tt, "expected an identifier, found `{}`", tt)?,
-                None => arg_err!(ident, "empty `marker` option")?,
+                Some(tt) => arg_err!(tt, "expected an identifier, found `{}`", tt),
+                None => arg_err!(ident, "empty `marker` option"),
             }
             match g.next() {
                 None => {}
                 Some(TokenTree::Punct(ref p)) if p.as_char() == ',' => {
                     if let Some(tt) = g.next() {
-                        arg_err!(tt, "multiple identifier in `marker` option")?;
+                        arg_err!(tt, "multiple identifier in `marker` option");
                     }
                 }
-                Some(tt) => arg_err!(tt, "multiple identifier in `marker` option")?,
+                Some(tt) => arg_err!(tt, "multiple identifier in `marker` option"),
             }
         }
         Some(TokenTree::Punct(ref p)) if p.as_char() == '=' => {
             match iter.next() {
                 Some(TokenTree::Ident(ref i)) if marker.is_some() => {
-                    arg_err!(i, "multiple `marker` option")?
+                    arg_err!(i, "multiple `marker` option")
                 }
                 Some(TokenTree::Ident(i)) => *marker = Some(i.to_string()),
-                Some(tt) => arg_err!(tt, "expected an identifier, found `{}`", tt)?,
-                None => arg_err!(p, "empty `marker` option")?,
+                Some(tt) => arg_err!(tt, "expected an identifier, found `{}`", tt),
+                None => arg_err!(p, "empty `marker` option"),
             }
             match iter.next() {
                 None => {}
                 Some(TokenTree::Punct(ref p)) if p.as_char() == ',' => {}
-                Some(tt) => arg_err!(tt, "multiple identifier in `marker` option")?,
+                Some(tt) => arg_err!(tt, "multiple identifier in `marker` option"),
             }
         }
         tt => args.push(path_or_ident(ident, tt, iter)?),
