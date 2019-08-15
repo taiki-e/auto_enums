@@ -12,6 +12,8 @@
 
 * Improved error messages.
 
+* Added some generated code examples.
+
 # 0.5.9 - 2019-07-07
 
 * Updated to support `futures-preview` 0.3.0-alpha.17.

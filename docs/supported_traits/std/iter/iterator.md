@@ -21,8 +21,10 @@ enum Enum<A, B> {
 impl<A, B> ::core::iter::Iterator for Enum<A, B>
 where
     A: ::core::iter::Iterator,
-    B: ::core::iter::Iterator,
+    B: ::core::iter::Iterator<Item = <A as ::core::iter::Iterator>::Item>,
 {
+    type Item = <A as ::core::iter::Iterator>::Item;
+
     #[inline]
     fn next(&mut self) -> ::core::option::Option<Self::Item> {
         match self {

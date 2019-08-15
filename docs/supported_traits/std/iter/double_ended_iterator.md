@@ -21,7 +21,7 @@ enum Enum<A, B> {
 impl<A, B> ::core::iter::DoubleEndedIterator for Enum<A, B>
 where
     A: ::core::iter::DoubleEndedIterator,
-    B: ::core::iter::DoubleEndedIterator,
+    B: ::core::iter::DoubleEndedIterator<Item = <A as ::core::iter::Iterator>::Item>,
 {
     #[inline]
     fn next_back(&mut self) -> ::core::option::Option<Self::Item> {

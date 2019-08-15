@@ -194,9 +194,9 @@ You can add support for external library by activating the each crate feature.
 
 [`rayon`](https://github.com/rayon-rs/rayon) *(requires `"rayon"` crate feature)*
 
-* [`rayon::ParallelIterator`](https://docs.rs/rayon/1.0/rayon/iter/trait.ParallelIterator.html)
-* [`rayon::IndexedParallelIterator`](https://docs.rs/rayon/1.0/rayon/iter/trait.IndexedParallelIterator.html)
-* [`rayon::ParallelExtend`](https://docs.rs/rayon/1.0/rayon/iter/trait.ParallelExtend.html)
+* [`rayon::ParallelIterator`](https://docs.rs/rayon/1.0/rayon/iter/trait.ParallelIterator.html) - [generated code](docs/supported_traits/external/rayon/parallel_iterator.md)
+* [`rayon::IndexedParallelIterator`](https://docs.rs/rayon/1.0/rayon/iter/trait.IndexedParallelIterator.html) - [generated code](docs/supported_traits/external/rayon/indexed_parallel_iterator.md)
+* [`rayon::ParallelExtend`](https://docs.rs/rayon/1.0/rayon/iter/trait.ParallelExtend.html) - [generated code](docs/supported_traits/external/rayon/parallel_extend.md)
 
 [`serde`](https://github.com/serde-rs/serde) *(requires `"serde"` crate feature)*
 
