@@ -860,7 +860,7 @@
 //!
 
 #![recursion_limit = "256"]
-#![doc(html_root_url = "https://docs.rs/auto_enums/0.5.9")]
+#![doc(html_root_url = "https://docs.rs/auto_enums/0.5.10")]
 #![no_std]
 #![warn(unsafe_code)]
 #![warn(rust_2018_idioms, unreachable_pub)]
