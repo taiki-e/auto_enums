@@ -122,7 +122,7 @@ impl<'a> Visitor<'a> {
         replace_expr(expr, |expr| match expr {
             Expr::Macro(expr) => {
                 if expr.mac.path.is_ident(self.cx.marker.ident()) {
-                    let args = syn::parse2(expr.mac.tts).unwrap_or_else(|e| {
+                    let args = syn::parse2(expr.mac.tokens).unwrap_or_else(|e| {
                         self.cx.error = true;
                         syn::parse2(e.to_compile_error()).unwrap_or_else(|_| unreachable!())
                     });
@@ -283,8 +283,8 @@ fn visit_stmt_mut(stmt: &mut Stmt, cx: &mut Context) {
         return;
     }
 
-    if let Some(Attribute { tts, .. }) = stmt.find_remove_attr(NAME) {
-        parse_group(tts)
+    if let Some(Attribute { tokens, .. }) = stmt.find_remove_attr(NAME) {
+        parse_group(tokens)
             .map(|x| Context::child(span!(stmt), x))
             .and_then(|mut cx| stmt.visit_parent(&mut cx))
             .unwrap_or_else(|e| {

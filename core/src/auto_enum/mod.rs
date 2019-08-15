@@ -4,6 +4,8 @@ use syn::{
     visit_mut::VisitMut, AngleBracketedGenericArguments, Expr, ExprClosure, GenericArgument, Item,
     ItemEnum, ItemFn, Local, PathArguments, PathSegment, Result, ReturnType, Stmt, Type, TypePath,
 };
+#[cfg(feature = "type_analysis")]
+use syn::{Pat, PatType};
 
 use crate::utils::*;
 
@@ -104,7 +106,7 @@ impl Parent for Local {
     fn visit_parent(&mut self, cx: &mut Context) -> Result<()> {
         #[cfg(feature = "type_analysis")]
         {
-            if let Some((_, ty)) = &mut self.ty {
+            if let Pat::Type(PatType { ty, .. }) = &mut self.pat {
                 cx.impl_traits(&mut *ty);
             }
         }
@@ -116,10 +118,12 @@ impl Parent for Local {
 
         let expr = match self.init.as_mut().map(|(_, expr)| &mut **expr) {
             Some(expr) => expr,
-            None => Err(err!(
-                self,
-                "the `#[auto_enum]` attribute is not supported uninitialized let statement"
-            ))?,
+            None => {
+                return Err(err!(
+                    self,
+                    "the `#[auto_enum]` attribute is not supported uninitialized let statement"
+                ))
+            }
         };
 
         visit_expr(expr, cx)?;
@@ -130,8 +134,8 @@ impl Parent for Local {
 
 impl Parent for ItemFn {
     fn visit_parent(&mut self, cx: &mut Context) -> Result<()> {
-        let Self { decl, block, .. } = self;
-        if let ReturnType::Type(_, ty) = &mut decl.output {
+        let Self { sig, block, .. } = self;
+        if let ReturnType::Type(_, ty) = &mut sig.output {
             match &**ty {
                 // `return`
                 Type::ImplTrait(_) if cx.visit_last() => cx.visit_mode(VisitMode::Return),
@@ -173,10 +177,12 @@ impl Parent for ItemFn {
         match self.block.stmts.last_mut() {
             Some(Stmt::Expr(expr)) => child_expr(expr, cx)?,
             Some(_) => {}
-            None => Err(err!(
-                self.block,
-                "the `#[auto_enum]` attribute is not supported empty functions"
-            ))?,
+            None => {
+                return Err(err!(
+                    self.block,
+                    "the `#[auto_enum]` attribute is not supported empty functions"
+                ))
+            }
         }
 
         cx.visitor(|v| v.visit_item_fn_mut(self));

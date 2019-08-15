@@ -1,28 +1,25 @@
 [package]
 name = "auto_enums_core"
-# NB: When modifying, also modify html_root_url in lib.rs
-version = "0.5.9"
+version = "0.5.10"
 authors = ["Taiki Endo <te316e89@gmail.com>"]
 edition = "2018"
 license = "Apache-2.0/MIT"
-description = "This library provides an attribute macro for to allow multiple return types by automatically generated enum."
 repository = "https://github.com/taiki-e/auto_enums"
 documentation = "https://docs.rs/auto_enums_core/"
 keywords = ["enum", "macros", "derive", "attribute"]
 categories = ["rust-patterns"]
-include = ["Cargo.toml", "build.rs", "src/**/*.rs", "LICENSE-APACHE", "LICENSE-MIT"]
-
-[badges]
-travis-ci = { repository = "taiki-e/auto_enums" }
+description = """
+This library provides an attribute macro for to allow multiple return types by automatically generated enum.
+"""
 
 [lib]
 proc-macro = true
 
 [dependencies]
-proc-macro2 = "0.4.13"
-quote = "0.6.8"
+proc-macro2 = "1.0"
+quote = "1.0"
 smallvec = "0.6.9"
-syn = { version = "0.15.29", features = ["full", "visit-mut"] }
+syn = { version = "1.0", features = ["full", "visit-mut"] }
 
 [features]
 # Default features.

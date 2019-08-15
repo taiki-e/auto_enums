@@ -17,7 +17,7 @@ impl Arg {
     pub(super) fn to_trimed_string(&self) -> String {
         match self {
             Arg::Ident(i) => i.to_string(),
-            Arg::Path(p) => p.clone().into_token_stream().to_string().replace(" ", ""),
+            Arg::Path(p) => p.to_token_stream().to_string().replace(" ", ""),
         }
     }
 }
@@ -61,9 +61,9 @@ pub(super) fn parse_args(args: TokenStream) -> Result<Stack<(String, Arg)>> {
             TokenTree::Punct(p) => match p.as_char() {
                 ',' => {}
                 ':' => push(&mut args, parse_path(smallvec![p.into()], &mut iter)?),
-                _ => Err(arg_err!(p, "{}`{}`", ERR, p))?,
+                _ => return Err(arg_err!(p, "{}`{}`", ERR, p)),
             },
-            _ => Err(arg_err!(tt, "{}`{}`", ERR, tt))?,
+            _ => return Err(arg_err!(tt, "{}`{}`", ERR, tt)),
         }
     }
 

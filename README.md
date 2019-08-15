@@ -1,10 +1,21 @@
 # auto_enums
 
-[![Build Status](https://travis-ci.org/taiki-e/auto_enums.svg?branch=master)](https://travis-ci.org/taiki-e/auto_enums)
-[![version](https://img.shields.io/crates/v/auto_enums.svg)](https://crates.io/crates/auto_enums/)
-[![documentation](https://docs.rs/auto_enums/badge.svg)](https://docs.rs/auto_enums/)
-[![license](https://img.shields.io/crates/l/auto_enums.svg)](https://crates.io/crates/auto_enums/)
-[![Rustc Version](https://img.shields.io/badge/rustc-1.31+-lightgray.svg)](https://blog.rust-lang.org/2018/12/06/Rust-1.31-and-rust-2018.html)
+[![Build Status][azure-badge]][azure-url]
+[![Crates.io][crates-version-badge]][crates-url]
+[![Docs.rs][docs-badge]][docs-url]
+[![License][crates-license-badge]][crates-url]
+[![Minimum supported Rust version][rustc-badge]][rustc-url]
+
+[azure-badge]: https://dev.azure.com/taiki-e/taiki-e/_apis/build/status/taiki-e.auto_enums?branchName=master
+[azure-url]: https://dev.azure.com/taiki-e/taiki-e/_build/latest?definitionId=3&branchName=master
+[crates-version-badge]: https://img.shields.io/crates/v/auto_enums.svg
+[crates-license-badge]: https://img.shields.io/crates/l/auto_enums.svg
+[crates-badge]: https://img.shields.io/crates/v/auto_enums.svg
+[crates-url]: https://crates.io/crates/auto_enums/
+[docs-badge]: https://docs.rs/auto_enums/badge.svg
+[docs-url]: https://docs.rs/auto_enums/
+[rustc-badge]: https://img.shields.io/badge/rustc-1.31+-lightgray.svg
+[rustc-url]: https://blog.rust-lang.org/2018/12/06/Rust-1.31-and-rust-2018.html
 
 A library for to allow multiple return types by automatically generated enum.
 
@@ -102,6 +113,27 @@ enum Foo<A, B> {
 ### [std|core] libraries
 
 Note that some traits have aliases.
+Also, some traits support is disabled by default.
+
+`[std|core]::iter`
+
+* [`Iterator`](https://doc.rust-lang.org/std/iter/trait.Iterator.html) - [generated code](docs/supported_traits/std/iter/Iterator.md)
+* [`DoubleEndedIterator`](https://doc.rust-lang.org/std/iter/trait.DoubleEndedIterator.html) - [generated code](docs/supported_traits/std/iter/DoubleEndedIterator.md)
+* [`ExactSizeIterator`](https://doc.rust-lang.org/std/iter/trait.ExactSizeIterator.html) - [generated code](docs/supported_traits/std/iter/ExactSizeIterator.md)
+* [`FusedIterator`](https://doc.rust-lang.org/std/iter/trait.FusedIterator.html) - [generated code](docs/supported_traits/std/iter/FusedIterator.md)
+* [`TrustedLen`](https://doc.rust-lang.org/std/iter/trait.TrustedLen.html) - [generated code](docs/supported_traits/std/iter/TrustedLen.md) (*nightly-only*)
+* [`Extend`](https://doc.rust-lang.org/std/iter/trait.Extend.html) - [generated code](docs/supported_traits/std/iter/Extend.md)
+
+`[std|core]::future`
+
+* [`Future`](https://doc.rust-lang.org/nightly/std/future/trait.Future.html) - [generated code](docs/supported_traits/std/Future.md)
+
+`std::io`
+
+* [`Read`](https://doc.rust-lang.org/std/io/trait.Read.html) (alias: `io::Read`) - [generated code](docs/supported_traits/std/io/Read.md)
+* [`BufRead`](https://doc.rust-lang.org/std/io/trait.BufRead.html) (alias: `io::BufRead`) - [generated code](docs/supported_traits/std/io/BufRead.md)
+* [`Write`](https://doc.rust-lang.org/std/io/trait.Write.html) (alias: `io::Write`) - [generated code](docs/supported_traits/std/io/Write.md)
+* [`Seek`](https://doc.rust-lang.org/std/io/trait.Seek.html) (alias: `io::Seek`) - [generated code](docs/supported_traits/std/io/Seek.md)
 
 `[std|core]::ops`
 
@@ -120,18 +152,9 @@ Note that some traits have aliases.
 * [`AsRef`](https://doc.rust-lang.org/std/convert/trait.AsRef.html)
 * [`AsMut`](https://doc.rust-lang.org/std/convert/trait.AsMut.html)
 
-`[std|core]::iter`
-
-* [`Iterator`](https://doc.rust-lang.org/std/iter/trait.Iterator.html) - [generated code](docs/supported_traits/std/iter/iterator.md)
-* [`DoubleEndedIterator`](https://doc.rust-lang.org/std/iter/trait.DoubleEndedIterator.html) - [generated code](docs/supported_traits/std/iter/double_ended_iterator.md)
-* [`ExactSizeIterator`](https://doc.rust-lang.org/std/iter/trait.ExactSizeIterator.html) - [generated code](docs/supported_traits/std/iter/exact_size_iterator.md)
-* [`FusedIterator`](https://doc.rust-lang.org/std/iter/trait.FusedIterator.html) - [generated code](docs/supported_traits/std/iter/fused_iterator.md)
-* [`TrustedLen`](https://doc.rust-lang.org/std/iter/trait.TrustedLen.html) - [generated code](docs/supported_traits/std/iter/trusted_len.md) (*nightly-only*)
-* [`Extend`](https://doc.rust-lang.org/std/iter/trait.Extend.html) - [generated code](docs/supported_traits/std/iter/extend.md)
-
 `[std|core]::fmt`
 
-* [`Debug`](https://doc.rust-lang.org/std/fmt/trait.Debug.html) (alias: `fmt::Debug`) - [generated code](docs/supported_traits/std/debug.md)
+* [`Debug`](https://doc.rust-lang.org/std/fmt/trait.Debug.html) (alias: `fmt::Debug`) - [generated code](docs/supported_traits/std/Debug.md)
 * [`Display`](https://doc.rust-lang.org/std/fmt/trait.Display.html) (alias: `fmt::Display`)
 * [`fmt::Binary`](https://doc.rust-lang.org/std/fmt/trait.Binary.html) *(requires `"fmt"` crate feature)*
 * [`fmt::LowerExp`](https://doc.rust-lang.org/std/fmt/trait.LowerExp.html) *(requires `"fmt"` crate feature)*
@@ -142,20 +165,9 @@ Note that some traits have aliases.
 * [`fmt::UpperHex`](https://doc.rust-lang.org/std/fmt/trait.UpperHex.html) *(requires `"fmt"` crate feature)*
 * [`fmt::Write`](https://doc.rust-lang.org/std/fmt/trait.Write.html)
 
-`[std|core]::future`
-
-* [`Future`](https://doc.rust-lang.org/nightly/std/future/trait.Future.html) - [generated code](docs/supported_traits/std/future.md)
-
-`std::io`
-
-* [`Read`](https://doc.rust-lang.org/std/io/trait.Read.html) (alias: `io::Read`) - [generated code](docs/supported_traits/std/io/read.md)
-* [`BufRead`](https://doc.rust-lang.org/std/io/trait.BufRead.html) (alias: `io::BufRead`) - [generated code](docs/supported_traits/std/io/buf_read.md)
-* [`Write`](https://doc.rust-lang.org/std/io/trait.Write.html) (alias: `io::Write`) - [generated code](docs/supported_traits/std/io/write.md)
-* [`Seek`](https://doc.rust-lang.org/std/io/trait.Seek.html) (alias: `io::Seek`) - [generated code](docs/supported_traits/std/io/seek.md)
-
 `std::error`
 
-* [`Error`](https://doc.rust-lang.org/std/error/trait.Error.html) - [generated code](docs/supported_traits/std/error.md)
+* [`Error`](https://doc.rust-lang.org/std/error/trait.Error.html) - [generated code](docs/supported_traits/std/Error.md)
 
 ### External libraries
 
@@ -163,12 +175,12 @@ You can add support for external library by activating the each crate feature.
 
 [`futures(v0.3)`](https://github.com/rust-lang-nursery/futures-rs) *(requires `"futures"` crate feature)*
 
-* [`futures::Stream`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.17/futures/stream/trait.Stream.html) - [generated code](docs/supported_traits/external/futures/stream.md)
-* [`futures::Sink`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.17/futures/sink/trait.Sink.html) - [generated code](docs/supported_traits/external/futures/sink.md)
-* [`futures::AsyncRead`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.17/futures/io/trait.AsyncRead.html) - [generated code](docs/supported_traits/external/futures/async_read.md)
-* [`futures::AsyncWrite`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.17/futures/io/trait.AsyncWrite.html) - [generated code](docs/supported_traits/external/futures/async_write.md)
-* [`futures::AsyncSeek`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.17/futures/io/trait.AsyncSeek.html) - [generated code](docs/supported_traits/external/futures/async_seek.md)
-* [`futures::AsyncBufRead`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.17/futures/io/trait.AsyncBufRead.html) - [generated code](docs/supported_traits/external/futures/async_buf_read.md)
+* [`futures::Stream`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.17/futures/stream/trait.Stream.html) - [generated code](docs/supported_traits/external/futures/Stream.md)
+* [`futures::Sink`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.17/futures/sink/trait.Sink.html) - [generated code](docs/supported_traits/external/futures/Sink.md)
+* [`futures::AsyncRead`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.17/futures/io/trait.AsyncRead.html) - [generated code](docs/supported_traits/external/futures/AsyncRead.md)
+* [`futures::AsyncWrite`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.17/futures/io/trait.AsyncWrite.html) - [generated code](docs/supported_traits/external/futures/AsyncWrite.md)
+* [`futures::AsyncSeek`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.17/futures/io/trait.AsyncSeek.html) - [generated code](docs/supported_traits/external/futures/AsyncSeek.md)
+* [`futures::AsyncBufRead`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.17/futures/io/trait.AsyncBufRead.html) - [generated code](docs/supported_traits/external/futures/AsyncBufRead.md)
 
 [`futures(v0.1)`](https://github.com/rust-lang-nursery/futures-rs) *(requires `"futures01"` crate feature)*
 
@@ -182,13 +194,13 @@ You can add support for external library by activating the each crate feature.
 
 [`rayon`](https://github.com/rayon-rs/rayon) *(requires `"rayon"` crate feature)*
 
-* [`rayon::ParallelIterator`](https://docs.rs/rayon/1.0/rayon/iter/trait.ParallelIterator.html)
-* [`rayon::IndexedParallelIterator`](https://docs.rs/rayon/1.0/rayon/iter/trait.IndexedParallelIterator.html)
-* [`rayon::ParallelExtend`](https://docs.rs/rayon/1.0/rayon/iter/trait.ParallelExtend.html)
+* [`rayon::ParallelIterator`](https://docs.rs/rayon/1.0/rayon/iter/trait.ParallelIterator.html) - [generated code](docs/supported_traits/external/rayon/ParallelIterator.md)
+* [`rayon::IndexedParallelIterator`](https://docs.rs/rayon/1.0/rayon/iter/trait.IndexedParallelIterator.html) - [generated code](docs/supported_traits/external/rayon/IndexedParallelIterator.md)
+* [`rayon::ParallelExtend`](https://docs.rs/rayon/1.0/rayon/iter/trait.ParallelExtend.html) - [generated code](docs/supported_traits/external/rayon/ParallelExtend.md)
 
 [`serde`](https://github.com/serde-rs/serde) *(requires `"serde"` crate feature)*
 
-* [`serde::Serialize`](https://docs.serde.rs/serde/trait.Serialize.html) - [generated code](docs/supported_traits/external/serde/serialize.md)
+* [`serde::Serialize`](https://docs.serde.rs/serde/trait.Serialize.html) - [generated code](docs/supported_traits/external/serde/Serialize.md)
 
 ## License
 

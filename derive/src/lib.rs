@@ -1,11 +1,9 @@
 #![recursion_limit = "256"]
-#![doc(html_root_url = "https://docs.rs/auto_enums_derive/0.5.9")]
+#![doc(html_root_url = "https://docs.rs/auto_enums_derive/0.5.10")]
 #![warn(unsafe_code)]
 #![warn(rust_2018_idioms, unreachable_pub)]
 #![warn(clippy::all, clippy::pedantic)]
-#![warn(single_use_lifetimes)]
-#![warn(clippy::nursery)]
-#![allow(clippy::identity_conversion)] // https://github.com/rust-lang/rust-clippy/issues/4081
+#![allow(clippy::use_self)]
 
 extern crate proc_macro;
 
