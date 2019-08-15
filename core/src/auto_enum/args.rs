@@ -18,7 +18,7 @@ impl Arg {
     pub(super) fn to_trimed_string(&self) -> String {
         match self {
             Arg::Ident(i) => i.to_string(),
-            Arg::Path(p) => p.clone().into_token_stream().to_string().replace(" ", ""),
+            Arg::Path(p) => p.to_token_stream().to_string().replace(" ", ""),
         }
     }
 }
@@ -52,10 +52,10 @@ impl PartialEq for Arg {
         match self {
             Arg::Ident(x) => match other {
                 Arg::Ident(y) => x.eq(y),
-                Arg::Path(y) => y.is_ident(x.to_string()),
+                Arg::Path(y) => y.is_ident(x),
             },
             Arg::Path(x) => match other {
-                Arg::Ident(y) => x.is_ident(y.to_string()),
+                Arg::Ident(y) => x.is_ident(y),
                 Arg::Path(y) => x.eq(y),
             },
         }

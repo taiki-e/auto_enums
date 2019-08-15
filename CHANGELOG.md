@@ -1,5 +1,9 @@
 # Unreleased
 
+* Updated `proc-macro2`, `syn`, and `quote` to 1.0.
+
+* Updated `derive_utils` to 0.9. This improves the error message.
+
 * Added some generated code examples.
 
 # 0.5.9 - 2019-07-07

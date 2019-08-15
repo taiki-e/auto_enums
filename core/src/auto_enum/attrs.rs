@@ -1,4 +1,4 @@
-use syn::{Arm, Attribute, Expr, Local, Stmt};
+use syn::*;
 
 use crate::utils::VecExt;
 
@@ -10,9 +10,7 @@ pub(super) trait Attrs {
     }
 
     fn any_empty_attr(&self, ident: &str) -> bool {
-        self.attrs()
-            .iter()
-            .any(|Attribute { path, tts, .. }| path.is_ident(ident) && tts.is_empty())
+        self.attrs().iter().any(|attr| attr.path.is_ident(ident) && attr.tokens.is_empty())
     }
 }
 
@@ -25,7 +23,7 @@ pub(super) trait AttrsMut: Attrs {
 
     fn find_remove_empty_attr(&mut self, ident: &str) -> bool {
         fn find_remove(attrs: &mut Vec<Attribute>, ident: &str) -> Option<Attribute> {
-            attrs.find_remove(|Attribute { path, tts, .. }| path.is_ident(ident) && tts.is_empty())
+            attrs.find_remove(|attr| attr.path.is_ident(ident) && attr.tokens.is_empty())
         }
 
         self.attrs_mut(|attrs| find_remove(attrs, ident).is_some())
@@ -97,12 +95,12 @@ impl AttrsMut for Stmt {
 }
 
 macro_rules! attrs_impl {
-    ($($Expr:ident,)*) => {
+    ($($Expr:ident($Struct:ident),)*) => {
         impl Attrs for Expr {
             fn attrs(&self) -> &[Attribute] {
                 match self {
-                    $(Expr::$Expr(expr) => &expr.attrs,)*
-                    Expr::Verbatim(_) => &[],
+                    $(Expr::$Expr($Struct { attrs, .. }))|* => &attrs,
+                    _ => &[],
                 }
             }
         }
@@ -110,8 +108,8 @@ macro_rules! attrs_impl {
         impl AttrsMut for Expr {
             fn attrs_mut<T, F: FnOnce(&mut Vec<Attribute>) -> T>(&mut self, f: F) -> T {
                 match self {
-                    $(Expr::$Expr(expr) => f(&mut expr.attrs),)*
-                    Expr::Verbatim(_) => f(&mut Vec::new()),
+                    $(Expr::$Expr($Struct { attrs, .. }))|* => f(attrs),
+                    _ => f(&mut Vec::new()),
                 }
             }
         }
@@ -119,43 +117,43 @@ macro_rules! attrs_impl {
 }
 
 attrs_impl! {
-    Box,
-    InPlace,
-    Array,
-    Call,
-    MethodCall,
-    Tuple,
-    Binary,
-    Unary,
-    Lit,
-    Cast,
-    Type,
-    Let,
-    If,
-    While,
-    ForLoop,
-    Loop,
-    Match,
-    Closure,
-    Unsafe,
-    Block,
-    Assign,
-    AssignOp,
-    Field,
-    Index,
-    Range,
-    Path,
-    Reference,
-    Break,
-    Continue,
-    Return,
-    Macro,
-    Struct,
-    Repeat,
-    Paren,
-    Group,
-    Try,
-    Async,
-    TryBlock,
-    Yield,
+    Array(ExprArray),
+    Assign(ExprAssign),
+    AssignOp(ExprAssignOp),
+    Async(ExprAsync),
+    Await(ExprAwait),
+    Binary(ExprBinary),
+    Block(ExprBlock),
+    Box(ExprBox),
+    Break(ExprBreak),
+    Call(ExprCall),
+    Cast(ExprCast),
+    Closure(ExprClosure),
+    Continue(ExprContinue),
+    Field(ExprField),
+    ForLoop(ExprForLoop),
+    Group(ExprGroup),
+    If(ExprIf),
+    Index(ExprIndex),
+    Let(ExprLet),
+    Lit(ExprLit),
+    Loop(ExprLoop),
+    Macro(ExprMacro),
+    Match(ExprMatch),
+    MethodCall(ExprMethodCall),
+    Paren(ExprParen),
+    Path(ExprPath),
+    Range(ExprRange),
+    Reference(ExprReference),
+    Repeat(ExprRepeat),
+    Return(ExprReturn),
+    Struct(ExprStruct),
+    Try(ExprTry),
+    TryBlock(ExprTryBlock),
+    Tuple(ExprTuple),
+    Type(ExprType),
+    Unary(ExprUnary),
+    Unsafe(ExprUnsafe),
+    While(ExprWhile),
+    Yield(ExprYield),
 }

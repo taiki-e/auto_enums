@@ -2,10 +2,7 @@ use std::mem;
 
 use proc_macro2::{Ident, Span, TokenStream};
 use smallvec::SmallVec;
-use syn::{
-    punctuated::Punctuated, Block, Expr, ExprBlock, ExprTuple, ExprVerbatim, Path, PathSegment,
-    Stmt,
-};
+use syn::{punctuated::Punctuated, Block, Expr, ExprBlock, ExprTuple, Path, PathSegment, Stmt};
 
 pub(crate) type Stack<T> = SmallVec<[T; 4]>;
 
@@ -66,7 +63,7 @@ pub(crate) fn unit() -> Expr {
 }
 
 pub(crate) fn replace_expr<F: FnOnce(Expr) -> Expr>(this: &mut Expr, op: F) {
-    *this = op(mem::replace(this, Expr::Verbatim(ExprVerbatim { tts: TokenStream::new() })));
+    *this = op(mem::replace(this, Expr::Verbatim(TokenStream::new())));
 }
 
 pub(crate) fn replace_block<F: FnOnce(Block) -> Expr>(this: &mut Block, op: F) {

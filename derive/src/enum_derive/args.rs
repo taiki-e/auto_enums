@@ -17,7 +17,7 @@ impl Arg {
     pub(super) fn to_trimed_string(&self) -> String {
         match self {
             Arg::Ident(i) => i.to_string(),
-            Arg::Path(p) => p.clone().into_token_stream().to_string().replace(" ", ""),
+            Arg::Path(p) => p.to_token_stream().to_string().replace(" ", ""),
         }
     }
 }
