@@ -14,11 +14,11 @@ pub(crate) use self::attrs::{Attrs, AttrsMut};
 // Extension traits
 
 pub(crate) trait VecExt<T> {
-    fn find_remove<P: FnMut(&T) -> bool>(&mut self, predicate: P) -> Option<T>;
+    fn find_remove(&mut self, predicate: impl FnMut(&T) -> bool) -> Option<T>;
 }
 
 impl<T> VecExt<T> for Vec<T> {
-    fn find_remove<P: FnMut(&T) -> bool>(&mut self, predicate: P) -> Option<T> {
+    fn find_remove(&mut self, predicate: impl FnMut(&T) -> bool) -> Option<T> {
         self.iter().position(predicate).map(|i| self.remove(i))
     }
 }
@@ -26,7 +26,7 @@ impl<T> VecExt<T> for Vec<T> {
 // =============================================================================
 // Functions
 
-pub(crate) fn path<I: IntoIterator<Item = PathSegment>>(segments: I) -> Path {
+pub(crate) fn path(segments: impl IntoIterator<Item = PathSegment>) -> Path {
     Path { leading_colon: None, segments: segments.into_iter().collect() }
 }
 
@@ -59,12 +59,12 @@ pub(crate) fn unit() -> Expr {
     })
 }
 
-pub(crate) fn replace_expr<F: FnOnce(Expr) -> Expr>(this: &mut Expr, op: F) {
-    *this = op(mem::replace(this, Expr::Verbatim(TokenStream::new())));
+pub(crate) fn replace_expr(this: &mut Expr, f: impl FnOnce(Expr) -> Expr) {
+    *this = f(mem::replace(this, Expr::Verbatim(TokenStream::new())));
 }
 
-pub(crate) fn replace_block<F: FnOnce(Block) -> Expr>(this: &mut Block, op: F) {
-    *this = block(vec![Stmt::Expr(op(mem::replace(this, block(Vec::new()))))]);
+pub(crate) fn replace_block(this: &mut Block, f: impl FnOnce(Block) -> Expr) {
+    *this = block(vec![Stmt::Expr(f(mem::replace(this, block(Vec::new()))))]);
 }
 
 // =============================================================================

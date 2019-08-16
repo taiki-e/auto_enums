@@ -1,8 +1,11 @@
 use std::ops::{Deref, DerefMut};
 
 use syn::{
+    token,
     visit_mut::{self, VisitMut},
-    *,
+    Arm, Expr, ExprBlock, ExprBreak, ExprCall, ExprIf, ExprLoop, ExprMacro, ExprMatch,
+    ExprMethodCall, ExprParen, ExprPath, ExprTry, ExprType, ExprUnsafe, Item, Lifetime, Result,
+    Stmt,
 };
 
 use crate::utils::{expr_block, replace_block, replace_expr};
@@ -41,11 +44,12 @@ impl<'a> From<&'a mut super::Context> for Context<'a> {
 // =============================================================================
 // Visiting last expression
 
-fn last_expr<T, F, OP>(expr: &Expr, success: T, mut filter: F, op: OP) -> T
-where
-    F: FnMut(&Expr) -> bool,
-    OP: FnOnce(&Expr) -> T,
-{
+fn last_expr<T>(
+    expr: &Expr,
+    success: T,
+    mut filter: impl FnMut(&Expr) -> bool,
+    f: impl FnOnce(&Expr) -> T,
+) -> T {
     if !filter(expr) {
         return success;
     }
@@ -53,7 +57,7 @@ where
     match expr {
         Expr::Block(ExprBlock { block, .. }) | Expr::Unsafe(ExprUnsafe { block, .. }) => {
             match block.stmts.last() {
-                Some(Stmt::Expr(expr)) => return last_expr(expr, success, filter, op),
+                Some(Stmt::Expr(expr)) => return last_expr(expr, success, filter, f),
                 Some(Stmt::Semi(expr, _)) => {
                     if !filter(expr) {
                         return success;
@@ -66,20 +70,16 @@ where
         _ => {}
     }
 
-    op(expr)
+    f(expr)
 }
 
-fn last_expr_mut<T, F, OP>(
+fn last_expr_mut<T>(
     expr: &mut Expr,
     cx: &mut Context<'_>,
     success: T,
-    mut filter: F,
-    op: OP,
-) -> T
-where
-    F: FnMut(&Expr, &mut Context<'_>) -> bool,
-    OP: FnOnce(&mut Expr, &mut Context<'_>) -> T,
-{
+    mut filter: impl FnMut(&Expr, &mut Context<'_>) -> bool,
+    f: impl FnOnce(&mut Expr, &mut Context<'_>) -> T,
+) -> T {
     if !filter(expr, cx) {
         return success;
     }
@@ -87,7 +87,7 @@ where
     match expr {
         Expr::Block(ExprBlock { block, .. }) | Expr::Unsafe(ExprUnsafe { block, .. }) => {
             match block.stmts.last_mut() {
-                Some(Stmt::Expr(expr)) => return last_expr_mut(expr, cx, success, filter, op),
+                Some(Stmt::Expr(expr)) => return last_expr_mut(expr, cx, success, filter, f),
                 Some(Stmt::Semi(expr, _)) => {
                     if !filter(expr, cx) {
                         return success;
@@ -100,7 +100,7 @@ where
         _ => {}
     }
 
-    op(expr, cx)
+    f(expr, cx)
 }
 
 fn is_unreachable(expr: &Expr, cx: &Context<'_>) -> bool {
@@ -118,10 +118,6 @@ fn is_unreachable(expr: &Expr, cx: &Context<'_>) -> bool {
                 UNREACHABLE_MACROS.iter().any(|i| mac.path.is_ident(i)) || cx.is_marker_macro(mac)
             }
 
-            /* FIXME: This may not be necessary.
-            // Assigned.
-            Expr::Call(expr) => cx.assigned_enum(expr),
-            */
             Expr::Match(ExprMatch { arms, .. }) => {
                 arms.iter().all(|arm| arm.any_empty_attr(NEVER) || is_unreachable(&*arm.body, cx))
             }
@@ -212,7 +208,6 @@ impl VisitLast<()> for ExprMatch {
                 arm.comma = Some(token::Comma::default());
                 replace_expr(&mut *arm.body, |x| cx.next_expr(x));
             }
-
             Ok(())
         })
     }
@@ -242,7 +237,6 @@ impl VisitLast<()> for ExprIf {
                 if !skip(expr.block.stmts.last_mut(), cx)? {
                     replace_block(&mut expr.block, |b| cx.next_expr(expr_block(b)));
                 }
-
                 Ok(())
             }
             Some(Expr::If(expr)) => expr.visit_last(cx),
@@ -285,13 +279,13 @@ impl<'a> LoopVisitor<'a> {
 }
 
 impl VisitMut for LoopVisitor<'_> {
-    fn visit_expr_mut(&mut self, expr: &mut Expr) {
-        if expr.any_empty_attr(NEVER) {
+    fn visit_expr_mut(&mut self, node: &mut Expr) {
+        if node.any_empty_attr(NEVER) {
             return;
         }
 
         let tmp = self.nested;
-        match expr {
+        match node {
             // Stop at closure bounds
             Expr::Closure(_) => return,
 
@@ -313,10 +307,11 @@ impl VisitMut for LoopVisitor<'_> {
             _ => {}
         }
 
-        visit_mut::visit_expr_mut(self, expr);
+        visit_mut::visit_expr_mut(self, node);
         self.nested = tmp;
     }
 
-    // Stop at item bounds
-    fn visit_item_mut(&mut self, _item: &mut Item) {}
+    fn visit_item_mut(&mut self, _: &mut Item) {
+        // Do not recurse into nested items.
+    }
 }

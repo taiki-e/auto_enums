@@ -1,4 +1,4 @@
-use syn::*;
+use syn::{Arm, Attribute, Expr, Local};
 
 use super::VecExt;
 
@@ -15,7 +15,7 @@ pub(crate) trait Attrs {
 }
 
 pub(crate) trait AttrsMut: Attrs {
-    fn attrs_mut<T, F: FnOnce(&mut Vec<Attribute>) -> T>(&mut self, f: F) -> T;
+    fn attrs_mut<T>(&mut self, f: impl FnOnce(&mut Vec<Attribute>) -> T) -> T;
 
     fn find_remove_attr(&mut self, ident: &str) -> Option<Attribute> {
         self.attrs_mut(|attrs| attrs.find_remove(|attr| attr.path.is_ident(ident)))
@@ -30,24 +30,6 @@ pub(crate) trait AttrsMut: Attrs {
     }
 }
 
-impl Attrs for [Attribute] {
-    fn attrs(&self) -> &[Attribute] {
-        self
-    }
-}
-
-impl Attrs for Vec<Attribute> {
-    fn attrs(&self) -> &[Attribute] {
-        self
-    }
-}
-
-impl AttrsMut for Vec<Attribute> {
-    fn attrs_mut<T, F: FnOnce(&mut Vec<Attribute>) -> T>(&mut self, f: F) -> T {
-        f(self)
-    }
-}
-
 impl Attrs for Arm {
     fn attrs(&self) -> &[Attribute] {
         &self.attrs
@@ -55,7 +37,7 @@ impl Attrs for Arm {
 }
 
 impl AttrsMut for Arm {
-    fn attrs_mut<T, F: FnOnce(&mut Vec<Attribute>) -> T>(&mut self, f: F) -> T {
+    fn attrs_mut<T>(&mut self, f: impl FnOnce(&mut Vec<Attribute>) -> T) -> T {
         f(&mut self.attrs)
     }
 }
@@ -67,30 +49,8 @@ impl Attrs for Local {
 }
 
 impl AttrsMut for Local {
-    fn attrs_mut<T, F: FnOnce(&mut Vec<Attribute>) -> T>(&mut self, f: F) -> T {
+    fn attrs_mut<T>(&mut self, f: impl FnOnce(&mut Vec<Attribute>) -> T) -> T {
         f(&mut self.attrs)
-    }
-}
-
-impl Attrs for Stmt {
-    fn attrs(&self) -> &[Attribute] {
-        match self {
-            Stmt::Expr(expr) | Stmt::Semi(expr, _) => expr.attrs(),
-            Stmt::Local(local) => local.attrs(),
-            // Stop at item bounds
-            Stmt::Item(_) => &[],
-        }
-    }
-}
-
-impl AttrsMut for Stmt {
-    fn attrs_mut<T, F: FnOnce(&mut Vec<Attribute>) -> T>(&mut self, f: F) -> T {
-        match self {
-            Stmt::Expr(expr) | Stmt::Semi(expr, _) => expr.attrs_mut(f),
-            Stmt::Local(local) => local.attrs_mut(f),
-            // Stop at item bounds
-            Stmt::Item(_) => f(&mut Vec::new()),
-        }
     }
 }
 
@@ -99,16 +59,16 @@ macro_rules! attrs_impl {
         impl Attrs for Expr {
             fn attrs(&self) -> &[Attribute] {
                 match self {
-                    $(Expr::$Expr($Struct { attrs, .. }))|* => &attrs,
+                    $(Expr::$Expr(syn::$Struct { attrs, .. }))|* => &attrs,
                     _ => &[],
                 }
             }
         }
 
         impl AttrsMut for Expr {
-            fn attrs_mut<T, F: FnOnce(&mut Vec<Attribute>) -> T>(&mut self, f: F) -> T {
+            fn attrs_mut<T>(&mut self, f: impl FnOnce(&mut Vec<Attribute>) -> T) -> T {
                 match self {
-                    $(Expr::$Expr($Struct { attrs, .. }))|* => f(attrs),
+                    $(Expr::$Expr(syn::$Struct { attrs, .. }))|* => f(attrs),
                     _ => f(&mut Vec::new()),
                 }
             }

@@ -4,22 +4,19 @@ use syn::{
     visit_mut::VisitMut, AngleBracketedGenericArguments, Expr, ExprClosure, GenericArgument, Item,
     ItemEnum, ItemFn, Local, PathArguments, PathSegment, Result, ReturnType, Stmt, Type, TypePath,
 };
-#[cfg(feature = "type_analysis")]
-use syn::{Pat, PatType};
 
 use crate::utils::*;
 
 mod args;
 mod context;
 mod expr;
+#[cfg(feature = "type_analysis")]
+mod traits;
 mod visitor;
 
 use self::args::{parse_args, parse_group, Arg};
 use self::context::{Context, VisitLastMode, VisitMode};
 use self::expr::child_expr;
-
-#[cfg(feature = "type_analysis")]
-mod traits;
 #[cfg(feature = "type_analysis")]
 use self::traits::*;
 
@@ -105,7 +102,7 @@ impl Parent for Local {
         #[cfg(feature = "type_analysis")]
         {
             if let Pat::Type(PatType { ty, .. }) = &mut self.pat {
-                cx.impl_traits(&mut *ty);
+                cx.collect_trait(&mut *ty);
             }
         }
 
@@ -164,7 +161,7 @@ impl Parent for ItemFn {
             }
 
             #[cfg(feature = "type_analysis")]
-            cx.impl_traits(&mut *ty);
+            cx.collect_trait(&mut *ty);
         }
 
         if cx.args.is_empty() {

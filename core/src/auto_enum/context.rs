@@ -10,11 +10,13 @@ use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, ToTokens};
 use syn::{Attribute, Expr, ItemEnum, Macro, Result};
 
-use crate::utils::{expr_call, path};
+use crate::utils::{expr_call, path, replace_expr, unit};
 
+#[cfg(feature = "type_analysis")]
+use super::traits::*;
 use super::{
     visitor::{Dummy, FindTry, Visitor},
-    *,
+    Arg,
 };
 
 // =============================================================================
@@ -33,11 +35,11 @@ pub(super) enum VisitMode {
 pub(super) enum VisitLastMode {
     Default,
     /*
-    local `let .. = || {};`
+    local: `let .. = || {};`
     or
-    expr `|| {}`
+    expr: `|| {}`
     not
-    item_fn `fn _() -> Fn*() { || {} }`
+    item_fn: `fn _() -> Fn*() { || {} }`
     */
     Closure,
     /// `Stmt::Semi(..)` or `never` option - never visit last expr
@@ -50,7 +52,7 @@ pub(super) struct Context {
     pub(super) args: Vec<Arg>,
     builder: Builder,
     pub(super) marker: Marker,
-    // pub(super) depth: usize,
+    // pub(super) depth: u32,
     root: bool,
     visit_mode: VisitMode,
     visit_last_mode: VisitLastMode,
@@ -61,8 +63,8 @@ pub(super) struct Context {
 }
 
 impl Context {
-    fn new<T: ToTokens>(
-        span: T,
+    fn new(
+        span: impl ToTokens,
         args: Vec<Arg>,
         marker: Option<String>,
         never: bool,
@@ -82,15 +84,15 @@ impl Context {
         }
     }
 
-    pub(super) fn root<T: ToTokens>(
-        span: T,
+    pub(super) fn root(
+        span: impl ToTokens,
         (args, marker, never): (Vec<Arg>, Option<String>, bool),
     ) -> Self {
         Self::new(span, args, marker, never, true)
     }
 
-    pub(super) fn child<T: ToTokens>(
-        span: T,
+    pub(super) fn child(
+        span: impl ToTokens,
         (args, marker, never): (Vec<Arg>, Option<String>, bool),
     ) -> Self {
         Self::new(span, args, marker, never, false)
@@ -119,15 +121,15 @@ impl Context {
 
     // visitors
 
-    pub(super) fn visitor<F: FnOnce(&mut Visitor<'_>)>(&mut self, f: F) {
+    pub(super) fn visitor(&mut self, f: impl FnOnce(&mut Visitor<'_>)) {
         f(&mut Visitor::new(self));
     }
 
-    pub(super) fn dummy<F: FnOnce(&mut Dummy<'_>)>(&mut self, f: F) {
+    pub(super) fn dummy(&mut self, f: impl FnOnce(&mut Dummy<'_>)) {
         f(&mut Dummy::new(self));
     }
 
-    pub(super) fn find_try<F: FnOnce(&mut FindTry<'_>)>(&mut self, f: F) {
+    pub(super) fn find_try(&mut self, f: impl FnOnce(&mut FindTry<'_>)) {
         let mut find = FindTry::new(self);
         f(&mut find);
         if find.has {
@@ -176,24 +178,6 @@ impl Context {
         }
     }
 
-    /* FIXME: This may not be necessary.
-    pub(super) fn assigned_enum(&self, ExprCall { args, func, .. }: &ExprCall) -> bool {
-        args.len() == 1
-            && match &**func {
-                Expr::Path(ExprPath {
-                    path, qself: None, ..
-                }) => {
-                    path.leading_colon.is_none()
-                        && path.segments.len() == 2
-                        && path.segments[0].arguments.is_empty()
-                        && path.segments[1].arguments.is_empty()
-                        && path.segments[0].ident == self.builder.ident
-                }
-                _ => false,
-            }
-    }
-    */
-
     // build
 
     fn buildable(&mut self) -> Result<bool> {
@@ -226,19 +210,18 @@ impl Context {
         }
     }
 
-    pub(super) fn build<F: FnOnce(ItemEnum)>(&mut self, f: F) -> Result<()> {
-        self.buildable().map(|buildable| {
-            if buildable {
-                f(self.builder.build(&self.args))
-            }
-        })
+    pub(super) fn build(&mut self, f: impl FnOnce(ItemEnum)) -> Result<()> {
+        if self.buildable()? {
+            f(self.builder.build(&self.args))
+        }
+        Ok(())
     }
 
     // type_analysis feature
 
     #[cfg(feature = "type_analysis")]
-    pub(super) fn impl_traits(&mut self, ty: &mut Type) {
-        collect_impl_traits(&mut self.args, ty);
+    pub(super) fn collect_trait(&mut self, ty: &mut Type) {
+        collect_impl_trait(&mut self.args, ty);
     }
 }
 
