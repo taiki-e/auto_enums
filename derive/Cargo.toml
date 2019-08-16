@@ -65,9 +65,17 @@ serde = []
 # ==============================================================================
 # Enable unstable features of [std|core] libraries.
 
+# Enable to use `[std|core]::iter::Generator` trait.
+generator_trait = []
+# Enable to use `Fn`, `FnMut`, and `FnOnce` traits.
+fn_traits = []
+# Enable to use `[std|core]::iter::TrustedLen` trait.
+trusted_len = []
+
 # Implements `ExactSizeIterator::is_empty`.
 exact_size_is_empty = []
 # Implements `io::Read::read_initializer`.
 read_initializer = []
+
 # Make iterator implementation more effective.
 try_trait = []

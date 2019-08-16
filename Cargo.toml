@@ -27,6 +27,7 @@ auto_enums_derive = { version = "=0.5.8", path = "derive", default-features = fa
 
 [dev-dependencies]
 compiletest = { version = "0.3.21", package = "compiletest_rs", features = ["stable", "tmp"] }
+rustversion = "0.1"
 
 [features]
 # Default features.
@@ -76,6 +77,13 @@ serde = ["auto_enums_derive/serde"]
 
 # ==============================================================================
 # Enable unstable features of [std|core] libraries
+
+# Enable to use `[std|core]::iter::Generator` trait.
+generator_trait = ["auto_enums_derive/generator_trait"]
+# Enable to use `[std|core]::ops`'s `Fn`, `FnMut`, and `FnOnce` traits.
+fn_traits = ["auto_enums_derive/fn_traits"]
+# Enable to use `[std|core]::iter::TrustedLen` trait.
+trusted_len = ["auto_enums_derive/trusted_len"]
 
 # Implements `ExactSizeIterator::is_empty`.
 exact_size_is_empty = ["auto_enums_derive/exact_size_is_empty"]

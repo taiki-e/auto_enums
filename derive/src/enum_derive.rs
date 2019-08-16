@@ -124,6 +124,7 @@ lazy_static! {
             core::iter::double_ended_iterator,
             core::iter::exact_size_iterator,
             core::iter::fused_iterator,
+            #[cfg(feature = "trusted_len")]
             core::iter::trusted_len,
             core::iter::extend,
             #[cfg(feature = "ops")]
@@ -136,9 +137,13 @@ lazy_static! {
             core::ops::index_mut,
             #[cfg(feature = "ops")]
             core::ops::range_bounds,
+            #[cfg(feature = "fn_traits")]
             core::ops::fn_,
+            #[cfg(feature = "fn_traits")]
             core::ops::fn_mut,
+            #[cfg(feature = "fn_traits")]
             core::ops::fn_once,
+            #[cfg(feature = "generator_trait")]
             core::ops::generator,
             core::future,
             // std

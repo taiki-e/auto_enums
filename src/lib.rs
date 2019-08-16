@@ -15,7 +15,6 @@
 //! `#[auto_enum]`'s basic feature is to wrap the value returned by the obvious branches (`match`, `if`, `return`, etc..) by an enum that implemented the specified traits.
 //!
 //! ```rust
-//! # #![deny(warnings)]
 //! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //! use auto_enums::auto_enum;
 //!
@@ -40,7 +39,6 @@
 //! Code like this will be generated:
 //!
 //! ```rust
-//! # #![deny(warnings)]
 //! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //! fn foo(x: i32) -> impl Iterator<Item = i32> {
 //!     #[::auto_enums::enum_derive(Iterator)]
@@ -63,7 +61,6 @@
 //! <summary>Code like this will be generated:</summary>
 //!
 //! ```rust
-//! # #![deny(warnings)]
 //! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //! fn foo(x: i32) -> impl Iterator<Item = i32> {
 //!     enum __Enum1<__T1, __T2> {
@@ -110,7 +107,6 @@
 //! * functions
 //!
 //!   ```rust
-//!   # #![deny(warnings)]
 //!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //!   # use auto_enums::auto_enum;
 //!   #[auto_enum(Iterator)]
@@ -127,7 +123,6 @@
 //! * expressions
 //!
 //!   ```rust
-//!   # #![deny(warnings)]
 //!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //!   # use auto_enums::auto_enum;
 //!   #[auto_enum] // Nightly does not need an empty attribute to the function.
@@ -144,7 +139,6 @@
 //! * let binding
 //!
 //!   ```rust
-//!   # #![deny(warnings)]
 //!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //!   # use auto_enums::auto_enum;
 //!   #[auto_enum] // Nightly does not need an empty attribute to the function.
@@ -166,7 +160,6 @@
 //!   Wrap each branch with a variant.
 //!
 //!   ```rust
-//!   # #![deny(warnings)]
 //!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //!   # use auto_enums::auto_enum;
 //!   // if
@@ -197,7 +190,6 @@
 //!   Wrap each `break` with a variant. Nested loops and labeled `break` are also supported.
 //!
 //!   ```rust
-//!   # #![deny(warnings)]
 //!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //!   # use auto_enums::auto_enum;
 //!   #[auto_enum(Iterator)]
@@ -221,7 +213,6 @@
 //!   This analysis is valid only when the return type is `impl Trait`.
 //!
 //!   ```rust
-//!   # #![deny(warnings)]
 //!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //!   # use auto_enums::auto_enum;
 //!   // return (in functions)
@@ -250,7 +241,6 @@
 //!     * `?` operator not used in the scope.
 //!
 //!   ```rust
-//!   # #![deny(warnings)]
 //!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //!   # use auto_enums::auto_enum;
 //!   // return (in closures)
@@ -280,7 +270,6 @@
 //!   This analysis is valid only when the return type is `Result<T, impl Trait>`.
 //!
 //!   ```rust
-//!   # #![deny(warnings)]
 //!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //!   # use auto_enums::auto_enum;
 //!   use std::fmt::{Debug, Display};
@@ -305,7 +294,6 @@
 //!   By default, `?` operator is expanded as follows:
 //!
 //!   ```rust
-//!   # #![deny(warnings)]
 //!   # pub enum Enum<A> { Veriant(A) }
 //!   # pub fn a<T, E>(expr: Result<T, E>) -> Result<T, Enum<E>> {
 //!   # Ok(
@@ -320,7 +308,6 @@
 //!   When "try_trait" crate feature is enabled, `?` operator is expanded as follows (note that this uses [an unstable feature](https://github.com/rust-lang/rust/issues/42327)):
 //!
 //!   ```rust
-//!   # #![deny(warnings)]
 //!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //!   # #[cfg(feature = "try_trait")]
 //!   # use std::ops::Try;
@@ -345,7 +332,6 @@
 //!   However, `#[auto_enum]` must be used directly for that closure (or the let binding of the closure).
 //!
 //!   ```rust
-//!   # #![deny(warnings)]
 //!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //!   # use auto_enums::auto_enum;
 //!   use std::fmt::{Debug, Display};
@@ -382,7 +368,6 @@
 //!   * type ascriptions
 //!
 //!   ```rust
-//!   # #![deny(warnings)]
 //!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //!   # use auto_enums::auto_enum;
 //!   // block
@@ -421,7 +406,6 @@
 //! You can parse nested branches by `#[nested]` attribute.
 //!
 //! ```rust
-//! # #![deny(warnings)]
 //! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //! # use auto_enums::auto_enum;
 //! #[auto_enum(Iterator)]
@@ -453,7 +437,6 @@
 //! * An item definition.
 //!
 //! ```rust
-//! # #![deny(warnings)]
 //! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //! # use auto_enums::auto_enum;
 //! #[auto_enum(Iterator)]
@@ -470,7 +453,6 @@
 //! You can also skip that branch explicitly by `#[never]` attribute.
 //!
 //! ```rust
-//! # #![deny(warnings)]
 //! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //! # use auto_enums::auto_enum;
 //! #[auto_enum(Iterator)]
@@ -490,7 +472,6 @@
 //! You can also skip all branches by `never` option.
 //!
 //! ```rust
-//! # #![deny(warnings)]
 //! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //! # use auto_enums::auto_enum;
 //! #[auto_enum(never, Iterator)]
@@ -516,7 +497,6 @@
 //! If values of two or more are specified by `marker!` macros, `#[auto_enum]` can be used for unsupported expressions and statements.
 //!
 //! ```rust
-//! # #![deny(warnings)]
 //! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //! # use auto_enums::auto_enum;
 //! #[auto_enum(Iterator)]
@@ -532,7 +512,6 @@
 //! The default name of the macro is `"marker"`, but you can change it by `marker` option.
 //!
 //! ```rust
-//! # #![deny(warnings)]
 //! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //! # use auto_enums::auto_enum;
 //! #[auto_enum(marker(bar), Iterator)]
@@ -550,19 +529,15 @@
 //! When using `#[auto_enum]` for expressions and statements, `#[auto_enum]` for function is unnecessary.
 //!
 //! ```rust
-//! # #![deny(warnings)]
 //! // Add this to your crate root:
 //! #![feature(proc_macro_hygiene, stmt_expr_attributes)]
 //! # fn main() {}
 //! ```
 //!
 //! ```rust
-//! # #![deny(warnings)]
 //! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
-//! # #![cfg_attr(feature = "unstable", feature(proc_macro_hygiene, stmt_expr_attributes))]
-//! # #[cfg(feature = "unstable")]
+//! # #![feature(proc_macro_hygiene, stmt_expr_attributes)]
 //! # use auto_enums::auto_enum;
-//! # #[cfg(feature = "unstable")]
 //! fn foo(x: i32) -> i32 {
 //!     #[auto_enum(Iterator)]
 //!     let iter = match x {
@@ -572,27 +547,20 @@
 //!
 //!     iter.fold(0, |sum, x| sum + x)
 //! }
-//! # #[cfg(feature = "unstable")]
 //! # fn main() { let _ = foo(0); }
-//! # #[cfg(not(feature = "unstable"))]
-//! # fn main() {}
 //! ```
 //!
 //! You can also return closures.
 //!
 //! ```rust
-//! # #![deny(warnings)]
 //! // Add this to your crate root:
 //! #![feature(fn_traits, unboxed_closures)]
 //! # fn main() {}
 //! ```
 //!
 //! ```rust
-//! # #![deny(warnings)]
-//! # #![cfg_attr(feature = "unstable", feature(fn_traits, unboxed_closures))]
-//! # #[cfg(feature = "unstable")]
+//! # #![feature(fn_traits, unboxed_closures)]
 //! # use auto_enums::auto_enum;
-//! # #[cfg(feature = "unstable")]
 //! #[auto_enum(Fn)]
 //! fn foo(x: bool) -> impl Fn(i32) -> i32 {
 //!     if x {
@@ -601,10 +569,7 @@
 //!         |z| z - 1
 //!     }
 //! }
-//! # #[cfg(feature = "unstable")]
 //! # fn main() { let _ = foo(false); }
-//! # #[cfg(not(feature = "unstable"))]
-//! # fn main() {}
 //! ```
 //!
 //! ## `#[enum_derive]`
@@ -616,7 +581,6 @@
 //! Basic usage of `#[enum_derive]`
 //!
 //! ```rust
-//! # #![deny(warnings)]
 //! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //! use auto_enums::enum_derive;
 //!
@@ -632,7 +596,6 @@
 //! `#[enum_derive]` adds the dependency of the specified trait if it is not specified.
 //!
 //! ```rust
-//! # #![deny(warnings)]
 //! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //! # #![cfg_attr(feature = "exact_size_is_empty", feature(exact_size_is_empty))]
 //! use auto_enums::enum_derive;
@@ -661,7 +624,7 @@
 //! * [`DoubleEndedIterator`](https://doc.rust-lang.org/std/iter/trait.DoubleEndedIterator.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/iter/DoubleEndedIterator.md)
 //! * [`ExactSizeIterator`](https://doc.rust-lang.org/std/iter/trait.ExactSizeIterator.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/iter/ExactSizeIterator.md)
 //! * [`FusedIterator`](https://doc.rust-lang.org/std/iter/trait.FusedIterator.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/iter/FusedIterator.md)
-//! * [`TrustedLen`](https://doc.rust-lang.org/std/iter/trait.TrustedLen.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/iter/TrustedLen.md) (*nightly-only*)
+//! * [`TrustedLen`](https://doc.rust-lang.org/std/iter/trait.TrustedLen.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/iter/TrustedLen.md) *(requires `"trusted_len"` crate feature)* - *nightly-only*
 //! * [`Extend`](https://doc.rust-lang.org/std/iter/trait.Extend.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/iter/Extend.md)
 //!
 //! `[std|core]::future`
@@ -682,10 +645,10 @@
 //! * [`Index`](https://doc.rust-lang.org/std/ops/trait.Index.html) *(requires `"ops"` crate feature)*
 //! * [`IndexMut`](https://doc.rust-lang.org/std/ops/trait.IndexMut.html) *(requires `"ops"` crate feature)*
 //! * [`RangeBounds`](https://doc.rust-lang.org/std/ops/trait.RangeBounds.html) *(requires `"ops"` crate feature)*
-//! * [`Fn`](https://doc.rust-lang.org/std/ops/trait.Fn.html) (*nightly-only*)
-//! * [`FnMut`](https://doc.rust-lang.org/std/ops/trait.FnMut.html) (*nightly-only*)
-//! * [`FnOnce`](https://doc.rust-lang.org/std/ops/trait.FnOnce.html) (*nightly-only*)
-//! * [`Generator`](https://doc.rust-lang.org/nightly/std/ops/trait.Generator.html) (*nightly-only*)
+//! * [`Fn`](https://doc.rust-lang.org/std/ops/trait.Fn.html) *(requires `"fn_traits"` crate feature)* - *nightly-only*
+//! * [`FnMut`](https://doc.rust-lang.org/std/ops/trait.FnMut.html) *(requires `"fn_traits"` crate feature)* - *nightly-only*
+//! * [`FnOnce`](https://doc.rust-lang.org/std/ops/trait.FnOnce.html) *(requires `"fn_traits"` crate feature)* - *nightly-only*
+//! * [`Generator`](https://doc.rust-lang.org/nightly/std/ops/trait.Generator.html) *(requires `"generator_trait"` crate feature)* - *nightly-only*
 //!
 //! `[std|core]::convert`
 //!
@@ -757,7 +720,6 @@
 //!     Examples:
 //!
 //!     ```rust
-//!     # #![deny(warnings)]
 //!     # #[cfg(feature = "transpose_methods")]
 //!     # use auto_enums::auto_enum;
 //!     # #[cfg(feature = "transpose_methods")]
@@ -806,7 +768,6 @@
 //!     Examples:
 //!
 //!     ```rust
-//!     # #![deny(warnings)]
 //!     # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //!     # #[cfg(feature = "type_analysis")]
 //!     # use auto_enums::auto_enum;

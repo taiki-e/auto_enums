@@ -16,6 +16,7 @@ jobs:
   parameters:
     name: minrust
     rust: 1.31.0
+    cmd: check
 
 - template: ci/azure-test.yml
   parameters:
@@ -31,7 +32,6 @@ jobs:
   parameters:
     name: nightly
     rust: nightly
-    cmd: test
 
 - template: ci/azure-compiletest.yml
   parameters:

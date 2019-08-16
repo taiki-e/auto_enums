@@ -2,9 +2,13 @@
 pub(crate) mod deref;
 #[cfg(feature = "ops")]
 pub(crate) mod deref_mut;
+#[cfg(feature = "fn_traits")]
 pub(crate) mod fn_;
+#[cfg(feature = "fn_traits")]
 pub(crate) mod fn_mut;
+#[cfg(feature = "fn_traits")]
 pub(crate) mod fn_once;
+#[cfg(feature = "generator_trait")]
 pub(crate) mod generator;
 #[cfg(feature = "ops")]
 pub(crate) mod index;

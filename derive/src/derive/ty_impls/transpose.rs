@@ -57,7 +57,7 @@ fn transpose_result(data: &Data) -> Result<ItemImpl> {
     let err_fields: &Vec<_> = &(0..fields.len())
         .map(|i| {
             let id = format_ident!("__E{}", i);
-            items.push_generic_param(param_ident(id.clone()));
+            items.push_generic_param(param_ident!("{}", id));
             id
         })
         .collect();
