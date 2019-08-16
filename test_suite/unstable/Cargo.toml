@@ -8,14 +8,5 @@ publish = false
 [dependencies]
 
 [dev-dependencies]
-auto_enums = { path = "../..", default-features = false }
+auto_enums = { path = "../..", default-features = false, features = ["std", "futures"] }
 futures-preview = "0.3.0-alpha.18"
-
-[features]
-unstable = [
-    "auto_enums/std",
-    "auto_enums/futures",
-    "auto_enums/read_initializer",
-    "auto_enums/exact_size_is_empty",
-    "auto_enums/try_trait",
-]

@@ -1,5 +1,5 @@
 parameters:
-  cmd: check
+  cmd: test
 
 jobs:
 - job: ${{ parameters.name }}
@@ -22,10 +22,17 @@ jobs:
       parameters:
         rust: ${{ parameters.rust }}
 
-    - script: |
-        cargo ${{ parameters.cmd }} --all --no-default-features
-        cargo ${{ parameters.cmd }} --all
-      displayName: cargo ${{ parameters.cmd }}
+    - ${{ if not(eq(parameters.cmd, 'test')) }}:
+      - script: |
+          cargo ${{ parameters.cmd }} --all --no-default-features
+          cargo ${{ parameters.cmd }} --all
+        displayName: cargo ${{ parameters.cmd }}
+
+    - ${{ if eq(parameters.cmd, 'test') }}:
+      - script: |
+          cargo ${{ parameters.cmd }} --all --tests --no-default-features
+          cargo ${{ parameters.cmd }} --all --tests
+        displayName: cargo ${{ parameters.cmd }} --tests
 
     - ${{ if eq(parameters.rust, 'nightly') }}:
       - script: |

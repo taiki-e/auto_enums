@@ -1,19 +1,17 @@
-#![feature(
-    proc_macro_hygiene,
-    stmt_expr_attributes,
-    fn_traits,
-    unboxed_closures,
-    exact_size_is_empty,
-    generators,
-    generator_trait,
-    read_initializer,
-    trusted_len,
-    try_trait,
-    type_ascription
+#![cfg_attr(
+    all(feature = "try_trait", feature = "generator_trait", feature = "fn_traits",),
+    feature(proc_macro_hygiene, stmt_expr_attributes, type_ascription)
 )]
+#![cfg_attr(feature = "try_trait", feature(try_trait))]
+#![cfg_attr(feature = "generator_trait", feature(generator_trait, generators))]
+#![cfg_attr(feature = "fn_traits", feature(fn_traits, unboxed_closures))]
+#![cfg_attr(feature = "trusted_len", feature(trusted_len))]
+#![cfg_attr(feature = "exact_size_is_empty", feature(exact_size_is_empty))]
+#![cfg_attr(feature = "read_initializer", feature(read_initializer))]
 #![cfg_attr(not(feature = "std"), no_std)]
 #![warn(rust_2018_idioms)]
 
+#[allow(unused_imports)]
 #[macro_use]
 extern crate alloc;
 
@@ -555,12 +553,14 @@ fn stable_std() {
         } else {
             Err(io::Error::from(io::ErrorKind::NotFound))?
         }
-
         Ok(())
     }
     assert!(try_operator(None).unwrap_err().source().is_some());
 }
 
+// nightly
+
+#[cfg(all(feature = "try_trait", feature = "generator_trait", feature = "fn_traits"))]
 #[test]
 fn nightly() {
     const ANS: &[i32] = &[28, 3];

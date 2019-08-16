@@ -1,9 +1,10 @@
 use std::ops::Deref;
 
-use proc_macro2::{Ident, TokenStream};
-use syn::{punctuated::Punctuated, *};
+use proc_macro2::TokenStream;
 
-pub(crate) use derive_utils::{derive_trait_internal as derive_trait, EnumData, Trait};
+#[cfg(feature = "fn_traits")]
+pub(crate) use derive_utils::Trait;
+pub(crate) use derive_utils::{derive_trait_internal as derive_trait, EnumData};
 pub(crate) use quote::{format_ident, quote, ToTokens};
 pub(crate) use syn::{parse2, ItemImpl, Result};
 
@@ -20,23 +21,20 @@ impl Deref for Data {
     }
 }
 
-pub(crate) fn param_ident(ident: Ident) -> GenericParam {
-    GenericParam::Type(TypeParam {
-        attrs: Vec::new(),
-        ident,
-        colon_token: None,
-        bounds: Punctuated::new(),
-        eq_token: None,
-        default: None,
-    })
-}
-
 // =============================================================================
 // Macros
 
+#[cfg(any(feature = "fn_traits", feature = "transpose_methods"))]
 macro_rules! param_ident {
     ($($tt:tt)*) => {
-        $crate::utils::param_ident($crate::utils::format_ident!($($tt)*))
+        syn::GenericParam::Type(syn::TypeParam {
+            attrs: Vec::new(),
+            ident:$crate::utils::format_ident!($($tt)*),
+            colon_token: None,
+            bounds: syn::punctuated::Punctuated::new(),
+            eq_token: None,
+            default: None,
+        })
     };
 }
 

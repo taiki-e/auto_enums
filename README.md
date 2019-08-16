@@ -121,7 +121,7 @@ Also, some traits support is disabled by default.
 * [`DoubleEndedIterator`](https://doc.rust-lang.org/std/iter/trait.DoubleEndedIterator.html) - [generated code](docs/supported_traits/std/iter/DoubleEndedIterator.md)
 * [`ExactSizeIterator`](https://doc.rust-lang.org/std/iter/trait.ExactSizeIterator.html) - [generated code](docs/supported_traits/std/iter/ExactSizeIterator.md)
 * [`FusedIterator`](https://doc.rust-lang.org/std/iter/trait.FusedIterator.html) - [generated code](docs/supported_traits/std/iter/FusedIterator.md)
-* [`TrustedLen`](https://doc.rust-lang.org/std/iter/trait.TrustedLen.html) - [generated code](docs/supported_traits/std/iter/TrustedLen.md) (*nightly-only*)
+* [`TrustedLen`](https://doc.rust-lang.org/std/iter/trait.TrustedLen.html) - [generated code](docs/supported_traits/std/iter/TrustedLen.md) *(requires `"trusted_len"` crate feature)* - *nightly-only*
 * [`Extend`](https://doc.rust-lang.org/std/iter/trait.Extend.html) - [generated code](docs/supported_traits/std/iter/Extend.md)
 
 `[std|core]::future`
@@ -142,10 +142,10 @@ Also, some traits support is disabled by default.
 * [`Index`](https://doc.rust-lang.org/std/ops/trait.Index.html) *(requires `"ops"` crate feature)*
 * [`IndexMut`](https://doc.rust-lang.org/std/ops/trait.IndexMut.html) *(requires `"ops"` crate feature)*
 * [`RangeBounds`](https://doc.rust-lang.org/std/ops/trait.RangeBounds.html) *(requires `"ops"` crate feature)*
-* [`Fn`](https://doc.rust-lang.org/std/ops/trait.Fn.html) (*nightly-only*)
-* [`FnMut`](https://doc.rust-lang.org/std/ops/trait.FnMut.html) (*nightly-only*)
-* [`FnOnce`](https://doc.rust-lang.org/std/ops/trait.FnOnce.html) (*nightly-only*)
-* [`Generator`](https://doc.rust-lang.org/nightly/std/ops/trait.Generator.html) (*nightly-only*)
+* [`Fn`](https://doc.rust-lang.org/std/ops/trait.Fn.html) *(requires `"fn_traits"` crate feature)* - *nightly-only*
+* [`FnMut`](https://doc.rust-lang.org/std/ops/trait.FnMut.html) *(requires `"fn_traits"` crate feature)* - *nightly-only*
+* [`FnOnce`](https://doc.rust-lang.org/std/ops/trait.FnOnce.html) *(requires `"fn_traits"` crate feature)* - *nightly-only*
+* [`Generator`](https://doc.rust-lang.org/nightly/std/ops/trait.Generator.html) *(requires `"generator_trait"` crate feature)* - *nightly-only*
 
 `[std|core]::convert`
 

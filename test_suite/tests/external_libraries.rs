@@ -1,15 +1,3 @@
-#![feature(
-    proc_macro_hygiene,
-    stmt_expr_attributes,
-    fn_traits,
-    unboxed_closures,
-    exact_size_is_empty,
-    generator_trait,
-    read_initializer,
-    trusted_len,
-    try_trait
-)]
-#![cfg_attr(not(feature = "std"), no_std)]
 #![warn(unsafe_code)]
 #![warn(rust_2018_idioms)]
 #![allow(dead_code)]
