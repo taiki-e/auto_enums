@@ -26,7 +26,7 @@ pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
 
     derive_trait!(
         data,
-        Some(ident("Item")),
+        Some(format_ident!("Item")),
         parse_quote!(::core::iter::DoubleEndedIterator)?,
         parse_quote! {
             trait DoubleEndedIterator: ::core::iter::Iterator {

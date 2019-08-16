@@ -5,7 +5,7 @@ pub(crate) const NAME: &[&str] = &["IndexMut"];
 pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
     derive_trait!(
         data,
-        Some(ident("Output")),
+        Some(format_ident!("Output")),
         parse_quote!(::core::ops::IndexMut)?,
         parse_quote! {
             trait IndexMut<__Idx>: ::core::ops::Index<__Idx> {

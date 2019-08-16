@@ -7,7 +7,7 @@ pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
 
     derive_trait!(
         data,
-        Some(ident("Item")),
+        Some(format_ident!("Item")),
         parse_quote!(#iter::IndexedParallelIterator)?,
         parse_quote! {
             trait IndexedParallelIterator: #iter::ParallelIterator {

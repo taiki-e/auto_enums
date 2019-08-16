@@ -1,10 +1,10 @@
 use std::ops::Deref;
 
-use proc_macro2::{Ident, Span, TokenStream};
+use proc_macro2::{Ident, TokenStream};
 use syn::{punctuated::Punctuated, *};
 
 pub(crate) use derive_utils::{derive_trait_internal as derive_trait, EnumData, Trait};
-pub(crate) use quote::{quote, ToTokens};
+pub(crate) use quote::{format_ident, quote, ToTokens};
 pub(crate) use syn::{parse2, ItemImpl, Result};
 
 pub(crate) struct Data {
@@ -20,14 +20,10 @@ impl Deref for Data {
     }
 }
 
-pub(crate) fn ident<S: AsRef<str>>(s: S) -> Ident {
-    Ident::new(s.as_ref(), Span::call_site())
-}
-
-pub(crate) fn param_ident(s: &str) -> GenericParam {
+pub(crate) fn param_ident(ident: Ident) -> GenericParam {
     GenericParam::Type(TypeParam {
         attrs: Vec::new(),
-        ident: ident(s),
+        ident,
         colon_token: None,
         bounds: Punctuated::new(),
         eq_token: None,
@@ -37,6 +33,12 @@ pub(crate) fn param_ident(s: &str) -> GenericParam {
 
 // =============================================================================
 // Macros
+
+macro_rules! param_ident {
+    ($($tt:tt)*) => {
+        $crate::utils::param_ident($crate::utils::format_ident!($($tt)*))
+    };
+}
 
 macro_rules! parse_quote {
     ($($tt:tt)*) => {
