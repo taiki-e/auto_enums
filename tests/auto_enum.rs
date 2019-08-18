@@ -1,9 +1,9 @@
 #![cfg_attr(
-    all(feature = "try_trait", feature = "generator_trait", feature = "fn_traits",),
+    any(feature = "try_trait", feature = "fn_traits"),
     feature(proc_macro_hygiene, stmt_expr_attributes, type_ascription)
 )]
 #![cfg_attr(feature = "try_trait", feature(try_trait))]
-#![cfg_attr(feature = "generator_trait", feature(generator_trait, generators))]
+#![cfg_attr(feature = "generator_trait", feature(generator_trait))]
 #![cfg_attr(feature = "fn_traits", feature(fn_traits, unboxed_closures))]
 #![cfg_attr(feature = "trusted_len", feature(trusted_len))]
 #![cfg_attr(feature = "exact_size_is_empty", feature(exact_size_is_empty))]
@@ -560,7 +560,7 @@ fn stable_std() {
 
 // nightly
 
-#[cfg(all(feature = "try_trait", feature = "generator_trait", feature = "fn_traits"))]
+#[cfg(all(feature = "try_trait", feature = "fn_traits"))]
 #[test]
 fn nightly() {
     const ANS: &[i32] = &[28, 3];
@@ -783,45 +783,6 @@ fn nightly() {
         (if option { |x| x + 1 } else { |y| y - 1 }): _
     }
     assert_eq!(fn_traits2(true)(1), 2);
-
-    use core::{
-        ops::{Generator, GeneratorState},
-        pin::Pin,
-    };
-
-    #[auto_enum(Generator)]
-    fn generator_trait(x: i32) -> impl Generator<Yield = i32, Return = &'static str> {
-        match x {
-            0 => || {
-                yield 1;
-                return "foo";
-            },
-            _ => || {
-                yield 2;
-                return "bar";
-            },
-        }
-    }
-
-    let mut generator = generator_trait(0);
-    match Pin::new(&mut generator).resume() {
-        GeneratorState::Yielded(1) => {}
-        _ => panic!("unexpected return from resume"),
-    }
-    match Pin::new(&mut generator).resume() {
-        GeneratorState::Complete("foo") => {}
-        _ => panic!("unexpected return from resume"),
-    }
-
-    let mut generator = generator_trait(1);
-    match Pin::new(&mut generator).resume() {
-        GeneratorState::Yielded(2) => {}
-        _ => panic!("unexpected return from resume"),
-    }
-    match Pin::new(&mut generator).resume() {
-        GeneratorState::Complete("bar") => {}
-        _ => panic!("unexpected return from resume"),
-    }
 }
 
 #[cfg(feature = "try_trait")]
