@@ -14,20 +14,15 @@ A library for to allow multiple return types by automatically generated enum.
 """
 
 [workspace]
-members = [
-    "core",
-    "derive",
-    "test_suite",
-    "test_suite/unstable",
-]
+members = ["core", "derive", "test_suite"]
 
 [dependencies]
 auto_enums_core = { version = "=0.5.8", path = "core", default-features = false }
 auto_enums_derive = { version = "=0.5.8", path = "derive", default-features = false }
 
 [dev-dependencies]
-compiletest = { version = "0.3.21", package = "compiletest_rs", features = ["stable", "tmp"] }
-rustversion = "0.1"
+compiletest = { version = "0.3.22", package = "compiletest_rs", features = ["stable", "tmp"] }
+rustversion = "0.1.4"
 
 [features]
 # Default features.

@@ -48,29 +48,23 @@ fn stable() {
         Hash,
         Future
     )]
-    enum Stable<A, B, C, D> {
+    enum Stable<A, B> {
         A(A),
         B(B),
-        C(C),
-        D(D),
     }
 
     #[cfg(feature = "ops")]
     #[enum_derive(Deref, DerefMut, Index, IndexMut, RangeBounds)]
-    enum Ops<A, B, C, D> {
+    enum Ops<A, B> {
         A(A),
         B(B),
-        C(C),
-        D(D),
     }
 
     #[cfg(feature = "convert")]
     #[enum_derive(AsRef, AsMut)]
-    enum Convert<A, B, C, D> {
+    enum Convert<A, B> {
         A(A),
         B(B),
-        C(C),
-        D(D),
     }
 
     #[cfg(feature = "fmt")]
@@ -83,20 +77,16 @@ fn stable() {
         fmt::UpperExp,
         fmt::UpperHex
     )]
-    enum Fmt<A, B, C, D> {
+    enum Fmt<A, B> {
         A(A),
         B(B),
-        C(C),
-        D(D),
     }
 
     #[cfg(feature = "transpose_methods")]
     #[enum_derive(Transpose)]
-    enum Transpose<A, B, C, D> {
+    enum Transpose<A, B> {
         A(A),
         B(B),
-        C(C),
-        D(D),
     }
 
     #[enum_derive(Iterator, Clone)]
@@ -114,11 +104,9 @@ fn stable_std() {
         BufRead, Read, Seek, Write, Display, Error, Debug, Clone, Copy, PartialEq, Eq, PartialOrd,
         Ord, Hash
     )]
-    enum Stable<A, B, C, D> {
+    enum Stable<A, B> {
         A(A),
         B(B),
-        C(C),
-        D(D),
     }
 }
 
