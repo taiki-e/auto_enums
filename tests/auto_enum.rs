@@ -647,19 +647,6 @@ fn nightly() {
         assert_eq!(iter.sum::<i32>(), *x);
     }
 
-    // never opt
-    for (i, x) in ANS.iter().enumerate() {
-        #[auto_enum(never, Iterator)]
-        let iter = match i {
-            0 => marker!(1..8),
-            5..=10 => loop {
-                panic!()
-            },
-            _ => marker!(vec![1, 2, 0].into_iter()),
-        };
-        assert_eq!(iter.sum::<i32>(), *x);
-    }
-
     // never attr
     for (i, x) in ANS.iter().enumerate() {
         #[rustfmt::skip]

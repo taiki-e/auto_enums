@@ -42,7 +42,7 @@ pub(super) enum VisitLastMode {
     item_fn: `fn _() -> Fn*() { || {} }`
     */
     Closure,
-    /// `Stmt::Semi(..)` or `never` option - never visit last expr
+    /// `Stmt::Semi(..)` - never visit last expr
     Never,
 }
 
@@ -63,13 +63,7 @@ pub(super) struct Context {
 }
 
 impl Context {
-    fn new(
-        span: impl ToTokens,
-        args: Vec<Arg>,
-        marker: Option<String>,
-        never: bool,
-        root: bool,
-    ) -> Self {
+    fn new(span: impl ToTokens, args: Vec<Arg>, marker: Option<String>, root: bool) -> Self {
         Self {
             span: Some(span.into_token_stream()),
             args,
@@ -78,24 +72,18 @@ impl Context {
             // depth: 0,
             root,
             visit_mode: VisitMode::Default,
-            visit_last_mode: if never { VisitLastMode::Never } else { VisitLastMode::Default },
+            visit_last_mode: VisitLastMode::Default,
             other_attr: false,
             error: false,
         }
     }
 
-    pub(super) fn root(
-        span: impl ToTokens,
-        (args, marker, never): (Vec<Arg>, Option<String>, bool),
-    ) -> Self {
-        Self::new(span, args, marker, never, true)
+    pub(super) fn root(span: impl ToTokens, (args, marker): (Vec<Arg>, Option<String>)) -> Self {
+        Self::new(span, args, marker, true)
     }
 
-    pub(super) fn child(
-        span: impl ToTokens,
-        (args, marker, never): (Vec<Arg>, Option<String>, bool),
-    ) -> Self {
-        Self::new(span, args, marker, never, false)
+    pub(super) fn child(span: impl ToTokens, (args, marker): (Vec<Arg>, Option<String>)) -> Self {
+        Self::new(span, args, marker, false)
     }
 
     pub(super) fn span(&mut self) -> TokenStream {

@@ -74,38 +74,25 @@ macro_rules! error {
     };
 }
 
-pub(super) fn parse_group(group: TokenStream) -> Result<(Vec<Arg>, Option<String>, bool)> {
+pub(super) fn parse_group(group: TokenStream) -> Result<(Vec<Arg>, Option<String>)> {
     syn::parse2::<Group>(group).and_then(|group| parse_args(group.stream()))
 }
 
-pub(super) fn parse_args(args: TokenStream) -> Result<(Vec<Arg>, Option<String>, bool)> {
+pub(super) fn parse_args(args: TokenStream) -> Result<(Vec<Arg>, Option<String>)> {
     const ERR: &str = "expected one of `,`, `::`, or identifier, found ";
 
     let mut iter = args.into_iter();
     let mut args = Vec::new();
     let mut marker = None;
-    let mut never = false;
     while let Some(tt) = iter.next() {
         match tt {
-            TokenTree::Ident(i) => match &*i.to_string() {
-                "marker" => marker_opt(i, &mut iter, &mut args, &mut marker)?,
-                "never" => {
-                    match iter.next() {
-                        None => {}
-                        Some(TokenTree::Punct(ref p)) if p.as_char() == ',' => {}
-                        tt => {
-                            args.push(path_or_ident(i, tt, &mut iter)?);
-                            continue;
-                        }
-                    }
-
-                    if never {
-                        error!(i, "multiple `never` option")
-                    }
-                    never = true;
+            TokenTree::Ident(i) => {
+                if i == "marker" {
+                    marker_opt(i, &mut iter, &mut args, &mut marker)?;
+                } else {
+                    args.push(path_or_ident(i, iter.next(), &mut iter)?);
                 }
-                _ => args.push(path_or_ident(i, iter.next(), &mut iter)?),
-            },
+            }
             TokenTree::Punct(p) => match p.as_char() {
                 ',' => {}
                 ':' => args.push(parse_path(vec![p.into()], &mut iter)?),
@@ -115,7 +102,7 @@ pub(super) fn parse_args(args: TokenStream) -> Result<(Vec<Arg>, Option<String>,
         }
     }
 
-    Ok((args, marker, never))
+    Ok((args, marker))
 }
 
 fn parse_path(mut path: Vec<TokenTree>, iter: &mut IntoIter) -> Result<Arg> {
