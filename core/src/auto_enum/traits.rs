@@ -1,3 +1,4 @@
+use quote::ToTokens;
 use syn::{
     visit_mut::{self, VisitMut},
     *,
@@ -5,18 +6,20 @@ use syn::{
 
 use crate::utils::*;
 
-use super::Arg;
-
 pub(super) use syn::{Pat, PatType, Type};
 
-pub(super) fn collect_impl_trait(args: &mut Vec<Arg>, ty: &mut Type) {
+pub(super) fn collect_impl_trait(args: &mut Vec<Path>, ty: &mut Type) {
     if let Some(traits) = collect(ty) {
-        traits.into_iter().map(Arg::from).for_each(|t| {
-            if !args.contains(&t) && TRAITS.contains(&&*t.to_trimed_string()) {
+        traits.into_iter().for_each(|t| {
+            if !args.contains(&t) && TRAITS.contains(&&*to_trimed_string(&t)) {
                 args.push(t);
             }
         });
     }
+}
+
+fn to_trimed_string(path: &Path) -> String {
+    path.to_token_stream().to_string().replace(" ", "")
 }
 
 fn collect(ty: &mut Type) -> Option<Vec<Path>> {

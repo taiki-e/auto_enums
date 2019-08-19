@@ -14,7 +14,7 @@ mod expr;
 mod traits;
 mod visitor;
 
-use self::args::{parse_args, parse_group, Arg};
+use self::args::parse_args;
 use self::context::{Context, VisitLastMode, VisitMode};
 use self::expr::child_expr;
 #[cfg(feature = "type_analysis")]

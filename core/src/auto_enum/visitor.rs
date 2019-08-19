@@ -1,3 +1,4 @@
+use proc_macro2::Group;
 use syn::{
     token,
     visit_mut::{self, VisitMut},
@@ -8,7 +9,7 @@ use syn::{
 use crate::utils::expr_call;
 use crate::utils::{expr_compile_error, replace_expr, Attrs, AttrsMut};
 
-use super::{parse_group, Context, Parent, VisitMode, EMPTY_ATTRS, NAME, NEVER};
+use super::{parse_args, Context, Parent, VisitMode, EMPTY_ATTRS, NAME, NEVER};
 
 // =============================================================================
 // Visitor
@@ -309,7 +310,8 @@ fn visit_stmt_mut(stmt: &mut Stmt, cx: &mut Context) {
     };
 
     if let Some(Attribute { tokens, .. }) = attr {
-        parse_group(tokens)
+        syn::parse2(tokens)
+            .and_then(|group: Group| parse_args(group.stream()))
             .map(|x| Context::child(&stmt, x))
             .and_then(|mut cx| stmt.visit_parent(&mut cx))
             .unwrap_or_else(|e| {

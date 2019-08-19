@@ -8,16 +8,13 @@ use std::{
 
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, ToTokens};
-use syn::{Attribute, Expr, ItemEnum, Macro, Result};
+use syn::{Attribute, Expr, ItemEnum, Macro, Path, Result};
 
 use crate::utils::{expr_call, path, replace_expr, unit};
 
 #[cfg(feature = "type_analysis")]
 use super::traits::*;
-use super::{
-    visitor::{Dummy, FindTry, Visitor},
-    Arg,
-};
+use super::visitor::{Dummy, FindTry, Visitor};
 
 // =============================================================================
 // Context
@@ -49,7 +46,7 @@ pub(super) enum VisitLastMode {
 pub(super) struct Context {
     /// Span passed to `syn::Error::new_spanned`.
     span: Option<TokenStream>,
-    pub(super) args: Vec<Arg>,
+    pub(super) args: Vec<Path>,
     builder: Builder,
     pub(super) marker: Marker,
     // pub(super) depth: u32,
@@ -63,7 +60,7 @@ pub(super) struct Context {
 }
 
 impl Context {
-    fn new(span: impl ToTokens, args: Vec<Arg>, marker: Option<String>, root: bool) -> Self {
+    fn new(span: impl ToTokens, args: Vec<Path>, marker: Option<String>, root: bool) -> Self {
         Self {
             span: Some(span.into_token_stream()),
             args,
@@ -78,11 +75,11 @@ impl Context {
         }
     }
 
-    pub(super) fn root(span: impl ToTokens, (args, marker): (Vec<Arg>, Option<String>)) -> Self {
+    pub(super) fn root(span: impl ToTokens, (args, marker): (Vec<Path>, Option<String>)) -> Self {
         Self::new(span, args, marker, true)
     }
 
-    pub(super) fn child(span: impl ToTokens, (args, marker): (Vec<Arg>, Option<String>)) -> Self {
+    pub(super) fn child(span: impl ToTokens, (args, marker): (Vec<Path>, Option<String>)) -> Self {
         Self::new(span, args, marker, false)
     }
 
@@ -267,7 +264,7 @@ impl Builder {
         expr_call(attrs, path, expr)
     }
 
-    fn build(&self, args: &[Arg]) -> ItemEnum {
+    fn build(&self, args: &[Path]) -> ItemEnum {
         let ident = &self.ident;
         let ty_generics = self.iter();
         let variants = self.iter();
