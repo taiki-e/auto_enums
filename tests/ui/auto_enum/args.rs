@@ -24,14 +24,6 @@ fn unexpected_token_2(x: usize) -> impl Iterator<Item = i32> {
 mod marker {
     use auto_enums::auto_enum;
 
-    #[auto_enum(never, never, Iterator)] //~ ERROR multiple `never` option
-    fn multiple_never(x: usize) -> impl Iterator<Item = i32> {
-        match x {
-            0 => 1..=8,
-            _ => 0..2,
-        }
-    }
-
     #[auto_enum(marker{f}, Iterator)] //~ ERROR invalid delimiter
     fn marker_invalid_delimiter_1(x: usize) -> impl Iterator<Item = i32> {
         match x {

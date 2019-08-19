@@ -10,65 +10,59 @@ error: expected one of `,`, `::`, or identifier, found `;`
 16 | #[auto_enum(Iterator,;)] //~ ERROR expected one of `,`, `::`, or identifier, found `;`
    |                      ^
 
-error: multiple `never` option
-  --> $DIR/args.rs:27:24
+error: invalid delimiter
+  --> $DIR/args.rs:27:23
    |
-27 |     #[auto_enum(never, never, Iterator)] //~ ERROR multiple `never` option
-   |                        ^^^^^
+27 |     #[auto_enum(marker{f}, Iterator)] //~ ERROR invalid delimiter
+   |                       ^^^
 
 error: invalid delimiter
   --> $DIR/args.rs:35:23
    |
-35 |     #[auto_enum(marker{f}, Iterator)] //~ ERROR invalid delimiter
-   |                       ^^^
-
-error: invalid delimiter
-  --> $DIR/args.rs:43:23
-   |
-43 |     #[auto_enum(marker[f], Iterator)] //~ ERROR invalid delimiter
+35 |     #[auto_enum(marker[f], Iterator)] //~ ERROR invalid delimiter
    |                       ^^^
 
 error: multiple `marker` option
-  --> $DIR/args.rs:51:35
+  --> $DIR/args.rs:43:35
    |
-51 |     #[auto_enum(marker(f), marker(g), Iterator)] //~ ERROR multiple `marker` option
+43 |     #[auto_enum(marker(f), marker(g), Iterator)] //~ ERROR multiple `marker` option
    |                                   ^
 
 error: empty `marker` option
-  --> $DIR/args.rs:59:23
+  --> $DIR/args.rs:51:23
    |
-59 |     #[auto_enum(marker(), Iterator)] //~ ERROR empty `marker` option
+51 |     #[auto_enum(marker(), Iterator)] //~ ERROR empty `marker` option
    |                       ^^
 
 error: multiple identifier in `marker` option
-  --> $DIR/args.rs:67:27
+  --> $DIR/args.rs:59:27
    |
-67 |     #[auto_enum(marker(f, g), Iterator)] //~ ERROR multiple identifier in `marker` option
+59 |     #[auto_enum(marker(f, g), Iterator)] //~ ERROR multiple identifier in `marker` option
    |                           ^
 
 error: multiple identifier in `marker` option
-  --> $DIR/args.rs:75:26
+  --> $DIR/args.rs:67:26
    |
-75 |     #[auto_enum(marker(f t), Iterator)] //~ ERROR multiple identifier in `marker` option
+67 |     #[auto_enum(marker(f t), Iterator)] //~ ERROR multiple identifier in `marker` option
    |                          ^
 
 error: multiple `marker` option
-  --> $DIR/args.rs:83:34
+  --> $DIR/args.rs:75:34
    |
-83 |     #[auto_enum(marker=f, marker=g, Iterator)] //~ ERROR multiple `marker` option
+75 |     #[auto_enum(marker=f, marker=g, Iterator)] //~ ERROR multiple `marker` option
    |                                  ^
 
 error: expected an identifier, found `,`
-  --> $DIR/args.rs:91:24
+  --> $DIR/args.rs:83:24
    |
-91 |     #[auto_enum(marker=, Iterator)] //~ ERROR empty `marker` option
+83 |     #[auto_enum(marker=, Iterator)] //~ ERROR empty `marker` option
    |                        ^
 
 error: expected `,`, found `t`
-  --> $DIR/args.rs:99:26
+  --> $DIR/args.rs:91:26
    |
-99 |     #[auto_enum(marker=f t, Iterator)] //~ ERROR expected `,`, found `t`
+91 |     #[auto_enum(marker=f t, Iterator)] //~ ERROR expected `,`, found `t`
    |                          ^
 
-error: aborting due to 12 previous errors
+error: aborting due to 11 previous errors
 

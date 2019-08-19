@@ -2,6 +2,8 @@
 
 * Renamed `#[rec]` to `#[nested]`.
 
+* [Removed `never` option in argument position in favor of `#[enum_derive]` attribute.][48]
+
 * Added `"ops"` crate feature, and made `[std|core]::ops`'s `Deref`, `DerefMut`, `Index`, `IndexMut`, and `RangeBounds` traits optional.
 
 * Added `"convert"` crate feature, and made `[std|core]::convert`'s `AsRef` and `AsMut` traits optional.
@@ -13,6 +15,8 @@
 * Added `"trusted_len"` crate feature, and made `[std|core]::iter::TrustedLen` traits optional. *(nightly-only)*
 
 * Improved error messages.
+
+[48]: https://github.com/taiki-e/auto_enums/pull/48
 
 # 0.5.10 - 2019-08-15
 

@@ -469,28 +469,6 @@
 //! # fn main() { let _ = foo(0); }
 //! ```
 //!
-//! You can also skip all branches by `never` option.
-//!
-//! ```rust
-//! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
-//! # use auto_enums::auto_enum;
-//! #[auto_enum(never, Iterator)]
-//! fn foo(x: i32) -> impl Iterator<Item = i32> {
-//!     match x {
-//!         0 => loop {
-//!             return marker!(1..10);
-//!         },
-//!         1 => loop {
-//!             panic!()
-//!         },
-//!         _ => loop {
-//!             return marker!(vec![5, 10].into_iter());
-//!         },
-//!     }
-//! }
-//! # fn main() { let _ = foo(0); }
-//! ```
-//!
 //! ### Expression level marker (`marker!` macro)
 //!
 //! `#[auto_enum]` replaces `marker!` macros with variants.
