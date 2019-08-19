@@ -5,7 +5,7 @@
 
 use auto_enums::auto_enum;
 
-#[auto_enum(Iterator;)] //~ ERROR expected one of `,`, or `::`, found `;`
+#[auto_enum(Iterator;)] //~ ERROR unexpected token
 fn unexpected_token_1(x: usize) -> impl Iterator<Item = i32> {
     match x {
         0 => 1..=8,

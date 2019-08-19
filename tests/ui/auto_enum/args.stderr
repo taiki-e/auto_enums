@@ -1,7 +1,7 @@
-error: expected one of `,`, or `::`, found `;`
+error: unexpected token
  --> $DIR/args.rs:8:21
   |
-8 | #[auto_enum(Iterator;)] //~ ERROR expected one of `,`, or `::`, found `;`
+8 | #[auto_enum(Iterator;)] //~ ERROR unexpected token
   |                     ^
 
 error: expected one of `,`, `::`, or identifier, found `;`
