@@ -3,6 +3,7 @@ use std::{
     collections::hash_map::DefaultHasher,
     hash::Hasher,
     iter,
+    num::Wrapping,
     rc::Rc,
     sync::atomic::{AtomicUsize, Ordering},
 };
@@ -268,10 +269,7 @@ struct Builder {
 
 impl Builder {
     fn new() -> Self {
-        Self {
-            ident: format_ident!("___Enum{}", RNG.with(|rng| rng.borrow_mut().next())),
-            variants: Vec::new(),
-        }
+        Self { ident: format_ident!("___Enum{}", random()), variants: Vec::new() }
     }
 
     fn iter(&self) -> impl Iterator<Item = &Ident> + '_ {
@@ -307,41 +305,35 @@ impl Builder {
 // =============================================================================
 // RNG
 
-thread_local! {
-    static RNG: RefCell<XorShift64Star> = RefCell::new(XorShift64Star::new());
-}
-
-// https://github.com/rayon-rs/rayon/blob/rayon-core-v1.4.1/rayon-core/src/registry.rs#L712-L750
-
-/// [xorshift*] is a fast pseudorandom number generator which will
-/// even tolerate weak seeding, as long as it's not zero.
+/// Pseudorandom number generator based on [xorshift*].
 ///
 /// [xorshift*]: https://en.wikipedia.org/wiki/Xorshift#xorshift*
-struct XorShift64Star {
-    state: Cell<u64>,
-}
+fn random() -> u64 {
+    thread_local! {
+        static RNG: Cell<Wrapping<u64>> = Cell::new(Wrapping(prng_seed()));
+    }
 
-impl XorShift64Star {
-    fn new() -> Self {
+    fn prng_seed() -> u64 {
+        static COUNTER: AtomicUsize = AtomicUsize::new(0);
+
         // Any non-zero seed will do -- this uses the hash of a global counter.
+        // Refs: https://github.com/rayon-rs/rayon/pull/571
         let mut seed = 0;
         while seed == 0 {
-            static COUNTER: AtomicUsize = AtomicUsize::new(0);
             let mut hasher = DefaultHasher::new();
             hasher.write_usize(COUNTER.fetch_add(1, Ordering::Relaxed));
             seed = hasher.finish();
         }
-
-        Self { state: Cell::new(seed) }
+        seed
     }
 
-    fn next(&self) -> u64 {
-        let mut x = self.state.get();
-        debug_assert_ne!(x, 0);
+    RNG.with(|rng| {
+        let mut x = rng.get();
+        debug_assert_ne!(x.0, 0);
         x ^= x >> 12;
         x ^= x << 25;
         x ^= x >> 27;
-        self.state.set(x);
-        x.wrapping_mul(0x2545_f491_4f6c_dd1d)
-    }
+        rng.set(x);
+        x.0.wrapping_mul(0x2545_f491_4f6c_dd1d)
+    })
 }
