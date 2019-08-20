@@ -15,6 +15,7 @@ pub(crate) fn attribute(args: TokenStream, input: TokenStream) -> TokenStream {
 
 macro_rules! trait_map {
     ($map:ident, $($(#[$meta:meta])* <$ident:expr, [$($deps:expr),*]>,)*) => {$(
+        $(#[$meta])*
         $map.insert($ident, &[$($deps),*]);
     )*};
 }
@@ -28,9 +29,13 @@ lazy_static! {
             <"Eq", ["PartialEq"]>,
             <"PartialOrd", ["PartialEq"]>,
             <"Ord", ["PartialOrd", "Eq", "PartialEq"]>,
+            #[cfg(feature = "ops")]
             <"DerefMut", ["Deref"]>,
+            #[cfg(feature = "ops")]
             <"IndexMut", ["Index"]>,
+            #[cfg(feature = "fn_traits")]
             <"Fn", ["FnMut", "FnOnce"]>,
+            #[cfg(feature = "fn_traits")]
             <"FnMut", ["FnOnce"]>,
             <"DoubleEndedIterator", ["Iterator"]>,
             <"ExactSizeIterator", ["Iterator"]>,
