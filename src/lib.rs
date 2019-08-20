@@ -345,7 +345,7 @@
 //!               Err("`x` is zero")?
 //!           }
 //!
-//!           // The last branch of the function is not parsed.
+//!           // The last branch of the function is not interpreted as a branch.
 //!           if x < 0 {
 //!               Err(x)?
 //!           } else {
