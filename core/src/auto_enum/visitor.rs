@@ -1,5 +1,6 @@
 use proc_macro2::Group;
 use syn::{
+    parse::Nothing,
     token,
     visit_mut::{self, VisitMut},
     Arm, Attribute, Expr, ExprMacro, ExprMatch, ExprReturn, ExprTry, Item, Local, Stmt,
@@ -7,9 +8,9 @@ use syn::{
 
 #[cfg(feature = "try_trait")]
 use crate::utils::expr_call;
-use crate::utils::{expr_compile_error, replace_expr, Attrs, AttrsMut};
+use crate::utils::{expr_unimplemented, replace_expr, Attrs, AttrsMut};
 
-use super::{parse_args, Context, Parent, VisitMode, EMPTY_ATTRS, NAME, NEVER};
+use super::{parse_args, Context, Parent, VisitMode, NAME, NEVER};
 
 // =============================================================================
 // Visitor
@@ -34,11 +35,24 @@ impl<'a> Visitor<'a> {
         Self { cx, scope: Scope::default() }
     }
 
-    fn find_remove_empty_attrs(&self, attrs: &mut impl AttrsMut) {
+    fn find_remove_attrs(&mut self, attrs: &mut impl AttrsMut) {
         if !self.scope.foreign {
-            EMPTY_ATTRS.iter().for_each(|ident| {
-                attrs.find_remove_empty_attr(ident);
+            super::EMPTY_ATTRS.iter().for_each(|ident| {
+                if let Some(attr) = attrs.find_remove_attr(ident) {
+                    if let Err(e) = syn::parse2::<Nothing>(attr.tokens) {
+                        self.cx.diagnostic.error(e);
+                    }
+                }
             });
+
+            if let Some(old) = attrs.find_remove_attr(super::NESTED_OLD) {
+                self.cx.diagnostic.error(error!(
+                    old,
+                    "#[{}] has been removed and replaced with #[{}]",
+                    super::NESTED_OLD,
+                    super::NESTED
+                ));
+            }
         }
     }
 
@@ -140,11 +154,11 @@ impl<'a> Visitor<'a> {
                 replace_expr(node, |expr| {
                     let expr = if let Expr::Macro(expr) = expr { expr } else { unreachable!() };
                     let args = syn::parse2(expr.mac.tokens).unwrap_or_else(|e| {
-                        self.cx.error = true;
-                        expr_compile_error(&e)
+                        self.cx.diagnostic.error(e);
+                        expr_unimplemented()
                     });
 
-                    if self.cx.error {
+                    if self.cx.failed() {
                         args
                     } else {
                         self.cx.next_expr_with_attrs(expr.attrs, args)
@@ -158,7 +172,7 @@ impl<'a> Visitor<'a> {
 
 impl VisitMut for Visitor<'_> {
     fn visit_expr_mut(&mut self, node: &mut Expr) {
-        if !self.cx.error {
+        if !self.cx.failed() {
             let tmp = self.scope;
             self.check_other_attr(node);
 
@@ -179,7 +193,7 @@ impl VisitMut for Visitor<'_> {
 
             if !self.scope.foreign || self.cx.marker.is_unique() {
                 self.visit_marker_macro(node);
-                self.find_remove_empty_attrs(node);
+                self.find_remove_attrs(node);
             }
 
             self.scope = tmp;
@@ -187,25 +201,25 @@ impl VisitMut for Visitor<'_> {
     }
 
     fn visit_arm_mut(&mut self, node: &mut Arm) {
-        if !self.cx.error {
+        if !self.cx.failed() {
             visit_mut::visit_arm_mut(self, node);
-            self.find_remove_empty_attrs(node);
+            self.find_remove_attrs(node);
         }
     }
 
     fn visit_local_mut(&mut self, node: &mut Local) {
-        if !self.cx.error {
+        if !self.cx.failed() {
             let tmp = self.scope;
             self.check_other_attr(node);
 
             visit_mut::visit_local_mut(self, node);
-            self.find_remove_empty_attrs(node);
+            self.find_remove_attrs(node);
             self.scope = tmp;
         }
     }
 
     fn visit_stmt_mut(&mut self, node: &mut Stmt) {
-        if !self.cx.error {
+        if !self.cx.failed() {
             visit_mut::visit_stmt_mut(self, node);
             visit_stmt_mut(node, self.cx);
         }
@@ -290,7 +304,7 @@ impl<'a> Dummy<'a> {
 
 impl VisitMut for Dummy<'_> {
     fn visit_stmt_mut(&mut self, node: &mut Stmt) {
-        if !self.cx.error {
+        if !self.cx.failed() {
             visit_mut::visit_stmt_mut(self, node);
             visit_stmt_mut(node, self.cx);
         }
@@ -312,11 +326,10 @@ fn visit_stmt_mut(stmt: &mut Stmt, cx: &mut Context) {
     if let Some(Attribute { tokens, .. }) = attr {
         syn::parse2(tokens)
             .and_then(|group: Group| parse_args(group.stream()))
-            .map(|x| Context::child(&stmt, x))
-            .and_then(|mut cx| stmt.visit_parent(&mut cx))
+            .and_then(|x| stmt.visit_parent(&mut cx.make_child(&stmt, x)))
             .unwrap_or_else(|e| {
-                cx.error = true;
-                *stmt = Stmt::Expr(expr_compile_error(&e));
+                cx.diagnostic.error(e);
+                *stmt = Stmt::Expr(expr_unimplemented());
             });
     }
 }

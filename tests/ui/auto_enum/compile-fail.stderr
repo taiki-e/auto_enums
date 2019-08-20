@@ -1,16 +1,3 @@
-error: expected `{`, found keyword `return`
-  --> $DIR/compile-fail.rs:30:12
-   |
-30 |     } else return {
-   |            ^^^^^^ expected `{`
-help: try placing this code inside a block
-   |
-30 |     } else { return {
-31 |         //~^ ERROR expected `{`, found keyword `return`
-32 |         2..=10
-33 |     } }
-   |
-
 error: expected one of `)`, `,`, `.`, `?`, or an operator, found `..`
   --> $DIR/compile-fail.rs:11:26
    |
@@ -23,29 +10,25 @@ error: `if` expression missing an else clause
 20 |     } else if x > 3 {
    |            ^^
 
-error: the `#[auto_enum]` attribute is required two or more branches or marker macros in total, there is no branch or marker macro in this statement
-
-error: the `#[auto_enum]` attribute is required two or more branches or marker macros in total, there is only one branch or marker macro in this statement
-  --> $DIR/compile-fail.rs:39:5
+error: `#[auto_enum]` is required two or more branches or marker macros in total, there is only one branch or marker macro in this statement
+  --> $DIR/compile-fail.rs:29:5
    |
-39 | /     let iter = match x {
-40 | |         //~^ ERROR the `#[auto_enum]` attribute is required two or more branches or marker macros in total, there is only one branch or marker macro in this statement
-41 | |         _ if y < 0 => return y..=0,
-42 | |         _ => 2..=10,
-43 | |     };
+29 | /     let iter = match x {
+30 | |         //~^ ERROR `#[auto_enum]` is required two or more branches or marker macros in total, there is only one branch or marker macro in this statement
+31 | |         _ if y < 0 => return y..=0,
+32 | |         _ => 2..=10,
+33 | |     };
    | |______^
 
-error[E0425]: cannot find value `iter` in this scope
-  --> $DIR/compile-fail.rs:46:14
+error: `#[auto_enum]` is required two or more branches or marker macros in total, there is no branch or marker macro in this statement
+  --> $DIR/compile-fail.rs:44:5
    |
-46 |         0 => iter.flat_map(|x| 0..x),
-   |              ^^^^ not found in this scope
-
-error[E0425]: cannot find value `iter` in this scope
-  --> $DIR/compile-fail.rs:47:14
-   |
-47 |         _ => iter.map(|x| x + 1),
-   |              ^^^^ not found in this scope
+44 | /     let iter = match x {
+45 | |         //~^ ERROR `#[auto_enum]` is required two or more branches or marker macros in total, there is no branch or marker macro in this statement
+46 | |         _ if y < 0 => return y..=0,
+47 | |         _ => return 2..=10,
+48 | |     };
+   | |______^
 
 error[E0061]: this function takes 1 parameter but 2 parameters were supplied
  --> $DIR/compile-fail.rs:8:1
@@ -56,7 +39,6 @@ error[E0061]: this function takes 1 parameter but 2 parameters were supplied
   | defined here
   | expected 1 parameter
 
-error: aborting due to 8 previous errors
+error: aborting due to 5 previous errors
 
-Some errors have detailed explanations: E0061, E0425.
-For more information about an error, try `rustc --explain E0061`.
+For more information about this error, try `rustc --explain E0061`.

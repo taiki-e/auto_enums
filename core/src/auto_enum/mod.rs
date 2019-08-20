@@ -14,7 +14,7 @@ mod expr;
 mod traits;
 mod visitor;
 
-use self::args::parse_args;
+use self::args::{parse_args, Args};
 use self::context::{Context, VisitLastMode, VisitMode};
 use self::expr::child_expr;
 #[cfg(feature = "type_analysis")]
@@ -29,19 +29,34 @@ const NEVER: &str = "never";
 /// The annotations used by `#[auto_enum]`.
 const EMPTY_ATTRS: &[&str] = &[NEVER, NESTED];
 
+const NESTED_OLD: &str = "rec";
+
 pub(crate) fn attribute(args: TokenStream, input: TokenStream) -> TokenStream {
-    expand(args, input).unwrap_or_else(|e| e.to_compile_error())
+    expand(args, input)
 }
 
-fn expand(args: TokenStream, input: TokenStream) -> Result<TokenStream> {
-    let mut cx = parse_args(args).map(|x| Context::root(&input, x))?;
+fn expand(args: TokenStream, input: TokenStream) -> TokenStream {
+    let mut cx = match parse_args(args) {
+        Ok(x) => Context::root(&input, x),
+        Err(e) => return e.to_compile_error(),
+    };
 
-    match syn::parse2::<Stmt>(input.clone()) {
+    let res = match syn::parse2::<Stmt>(input.clone()) {
         Ok(mut stmt) => stmt.visit_parent(&mut cx).map(|()| stmt.into_token_stream()),
-        Err(_) => syn::parse2::<Expr>(input)
-            .map_err(|_| error!(cx.span(), "the `#[auto_enum]` attribute may only be used on expression, statement, or function"))
+        Err(e) => syn::parse2::<Expr>(input)
+            .map_err(|_e| {
+                cx.diagnostic.error(e);
+                error!(cx.span(), "the `#[auto_enum]` attribute may only be used on expression, statement, or function")
+            })
             .and_then(|mut expr| expr.visit_parent(&mut cx).map(|()| expr.into_token_stream())),
+    };
+
+    match res {
+        Err(e) => cx.diagnostic.error(e),
+        Ok(_) if cx.failed() => {}
+        Ok(tokens) => return tokens,
     }
+    cx.diagnostic.combine().unwrap().to_compile_error()
 }
 
 fn visit_expr(expr: &mut Expr, cx: &mut Context) -> Result<()> {

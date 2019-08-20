@@ -3,18 +3,22 @@ use std::{
     collections::hash_map::DefaultHasher,
     hash::Hasher,
     iter,
+    rc::Rc,
     sync::atomic::{AtomicUsize, Ordering},
 };
 
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, ToTokens};
-use syn::{Attribute, Expr, ItemEnum, Macro, Path, Result};
+use syn::{Attribute, Error, Expr, ItemEnum, Macro, Path, Result};
 
 use crate::utils::{expr_call, path, replace_expr, unit};
 
 #[cfg(feature = "type_analysis")]
 use super::traits::*;
-use super::visitor::{Dummy, FindTry, Visitor};
+use super::{
+    visitor::{Dummy, FindTry, Visitor},
+    Args,
+};
 
 // =============================================================================
 // Context
@@ -43,9 +47,29 @@ pub(super) enum VisitLastMode {
     Never,
 }
 
+#[derive(Clone, Default)]
+pub(super) struct Diagnostic {
+    message: Rc<RefCell<Option<Error>>>,
+}
+
+impl Diagnostic {
+    pub(super) fn error(&self, message: Error) {
+        let mut base = self.message.borrow_mut();
+        if let Some(base) = &mut *base {
+            base.combine(message)
+        } else {
+            *base = Some(message)
+        }
+    }
+
+    pub(super) fn combine(self) -> Option<Error> {
+        Rc::try_unwrap(self.message)
+            .expect("Called Diagnostic::combine in a non-root context")
+            .into_inner()
+    }
+}
+
 pub(super) struct Context {
-    /// Span passed to `syn::Error::new_spanned`.
-    span: Option<TokenStream>,
     pub(super) args: Vec<Path>,
     builder: Builder,
     pub(super) marker: Marker,
@@ -55,14 +79,14 @@ pub(super) struct Context {
     visit_last_mode: VisitLastMode,
     /// This is `true` if other `auto_enum` attribute exists in this attribute's scope.
     pub(super) other_attr: bool,
-    /// This is `true` if an error occurred in visiting.
-    pub(super) error: bool,
+    /// Span passed to `syn::Error::new_spanned`.
+    span: TokenStream,
+    pub(super) diagnostic: Diagnostic,
 }
 
 impl Context {
-    fn new(span: impl ToTokens, args: Vec<Path>, marker: Option<String>, root: bool) -> Self {
+    fn new(span: impl ToTokens, (args, marker): Args, root: bool, diagnostic: Diagnostic) -> Self {
         Self {
-            span: Some(span.into_token_stream()),
             args,
             builder: Builder::new(),
             marker: Marker::new(marker),
@@ -71,21 +95,26 @@ impl Context {
             visit_mode: VisitMode::Default,
             visit_last_mode: VisitLastMode::Default,
             other_attr: false,
-            error: false,
+            span: span.into_token_stream(),
+            diagnostic,
         }
     }
 
-    pub(super) fn root(span: impl ToTokens, (args, marker): (Vec<Path>, Option<String>)) -> Self {
-        Self::new(span, args, marker, true)
+    pub(super) fn root(span: impl ToTokens, args: Args) -> Self {
+        Self::new(span, args, true, Diagnostic::default())
     }
 
-    pub(super) fn child(span: impl ToTokens, (args, marker): (Vec<Path>, Option<String>)) -> Self {
-        Self::new(span, args, marker, false)
+    pub(super) fn make_child(&self, span: impl ToTokens, args: Args) -> Self {
+        Self::new(span, args, false, self.diagnostic.clone())
     }
 
-    pub(super) fn span(&mut self) -> TokenStream {
-        // If this is called more than once, it is a bug.
-        self.span.take().unwrap_or_else(|| unreachable!())
+    /// This is `true` if errors occurred.
+    pub(super) fn failed(&self) -> bool {
+        self.diagnostic.message.borrow().is_some()
+    }
+
+    pub(super) fn span(&self) -> &TokenStream {
+        &self.span
     }
 
     pub(super) fn visit_mode(&self) -> VisitMode {
@@ -165,8 +194,8 @@ impl Context {
 
     // build
 
-    fn buildable(&mut self) -> Result<bool> {
-        fn err(cx: &mut Context, len: usize) -> Result<bool> {
+    pub(super) fn build(&mut self, f: impl FnOnce(ItemEnum)) -> Result<()> {
+        fn err(cx: &Context) -> Error {
             let (msg1, msg2) = match cx.visit_last_mode {
                 VisitLastMode::Default | VisitLastMode::Closure => {
                     ("branches or marker macros in total", "branch or marker macro")
@@ -174,29 +203,25 @@ impl Context {
                 VisitLastMode::Never => ("marker macros", "marker macro"),
             };
 
-            Err(error!(cx.span(),
-                "the `#[auto_enum]` attribute is required two or more {}, there is {} {} in this statement",
+            error!(
+                cx.span(),
+                "`#[auto_enum]` is required two or more {}, there is {} {} in this statement",
                 msg1,
-                if len == 0 { "no" } else { "only one" },
+                if cx.builder.variants.is_empty() { "no" } else { "only one" },
                 msg2
-            ))
+            )
         }
 
-        if self.error {
-            // As we know that an error will occur, it does not matter if there are not enough variants.
-            Ok(true)
-        } else {
+        // As we know that an error will occur, it does not matter if there are not enough variants.
+        if !self.failed() {
             match self.builder.variants.len() {
-                1 => err(self, 1),
-                0 if !self.other_attr => err(self, 0),
-                0 => Ok(false),
-                _ => Ok(true),
+                1 => return Err(err(self)),
+                0 if !self.other_attr => return Err(err(self)),
+                _ => {}
             }
         }
-    }
 
-    pub(super) fn build(&mut self, f: impl FnOnce(ItemEnum)) -> Result<()> {
-        if self.buildable()? {
+        if !self.builder.variants.is_empty() {
             f(self.builder.build(&self.args))
         }
         Ok(())
