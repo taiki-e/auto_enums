@@ -1,0 +1,20 @@
+error: unexpected token
+  --> $DIR/attribute.rs:12:16
+   |
+12 |         #[never(foo)] //~ ERROR unexpected token
+   |                ^
+
+error: unexpected token
+  --> $DIR/attribute.rs:22:17
+   |
+22 |         #[nested(foo)] //~ ERROR unexpected token
+   |                 ^
+
+error: #[rec] has been removed and replaced with #[nested]
+  --> $DIR/attribute.rs:32:9
+   |
+32 |         #[rec] //~ ERROR #[rec] has been removed and replaced with #[nested]
+   |         ^^^^^^
+
+error: aborting due to 3 previous errors
+

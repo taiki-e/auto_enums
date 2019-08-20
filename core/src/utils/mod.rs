@@ -47,8 +47,10 @@ pub(crate) fn expr_call(attrs: Vec<Attribute>, path: Path, arg: Expr) -> Expr {
     })
 }
 
-pub(super) fn expr_compile_error(e: &syn::Error) -> Expr {
-    syn::parse2(e.to_compile_error()).unwrap()
+/// Generate an expression to fill in where the error occurred during the visit.
+/// These will eventually need to be replaced with the original error message.
+pub(super) fn expr_unimplemented() -> Expr {
+    syn::parse_quote!(compile_error!("#[auto_enum] failed to generate error message"))
 }
 
 pub(crate) fn unit() -> Expr {

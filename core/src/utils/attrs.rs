@@ -20,14 +20,6 @@ pub(crate) trait AttrsMut: Attrs {
     fn find_remove_attr(&mut self, ident: &str) -> Option<Attribute> {
         self.attrs_mut(|attrs| attrs.find_remove(|attr| attr.path.is_ident(ident)))
     }
-
-    fn find_remove_empty_attr(&mut self, ident: &str) -> bool {
-        fn find_remove(attrs: &mut Vec<Attribute>, ident: &str) -> Option<Attribute> {
-            attrs.find_remove(|attr| attr.path.is_ident(ident) && attr.tokens.is_empty())
-        }
-
-        self.attrs_mut(|attrs| find_remove(attrs, ident).is_some())
-    }
 }
 
 impl Attrs for Arm {

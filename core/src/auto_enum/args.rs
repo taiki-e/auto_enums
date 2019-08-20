@@ -1,6 +1,8 @@
 use proc_macro2::{token_stream::IntoIter, Delimiter, Ident, TokenStream, TokenTree};
 use syn::{Path, Result};
 
+pub(super) type Args = (Vec<Path>, Option<String>);
+
 macro_rules! error {
     ($span:expr, $msg:expr) => {
          Err(syn::Error::new($span.span(), $msg))
@@ -10,7 +12,7 @@ macro_rules! error {
     };
 }
 
-pub(super) fn parse_args(args: TokenStream) -> Result<(Vec<Path>, Option<String>)> {
+pub(super) fn parse_args(args: TokenStream) -> Result<Args> {
     const ERR: &str = "expected one of `,`, `::`, or identifier, found ";
 
     let mut iter = args.into_iter();
