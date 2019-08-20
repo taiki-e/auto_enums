@@ -8,9 +8,9 @@ use std::{
     sync::atomic::{AtomicUsize, Ordering},
 };
 
-use proc_macro2::{Ident, TokenStream};
+use proc_macro2::TokenStream;
 use quote::{format_ident, ToTokens};
-use syn::{Attribute, Error, Expr, ItemEnum, Macro, Path, Result};
+use syn::{Attribute, Error, Expr, Ident, ItemEnum, Macro, Path, Result};
 
 use crate::utils::{expr_call, path, replace_expr, unit};
 
@@ -71,28 +71,28 @@ impl Diagnostic {
 }
 
 pub(super) struct Context {
-    pub(super) args: Vec<Path>,
     builder: Builder,
+    pub(super) args: Vec<Path>,
     pub(super) marker: Marker,
-    // pub(super) depth: u32,
     root: bool,
-    visit_mode: VisitMode,
-    visit_last_mode: VisitLastMode,
+    // pub(super) depth: u32,
+    pub(super) visit_mode: VisitMode,
+    pub(super) visit_last_mode: VisitLastMode,
     /// This is `true` if other `auto_enum` attribute exists in this attribute's scope.
     pub(super) other_attr: bool,
     /// Span passed to `syn::Error::new_spanned`.
-    span: TokenStream,
+    pub(super) span: TokenStream,
     pub(super) diagnostic: Diagnostic,
 }
 
 impl Context {
     fn new(span: impl ToTokens, (args, marker): Args, root: bool, diagnostic: Diagnostic) -> Self {
         Self {
-            args,
             builder: Builder::new(),
+            args,
             marker: Marker::new(marker),
-            // depth: 0,
             root,
+            // depth: 0,
             visit_mode: VisitMode::Default,
             visit_last_mode: VisitLastMode::Default,
             other_attr: false,
@@ -112,22 +112,6 @@ impl Context {
     /// This is `true` if errors occurred.
     pub(super) fn failed(&self) -> bool {
         self.diagnostic.message.borrow().is_some()
-    }
-
-    pub(super) fn span(&self) -> &TokenStream {
-        &self.span
-    }
-
-    pub(super) fn visit_mode(&self) -> VisitMode {
-        self.visit_mode
-    }
-
-    pub(super) fn set_visit_mode(&mut self, mode: VisitMode) {
-        self.visit_mode = mode;
-    }
-
-    pub(super) fn set_visit_last_mode(&mut self, mode: VisitLastMode) {
-        self.visit_last_mode = mode;
     }
 
     pub(super) fn visit_last(&self) -> bool {
@@ -164,15 +148,17 @@ impl Context {
 
     pub(super) fn is_marker_expr(&self, expr: &Expr) -> bool {
         match expr {
-            Expr::Macro(expr) => self.is_marker_macro(&expr.mac),
+            Expr::Macro(expr) => self.is_marker_macro(&expr.mac, false),
             _ => false,
         }
     }
 
-    pub(super) fn is_marker_macro(&self, Macro { path, .. }: &Macro) -> bool {
+    pub(super) fn is_marker_macro(&self, Macro { path, .. }: &Macro, exact: bool) -> bool {
         match &self.marker.ident {
             None => path.is_ident(Marker::DEFAULT),
-            Some(marker) => path.is_ident(marker) || (!self.root && path.is_ident(Marker::DEFAULT)),
+            Some(marker) => {
+                path.is_ident(marker) || (!exact && !self.root && path.is_ident(Marker::DEFAULT))
+            }
         }
     }
 
@@ -205,7 +191,7 @@ impl Context {
             };
 
             error!(
-                cx.span(),
+                cx.span,
                 "`#[auto_enum]` is required two or more {}, there is {} {} in this statement",
                 msg1,
                 if cx.builder.variants.is_empty() { "no" } else { "only one" },
@@ -252,10 +238,6 @@ impl Marker {
 
     pub(super) fn is_unique(&self) -> bool {
         self.ident.is_some()
-    }
-
-    pub(super) fn ident(&self) -> &str {
-        self.ident.as_ref().map_or(Self::DEFAULT, |s| s)
     }
 }
 

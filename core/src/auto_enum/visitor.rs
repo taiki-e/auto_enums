@@ -66,7 +66,7 @@ impl<'a> Visitor<'a> {
 
     /// `return` in functions or closures
     fn visit_return(&mut self, node: &mut Expr) {
-        debug_assert!(self.cx.visit_mode() == VisitMode::Return);
+        debug_assert!(self.cx.visit_mode == VisitMode::Return);
 
         if !self.scope.closure && !node.any_empty_attr(NEVER) {
             // Desugar `return <expr>` into `return Enum::VariantN(<expr>)`.
@@ -78,7 +78,7 @@ impl<'a> Visitor<'a> {
 
     /// `?` operator in functions or closures
     fn visit_try(&mut self, node: &mut Expr) {
-        debug_assert!(self.cx.visit_mode() == VisitMode::Try);
+        debug_assert!(self.cx.visit_mode == VisitMode::Try);
 
         if !self.scope.try_block && !self.scope.closure && !node.any_empty_attr(NEVER) {
             match &node {
@@ -147,10 +147,8 @@ impl<'a> Visitor<'a> {
 
         match &node {
             // Desugar `marker!(<expr>)` into `Enum::VariantN(<expr>)`.
-            Expr::Macro(ExprMacro { mac, .. })
-                // Skip if `marker!` is not a marker macro.
-                if mac.path.is_ident(self.cx.marker.ident()) =>
-            {
+            // Skip if `marker!` is not a marker macro.
+            Expr::Macro(ExprMacro { mac, .. }) if self.cx.is_marker_macro(mac, true) => {
                 replace_expr(node, |expr| {
                     let expr = if let Expr::Macro(expr) = expr { expr } else { unreachable!() };
                     let args = syn::parse2(expr.mac.tokens).unwrap_or_else(|e| {
@@ -183,7 +181,7 @@ impl VisitMut for Visitor<'_> {
                 _ => {}
             }
 
-            match self.cx.visit_mode() {
+            match self.cx.visit_mode {
                 VisitMode::Return => self.visit_return(node),
                 VisitMode::Try => self.visit_try(node),
                 VisitMode::Default => {}

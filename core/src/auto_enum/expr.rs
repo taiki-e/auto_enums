@@ -115,7 +115,8 @@ fn is_unreachable(expr: &Expr, cx: &Context<'_>) -> bool {
 
             // `unreachable!`, `panic!` or an expression level marker (`marker!` macro).
             Expr::Macro(ExprMacro { mac, .. }) => {
-                UNREACHABLE_MACROS.iter().any(|i| mac.path.is_ident(i)) || cx.is_marker_macro(mac)
+                UNREACHABLE_MACROS.iter().any(|i| mac.path.is_ident(i))
+                    || cx.is_marker_macro(mac, false)
             }
 
             Expr::Match(ExprMatch { arms, .. }) => {

@@ -46,7 +46,7 @@ fn expand(args: TokenStream, input: TokenStream) -> TokenStream {
         Err(e) => syn::parse2::<Expr>(input)
             .map_err(|_e| {
                 cx.diagnostic.error(e);
-                error!(cx.span(), "the `#[auto_enum]` attribute may only be used on expression, statement, or function")
+                error!(cx.span, "the `#[auto_enum]` attribute may only be used on expression, statement, or function")
             })
             .and_then(|mut expr| expr.visit_parent(&mut cx).map(|()| expr.into_token_stream())),
     };
@@ -62,8 +62,8 @@ fn expand(args: TokenStream, input: TokenStream) -> TokenStream {
 fn visit_expr(expr: &mut Expr, cx: &mut Context) -> Result<()> {
     let expr = match expr {
         Expr::Closure(ExprClosure { body, .. }) if cx.visit_last() => {
-            cx.set_visit_mode(VisitMode::Return);
-            cx.set_visit_last_mode(VisitLastMode::Closure);
+            cx.visit_mode = VisitMode::Return;
+            cx.visit_last_mode = VisitLastMode::Closure;
             cx.find_try(|v| v.visit_expr_mut(body));
             &mut **body
         }
@@ -85,7 +85,7 @@ trait Parent {
 impl Parent for Stmt {
     fn visit_parent(&mut self, cx: &mut Context) -> Result<()> {
         if let Stmt::Semi(..) = &self {
-            cx.set_visit_last_mode(VisitLastMode::Never);
+            cx.visit_last_mode = VisitLastMode::Never;
         }
 
         match self {
@@ -148,7 +148,7 @@ impl Parent for ItemFn {
         if let ReturnType::Type(_, ty) = &mut sig.output {
             match &**ty {
                 // `return`
-                Type::ImplTrait(_) if cx.visit_last() => cx.set_visit_mode(VisitMode::Return),
+                Type::ImplTrait(_) if cx.visit_last() => cx.visit_mode = VisitMode::Return,
 
                 // `?` operator
                 Type::Path(TypePath { qself: None, path }) if cx.visit_last() => {
