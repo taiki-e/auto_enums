@@ -1,4 +1,4 @@
-## [`AsyncSeek`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.17/futures/io/trait.AsyncSeek.html)
+## [`AsyncSeek`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.18/futures/io/trait.AsyncSeek.html)
 
 When deriving for enum like the following:
 
