@@ -4,8 +4,6 @@
     feature = "type_analysis",
     feature = "transpose_methods",
     feature = "try_trait",
-    feature = "exact_size_is_empty",
-    feature = "read_initializer",
 ))]
 
 use std::{env, path::PathBuf};
