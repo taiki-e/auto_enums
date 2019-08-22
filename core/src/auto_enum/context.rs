@@ -104,7 +104,7 @@ impl Drop for Context {
 impl Context {
     fn new(
         span: impl ToTokens,
-        (args, marker): Args,
+        Args { args, marker }: Args,
         root: bool,
         markers: Rc<RefCell<Vec<String>>>,
         diagnostic: Diagnostic,
