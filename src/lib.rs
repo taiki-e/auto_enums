@@ -492,7 +492,7 @@
 //! ```rust
 //! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //! # use auto_enums::auto_enum;
-//! #[auto_enum(marker(bar), Iterator)]
+//! #[auto_enum(marker = bar, Iterator)]
 //! fn foo(x: i32) -> impl Iterator<Item = i32> {
 //!     if x < 0 {
 //!         return x..=0;

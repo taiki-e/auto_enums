@@ -275,64 +275,6 @@ mod stable {
         }
         assert_eq!(try_operator2(10).unwrap().sum::<i32>(), 54);
 
-        #[auto_enum(Iterator)]
-        fn marker3(x: i32, y: i32) -> impl Iterator<Item = i32> {
-            let iter;
-            #[auto_enum(Iterator)]
-            match x {
-                0 => iter = marker!(2..8),
-                _ => iter = marker!(2..=10),
-            };
-
-            if y < 0 {
-                return y..=0;
-            }
-            match y {
-                0 => iter.flat_map(|x| 0..x),
-                _ => iter.map(|x| {
-                    if x < 0 {
-                        return x - 1;
-                    }
-                    x + 1
-                }),
-            }
-        }
-        assert_eq!(marker3(10, 10).sum::<i32>(), 63);
-
-        #[auto_enum(marker(marker_a), Iterator)]
-        fn marker4(x: i32, y: i32) -> impl Iterator<Item = i32> {
-            let iter;
-            #[auto_enum(Iterator)]
-            match x {
-                0 => iter = marker!(2..8),
-                _ if y < 0 => return y..=0,
-                _ => iter = marker!(2..=10),
-            };
-
-            match y {
-                0 => iter.flat_map(|x| 0..x),
-                _ => iter.map(|x| x + 1),
-            }
-        }
-        assert_eq!(marker4(10, 10).sum::<i32>(), 63);
-
-        #[auto_enum(Iterator)]
-        fn marker5(x: i32, y: i32) -> impl Iterator<Item = i32> {
-            let iter;
-            #[auto_enum(marker(marker_a), Iterator)]
-            match x {
-                0 => iter = marker_a!(2..8),
-                _ if y < 0 => return y..=0,
-                _ => iter = marker_a!(2..=10),
-            };
-
-            match y {
-                0 => iter.flat_map(|x| 0..x),
-                _ => iter.map(|x| x + 1),
-            }
-        }
-        assert_eq!(marker5(10, 10).sum::<i32>(), 63);
-
         #[auto_enum]
         fn closure() {
             #[auto_enum(Iterator)]
@@ -499,6 +441,100 @@ mod stable {
         for (i, x) in ANS.iter().enumerate() {
             assert_eq!(no_return(i).sum::<i32>(), *x);
         }
+    }
+
+    #[test]
+    fn marker() {
+        #[auto_enum(Iterator)]
+        fn marker3(x: i32, y: i32) -> impl Iterator<Item = i32> {
+            let iter;
+            #[auto_enum(Iterator)]
+            match x {
+                0 => iter = marker!(2..8),
+                _ => iter = marker!(2..=10),
+            };
+
+            if y < 0 {
+                return y..=0;
+            }
+            match y {
+                0 => iter.flat_map(|x| 0..x),
+                _ => iter.map(|x| {
+                    if x < 0 {
+                        return x - 1;
+                    }
+                    x + 1
+                }),
+            }
+        }
+        assert_eq!(marker3(10, 10).sum::<i32>(), 63);
+
+        #[auto_enum(marker(marker_a), Iterator)]
+        fn marker4(x: i32, y: i32) -> impl Iterator<Item = i32> {
+            let iter;
+            #[auto_enum(Iterator)]
+            match x {
+                0 => iter = marker!(2..8),
+                _ if y < 0 => return y..=0,
+                _ => iter = marker!(2..=10),
+            };
+
+            match y {
+                0 => iter.flat_map(|x| 0..x),
+                _ => iter.map(|x| x + 1),
+            }
+        }
+        assert_eq!(marker4(10, 10).sum::<i32>(), 63);
+
+        #[auto_enum(Iterator)]
+        fn marker5(x: i32, y: i32) -> impl Iterator<Item = i32> {
+            let iter;
+            #[auto_enum(marker(marker_a), Iterator)]
+            match x {
+                0 => iter = marker_a!(2..8),
+                _ if y < 0 => return y..=0,
+                _ => iter = marker_a!(2..=10),
+            };
+
+            match y {
+                0 => iter.flat_map(|x| 0..x),
+                _ => iter.map(|x| x + 1),
+            }
+        }
+        assert_eq!(marker5(10, 10).sum::<i32>(), 63);
+
+        #[auto_enum(Iterator, marker = foo)]
+        fn marker6(x: usize) -> impl Iterator<Item = i32> {
+            #[auto_enum(Iterator)]
+            let _iter = match x {
+                0 => 1..8,
+                _ => (0..2).map(|x| x + 1),
+            };
+
+            #[auto_enum(Iterator, marker = bar)]
+            let _iter = match x {
+                0 => 1..8,
+                1 => return foo!(1..9),
+                n if n > 3 =>
+                {
+                    #[auto_enum(Iterator, marker = baz)]
+                    match x {
+                        0 => 1..8,
+                        1 => return foo!(1..9),
+                        2 => baz!(1..9),
+                        n if n > 3 => 2..=10,
+                        _ => (0..2).map(|x| x + 1),
+                    }
+                }
+                _ => (0..2).map(|x| x + 1),
+            };
+
+            match x {
+                0 => 1..8,
+                _ => (0..2).map(|x| x + 1),
+            }
+        }
+        assert_eq!(marker6(10).sum::<i32>(), 3);
     }
 
     #[cfg(feature = "transpose_methods")]
@@ -690,35 +726,6 @@ mod nightly {
             assert_eq!(iter.sum::<i32>(), *x);
         }
 
-        fn marker1(x: usize) -> impl Iterator<Item = i32> + Clone {
-            #[auto_enum(Iterator, Clone)]
-            (0..x as i32).map(|x| x + 1).flat_map(|x| {
-                if x > 10 {
-                    marker!(0..x)
-                } else {
-                    marker!(-100..=0)
-                }
-            })
-        }
-        for (i, _x) in ANS.iter().enumerate() {
-            let _ = marker1(i).clone().sum::<i32>();
-        }
-
-        fn marker2(x: usize) -> impl Iterator<Item = i32> + Clone {
-            let a;
-
-            #[auto_enum(Iterator, Clone)]
-            match x {
-                0 => a = marker!(2..8),
-                _ if x < 2 => a = marker!(vec![2, 0].into_iter()),
-                _ => a = marker!(2..=10),
-            };
-            a
-        }
-        for (i, x) in ANS.iter().enumerate() {
-            assert_eq!(marker2(i).clone().sum::<i32>(), *x - 1);
-        }
-
         /*
         This can not be supported. It is parsed as follows.
             expected: ExprAssign { left: ExprPath, right: ExprMatch, .. }
@@ -780,6 +787,38 @@ mod nightly {
                 vec![1, 2, 0].into_iter()
             };
             assert_eq!(iter.sum::<i32>(), *x);
+        }
+    }
+
+    #[test]
+    fn marker() {
+        fn marker1(x: usize) -> impl Iterator<Item = i32> + Clone {
+            #[auto_enum(Iterator, Clone)]
+            (0..x as i32).map(|x| x + 1).flat_map(|x| {
+                if x > 10 {
+                    marker!(0..x)
+                } else {
+                    marker!(-100..=0)
+                }
+            })
+        }
+        for (i, _x) in ANS.iter().enumerate() {
+            let _ = marker1(i).clone().sum::<i32>();
+        }
+
+        fn marker2(x: usize) -> impl Iterator<Item = i32> + Clone {
+            let a;
+
+            #[auto_enum(Iterator, Clone)]
+            match x {
+                0 => a = marker!(2..8),
+                _ if x < 2 => a = marker!(vec![2, 0].into_iter()),
+                _ => a = marker!(2..=10),
+            };
+            a
+        }
+        for (i, x) in ANS.iter().enumerate() {
+            assert_eq!(marker2(i).clone().sum::<i32>(), *x - 1);
         }
     }
 

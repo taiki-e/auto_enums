@@ -10,9 +10,9 @@ use syn::{
 use crate::utils::expr_call;
 use crate::utils::{expr_unimplemented, replace_expr, Attrs, AttrsMut};
 
-use super::{parse_args, Context, Parent, VisitMode, NAME, NEVER};
+use super::{parse_args, Context, Parent, VisitMode, DEFAULT_MARKER, NAME, NEVER};
 
-// =============================================================================
+// =================================================================================================
 // Visitor
 
 #[derive(Clone, Copy, Default)]
@@ -53,14 +53,6 @@ impl<'a> Visitor<'a> {
                     super::NESTED
                 ));
             }
-        }
-    }
-
-    fn check_other_attr(&mut self, attrs: &impl Attrs) {
-        if attrs.any_attr(NAME) {
-            self.scope.foreign = true;
-            // Record whether other `auto_enum` attribute exists.
-            self.cx.other_attr = true;
         }
     }
 
@@ -143,12 +135,14 @@ impl<'a> Visitor<'a> {
 
     /// Expression level marker (`marker!` macro)
     fn visit_marker_macro(&mut self, node: &mut Expr) {
-        debug_assert!(!self.scope.foreign || self.cx.marker.is_unique());
+        debug_assert!(!self.scope.foreign || self.cx.marker != DEFAULT_MARKER);
 
         match &node {
             // Desugar `marker!(<expr>)` into `Enum::VariantN(<expr>)`.
-            // Skip if `marker!` is not a marker macro.
-            Expr::Macro(ExprMacro { mac, .. }) if self.cx.is_marker_macro(mac, true) => {
+            Expr::Macro(ExprMacro { mac, .. })
+                // Skip if `marker!` is not a marker macro.
+                if self.cx.is_marker_macro_exact(mac) =>
+            {
                 replace_expr(node, |expr| {
                     let expr = if let Expr::Macro(expr) = expr { expr } else { unreachable!() };
                     let args = syn::parse2(expr.mac.tokens).unwrap_or_else(|e| {
@@ -171,9 +165,6 @@ impl<'a> Visitor<'a> {
 impl VisitMut for Visitor<'_> {
     fn visit_expr_mut(&mut self, node: &mut Expr) {
         if !self.cx.failed() {
-            let tmp = self.scope;
-            self.check_other_attr(node);
-
             match node {
                 Expr::Closure(_) => self.scope.closure = true,
                 // `?` operator in try blocks are not supported.
@@ -189,12 +180,10 @@ impl VisitMut for Visitor<'_> {
 
             visit_mut::visit_expr_mut(self, node);
 
-            if !self.scope.foreign || self.cx.marker.is_unique() {
+            if !self.scope.foreign || self.cx.marker != DEFAULT_MARKER {
                 self.visit_marker_macro(node);
                 self.find_remove_attrs(node);
             }
-
-            self.scope = tmp;
         }
     }
 
@@ -207,19 +196,24 @@ impl VisitMut for Visitor<'_> {
 
     fn visit_local_mut(&mut self, node: &mut Local) {
         if !self.cx.failed() {
-            let tmp = self.scope;
-            self.check_other_attr(node);
-
             visit_mut::visit_local_mut(self, node);
             self.find_remove_attrs(node);
-            self.scope = tmp;
         }
     }
 
     fn visit_stmt_mut(&mut self, node: &mut Stmt) {
         if !self.cx.failed() {
-            visit_mut::visit_stmt_mut(self, node);
-            visit_stmt_mut(node, self.cx);
+            let tmp = self.scope;
+
+            if node.any_attr(NAME) {
+                self.scope.foreign = true;
+                // Record whether other `auto_enum` attribute exists.
+                self.cx.other_attr = true;
+            }
+
+            visit_stmt(node, self, |this| this.cx);
+
+            self.scope = tmp;
         }
     }
 
@@ -228,7 +222,7 @@ impl VisitMut for Visitor<'_> {
     }
 }
 
-// =============================================================================
+// =================================================================================================
 // FindTry
 
 /// Find `?` operator.
@@ -287,7 +281,7 @@ impl VisitMut for FindTry<'_> {
     }
 }
 
-// =============================================================================
+// =================================================================================================
 // Dummy visitor
 
 pub(super) struct Dummy<'a> {
@@ -303,8 +297,11 @@ impl<'a> Dummy<'a> {
 impl VisitMut for Dummy<'_> {
     fn visit_stmt_mut(&mut self, node: &mut Stmt) {
         if !self.cx.failed() {
-            visit_mut::visit_stmt_mut(self, node);
-            visit_stmt_mut(node, self.cx);
+            if node.any_attr(NAME) {
+                self.cx.other_attr = true;
+            }
+
+            visit_stmt(node, self, |this| this.cx);
         }
     }
 
@@ -313,21 +310,37 @@ impl VisitMut for Dummy<'_> {
     }
 }
 
-fn visit_stmt_mut(stmt: &mut Stmt, cx: &mut Context) {
-    let attr = match stmt {
+fn visit_stmt<V>(node: &mut Stmt, visitor: &mut V, f: impl Fn(&mut V) -> &mut Context)
+where
+    V: VisitMut,
+{
+    let attr = match node {
         Stmt::Expr(expr) | Stmt::Semi(expr, _) => expr.find_remove_attr(NAME),
         Stmt::Local(local) => local.find_remove_attr(NAME),
         // Do not recurse into nested items.
-        Stmt::Item(_) => return,
+        Stmt::Item(_) => None,
     };
 
     if let Some(Attribute { tokens, .. }) = attr {
-        syn::parse2(tokens)
+        let res = syn::parse2(tokens)
             .and_then(|group: Group| parse_args(group.stream()))
-            .and_then(|x| stmt.visit_parent(&mut cx.make_child(&stmt, x)))
-            .unwrap_or_else(|e| {
-                cx.diagnostic.error(e);
-                *stmt = Stmt::Expr(expr_unimplemented());
-            });
+            .and_then(|x| f(visitor).make_child(&node, x));
+
+        visit_mut::visit_stmt_mut(visitor, node);
+
+        match res {
+            Err(e) => {
+                f(visitor).diagnostic.error(e);
+                *node = Stmt::Expr(expr_unimplemented());
+            }
+            Ok(mut cx) => {
+                node.expand_parent(&mut cx).unwrap_or_else(|e| {
+                    f(visitor).diagnostic.error(e);
+                    *node = Stmt::Expr(expr_unimplemented());
+                });
+            }
+        }
+    } else {
+        visit_mut::visit_stmt_mut(visitor, node);
     }
 }

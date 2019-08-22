@@ -1,4 +1,4 @@
-use syn::{Arm, Attribute, Expr, Local};
+use syn::{Arm, Attribute, Expr, Local, Stmt};
 
 use super::VecExt;
 
@@ -43,6 +43,26 @@ impl Attrs for Local {
 impl AttrsMut for Local {
     fn attrs_mut<T>(&mut self, f: impl FnOnce(&mut Vec<Attribute>) -> T) -> T {
         f(&mut self.attrs)
+    }
+}
+
+impl Attrs for Stmt {
+    fn attrs(&self) -> &[Attribute] {
+        match self {
+            Stmt::Expr(expr) | Stmt::Semi(expr, _) => expr.attrs(),
+            Stmt::Local(local) => local.attrs(),
+            Stmt::Item(_) => &[],
+        }
+    }
+}
+
+impl AttrsMut for Stmt {
+    fn attrs_mut<T>(&mut self, f: impl FnOnce(&mut Vec<Attribute>) -> T) -> T {
+        match self {
+            Stmt::Expr(expr) | Stmt::Semi(expr, _) => expr.attrs_mut(f),
+            Stmt::Local(local) => local.attrs_mut(f),
+            Stmt::Item(_) => f(&mut Vec::new()),
+        }
     }
 }
 
