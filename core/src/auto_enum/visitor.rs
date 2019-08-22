@@ -10,7 +10,7 @@ use syn::{
 use crate::utils::expr_call;
 use crate::utils::{expr_unimplemented, replace_expr, Attrs, AttrsMut};
 
-use super::{parse_args, Context, Parent, VisitMode, DEFAULT_MARKER, NAME, NEVER};
+use super::{Context, Parent, VisitMode, DEFAULT_MARKER, NAME, NEVER};
 
 // =================================================================================================
 // Visitor
@@ -323,7 +323,7 @@ where
 
     if let Some(Attribute { tokens, .. }) = attr {
         let res = syn::parse2(tokens)
-            .and_then(|group: Group| parse_args(group.stream()))
+            .and_then(|group: Group| syn::parse2(group.stream()))
             .and_then(|x| f(visitor).make_child(&node, x));
 
         visit_mut::visit_stmt_mut(visitor, node);
