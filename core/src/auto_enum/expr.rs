@@ -12,7 +12,7 @@ use crate::utils::{expr_block, replace_block, replace_expr};
 
 use super::{Attrs, NAME, NESTED, NEVER};
 
-// =============================================================================
+// =================================================================================================
 // Context
 
 struct Context<'a> {
@@ -41,7 +41,7 @@ impl<'a> From<&'a mut super::Context> for Context<'a> {
     }
 }
 
-// =============================================================================
+// =================================================================================================
 // Visiting last expression
 
 fn last_expr<T>(
@@ -115,8 +115,7 @@ fn is_unreachable(expr: &Expr, cx: &Context<'_>) -> bool {
 
             // `unreachable!`, `panic!` or an expression level marker (`marker!` macro).
             Expr::Macro(ExprMacro { mac, .. }) => {
-                UNREACHABLE_MACROS.iter().any(|i| mac.path.is_ident(i))
-                    || cx.is_marker_macro(mac, false)
+                UNREACHABLE_MACROS.iter().any(|i| mac.path.is_ident(i)) || cx.is_marker_macro(mac)
             }
 
             Expr::Match(ExprMatch { arms, .. }) => {

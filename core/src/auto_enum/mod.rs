@@ -15,13 +15,14 @@ mod traits;
 mod visitor;
 
 use self::args::{parse_args, Args};
-use self::context::{Context, VisitLastMode, VisitMode};
+use self::context::{Context, VisitLastMode, VisitMode, DEFAULT_MARKER};
 use self::expr::child_expr;
 #[cfg(feature = "type_analysis")]
 use self::traits::*;
 
 /// The attribute name.
 const NAME: &str = "auto_enum";
+
 /// The annotation for recursively parsing.
 const NESTED: &str = "nested";
 /// The annotation for skipping branch.
@@ -29,34 +30,32 @@ const NEVER: &str = "never";
 /// The annotations used by `#[auto_enum]`.
 const EMPTY_ATTRS: &[&str] = &[NEVER, NESTED];
 
+/// The old annotation replaced by `#[nested]`.
 const NESTED_OLD: &str = "rec";
 
 pub(crate) fn attribute(args: TokenStream, input: TokenStream) -> TokenStream {
-    expand(args, input)
+    expand(args, input).unwrap_or_else(|e| e.to_compile_error())
 }
 
-fn expand(args: TokenStream, input: TokenStream) -> TokenStream {
-    let mut cx = match parse_args(args) {
-        Ok(x) => Context::root(&input, x),
-        Err(e) => return e.to_compile_error(),
-    };
+fn expand(args: TokenStream, input: TokenStream) -> Result<TokenStream> {
+    let mut cx = parse_args(args).and_then(|x| Context::root(&input, x))?;
 
     let res = match syn::parse2::<Stmt>(input.clone()) {
-        Ok(mut stmt) => stmt.visit_parent(&mut cx).map(|()| stmt.into_token_stream()),
+        Ok(mut stmt) => stmt.expand_parent(&mut cx).map(|()| stmt.into_token_stream()),
         Err(e) => syn::parse2::<Expr>(input)
             .map_err(|_e| {
                 cx.diagnostic.error(e);
                 error!(cx.span, "the `#[auto_enum]` attribute may only be used on expression, statement, or function")
             })
-            .and_then(|mut expr| expr.visit_parent(&mut cx).map(|()| expr.into_token_stream())),
+            .and_then(|mut expr| expr.expand_parent(&mut cx).map(|()| expr.into_token_stream())),
     };
 
     match res {
         Err(e) => cx.diagnostic.error(e),
         Ok(_) if cx.failed() => {}
-        Ok(tokens) => return tokens,
+        Ok(tokens) => return Ok(tokens),
     }
-    cx.diagnostic.combine().unwrap().to_compile_error()
+    Err(cx.diagnostic.get_inner().unwrap())
 }
 
 fn visit_expr(expr: &mut Expr, cx: &mut Context) -> Result<()> {
@@ -79,19 +78,19 @@ fn build_expr(expr: &mut Expr, item: ItemEnum) {
 
 /// The statement or expression in which `#[auto_enum]` was directly used.
 trait Parent {
-    fn visit_parent(&mut self, cx: &mut Context) -> Result<()>;
+    fn expand_parent(&mut self, cx: &mut Context) -> Result<()>;
 }
 
 impl Parent for Stmt {
-    fn visit_parent(&mut self, cx: &mut Context) -> Result<()> {
+    fn expand_parent(&mut self, cx: &mut Context) -> Result<()> {
         if let Stmt::Semi(..) = &self {
             cx.visit_last_mode = VisitLastMode::Never;
         }
 
         match self {
-            Stmt::Expr(expr) | Stmt::Semi(expr, _) => expr.visit_parent(cx),
-            Stmt::Local(local) => local.visit_parent(cx),
-            Stmt::Item(Item::Fn(item)) => item.visit_parent(cx),
+            Stmt::Expr(expr) | Stmt::Semi(expr, _) => expr.expand_parent(cx),
+            Stmt::Local(local) => local.expand_parent(cx),
+            Stmt::Item(Item::Fn(item)) => item.expand_parent(cx),
             Stmt::Item(item) => {
                 Err(error!(item, "may only be used on expression, statement, or function"))
             }
@@ -100,8 +99,8 @@ impl Parent for Stmt {
 }
 
 impl Parent for Expr {
-    fn visit_parent(&mut self, cx: &mut Context) -> Result<()> {
-        if cx.args.is_empty() {
+    fn expand_parent(&mut self, cx: &mut Context) -> Result<()> {
+        if cx.is_dummy() {
             cx.dummy(|v| v.visit_expr_mut(self));
             return Ok(());
         }
@@ -113,7 +112,7 @@ impl Parent for Expr {
 }
 
 impl Parent for Local {
-    fn visit_parent(&mut self, cx: &mut Context) -> Result<()> {
+    fn expand_parent(&mut self, cx: &mut Context) -> Result<()> {
         #[cfg(feature = "type_analysis")]
         {
             if let Pat::Type(PatType { ty, .. }) = &mut self.pat {
@@ -121,7 +120,7 @@ impl Parent for Local {
             }
         }
 
-        if cx.args.is_empty() {
+        if cx.is_dummy() {
             cx.dummy(|v| v.visit_local_mut(self));
             return Ok(());
         }
@@ -143,7 +142,7 @@ impl Parent for Local {
 }
 
 impl Parent for ItemFn {
-    fn visit_parent(&mut self, cx: &mut Context) -> Result<()> {
+    fn expand_parent(&mut self, cx: &mut Context) -> Result<()> {
         let Self { sig, block, .. } = self;
         if let ReturnType::Type(_, ty) = &mut sig.output {
             match &**ty {
@@ -179,7 +178,7 @@ impl Parent for ItemFn {
             cx.collect_trait(&mut *ty);
         }
 
-        if cx.args.is_empty() {
+        if cx.is_dummy() {
             cx.dummy(|v| v.visit_item_fn_mut(self));
             return Ok(());
         }

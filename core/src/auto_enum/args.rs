@@ -1,7 +1,7 @@
 use proc_macro2::{token_stream::IntoIter, Delimiter, Ident, TokenStream, TokenTree};
 use syn::{Path, Result};
 
-pub(super) type Args = (Vec<Path>, Option<String>);
+pub(super) type Args = (Vec<Path>, Option<Ident>);
 
 macro_rules! error {
     ($span:expr, $msg:expr) => {
@@ -54,7 +54,7 @@ fn marker_opt(
     ident: Ident,
     iter: &mut IntoIter,
     args: &mut Vec<Path>,
-    marker: &mut Option<String>,
+    marker: &mut Option<Ident>,
 ) -> Result<()> {
     match iter.next() {
         Some(TokenTree::Group(ref g)) if g.delimiter() != Delimiter::Parenthesis => {
@@ -70,7 +70,7 @@ fn marker_opt(
                 Some(tt) => return error!(tt, "expected an identifier, found `{}`", tt),
                 None => return error!(g, "empty `marker` option"),
             };
-            *marker = Some(i.to_string());
+            *marker = Some(i);
             match tokens.next() {
                 None => {}
                 Some(TokenTree::Punct(ref p)) if p.as_char() == ',' => {
@@ -89,7 +89,7 @@ fn marker_opt(
                 Some(TokenTree::Ident(ref i)) if marker.is_some() => {
                     return error!(i, "multiple `marker` option")
                 }
-                Some(TokenTree::Ident(i)) => *marker = Some(i.to_string()),
+                Some(TokenTree::Ident(i)) => *marker = Some(i),
                 Some(tt) => return error!(tt, "expected an identifier, found `{}`", tt),
                 None => return error!(p, "empty `marker` option"),
             }

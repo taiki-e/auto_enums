@@ -21,7 +21,7 @@ use super::{
     Args,
 };
 
-// =============================================================================
+// =================================================================================================
 // Context
 
 /// Config for related to `visotor::Visotor` type.
@@ -43,6 +43,7 @@ pub(super) enum VisitLastMode {
     not
     item_fn: `fn _() -> Fn*() { || {} }`
     */
+    /// Currently, this is handled as the same as `Default`.
     Closure,
     /// `Stmt::Semi(..)` - never visit last expr
     Never,
@@ -63,53 +64,92 @@ impl Diagnostic {
         }
     }
 
-    pub(super) fn combine(self) -> Option<Error> {
-        Rc::try_unwrap(self.message)
-            .expect("Called Diagnostic::combine in a non-root context")
-            .into_inner()
+    pub(super) fn get_inner(&self) -> Option<Error> {
+        self.message.borrow().clone()
     }
 }
 
+/// The default identifier of expression level marker.
+pub(super) const DEFAULT_MARKER: &str = "marker";
+
 pub(super) struct Context {
+    args: Vec<Path>,
     builder: Builder,
-    pub(super) args: Vec<Path>,
-    pub(super) marker: Marker,
+
+    /// The identifier of the marker macro of the current scope.
+    pub(super) marker: Ident,
+    /// All marker macro identifiers that may have effects on the current scope.
+    pub(super) markers: Rc<RefCell<Vec<String>>>,
+
+    // depth: i32,
+    /// Currently, this is basically the same as `self.markers.borrow().len() == 1`.
     root: bool,
-    // pub(super) depth: u32,
+    /// This is `true` if other `auto_enum` attribute exists in the current scope.
+    pub(super) other_attr: bool,
+
     pub(super) visit_mode: VisitMode,
     pub(super) visit_last_mode: VisitLastMode,
-    /// This is `true` if other `auto_enum` attribute exists in this attribute's scope.
-    pub(super) other_attr: bool,
+
     /// Span passed to `syn::Error::new_spanned`.
     pub(super) span: TokenStream,
     pub(super) diagnostic: Diagnostic,
 }
 
+impl Drop for Context {
+    fn drop(&mut self) {
+        self.markers.borrow_mut().pop();
+    }
+}
+
 impl Context {
-    fn new(span: impl ToTokens, (args, marker): Args, root: bool, diagnostic: Diagnostic) -> Self {
-        Self {
+    fn new(
+        span: impl ToTokens,
+        (args, marker): Args,
+        root: bool,
+        markers: Rc<RefCell<Vec<String>>>,
+        diagnostic: Diagnostic,
+    ) -> Result<Self> {
+        let (marker_string, marker) = if let Some(marker) = marker {
+            // Currently, there is no reason to preserve the span, so convert `Ident` to `String`.
+            // This should probably be more efficient than calling `to_string` for each comparison.
+            // https://github.com/alexcrichton/proc-macro2/blob/1.0.1/src/wrapper.rs#L706
+            let marker_string = marker.to_string();
+            if markers.borrow().contains(&marker_string) {
+                return Err(error!(
+                    marker,
+                    "A custom marker name is specified that duplicated the name already used in the parent scope",
+                ));
+            }
+            (marker_string, marker)
+        } else {
+            (DEFAULT_MARKER.to_owned(), format_ident!("{}", DEFAULT_MARKER))
+        };
+
+        markers.borrow_mut().push(marker_string);
+
+        Ok(Self {
             builder: Builder::new(),
             args,
-            marker: Marker::new(marker),
+            marker,
+            markers,
             root,
-            // depth: 0,
+            other_attr: false,
             visit_mode: VisitMode::Default,
             visit_last_mode: VisitLastMode::Default,
-            other_attr: false,
             span: span.into_token_stream(),
             diagnostic,
-        }
+        })
     }
 
-    pub(super) fn root(span: impl ToTokens, args: Args) -> Self {
-        Self::new(span, args, true, Diagnostic::default())
+    pub(super) fn root(span: impl ToTokens, args: Args) -> Result<Self> {
+        Self::new(span, args, true, Rc::default(), Diagnostic::default())
     }
 
-    pub(super) fn make_child(&self, span: impl ToTokens, args: Args) -> Self {
-        Self::new(span, args, false, self.diagnostic.clone())
+    pub(super) fn make_child(&self, span: impl ToTokens, args: Args) -> Result<Self> {
+        Self::new(span, args, false, self.markers.clone(), self.diagnostic.clone())
     }
 
-    /// This is `true` if errors occurred.
+    /// Returns `true` if one or more errors occurred.
     pub(super) fn failed(&self) -> bool {
         self.diagnostic.message.borrow().is_some()
     }
@@ -118,25 +158,36 @@ impl Context {
         self.visit_last_mode != VisitLastMode::Never && self.visit_mode != VisitMode::Try
     }
 
-    // visitors
-
-    pub(super) fn visitor(&mut self, f: impl FnOnce(&mut Visitor<'_>)) {
-        f(&mut Visitor::new(self));
+    /// Even if this is `false`, there are cases where this `auto_enum` attribute is handled as a
+    /// dummy. e.g., If `self.other_attr && self.builder.variants.is_empty()` is true, this
+    /// `auto_enum` attribute is handled as a dummy.
+    pub(super) fn is_dummy(&self) -> bool {
+        // `auto_enum` attribute with no argument is handled as a dummy.
+        self.args.is_empty()
     }
 
-    pub(super) fn dummy(&mut self, f: impl FnOnce(&mut Dummy<'_>)) {
-        f(&mut Dummy::new(self));
-    }
-
-    pub(super) fn find_try(&mut self, f: impl FnOnce(&mut FindTry<'_>)) {
-        let mut find = FindTry::new(self);
-        f(&mut find);
-        if find.has {
-            self.visit_mode = VisitMode::Try;
+    /// Returns `true` if `expr` is the marker macro that may have effects on the current scope.
+    pub(super) fn is_marker_expr(&self, expr: &Expr) -> bool {
+        match expr {
+            Expr::Macro(expr) => self.is_marker_macro(&expr.mac),
+            _ => false,
         }
     }
 
-    // utils
+    /// Returns `true` if `mac` is the marker macro that may have effects on the current scope.
+    pub(super) fn is_marker_macro(&self, mac: &Macro) -> bool {
+        let exact = self.is_marker_macro_exact(mac);
+        if exact || self.root {
+            return exact;
+        }
+
+        self.markers.borrow().iter().any(|marker| mac.path.is_ident(marker))
+    }
+
+    /// Returns `true` if `mac` is the marker macro of the current scope.
+    pub(super) fn is_marker_macro_exact(&self, mac: &Macro) -> bool {
+        mac.path.is_ident(&self.marker)
+    }
 
     pub(super) fn next_expr(&mut self, expr: Expr) -> Expr {
         self.next_expr_with_attrs(Vec::new(), expr)
@@ -144,22 +195,6 @@ impl Context {
 
     pub(super) fn next_expr_with_attrs(&mut self, attrs: Vec<Attribute>, expr: Expr) -> Expr {
         self.builder.next_expr(attrs, expr)
-    }
-
-    pub(super) fn is_marker_expr(&self, expr: &Expr) -> bool {
-        match expr {
-            Expr::Macro(expr) => self.is_marker_macro(&expr.mac, false),
-            _ => false,
-        }
-    }
-
-    pub(super) fn is_marker_macro(&self, Macro { path, .. }: &Macro, exact: bool) -> bool {
-        match &self.marker.ident {
-            None => path.is_ident(Marker::DEFAULT),
-            Some(marker) => {
-                path.is_ident(marker) || (!exact && !self.root && path.is_ident(Marker::DEFAULT))
-            }
-        }
     }
 
     pub(super) fn replace_boxed_expr(&mut self, expr: &mut Option<Box<Expr>>) {
@@ -176,6 +211,26 @@ impl Context {
                     self.next_expr(expr)
                 }
             });
+        }
+    }
+
+    // visitors
+
+    pub(super) fn visitor(&mut self, f: impl FnOnce(&mut Visitor<'_>)) {
+        f(&mut Visitor::new(self));
+    }
+
+    pub(super) fn dummy(&mut self, f: impl FnOnce(&mut Dummy<'_>)) {
+        debug_assert!(self.is_dummy());
+
+        f(&mut Dummy::new(self));
+    }
+
+    pub(super) fn find_try(&mut self, f: impl FnOnce(&mut FindTry<'_>)) {
+        let mut find = FindTry::new(self);
+        f(&mut find);
+        if find.has {
+            self.visit_mode = VisitMode::Try;
         }
     }
 
@@ -222,26 +277,7 @@ impl Context {
     }
 }
 
-// =============================================================================
-// Expression level marker
-
-pub(super) struct Marker {
-    ident: Option<String>,
-}
-
-impl Marker {
-    const DEFAULT: &'static str = "marker";
-
-    fn new(ident: Option<String>) -> Self {
-        Self { ident }
-    }
-
-    pub(super) fn is_unique(&self) -> bool {
-        self.ident.is_some()
-    }
-}
-
-// =============================================================================
+// =================================================================================================
 // Enum builder
 
 struct Builder {
@@ -284,7 +320,7 @@ impl Builder {
     }
 }
 
-// =============================================================================
+// =================================================================================================
 // RNG
 
 /// Pseudorandom number generator based on [xorshift*].
