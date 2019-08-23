@@ -211,26 +211,22 @@ struct Args {
 
 impl Parse for Args {
     fn parse(input: ParseStream<'_>) -> Result<Self> {
-        fn parse_terminated_with(input: ParseStream<'_>) -> Result<Vec<(String, Path)>> {
-            let mut punctuated = Vec::new();
-
-            while !input.is_empty() {
-                let value = input.parse()?;
-                punctuated.push((to_trimed_string(&value), value));
-
-                if !input.is_empty() {
-                    let _: token::Comma = input.parse()?;
-                }
-            }
-
-            Ok(punctuated)
-        }
-
         fn to_trimed_string(p: &Path) -> String {
             p.to_token_stream().to_string().replace(" ", "")
         }
 
-        parse_terminated_with(input).map(|inner| Self { inner })
+        let mut inner = Vec::new();
+
+        while !input.is_empty() {
+            let value = input.parse()?;
+            inner.push((to_trimed_string(&value), value));
+
+            if !input.is_empty() {
+                let _: token::Comma = input.parse()?;
+            }
+        }
+
+        Ok(Self { inner })
     }
 }
 
