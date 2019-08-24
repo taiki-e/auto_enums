@@ -10,7 +10,7 @@ use syn::{
 use crate::utils::expr_call;
 use crate::utils::{expr_unimplemented, replace_expr, Attrs, AttrsMut};
 
-use super::{Context, Parent, VisitMode, DEFAULT_MARKER, NAME, NEVER};
+use super::{Context, VisitMode, DEFAULT_MARKER, NAME, NEVER};
 
 // =================================================================================================
 // Visitor
@@ -333,7 +333,7 @@ where
                 *node = Stmt::Expr(expr_unimplemented());
             }
             Ok(mut cx) => {
-                node.expand_parent(&mut cx).unwrap_or_else(|e| {
+                super::expand_parent_stmt(node, &mut cx).unwrap_or_else(|e| {
                     f(visitor).diagnostic.error(e);
                     *node = Stmt::Expr(expr_unimplemented());
                 });
