@@ -32,7 +32,7 @@ pub(super) enum VisitMode {
     Try,
 }
 
-/// Config for related to `expr::VisitLast` trait.
+/// Config for related to `expr::child_expr`.
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub(super) enum VisitLastMode {
     Default,

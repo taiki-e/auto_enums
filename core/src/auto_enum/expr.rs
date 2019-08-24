@@ -1,23 +1,56 @@
 use std::ops::{Deref, DerefMut};
 
 use syn::{
-    token,
     visit_mut::{self, VisitMut},
-    Arm, Expr, ExprBlock, ExprBreak, ExprCall, ExprIf, ExprLoop, ExprMacro, ExprMatch,
-    ExprMethodCall, ExprParen, ExprPath, ExprTry, ExprType, ExprUnsafe, Item, Lifetime, Result,
-    Stmt,
+    *,
 };
 
 use crate::utils::{expr_block, replace_block, replace_expr};
 
 use super::{Attrs, NAME, NESTED, NEVER};
 
+/// Visits last expression.
+///
+/// Note that do not use this after `cx.visitor()`.
+pub(super) fn child_expr(expr: &mut Expr, cx: &mut super::Context) -> Result<()> {
+    fn child_expr_inner(expr: &mut Expr, cx: &mut Context<'_>) -> Result<()> {
+        cx.last_expr_mut(
+            expr,
+            (),
+            |expr, cx| {
+                if expr.any_empty_attr(NESTED) {
+                    cx.nested = true;
+                }
+                !cx.is_unreachable(expr)
+            },
+            |expr, cx| match expr {
+                Expr::Match(expr) => cx.visit_last_expr_match(expr),
+                Expr::If(expr) => cx.visit_last_expr_if(expr),
+                Expr::Loop(expr) => cx.visit_last_expr_loop(expr),
+
+                // Search recursively
+                Expr::MethodCall(ExprMethodCall { receiver: expr, .. })
+                | Expr::Paren(ExprParen { expr, .. })
+                | Expr::Type(ExprType { expr, .. }) => child_expr_inner(expr, cx),
+
+                _ => Ok(()),
+            },
+        )
+    }
+
+    if cx.visit_last() {
+        child_expr_inner(expr, &mut Context::from(cx))
+    } else {
+        Ok(())
+    }
+}
+
 // =================================================================================================
 // Context
 
 struct Context<'a> {
     cx: &'a mut super::Context,
-    rec: bool,
+    nested: bool,
 }
 
 // To avoid `cx.cx`
@@ -37,89 +70,74 @@ impl DerefMut for Context<'_> {
 
 impl<'a> From<&'a mut super::Context> for Context<'a> {
     fn from(cx: &'a mut super::Context) -> Self {
-        Self { cx, rec: false }
+        Self { cx, nested: false }
     }
 }
 
-// =================================================================================================
-// Visiting last expression
-
-fn last_expr<T>(
-    expr: &Expr,
-    success: T,
-    mut filter: impl FnMut(&Expr) -> bool,
-    f: impl FnOnce(&Expr) -> T,
-) -> T {
-    if !filter(expr) {
-        return success;
-    }
-
-    match expr {
-        Expr::Block(ExprBlock { block, .. }) | Expr::Unsafe(ExprUnsafe { block, .. }) => {
-            match block.stmts.last() {
-                Some(Stmt::Expr(expr)) => return last_expr(expr, success, filter, f),
-                Some(Stmt::Semi(expr, _)) => {
-                    if !filter(expr) {
-                        return success;
-                    }
-                }
-                Some(_) => return success,
-                None => {}
-            }
+impl Context<'_> {
+    fn last_expr_mut<T>(
+        &mut self,
+        expr: &mut Expr,
+        success: T,
+        mut filter: impl FnMut(&Expr, &mut Self) -> bool,
+        f: impl FnOnce(&mut Expr, &mut Self) -> Result<T>,
+    ) -> Result<T> {
+        if !filter(expr, self) {
+            return Ok(success);
         }
-        _ => {}
-    }
 
-    f(expr)
-}
-
-fn last_expr_mut<T>(
-    expr: &mut Expr,
-    cx: &mut Context<'_>,
-    success: T,
-    mut filter: impl FnMut(&Expr, &mut Context<'_>) -> bool,
-    f: impl FnOnce(&mut Expr, &mut Context<'_>) -> T,
-) -> T {
-    if !filter(expr, cx) {
-        return success;
-    }
-
-    match expr {
-        Expr::Block(ExprBlock { block, .. }) | Expr::Unsafe(ExprUnsafe { block, .. }) => {
-            match block.stmts.last_mut() {
-                Some(Stmt::Expr(expr)) => return last_expr_mut(expr, cx, success, filter, f),
-                Some(Stmt::Semi(expr, _)) => {
-                    if !filter(expr, cx) {
-                        return success;
+        match expr {
+            Expr::Block(ExprBlock { block, .. }) | Expr::Unsafe(ExprUnsafe { block, .. }) => {
+                match block.stmts.last_mut() {
+                    Some(Stmt::Expr(expr)) => return self.last_expr_mut(expr, success, filter, f),
+                    Some(Stmt::Semi(expr, _)) => {
+                        if !filter(expr, self) {
+                            return Ok(success);
+                        }
                     }
+                    Some(_) => return Ok(success),
+                    None => {}
                 }
-                Some(_) => return success,
-                None => {}
             }
+            _ => {}
         }
-        _ => {}
+
+        f(expr, self)
     }
 
-    f(expr, cx)
-}
+    fn is_unreachable(&self, expr: &Expr) -> bool {
+        const UNREACHABLE_MACROS: &[&str] = &["unreachable", "panic"];
 
-fn is_unreachable(expr: &Expr, cx: &Context<'_>) -> bool {
-    const UNREACHABLE_MACROS: &[&str] = &["unreachable", "panic"];
+        fn filter(expr: &Expr) -> bool {
+            !expr.any_empty_attr(NEVER) && !expr.any_attr(NAME)
+        }
 
-    last_expr(
-        expr,
-        true,
-        |expr| !expr.any_empty_attr(NEVER) && !expr.any_attr(NAME),
-        |expr| match expr {
+        if !filter(expr) {
+            return true;
+        }
+
+        match expr {
+            Expr::Block(ExprBlock { block, .. }) | Expr::Unsafe(ExprUnsafe { block, .. }) => {
+                match block.stmts.last() {
+                    Some(Stmt::Expr(expr)) => return self.is_unreachable(expr),
+                    Some(Stmt::Semi(expr, _)) if !filter(expr) => return true,
+                    Some(_) => return true,
+                    None => {}
+                }
+            }
+            _ => {}
+        }
+
+        match expr {
             Expr::Break(_) | Expr::Continue(_) | Expr::Return(_) => true,
 
             // `unreachable!`, `panic!` or an expression level marker (`marker!` macro).
             Expr::Macro(ExprMacro { mac, .. }) => {
-                UNREACHABLE_MACROS.iter().any(|i| mac.path.is_ident(i)) || cx.is_marker_macro(mac)
+                UNREACHABLE_MACROS.iter().any(|i| mac.path.is_ident(i)) || self.is_marker_macro(mac)
             }
 
             Expr::Match(ExprMatch { arms, .. }) => {
-                arms.iter().all(|arm| arm.any_empty_attr(NEVER) || is_unreachable(&*arm.body, cx))
+                arms.iter().all(|arm| arm.any_empty_attr(NEVER) || self.is_unreachable(&*arm.body))
             }
 
             // `Err(expr)?` or `None?`.
@@ -131,132 +149,84 @@ fn is_unreachable(expr: &Expr, cx: &Context<'_>) -> bool {
                 },
                 _ => false,
             },
-
             _ => false,
-        },
-    )
-}
-
-/// Note that do not use this after `cx.visitor()`.
-pub(super) fn child_expr(expr: &mut Expr, cx: &mut super::Context) -> Result<()> {
-    impl VisitLast<()> for Expr {
-        fn visit_last(&mut self, cx: &mut Context<'_>) -> Result<()> {
-            last_expr_mut(
-                self,
-                cx,
-                Ok(()),
-                |expr, cx| {
-                    if expr.any_empty_attr(NESTED) {
-                        cx.rec = true;
-                    }
-                    !is_unreachable(expr, cx)
-                },
-                |expr, cx| match expr {
-                    Expr::Match(expr) => expr.visit_last(cx),
-                    Expr::If(expr) => expr.visit_last(cx),
-                    Expr::Loop(expr) => expr.visit_last(cx),
-
-                    // Search recursively
-                    Expr::MethodCall(ExprMethodCall { receiver: expr, .. })
-                    | Expr::Paren(ExprParen { expr, .. })
-                    | Expr::Type(ExprType { expr, .. }) => expr.visit_last(cx),
-
-                    _ => Ok(()),
-                },
-            )
         }
     }
 
-    if cx.visit_last() {
-        expr.visit_last(&mut Context::from(cx))
-    } else {
-        Ok(())
-    }
-}
-
-trait VisitLast<T> {
-    fn visit_last(&mut self, cx: &mut Context<'_>) -> Result<T>;
-}
-
-impl VisitLast<bool> for Expr {
-    fn visit_last(&mut self, cx: &mut Context<'_>) -> Result<bool> {
-        last_expr_mut(
-            self,
-            cx,
-            Ok(true),
-            |expr, cx| !is_unreachable(expr, cx),
+    fn visit_last_expr(&mut self, expr: &mut Expr) -> Result<bool> {
+        self.last_expr_mut(
+            expr,
+            true,
+            |expr, cx| !cx.is_unreachable(expr),
             |expr, cx| match expr {
-                Expr::Match(expr) => expr.visit_last(cx).map(|()| true),
-                Expr::If(expr) => expr.visit_last(cx).map(|()| true),
-                Expr::Loop(expr) => expr.visit_last(cx).map(|()| true),
+                Expr::Match(expr) => cx.visit_last_expr_match(expr).map(|()| true),
+                Expr::If(expr) => cx.visit_last_expr_if(expr).map(|()| true),
+                Expr::Loop(expr) => cx.visit_last_expr_loop(expr).map(|()| true),
                 _ => Ok(false),
             },
         )
     }
-}
 
-impl VisitLast<()> for ExprMatch {
-    fn visit_last(&mut self, cx: &mut Context<'_>) -> Result<()> {
+    fn visit_last_expr_match(&mut self, expr: &mut ExprMatch) -> Result<()> {
         fn skip(arm: &mut Arm, cx: &mut Context<'_>) -> Result<bool> {
             Ok(arm.any_empty_attr(NEVER)
-                || is_unreachable(&*arm.body, cx)
-                || ((arm.any_empty_attr(NESTED) || cx.rec) && arm.body.visit_last(cx)?))
+                || cx.is_unreachable(&*arm.body)
+                || ((arm.any_empty_attr(NESTED) || cx.nested)
+                    && cx.visit_last_expr(&mut arm.body)?))
         }
 
-        self.arms.iter_mut().try_for_each(|arm| {
-            if !skip(arm, cx)? {
+        expr.arms.iter_mut().try_for_each(|arm| {
+            if !skip(arm, self)? {
                 arm.comma = Some(token::Comma::default());
-                replace_expr(&mut *arm.body, |x| cx.next_expr(x));
+                replace_expr(&mut *arm.body, |x| self.next_expr(x));
             }
             Ok(())
         })
     }
-}
 
-impl VisitLast<()> for ExprIf {
-    fn visit_last(&mut self, cx: &mut Context<'_>) -> Result<()> {
+    fn visit_last_expr_if(&mut self, expr: &mut ExprIf) -> Result<()> {
         #[allow(clippy::needless_pass_by_value)]
         fn skip(last: Option<&mut Stmt>, cx: &mut Context<'_>) -> Result<bool> {
             Ok(match &last {
-                Some(Stmt::Expr(expr)) | Some(Stmt::Semi(expr, _)) => is_unreachable(expr, cx),
+                Some(Stmt::Expr(expr)) | Some(Stmt::Semi(expr, _)) => cx.is_unreachable(expr),
                 _ => true,
             } || match last {
                 Some(Stmt::Expr(expr)) => {
-                    (expr.any_empty_attr(NESTED) || cx.rec) && expr.visit_last(cx)?
+                    (expr.any_empty_attr(NESTED) || cx.nested) && cx.visit_last_expr(expr)?
                 }
                 _ => true,
             })
         }
 
-        if !skip(self.then_branch.stmts.last_mut(), cx)? {
-            replace_block(&mut self.then_branch, |b| cx.next_expr(expr_block(b)));
+        if !skip(expr.then_branch.stmts.last_mut(), self)? {
+            replace_block(&mut expr.then_branch, |b| self.next_expr(expr_block(b)));
         }
 
-        match self.else_branch.as_mut().map(|(_, expr)| &mut **expr) {
+        match expr.else_branch.as_mut().map(|(_, expr)| &mut **expr) {
             Some(Expr::Block(expr)) => {
-                if !skip(expr.block.stmts.last_mut(), cx)? {
-                    replace_block(&mut expr.block, |b| cx.next_expr(expr_block(b)));
+                if !skip(expr.block.stmts.last_mut(), self)? {
+                    replace_block(&mut expr.block, |b| self.next_expr(expr_block(b)));
                 }
                 Ok(())
             }
-            Some(Expr::If(expr)) => expr.visit_last(cx),
+            Some(Expr::If(expr)) => self.visit_last_expr_if(expr),
 
             // TODO: https://docs.rs/proc-macro2/0.4/proc_macro2/struct.Span.html#method.join
-            // `self.span().join(self.then_branch.span()).unwrap_or_else(|| self.span())``
-            None => Err(error!(self.if_token, "`if` expression missing an else clause")),
+            // `expr.span().join(expr.then_branch.span()).unwrap_or_else(|| expr.span())``
+            None => Err(error!(expr.if_token, "`if` expression missing an else clause")),
 
             Some(_) => unreachable!("wrong_if"),
         }
     }
-}
 
-impl VisitLast<()> for ExprLoop {
-    fn visit_last(&mut self, cx: &mut Context<'_>) -> Result<()> {
-        LoopVisitor::new(self, cx).visit_block_mut(&mut self.body);
-
+    fn visit_last_expr_loop(&mut self, expr: &mut ExprLoop) -> Result<()> {
+        LoopVisitor::new(expr, self).visit_block_mut(&mut expr.body);
         Ok(())
     }
 }
+
+// =================================================================================================
+// LoopVisitor
 
 struct LoopVisitor<'a> {
     cx: &'a mut super::Context,
