@@ -17,8 +17,6 @@ use syn::{
 
 use crate::utils::{expr_call, path, replace_expr, unit};
 
-#[cfg(feature = "type_analysis")]
-use super::traits::*;
 use super::visitor::{Dummy, FindTry, Visitor};
 
 // =================================================================================================
@@ -275,7 +273,7 @@ impl Context {
 
     #[cfg(feature = "type_analysis")]
     pub(super) fn collect_trait(&mut self, ty: &mut Type) {
-        collect_impl_trait(&mut self.args, ty);
+        super::type_analysis::collect_impl_trait(&mut self.args, ty);
     }
 }
 

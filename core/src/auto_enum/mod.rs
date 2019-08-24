@@ -7,7 +7,7 @@ use crate::utils::*;
 mod context;
 mod expr;
 #[cfg(feature = "type_analysis")]
-mod traits;
+mod type_analysis;
 mod visitor;
 
 use self::context::{Context, VisitLastMode, VisitMode, DEFAULT_MARKER};
