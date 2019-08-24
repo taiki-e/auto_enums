@@ -1,26 +1,17 @@
 use proc_macro2::TokenStream;
 use quote::ToTokens;
-use syn::{
-    parse::{Nothing, Parse, ParseStream},
-    token,
-    visit_mut::VisitMut,
-    AngleBracketedGenericArguments, Expr, ExprClosure, GenericArgument, Ident, Item, ItemEnum,
-    ItemFn, Local, Path, PathArguments, PathSegment, Result, ReturnType, Stmt, Token, Type,
-    TypePath,
-};
+use syn::{visit_mut::VisitMut, *};
 
 use crate::utils::*;
 
 mod context;
 mod expr;
 #[cfg(feature = "type_analysis")]
-mod traits;
+mod type_analysis;
 mod visitor;
 
 use self::context::{Context, VisitLastMode, VisitMode, DEFAULT_MARKER};
 use self::expr::child_expr;
-#[cfg(feature = "type_analysis")]
-use self::traits::*;
 
 /// The attribute name.
 const NAME: &str = "auto_enum";
@@ -39,75 +30,19 @@ pub(crate) fn attribute(args: TokenStream, input: TokenStream) -> TokenStream {
     expand(args, input).unwrap_or_else(|e| e.to_compile_error())
 }
 
-mod kw {
-    syn::custom_keyword!(marker);
-}
-
-struct Args {
-    args: Vec<Path>,
-    marker: Option<Ident>,
-}
-
-impl Parse for Args {
-    fn parse(input: ParseStream<'_>) -> Result<Self> {
-        let mut args = Vec::new();
-        let mut marker = None;
-
-        while !input.is_empty() {
-            if input.peek(kw::marker) {
-                if input.peek2(Token![=]) {
-                    let _: kw::marker = input.parse()?;
-                    let _: Token![=] = input.parse()?;
-                    let i: Ident = input.parse()?;
-                    if marker.is_some() {
-                        return Err(error!(i, "duplicate `marker` argument"));
-                    } else {
-                        marker = Some(i);
-                        if !input.is_empty() {
-                            let _: token::Comma = input.parse()?;
-                        }
-                        continue;
-                    }
-                } else if input.peek2(token::Paren) {
-                    let _: kw::marker = input.parse()?;
-                    let content;
-                    let _ = syn::parenthesized!(content in input);
-                    let i: Ident = content.parse()?;
-                    let _: Nothing = content.parse()?;
-                    if marker.is_some() {
-                        return Err(error!(i, "duplicate `marker` argument"));
-                    } else {
-                        marker = Some(i);
-                        if !input.is_empty() {
-                            let _: token::Comma = input.parse()?;
-                        }
-                        continue;
-                    }
-                }
-            }
-
-            args.push(input.parse()?);
-
-            if !input.is_empty() {
-                let _: token::Comma = input.parse()?;
-            }
-        }
-
-        Ok(Self { args, marker })
-    }
-}
-
 fn expand(args: TokenStream, input: TokenStream) -> Result<TokenStream> {
-    let mut cx = syn::parse2(args).and_then(|x| Context::root(&input, x))?;
+    let mut cx = Context::root(input.clone(), args)?;
 
     let res = match syn::parse2::<Stmt>(input.clone()) {
-        Ok(mut stmt) => stmt.expand_parent(&mut cx).map(|()| stmt.into_token_stream()),
+        Ok(mut stmt) => expand_parent_stmt(&mut stmt, &mut cx).map(|()| stmt.into_token_stream()),
         Err(e) => syn::parse2::<Expr>(input)
             .map_err(|_e| {
                 cx.diagnostic.error(e);
-                error!(cx.span, "the `#[auto_enum]` attribute may only be used on expression, statement, or function")
+                error!(cx.span, "may only be used on expression, statement, or function")
             })
-            .and_then(|mut expr| expr.expand_parent(&mut cx).map(|()| expr.into_token_stream())),
+            .and_then(|mut expr| {
+                expand_parent_expr(&mut expr, &mut cx).map(|()| expr.into_token_stream())
+            }),
     };
 
     match res {
@@ -136,126 +71,116 @@ fn build_expr(expr: &mut Expr, item: ItemEnum) {
     replace_expr(expr, |expr| expr_block(block(vec![Stmt::Item(item.into()), Stmt::Expr(expr)])));
 }
 
-/// The statement or expression in which `#[auto_enum]` was directly used.
-trait Parent {
-    fn expand_parent(&mut self, cx: &mut Context) -> Result<()>;
-}
+// =================================================================================================
+// Expand statement or expression in which `#[auto_enum]` was directly used.
 
-impl Parent for Stmt {
-    fn expand_parent(&mut self, cx: &mut Context) -> Result<()> {
-        if let Stmt::Semi(..) = &self {
-            cx.visit_last_mode = VisitLastMode::Never;
-        }
+fn expand_parent_stmt(stmt: &mut Stmt, cx: &mut Context) -> Result<()> {
+    if let Stmt::Semi(..) = &stmt {
+        cx.visit_last_mode = VisitLastMode::Never;
+    }
 
-        match self {
-            Stmt::Expr(expr) | Stmt::Semi(expr, _) => expr.expand_parent(cx),
-            Stmt::Local(local) => local.expand_parent(cx),
-            Stmt::Item(Item::Fn(item)) => item.expand_parent(cx),
-            Stmt::Item(item) => {
-                Err(error!(item, "may only be used on expression, statement, or function"))
-            }
+    match stmt {
+        Stmt::Expr(expr) | Stmt::Semi(expr, _) => expand_parent_expr(expr, cx),
+        Stmt::Local(local) => expand_parent_local(local, cx),
+        Stmt::Item(Item::Fn(item)) => expand_parent_item_fn(item, cx),
+        Stmt::Item(item) => {
+            Err(error!(item, "may only be used on expression, statement, or function"))
         }
     }
 }
 
-impl Parent for Expr {
-    fn expand_parent(&mut self, cx: &mut Context) -> Result<()> {
-        if cx.is_dummy() {
-            cx.dummy(|v| v.visit_expr_mut(self));
-            return Ok(());
-        }
-
-        visit_expr(self, cx)?;
-
-        cx.build(|item| build_expr(self, item))
+fn expand_parent_expr(expr: &mut Expr, cx: &mut Context) -> Result<()> {
+    if cx.is_dummy() {
+        cx.dummy(|v| v.visit_expr_mut(expr));
+        return Ok(());
     }
+
+    visit_expr(expr, cx)?;
+
+    cx.build(|item| build_expr(expr, item))
 }
 
-impl Parent for Local {
-    fn expand_parent(&mut self, cx: &mut Context) -> Result<()> {
-        #[cfg(feature = "type_analysis")]
-        {
-            if let Pat::Type(PatType { ty, .. }) = &mut self.pat {
-                cx.collect_trait(&mut *ty);
-            }
-        }
-
-        if cx.is_dummy() {
-            cx.dummy(|v| v.visit_local_mut(self));
-            return Ok(());
-        }
-
-        let expr = match self.init.as_mut().map(|(_, expr)| &mut **expr) {
-            Some(expr) => expr,
-            None => {
-                return Err(error!(
-                    self,
-                    "the `#[auto_enum]` attribute is not supported uninitialized let statement"
-                ))
-            }
-        };
-
-        visit_expr(expr, cx)?;
-
-        cx.build(|item| build_expr(expr, item))
-    }
-}
-
-impl Parent for ItemFn {
-    fn expand_parent(&mut self, cx: &mut Context) -> Result<()> {
-        let Self { sig, block, .. } = self;
-        if let ReturnType::Type(_, ty) = &mut sig.output {
-            match &**ty {
-                // `return`
-                Type::ImplTrait(_) if cx.visit_last() => cx.visit_mode = VisitMode::Return,
-
-                // `?` operator
-                Type::Path(TypePath { qself: None, path }) if cx.visit_last() => {
-                    let PathSegment { arguments, ident } = &path.segments[path.segments.len() - 1];
-                    match arguments {
-                        // `Result<T, impl Trait>`
-                        PathArguments::AngleBracketed(AngleBracketedGenericArguments {
-                            colon2_token: None,
-                            args,
-                            ..
-                        }) if args.len() == 2 && ident == "Result" => {
-                            if let (
-                                GenericArgument::Type(_),
-                                GenericArgument::Type(Type::ImplTrait(_)),
-                            ) = (&args[0], &args[1])
-                            {
-                                cx.find_try(|v| v.visit_block_mut(&mut **block));
-                            }
-                        }
-                        _ => {}
-                    }
-                }
-
-                _ => {}
-            }
-
-            #[cfg(feature = "type_analysis")]
+fn expand_parent_local(local: &mut Local, cx: &mut Context) -> Result<()> {
+    #[cfg(feature = "type_analysis")]
+    {
+        if let Pat::Type(PatType { ty, .. }) = &mut local.pat {
             cx.collect_trait(&mut *ty);
         }
-
-        if cx.is_dummy() {
-            cx.dummy(|v| v.visit_item_fn_mut(self));
-            return Ok(());
-        }
-
-        match self.block.stmts.last_mut() {
-            Some(Stmt::Expr(expr)) => child_expr(expr, cx)?,
-            Some(_) => {}
-            None => {
-                return Err(error!(
-                    self.block,
-                    "the `#[auto_enum]` attribute is not supported empty functions"
-                ))
-            }
-        }
-
-        cx.visitor(|v| v.visit_item_fn_mut(self));
-
-        cx.build(|item| self.block.stmts.insert(0, Stmt::Item(item.into())))
     }
+
+    if cx.is_dummy() {
+        cx.dummy(|v| v.visit_local_mut(local));
+        return Ok(());
+    }
+
+    let expr = match local.init.as_mut().map(|(_, expr)| &mut **expr) {
+        Some(expr) => expr,
+        None => {
+            return Err(error!(
+                local,
+                "the `#[auto_enum]` attribute is not supported uninitialized let statement"
+            ))
+        }
+    };
+
+    visit_expr(expr, cx)?;
+
+    cx.build(|item| build_expr(expr, item))
+}
+
+fn expand_parent_item_fn(item: &mut ItemFn, cx: &mut Context) -> Result<()> {
+    let ItemFn { sig, block, .. } = item;
+    if let ReturnType::Type(_, ty) = &mut sig.output {
+        match &**ty {
+            // `return`
+            Type::ImplTrait(_) if cx.visit_last() => cx.visit_mode = VisitMode::Return,
+
+            // `?` operator
+            Type::Path(TypePath { qself: None, path }) if cx.visit_last() => {
+                let PathSegment { arguments, ident } = &path.segments[path.segments.len() - 1];
+                match arguments {
+                    // `Result<T, impl Trait>`
+                    PathArguments::AngleBracketed(AngleBracketedGenericArguments {
+                        colon2_token: None,
+                        args,
+                        ..
+                    }) if args.len() == 2 && ident == "Result" => {
+                        if let (
+                            GenericArgument::Type(_),
+                            GenericArgument::Type(Type::ImplTrait(_)),
+                        ) = (&args[0], &args[1])
+                        {
+                            cx.find_try(|v| v.visit_block_mut(&mut **block));
+                        }
+                    }
+                    _ => {}
+                }
+            }
+
+            _ => {}
+        }
+
+        #[cfg(feature = "type_analysis")]
+        cx.collect_trait(&mut *ty);
+    }
+
+    if cx.is_dummy() {
+        cx.dummy(|v| v.visit_item_fn_mut(item));
+        return Ok(());
+    }
+
+    match item.block.stmts.last_mut() {
+        Some(Stmt::Expr(expr)) => child_expr(expr, cx)?,
+        Some(_) => {}
+        None => {
+            return Err(error!(
+                item.block,
+                "the `#[auto_enum]` attribute is not supported empty functions"
+            ))
+        }
+    }
+
+    cx.visitor(|v| v.visit_item_fn_mut(item));
+
+    cx.build(|i| item.block.stmts.insert(0, Stmt::Item(i.into())))
 }

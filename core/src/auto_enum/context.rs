@@ -9,17 +9,15 @@ use std::{
 };
 
 use proc_macro2::TokenStream;
-use quote::{format_ident, ToTokens};
-use syn::{Attribute, Error, Expr, Ident, ItemEnum, Macro, Path, Result};
+use quote::format_ident;
+use syn::{
+    parse::{Nothing, Parse, ParseStream},
+    *,
+};
 
 use crate::utils::{expr_call, path, replace_expr, unit};
 
-#[cfg(feature = "type_analysis")]
-use super::traits::*;
-use super::{
-    visitor::{Dummy, FindTry, Visitor},
-    Args,
-};
+use super::visitor::{Dummy, FindTry, Visitor};
 
 // =================================================================================================
 // Context
@@ -32,7 +30,7 @@ pub(super) enum VisitMode {
     Try,
 }
 
-/// Config for related to `expr::VisitLast` trait.
+/// Config for related to `expr::child_expr`.
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub(super) enum VisitLastMode {
     Default,
@@ -103,12 +101,14 @@ impl Drop for Context {
 
 impl Context {
     fn new(
-        span: impl ToTokens,
-        Args { args, marker }: Args,
+        span: TokenStream,
+        args: TokenStream,
         root: bool,
         markers: Rc<RefCell<Vec<String>>>,
         diagnostic: Diagnostic,
     ) -> Result<Self> {
+        let Args { args, marker } = syn::parse2(args)?;
+
         let (marker_string, marker) = if let Some(marker) = marker {
             // Currently, there is no reason to preserve the span, so convert `Ident` to `String`.
             // This should probably be more efficient than calling `to_string` for each comparison.
@@ -136,16 +136,16 @@ impl Context {
             other_attr: false,
             visit_mode: VisitMode::Default,
             visit_last_mode: VisitLastMode::Default,
-            span: span.into_token_stream(),
+            span,
             diagnostic,
         })
     }
 
-    pub(super) fn root(span: impl ToTokens, args: Args) -> Result<Self> {
+    pub(super) fn root(span: TokenStream, args: TokenStream) -> Result<Self> {
         Self::new(span, args, true, Rc::default(), Diagnostic::default())
     }
 
-    pub(super) fn make_child(&self, span: impl ToTokens, args: Args) -> Result<Self> {
+    pub(super) fn make_child(&self, span: TokenStream, args: TokenStream) -> Result<Self> {
         Self::new(span, args, false, self.markers.clone(), self.diagnostic.clone())
     }
 
@@ -273,7 +273,69 @@ impl Context {
 
     #[cfg(feature = "type_analysis")]
     pub(super) fn collect_trait(&mut self, ty: &mut Type) {
-        collect_impl_trait(&mut self.args, ty);
+        super::type_analysis::collect_impl_trait(&mut self.args, ty);
+    }
+}
+
+// =================================================================================================
+// Args
+
+mod kw {
+    syn::custom_keyword!(marker);
+}
+
+#[allow(dead_code)] // https://github.com/rust-lang/rust/issues/56750
+struct Args {
+    args: Vec<Path>,
+    marker: Option<Ident>,
+}
+
+impl Parse for Args {
+    fn parse(input: ParseStream<'_>) -> Result<Self> {
+        let mut args = Vec::new();
+        let mut marker = None;
+
+        while !input.is_empty() {
+            if input.peek(kw::marker) {
+                if input.peek2(Token![=]) {
+                    let _: kw::marker = input.parse()?;
+                    let _: Token![=] = input.parse()?;
+                    let i: Ident = input.parse()?;
+                    if marker.is_some() {
+                        return Err(error!(i, "duplicate `marker` argument"));
+                    } else {
+                        marker = Some(i);
+                        if !input.is_empty() {
+                            let _: token::Comma = input.parse()?;
+                        }
+                        continue;
+                    }
+                } else if input.peek2(token::Paren) {
+                    let _: kw::marker = input.parse()?;
+                    let content;
+                    let _ = syn::parenthesized!(content in input);
+                    let i: Ident = content.parse()?;
+                    let _: Nothing = content.parse()?;
+                    if marker.is_some() {
+                        return Err(error!(i, "duplicate `marker` argument"));
+                    } else {
+                        marker = Some(i);
+                        if !input.is_empty() {
+                            let _: token::Comma = input.parse()?;
+                        }
+                        continue;
+                    }
+                }
+            }
+
+            args.push(input.parse()?);
+
+            if !input.is_empty() {
+                let _: token::Comma = input.parse()?;
+            }
+        }
+
+        Ok(Self { args, marker })
     }
 }
 
