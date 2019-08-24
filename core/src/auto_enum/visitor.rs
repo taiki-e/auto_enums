@@ -1,9 +1,9 @@
 use proc_macro2::Group;
+use quote::ToTokens;
 use syn::{
     parse::Nothing,
-    token,
     visit_mut::{self, VisitMut},
-    Arm, Attribute, Expr, ExprMacro, ExprMatch, ExprReturn, ExprTry, Item, Local, Stmt,
+    *,
 };
 
 #[cfg(feature = "try_trait")]
@@ -322,9 +322,8 @@ where
     };
 
     if let Some(Attribute { tokens, .. }) = attr {
-        let res = syn::parse2(tokens)
-            .and_then(|group: Group| syn::parse2(group.stream()))
-            .and_then(|x| f(visitor).make_child(&node, x));
+        let res = syn::parse2::<Group>(tokens)
+            .and_then(|group| f(visitor).make_child(node.to_token_stream(), group.stream()));
 
         visit_mut::visit_stmt_mut(visitor, node);
 

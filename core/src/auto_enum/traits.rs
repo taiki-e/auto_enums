@@ -6,8 +6,6 @@ use syn::{
 
 use crate::utils::*;
 
-pub(super) use syn::{Pat, PatType, Type};
-
 pub(super) fn collect_impl_trait(args: &mut Vec<Path>, ty: &mut Type) {
     if let Some(traits) = collect(ty) {
         traits.into_iter().for_each(|t| {

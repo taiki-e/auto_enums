@@ -1,13 +1,6 @@
 use proc_macro2::TokenStream;
 use quote::ToTokens;
-use syn::{
-    parse::{Nothing, Parse, ParseStream},
-    token,
-    visit_mut::VisitMut,
-    AngleBracketedGenericArguments, Expr, ExprClosure, GenericArgument, Ident, Item, ItemEnum,
-    ItemFn, Local, Path, PathArguments, PathSegment, Result, ReturnType, Stmt, Token, Type,
-    TypePath,
-};
+use syn::{visit_mut::VisitMut, *};
 
 use crate::utils::*;
 
@@ -19,8 +12,6 @@ mod visitor;
 
 use self::context::{Context, VisitLastMode, VisitMode, DEFAULT_MARKER};
 use self::expr::child_expr;
-#[cfg(feature = "type_analysis")]
-use self::traits::*;
 
 /// The attribute name.
 const NAME: &str = "auto_enum";
@@ -39,66 +30,8 @@ pub(crate) fn attribute(args: TokenStream, input: TokenStream) -> TokenStream {
     expand(args, input).unwrap_or_else(|e| e.to_compile_error())
 }
 
-mod kw {
-    syn::custom_keyword!(marker);
-}
-
-struct Args {
-    args: Vec<Path>,
-    marker: Option<Ident>,
-}
-
-impl Parse for Args {
-    fn parse(input: ParseStream<'_>) -> Result<Self> {
-        let mut args = Vec::new();
-        let mut marker = None;
-
-        while !input.is_empty() {
-            if input.peek(kw::marker) {
-                if input.peek2(Token![=]) {
-                    let _: kw::marker = input.parse()?;
-                    let _: Token![=] = input.parse()?;
-                    let i: Ident = input.parse()?;
-                    if marker.is_some() {
-                        return Err(error!(i, "duplicate `marker` argument"));
-                    } else {
-                        marker = Some(i);
-                        if !input.is_empty() {
-                            let _: token::Comma = input.parse()?;
-                        }
-                        continue;
-                    }
-                } else if input.peek2(token::Paren) {
-                    let _: kw::marker = input.parse()?;
-                    let content;
-                    let _ = syn::parenthesized!(content in input);
-                    let i: Ident = content.parse()?;
-                    let _: Nothing = content.parse()?;
-                    if marker.is_some() {
-                        return Err(error!(i, "duplicate `marker` argument"));
-                    } else {
-                        marker = Some(i);
-                        if !input.is_empty() {
-                            let _: token::Comma = input.parse()?;
-                        }
-                        continue;
-                    }
-                }
-            }
-
-            args.push(input.parse()?);
-
-            if !input.is_empty() {
-                let _: token::Comma = input.parse()?;
-            }
-        }
-
-        Ok(Self { args, marker })
-    }
-}
-
 fn expand(args: TokenStream, input: TokenStream) -> Result<TokenStream> {
-    let mut cx = syn::parse2(args).and_then(|x| Context::root(&input, x))?;
+    let mut cx = Context::root(input.clone(), args)?;
 
     let res = match syn::parse2::<Stmt>(input.clone()) {
         Ok(mut stmt) => stmt.expand_parent(&mut cx).map(|()| stmt.into_token_stream()),
