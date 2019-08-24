@@ -1,8 +1,12 @@
 # Unreleased
 
+# 0.6.0-alpha.1 - 2019-08-24
+
 * Renamed `#[rec]` to `#[nested]`.
 
 * [Removed `never` option in argument position in favor of `#[enum_derive]` attribute.][48]
+
+* Improved compile time.
 
 * Added `"ops"` crate feature, and made `[std|core]::ops`'s `Deref`, `DerefMut`, `Index`, `IndexMut`, and `RangeBounds` traits optional.
 
