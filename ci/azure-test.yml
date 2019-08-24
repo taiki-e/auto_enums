@@ -16,12 +16,14 @@ jobs:
       - script: |
           cargo ${{ parameters.cmd }} --all --no-default-features
           cargo ${{ parameters.cmd }} --all
+          cargo ${{ parameters.cmd }} --features type_analysis
         displayName: cargo ${{ parameters.cmd }}
 
     - ${{ if eq(parameters.cmd, 'test') }}:
       - script: |
           cargo ${{ parameters.cmd }} --all --tests --no-default-features
           cargo ${{ parameters.cmd }} --all --tests
+          cargo ${{ parameters.cmd }} --tests --features type_analysis
         displayName: cargo ${{ parameters.cmd }} --tests
 
     - ${{ if eq(parameters.toolchain, 'nightly') }}:
