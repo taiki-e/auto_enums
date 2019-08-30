@@ -8,7 +8,6 @@ use auto_enums::enum_derive;
 #[test]
 fn stable_external() {
     #[enum_derive(
-        quote::ToTokens,
         rayon::ParallelIterator,
         rayon::IndexedParallelIterator,
         rayon::ParallelExtend,

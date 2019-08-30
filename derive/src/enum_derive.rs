@@ -187,9 +187,6 @@ lazy_static! {
             external::futures01::stream,
             #[cfg(feature = "futures01")]
             external::futures01::sink,
-            // proc_macro
-            #[cfg(feature = "proc_macro")]
-            external::proc_macro::to_tokens,
             // rayon
             #[cfg(feature = "rayon")]
             external::rayon::par_iter,

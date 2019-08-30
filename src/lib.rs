@@ -669,10 +669,6 @@
 //! * [`futures01::Stream`](https://docs.rs/futures/0.1/futures/stream/trait.Stream.html)
 //! * [`futures01::Sink`](https://docs.rs/futures/0.1/futures/sink/trait.Sink.html)
 //!
-//! [`quote`](https://github.com/dtolnay/quote) *(requires `"proc_macro"` crate feature)*
-//!
-//! * [`quote::ToTokens`](https://docs.rs/quote/0.6/quote/trait.ToTokens.html)
-//!
 //! [`rayon`](https://github.com/rayon-rs/rayon) *(requires `"rayon"` crate feature)*
 //!
 //! * [`rayon::ParallelIterator`](https://docs.rs/rayon/1.0/rayon/iter/trait.ParallelIterator.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/rayon/ParallelIterator.md)
@@ -779,8 +775,6 @@
 //! * `futures` - [futures(v0.3)](https://github.com/rust-lang-nursery/futures-rs)
 //!
 //! * `futures01` - [futures(v0.1)](https://github.com/rust-lang-nursery/futures-rs)
-//!
-//! * `proc_macro` - [quote](https://github.com/dtolnay/quote)
 //!
 //! * `rayon` - [rayon](https://github.com/rayon-rs/rayon)
 //!

@@ -1,5 +1,9 @@
 # Unreleased
 
+* [Removed `"proc_macro"` crate feature.][54]
+
+[54]: https://github.com/taiki-e/auto_enums/pull/54
+
 # 0.6.0-alpha.1 - 2019-08-24
 
 * Renamed `#[rec]` to `#[nested]`.

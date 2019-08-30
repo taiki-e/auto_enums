@@ -53,9 +53,6 @@ futures = []
 # futures(v0.1)
 futures01 = []
 
-# proc_macro, proc-macro2, quote, syn
-proc_macro = []
-
 # rayon
 rayon = []
 
