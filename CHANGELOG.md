@@ -1,8 +1,11 @@
 # Unreleased
 
+* [Removed `marker(name)` option in favor of `marker = name`.][55]
+
 * [Removed `"proc_macro"` crate feature.][54]
 
 [54]: https://github.com/taiki-e/auto_enums/pull/54
+[55]: https://github.com/taiki-e/auto_enums/pull/55
 
 # 0.6.0-alpha.1 - 2019-08-24
 

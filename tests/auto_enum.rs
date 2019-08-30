@@ -469,7 +469,7 @@ mod stable {
         }
         assert_eq!(marker3(10, 10).sum::<i32>(), 63);
 
-        #[auto_enum(marker(marker_a), Iterator)]
+        #[auto_enum(marker = marker_a, Iterator)]
         fn marker4(x: i32, y: i32) -> impl Iterator<Item = i32> {
             let iter;
             #[auto_enum(Iterator)]
@@ -489,7 +489,7 @@ mod stable {
         #[auto_enum(Iterator)]
         fn marker5(x: i32, y: i32) -> impl Iterator<Item = i32> {
             let iter;
-            #[auto_enum(marker(marker_a), Iterator)]
+            #[auto_enum(marker = marker_a, Iterator)]
             match x {
                 0 => iter = marker_a!(2..8),
                 _ if y < 0 => return y..=0,

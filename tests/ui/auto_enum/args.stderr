@@ -22,47 +22,29 @@ error: expected `,`
 35 |     #[auto_enum(marker[f], Iterator)] //~ ERROR expected `,`
    |                       ^^^
 
-error: duplicate `marker` argument
-  --> $DIR/args.rs:43:35
+error: expected `,`
+  --> $DIR/args.rs:43:23
    |
-43 |     #[auto_enum(marker(f), marker(g), Iterator)] //~ ERROR duplicate `marker` argument
-   |                                   ^
-
-error: unexpected end of input, expected identifier
-  --> $DIR/args.rs:51:24
-   |
-51 |     #[auto_enum(marker(), Iterator)] //~ ERROR unexpected end of input, expected identifier
-   |                        ^
-
-error: unexpected token
-  --> $DIR/args.rs:59:25
-   |
-59 |     #[auto_enum(marker(f, g), Iterator)] //~ ERROR unexpected token
-   |                         ^
-
-error: unexpected token
-  --> $DIR/args.rs:67:26
-   |
-67 |     #[auto_enum(marker(f t), Iterator)] //~ ERROR unexpected token
-   |                          ^
+43 |     #[auto_enum(marker(f), Iterator)] //~ ERROR expected `,`
+   |                       ^^^
 
 error: duplicate `marker` argument
-  --> $DIR/args.rs:75:38
+  --> $DIR/args.rs:51:38
    |
-75 |     #[auto_enum(marker = f, marker = g, Iterator)] //~ ERROR duplicate `marker` argument
+51 |     #[auto_enum(marker = f, marker = g, Iterator)] //~ ERROR duplicate `marker` argument
    |                                      ^
 
 error: expected identifier
-  --> $DIR/args.rs:83:25
+  --> $DIR/args.rs:59:25
    |
-83 |     #[auto_enum(marker =, Iterator)] //~ ERROR expected identifier
+59 |     #[auto_enum(marker =, Iterator)] //~ ERROR expected identifier
    |                         ^
 
 error: expected `,`
-  --> $DIR/args.rs:91:28
+  --> $DIR/args.rs:67:28
    |
-91 |     #[auto_enum(marker = f t, Iterator)] //~ ERROR expected `,`
+67 |     #[auto_enum(marker = f t, Iterator)] //~ ERROR expected `,`
    |                            ^
 
-error: aborting due to 11 previous errors
+error: aborting due to 8 previous errors
 
