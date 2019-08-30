@@ -11,7 +11,7 @@ use std::{
 use proc_macro2::TokenStream;
 use quote::format_ident;
 use syn::{
-    parse::{Nothing, Parse, ParseStream},
+    parse::{Parse, ParseStream},
     *,
 };
 
@@ -296,35 +296,18 @@ impl Parse for Args {
         let mut marker = None;
 
         while !input.is_empty() {
-            if input.peek(kw::marker) {
-                if input.peek2(Token![=]) {
-                    let _: kw::marker = input.parse()?;
-                    let _: Token![=] = input.parse()?;
-                    let i: Ident = input.parse()?;
-                    if marker.is_some() {
-                        return Err(error!(i, "duplicate `marker` argument"));
-                    } else {
-                        marker = Some(i);
-                        if !input.is_empty() {
-                            let _: token::Comma = input.parse()?;
-                        }
-                        continue;
+            if input.peek(kw::marker) && input.peek2(Token![=]) {
+                let _: kw::marker = input.parse()?;
+                let _: Token![=] = input.parse()?;
+                let i: Ident = input.parse()?;
+                if marker.is_some() {
+                    return Err(error!(i, "duplicate `marker` argument"));
+                } else {
+                    marker = Some(i);
+                    if !input.is_empty() {
+                        let _: token::Comma = input.parse()?;
                     }
-                } else if input.peek2(token::Paren) {
-                    let _: kw::marker = input.parse()?;
-                    let content;
-                    let _ = syn::parenthesized!(content in input);
-                    let i: Ident = content.parse()?;
-                    let _: Nothing = content.parse()?;
-                    if marker.is_some() {
-                        return Err(error!(i, "duplicate `marker` argument"));
-                    } else {
-                        marker = Some(i);
-                        if !input.is_empty() {
-                            let _: token::Comma = input.parse()?;
-                        }
-                        continue;
-                    }
+                    continue;
                 }
             }
 
