@@ -70,7 +70,7 @@ serde = ["auto_enums_derive/serde"]
 # ==============================================================================
 # Enable unstable features of [std|core] libraries
 
-# Enable to use `[std|core]::iter::Generator` trait.
+# Enable to use `[std|core]::ops::Generator` trait.
 generator_trait = ["auto_enums_derive/generator_trait"]
 # Enable to use `[std|core]::ops`'s `Fn`, `FnMut`, and `FnOnce` traits.
 fn_traits = ["auto_enums_derive/fn_traits"]
@@ -79,5 +79,5 @@ trusted_len = ["auto_enums_derive/trusted_len"]
 
 # Implements `ExactSizeIterator::is_empty`.
 exact_size_is_empty = ["auto_enums_derive/exact_size_is_empty"]
-# Implements `io::Read::read_initializer`.
+# Implements `std::io::Read::read_initializer`.
 read_initializer = ["auto_enums_derive/read_initializer"]

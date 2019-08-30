@@ -786,9 +786,15 @@
 //!
 //! Note that support for these features are unstable and may cause incompatible changes between patch versions.
 //!
+//! * [`generator_trait`](https://github.com/rust-lang/rust/issues/43122) - Enable to use `[std|core]::ops::Generator` trait.
+//!
+//! * [`fn_traits`](https://github.com/rust-lang/rust/issues/29625) - Enable to use `[std|core]::ops`'s `Fn`, `FnMut`, and `FnOnce` traits.
+//!
+//! * [`trusted_len`](https://github.com/rust-lang/rust/issues/37572) - Enable to use `[std|core]::iter::TrustedLen` trait.
+//!
 //! * [`exact_size_is_empty`](https://github.com/rust-lang/rust/issues/35428) - Implements `ExactSizeIterator::is_empty`.
 //!
-//! * [`read_initializer`](https://github.com/rust-lang/rust/issues/42788) - Implements `io::Read::read_initializer`.
+//! * [`read_initializer`](https://github.com/rust-lang/rust/issues/42788) - Implements `std::io::Read::read_initializer`.
 //!
 //! * [`try_trait`](https://github.com/rust-lang/rust/issues/42327) - Make iterator implementation more effective.
 //!
