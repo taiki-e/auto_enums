@@ -10,7 +10,6 @@ publish = false
 [dev-dependencies]
 auto_enums = { path = "..", default-features = false }
 futures-preview = "0.3.0-alpha.18"
-quote = "1.0"
 rand = "0.7" # for benches
 rayon = "1.1"
 serde = "1.0"
@@ -23,7 +22,6 @@ type_analysis = ["auto_enums/type_analysis"]
 external_libraries = [
     "auto_enums/std",
     "auto_enums/futures",
-    "auto_enums/proc_macro",
     "auto_enums/rayon",
     "auto_enums/serde",
 ]

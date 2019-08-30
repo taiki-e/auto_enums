@@ -61,9 +61,6 @@ futures = ["auto_enums_derive/futures"]
 # futures(v0.1)
 futures01 = ["auto_enums_derive/futures01"]
 
-# proc_macro, proc-macro2, quote, syn
-proc_macro = ["auto_enums_derive/proc_macro"]
-
 # rayon
 rayon = ["auto_enums_derive/rayon"]
 

@@ -188,10 +188,6 @@ You can add support for external library by activating the each crate feature.
 * [`futures01::Stream`](https://docs.rs/futures/0.1/futures/stream/trait.Stream.html)
 * [`futures01::Sink`](https://docs.rs/futures/0.1/futures/sink/trait.Sink.html)
 
-[`quote`](https://github.com/dtolnay/quote) *(requires `"proc_macro"` crate feature)*
-
-* [`quote::ToTokens`](https://docs.rs/quote/1.0/quote/trait.ToTokens.html)
-
 [`rayon`](https://github.com/rayon-rs/rayon) *(requires `"rayon"` crate feature)*
 
 * [`rayon::ParallelIterator`](https://docs.rs/rayon/1.0/rayon/iter/trait.ParallelIterator.html) - [generated code](docs/supported_traits/external/rayon/ParallelIterator.md)
