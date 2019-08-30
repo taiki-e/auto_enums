@@ -1,6 +1,6 @@
 [package]
 name = "auto_enums"
-version = "0.6.0-alpha.1"
+version = "0.6.0-alpha.2"
 authors = ["Taiki Endo <te316e89@gmail.com>"]
 edition = "2018"
 license = "Apache-2.0/MIT"
@@ -17,8 +17,8 @@ A library for to allow multiple return types by automatically generated enum.
 members = ["core", "derive", "test_suite"]
 
 [dependencies]
-auto_enums_core = { version = "=0.6.0-alpha.1", path = "core", default-features = false }
-auto_enums_derive = { version = "=0.6.0-alpha.1", path = "derive", default-features = false }
+auto_enums_core = { version = "=0.6.0-alpha.2", path = "core", default-features = false }
+auto_enums_derive = { version = "=0.6.0-alpha.2", path = "derive", default-features = false }
 
 [dev-dependencies]
 compiletest = { version = "0.3.22", package = "compiletest_rs", features = ["stable", "tmp"] }

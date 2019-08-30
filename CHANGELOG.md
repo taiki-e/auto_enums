@@ -1,5 +1,7 @@
 # Unreleased
 
+# 0.6.0-alpha.2 - 2019-08-30
+
 * [Removed `marker(name)` option in favor of `marker = name`.][55]
 
 * [Removed `"proc_macro"` crate feature.][54]
