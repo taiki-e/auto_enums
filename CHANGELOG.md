@@ -2,7 +2,9 @@
 
 # 0.6.0-alpha.3 - 2019-09-06
 
-* Added `"unstable"` crate feature to separate unstable features from stable features. When using features that depend on unstable APIs, the `"unstable"` feature must be explicitly enabled.
+* [Added `"unstable"` crate feature to separate unstable features from stable features.][56] When using features that depend on unstable APIs, the `"unstable"` feature must be explicitly enabled.
+
+[56]: https://github.com/taiki-e/auto_enums/pull/56
 
 # 0.6.0-alpha.2 - 2019-08-30
 
