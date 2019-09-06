@@ -1,5 +1,7 @@
 # Unreleased
 
+* Added `"unstable"` crate feature to separate unstable features from stable features. When using features that depend on unstable APIs, the `"unstable"` feature must be explicitly enabled.
+
 # 0.6.0-alpha.2 - 2019-08-30
 
 * [Removed `marker(name)` option in favor of `marker = name`.][55]

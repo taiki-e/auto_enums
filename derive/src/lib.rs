@@ -7,6 +7,41 @@
 #![warn(clippy::all, clippy::pedantic)]
 #![allow(clippy::use_self)]
 
+#[cfg(all(feature = "try_trait", not(feature = "unstable")))]
+compile_error!(
+    "The `try_trait` feature requires the `unstable` feature as an explicit opt-in to unstable features"
+);
+
+#[cfg(all(feature = "futures", not(feature = "unstable")))]
+compile_error!(
+    "The `futures` feature requires the `unstable` feature as an explicit opt-in to unstable features"
+);
+
+#[cfg(all(feature = "generator_trait", not(feature = "unstable")))]
+compile_error!(
+    "The `generator_trait` feature requires the `unstable` feature as an explicit opt-in to unstable features"
+);
+
+#[cfg(all(feature = "fn_traits", not(feature = "unstable")))]
+compile_error!(
+    "The `fn_traits` feature requires the `unstable` feature as an explicit opt-in to unstable features"
+);
+
+#[cfg(all(feature = "trusted_len", not(feature = "unstable")))]
+compile_error!(
+    "The `trusted_len` feature requires the `unstable` feature as an explicit opt-in to unstable features"
+);
+
+#[cfg(all(feature = "exact_size_is_empty", not(feature = "unstable")))]
+compile_error!(
+    "The `exact_size_is_empty` feature requires the `unstable` feature as an explicit opt-in to unstable features"
+);
+
+#[cfg(all(feature = "read_initializer", not(feature = "unstable")))]
+compile_error!(
+    "The `read_initializer` feature requires the `unstable` feature as an explicit opt-in to unstable features"
+);
+
 extern crate proc_macro;
 
 #[macro_use]

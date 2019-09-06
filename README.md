@@ -112,8 +112,10 @@ enum Foo<A, B> {
 
 ### [std|core] libraries
 
+Some traits support is disabled by default.
 Note that some traits have aliases.
-Also, some traits support is disabled by default.
+
+*When using features that depend on unstable APIs, the `"unstable"` feature must be explicitly enabled*
 
 `[std|core]::iter`
 
@@ -121,8 +123,8 @@ Also, some traits support is disabled by default.
 * [`DoubleEndedIterator`](https://doc.rust-lang.org/std/iter/trait.DoubleEndedIterator.html) - [generated code](docs/supported_traits/std/iter/DoubleEndedIterator.md)
 * [`ExactSizeIterator`](https://doc.rust-lang.org/std/iter/trait.ExactSizeIterator.html) - [generated code](docs/supported_traits/std/iter/ExactSizeIterator.md)
 * [`FusedIterator`](https://doc.rust-lang.org/std/iter/trait.FusedIterator.html) - [generated code](docs/supported_traits/std/iter/FusedIterator.md)
-* [`TrustedLen`](https://doc.rust-lang.org/std/iter/trait.TrustedLen.html) - [generated code](docs/supported_traits/std/iter/TrustedLen.md) *(requires `"trusted_len"` crate feature)* - *nightly-only*
 * [`Extend`](https://doc.rust-lang.org/std/iter/trait.Extend.html) - [generated code](docs/supported_traits/std/iter/Extend.md)
+* [`TrustedLen`](https://doc.rust-lang.org/std/iter/trait.TrustedLen.html) - [generated code](docs/supported_traits/std/iter/TrustedLen.md) *(requires `"trusted_len"` and `"unstable"` crate features)*
 
 `[std|core]::future`
 
@@ -142,10 +144,10 @@ Also, some traits support is disabled by default.
 * [`Index`](https://doc.rust-lang.org/std/ops/trait.Index.html) *(requires `"ops"` crate feature)*
 * [`IndexMut`](https://doc.rust-lang.org/std/ops/trait.IndexMut.html) *(requires `"ops"` crate feature)*
 * [`RangeBounds`](https://doc.rust-lang.org/std/ops/trait.RangeBounds.html) *(requires `"ops"` crate feature)*
-* [`Fn`](https://doc.rust-lang.org/std/ops/trait.Fn.html) *(requires `"fn_traits"` crate feature)* - *nightly-only*
-* [`FnMut`](https://doc.rust-lang.org/std/ops/trait.FnMut.html) *(requires `"fn_traits"` crate feature)* - *nightly-only*
-* [`FnOnce`](https://doc.rust-lang.org/std/ops/trait.FnOnce.html) *(requires `"fn_traits"` crate feature)* - *nightly-only*
-* [`Generator`](https://doc.rust-lang.org/nightly/std/ops/trait.Generator.html) *(requires `"generator_trait"` crate feature)* - *nightly-only*
+* [`Fn`](https://doc.rust-lang.org/std/ops/trait.Fn.html) *(requires `"fn_traits"` and `"unstable"` crate features)*
+* [`FnMut`](https://doc.rust-lang.org/std/ops/trait.FnMut.html) *(requires `"fn_traits"` and `"unstable"` crate features)*
+* [`FnOnce`](https://doc.rust-lang.org/std/ops/trait.FnOnce.html) *(requires `"fn_traits"` and `"unstable"` crate features)*
+* [`Generator`](https://doc.rust-lang.org/nightly/std/ops/trait.Generator.html) *(requires `"generator_trait"` and `"unstable"` crate features)*
 
 `[std|core]::convert`
 
@@ -173,7 +175,7 @@ Also, some traits support is disabled by default.
 
 You can add support for external library by activating the each crate feature.
 
-[`futures(v0.3)`](https://github.com/rust-lang-nursery/futures-rs) *(requires `"futures"` crate feature)*
+[`futures(v0.3)`](https://github.com/rust-lang-nursery/futures-rs) *(requires `"futures"` and `"unstable"` crate features)*
 
 * [`futures::Stream`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.18/futures/stream/trait.Stream.html) - [generated code](docs/supported_traits/external/futures/Stream.md)
 * [`futures::Sink`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.18/futures/sink/trait.Sink.html) - [generated code](docs/supported_traits/external/futures/Sink.md)

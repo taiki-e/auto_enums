@@ -34,9 +34,6 @@ type_analysis = ["auto_enums_core/type_analysis"]
 # Enable to use `transpose*` methods.
 transpose_methods = ["auto_enums_derive/transpose_methods"]
 
-# Make `?` operator support more flexible, and to make iterator implementation more effective.
-try_trait = ["auto_enums_core/try_trait", "auto_enums_derive/try_trait"]
-
 # ==============================================================================
 # [std|core] libraries
 
@@ -55,9 +52,6 @@ fmt = ["auto_enums_derive/fmt"]
 # ==============================================================================
 # Using external libraries
 
-# futures(v0.3+)
-futures = ["auto_enums_derive/futures"]
-
 # futures(v0.1)
 futures01 = ["auto_enums_derive/futures01"]
 
@@ -68,6 +62,19 @@ rayon = ["auto_enums_derive/rayon"]
 serde = ["auto_enums_derive/serde"]
 
 # ==============================================================================
+# Unstable features
+# These features are outside of the normal semver guarantees and require the
+# `unstable` feature as an explicit opt-in to unstable API.
+unstable = ["auto_enums_core/unstable", "auto_enums_derive/unstable"]
+
+# Make `?` operator support more flexible, and to make iterator implementation more effective.
+try_trait = ["auto_enums_core/try_trait", "auto_enums_derive/try_trait"]
+
+# external libraries
+
+# futures(v0.3+)
+futures = ["auto_enums_derive/futures"]
+
 # Enable unstable features of [std|core] libraries
 
 # Enable to use `[std|core]::ops::Generator` trait.
