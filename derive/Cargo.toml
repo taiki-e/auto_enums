@@ -47,9 +47,6 @@ fmt = []
 # ==============================================================================
 # external libraries
 
-# futures(v0.3+)
-futures = []
-
 # futures(v0.1)
 futures01 = []
 
@@ -60,7 +57,17 @@ rayon = []
 serde = []
 
 # ==============================================================================
-# Enable unstable features of [std|core] libraries.
+# Unstable features
+# These features are outside of the normal semver guarantees and require the
+# `unstable` feature as an explicit opt-in to unstable API.
+unstable = []
+
+# external libraries
+
+# futures(v0.3+)
+futures = []
+
+# Enable unstable features of [std|core] libraries
 
 # Enable to use `[std|core]::ops::Generator` trait.
 generator_trait = []

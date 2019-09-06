@@ -591,10 +591,12 @@
 //!
 //! ## Supported traits
 //!
-//! ### [std|core] libraries
-//!
+//! Some traits support is disabled by default.
 //! Note that some traits have aliases.
-//! Also, some traits support is disabled by default.
+//!
+//! *When using features that depend on unstable APIs, the `unstable` feature must be explicitly enabled*
+//!
+//! ### [std|core] libraries
 //!
 //! `[std|core]::iter`
 //!
@@ -602,8 +604,8 @@
 //! * [`DoubleEndedIterator`](https://doc.rust-lang.org/std/iter/trait.DoubleEndedIterator.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/iter/DoubleEndedIterator.md)
 //! * [`ExactSizeIterator`](https://doc.rust-lang.org/std/iter/trait.ExactSizeIterator.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/iter/ExactSizeIterator.md)
 //! * [`FusedIterator`](https://doc.rust-lang.org/std/iter/trait.FusedIterator.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/iter/FusedIterator.md)
-//! * [`TrustedLen`](https://doc.rust-lang.org/std/iter/trait.TrustedLen.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/iter/TrustedLen.md) *(requires `"trusted_len"` crate feature)* - *nightly-only*
 //! * [`Extend`](https://doc.rust-lang.org/std/iter/trait.Extend.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/iter/Extend.md)
+//! * [`TrustedLen`](https://doc.rust-lang.org/std/iter/trait.TrustedLen.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/iter/TrustedLen.md) *(requires `"trusted_len"` and `"unstable"` crate features)*
 //!
 //! `[std|core]::future`
 //!
@@ -623,10 +625,10 @@
 //! * [`Index`](https://doc.rust-lang.org/std/ops/trait.Index.html) *(requires `"ops"` crate feature)*
 //! * [`IndexMut`](https://doc.rust-lang.org/std/ops/trait.IndexMut.html) *(requires `"ops"` crate feature)*
 //! * [`RangeBounds`](https://doc.rust-lang.org/std/ops/trait.RangeBounds.html) *(requires `"ops"` crate feature)*
-//! * [`Fn`](https://doc.rust-lang.org/std/ops/trait.Fn.html) *(requires `"fn_traits"` crate feature)* - *nightly-only*
-//! * [`FnMut`](https://doc.rust-lang.org/std/ops/trait.FnMut.html) *(requires `"fn_traits"` crate feature)* - *nightly-only*
-//! * [`FnOnce`](https://doc.rust-lang.org/std/ops/trait.FnOnce.html) *(requires `"fn_traits"` crate feature)* - *nightly-only*
-//! * [`Generator`](https://doc.rust-lang.org/nightly/std/ops/trait.Generator.html) *(requires `"generator_trait"` crate feature)* - *nightly-only*
+//! * [`Fn`](https://doc.rust-lang.org/std/ops/trait.Fn.html) *(requires `"fn_traits"` and `"unstable"` crate features)*
+//! * [`FnMut`](https://doc.rust-lang.org/std/ops/trait.FnMut.html) *(requires `"fn_traits"` and `"unstable"` crate features)*
+//! * [`FnOnce`](https://doc.rust-lang.org/std/ops/trait.FnOnce.html) *(requires `"fn_traits"` and `"unstable"` crate features)*
+//! * [`Generator`](https://doc.rust-lang.org/nightly/std/ops/trait.Generator.html) *(requires `"generator_trait"` and `"unstable"` crate features)*
 //!
 //! `[std|core]::convert`
 //!
@@ -654,7 +656,7 @@
 //!
 //! You can add support for external library by activating the each crate feature.
 //!
-//! [`futures(v0.3)`](https://github.com/rust-lang-nursery/futures-rs) *(requires `"futures"` crate feature)*
+//! [`futures(v0.3)`](https://github.com/rust-lang-nursery/futures-rs) *(requires `"futures"` and `"unstable"` crate feature)*
 //!
 //! * [`futures::Stream`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.18/futures/stream/trait.Stream.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/futures/Stream.md)
 //! * [`futures::Sink`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.18/futures/sink/trait.Sink.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/futures/Sink.md)
@@ -765,14 +767,14 @@
 //!   * Disabled by default.
 //!   * Enable to use `transpose*` methods.
 //!
-//! * `try_trait`
+//! * `try_trait` *(requires `"unstable"` crate feature)*
 //!   * Disabled by default.
 //!   * Make `?` operator support more flexible, and to make iterator implementation more effective.
 //!   * This requires Rust Nightly and you need to enable the unstable [`try_trait`](https://github.com/rust-lang/rust/issues/42327) feature gate.
 //!
 //! ### Using external libraries (disabled by default)
 //!
-//! * `futures` - [futures(v0.3)](https://github.com/rust-lang-nursery/futures-rs)
+//! * `futures` - [futures(v0.3)](https://github.com/rust-lang-nursery/futures-rs) *(requires `"unstable"` crate feature)*
 //!
 //! * `futures01` - [futures(v0.1)](https://github.com/rust-lang-nursery/futures-rs)
 //!
@@ -780,7 +782,7 @@
 //!
 //! * `serde` - [serde](https://github.com/serde-rs/serde)
 //!
-//! ### Enable unstable features of [std|core] libraries (disabled by default, nightly-only)
+//! ### Enable unstable features of [std|core] libraries (disabled by default, requires `"unstable"` crate feature)
 //!
 //! For these features, you need to enable the unstable feature gate of the same name.
 //!
@@ -814,6 +816,41 @@
 #![warn(single_use_lifetimes)]
 #![warn(clippy::all, clippy::pedantic)]
 #![allow(clippy::use_self)]
+
+#[cfg(all(feature = "try_trait", not(feature = "unstable")))]
+compile_error!(
+    "The `try_trait` feature requires the `unstable` feature as an explicit opt-in to unstable features"
+);
+
+#[cfg(all(feature = "futures", not(feature = "unstable")))]
+compile_error!(
+    "The `futures` feature requires the `unstable` feature as an explicit opt-in to unstable features"
+);
+
+#[cfg(all(feature = "generator_trait", not(feature = "unstable")))]
+compile_error!(
+    "The `generator_trait` feature requires the `unstable` feature as an explicit opt-in to unstable features"
+);
+
+#[cfg(all(feature = "fn_traits", not(feature = "unstable")))]
+compile_error!(
+    "The `fn_traits` feature requires the `unstable` feature as an explicit opt-in to unstable features"
+);
+
+#[cfg(all(feature = "trusted_len", not(feature = "unstable")))]
+compile_error!(
+    "The `trusted_len` feature requires the `unstable` feature as an explicit opt-in to unstable features"
+);
+
+#[cfg(all(feature = "exact_size_is_empty", not(feature = "unstable")))]
+compile_error!(
+    "The `exact_size_is_empty` feature requires the `unstable` feature as an explicit opt-in to unstable features"
+);
+
+#[cfg(all(feature = "read_initializer", not(feature = "unstable")))]
+compile_error!(
+    "The `read_initializer` feature requires the `unstable` feature as an explicit opt-in to unstable features"
+);
 
 #[doc(hidden)]
 pub use auto_enums_core::auto_enum;
