@@ -113,14 +113,13 @@ fn expand_parent_local(local: &mut Local, cx: &mut Context) -> Result<()> {
         return Ok(());
     }
 
-    let expr = match local.init.as_mut().map(|(_, expr)| &mut **expr) {
-        Some(expr) => expr,
-        None => {
-            return Err(error!(
-                local,
-                "the `#[auto_enum]` attribute is not supported uninitialized let statement"
-            ));
-        }
+    let expr = if let Some(expr) = local.init.as_mut().map(|(_, expr)| &mut **expr) {
+        expr
+    } else {
+        return Err(error!(
+            local,
+            "the `#[auto_enum]` attribute is not supported uninitialized let statement"
+        ));
     };
 
     visit_expr(expr, cx)?;
