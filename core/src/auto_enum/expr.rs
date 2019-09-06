@@ -38,11 +38,7 @@ pub(super) fn child_expr(expr: &mut Expr, cx: &mut super::Context) -> Result<()>
         )
     }
 
-    if cx.visit_last() {
-        child_expr_inner(expr, &mut Context::from(cx))
-    } else {
-        Ok(())
-    }
+    if cx.visit_last() { child_expr_inner(expr, &mut Context::from(cx)) } else { Ok(()) }
 }
 
 // =================================================================================================

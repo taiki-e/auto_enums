@@ -55,11 +55,7 @@ pub(super) struct Diagnostic {
 impl Diagnostic {
     pub(super) fn error(&self, message: Error) {
         let mut base = self.message.borrow_mut();
-        if let Some(base) = &mut *base {
-            base.combine(message)
-        } else {
-            *base = Some(message)
-        }
+        if let Some(base) = &mut *base { base.combine(message) } else { *base = Some(message) }
     }
 
     pub(super) fn get_inner(&self) -> Option<Error> {

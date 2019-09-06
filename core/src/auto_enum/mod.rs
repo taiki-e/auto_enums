@@ -119,7 +119,7 @@ fn expand_parent_local(local: &mut Local, cx: &mut Context) -> Result<()> {
             return Err(error!(
                 local,
                 "the `#[auto_enum]` attribute is not supported uninitialized let statement"
-            ))
+            ));
         }
     };
 
@@ -176,7 +176,7 @@ fn expand_parent_item_fn(item: &mut ItemFn, cx: &mut Context) -> Result<()> {
             return Err(error!(
                 item.block,
                 "the `#[auto_enum]` attribute is not supported empty functions"
-            ))
+            ));
         }
     }
 
