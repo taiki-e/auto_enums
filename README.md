@@ -37,7 +37,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-auto_enums = "0.6.0-alpha.3"
+auto_enums = "0.6"
 ```
 
 The current auto_enums requires Rust 1.31 or later.

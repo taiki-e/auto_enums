@@ -808,7 +808,7 @@
 //!
 
 #![recursion_limit = "256"]
-#![doc(html_root_url = "https://docs.rs/auto_enums/0.6.0-alpha.3")]
+#![doc(html_root_url = "https://docs.rs/auto_enums/0.6.0")]
 #![doc(test(attr(deny(warnings), allow(dead_code, unused_assignments, unused_variables))))]
 #![no_std]
 #![warn(unsafe_code)]
