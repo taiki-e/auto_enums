@@ -1,5 +1,33 @@
 # Unreleased
 
+# 0.6.0 - 2019-09-07
+
+* [Added `"unstable"` crate feature to separate unstable features from stable features.][56] When using features that depend on unstable APIs, the `"unstable"` feature must be explicitly enabled.
+
+* Improved compile time.
+
+* Renamed `#[rec]` to `#[nested]`.
+
+* [Removed `marker(name)` option in favor of `marker = name`.][55]
+
+* [Removed `never` option in argument position in favor of `#[enum_derive]` attribute.][48]
+
+* [Removed `"proc_macro"` crate feature.][54]
+
+* Added `"ops"` crate feature, and made `[std|core]::ops`'s `Deref`, `DerefMut`, `Index`, `IndexMut`, and `RangeBounds` traits optional.
+
+* Added `"convert"` crate feature, and made `[std|core]::convert`'s `AsRef` and `AsMut` traits optional.
+
+* Added `"generator_trait"` crate feature, and made `[std|core]::ops::Generator` traits optional. *(nightly-only)*
+
+* Added `"fn_traits"` crate feature, and made `Fn`, `FnMut`, and `FnOnce` traits optional. *(nightly-only)*
+
+* Added `"trusted_len"` crate feature, and made `[std|core]::iter::TrustedLen` traits optional. *(nightly-only)*
+
+* Improved error messages.
+
+(There are no changes since the 0.6.0-alpha.3 release.)
+
 # 0.6.0-alpha.3 - 2019-09-06
 
 * [Added `"unstable"` crate feature to separate unstable features from stable features.][56] When using features that depend on unstable APIs, the `"unstable"` feature must be explicitly enabled.

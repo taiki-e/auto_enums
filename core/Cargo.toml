@@ -1,6 +1,6 @@
 [package]
 name = "auto_enums_core"
-version = "0.6.0-alpha.3"
+version = "0.6.0"
 authors = ["Taiki Endo <te316e89@gmail.com>"]
 edition = "2018"
 license = "Apache-2.0/MIT"
