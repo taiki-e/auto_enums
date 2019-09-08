@@ -1,6 +1,9 @@
 #![recursion_limit = "256"]
 #![doc(html_root_url = "https://docs.rs/auto_enums_derive/0.6.0")]
-#![doc(test(attr(deny(warnings), allow(dead_code, unused_assignments, unused_variables))))]
+#![doc(test(
+    no_crate_inject,
+    attr(deny(warnings, rust_2018_idioms, single_use_lifetimes), allow(dead_code))
+))]
 #![warn(unsafe_code)]
 #![warn(rust_2018_idioms, unreachable_pub)]
 #![warn(single_use_lifetimes)]
