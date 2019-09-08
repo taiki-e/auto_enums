@@ -49,7 +49,9 @@ jobs:
         toolchain: nightly
     - script: |
         cargo clean
-        RUSTFLAGS='--cfg compiletest' cargo test -p auto_enums --all-features --test compiletest
+        cargo test -p auto_enums --all-features --test compiletest
+      env:
+        RUSTFLAGS: -Dwarnings --cfg compiletest
       displayName: compiletest
 
 - job: clippy
@@ -122,5 +124,7 @@ jobs:
       parameters:
         toolchain: nightly
     - script: |
-        RUSTDOCFLAGS=-Dwarnings cargo doc --no-deps --all --all-features
+        cargo doc --no-deps --all --all-features
+      env:
+        RUSTDOCFLAGS: -Dwarnings
       displayName: cargo doc
