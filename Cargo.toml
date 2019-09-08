@@ -22,7 +22,6 @@ auto_enums_derive = { version = "=0.6.0", path = "derive", default-features = fa
 
 [dev-dependencies]
 compiletest = { version = "0.3.22", package = "compiletest_rs", features = ["stable", "tmp"] }
-rustversion = "0.1.4"
 
 [features]
 # Default features.
