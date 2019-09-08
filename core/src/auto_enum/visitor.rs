@@ -334,9 +334,10 @@ where
             }
             Ok(mut cx) => {
                 super::expand_parent_stmt(node, &mut cx).unwrap_or_else(|e| {
-                    f(visitor).diagnostic.error(e);
+                    cx.diagnostic.error(e);
                     *node = Stmt::Expr(expr_unimplemented());
                 });
+                f(visitor).join_child(cx)
             }
         }
     } else {

@@ -1,10 +1,9 @@
 use std::{
-    cell::{Cell, RefCell},
+    cell::Cell,
     collections::hash_map::DefaultHasher,
     hash::Hasher,
-    iter,
+    iter, mem,
     num::Wrapping,
-    rc::Rc,
     sync::atomic::{AtomicUsize, Ordering},
 };
 
@@ -49,17 +48,20 @@ pub(super) enum VisitLastMode {
 
 #[derive(Clone, Default)]
 pub(super) struct Diagnostic {
-    message: Rc<RefCell<Option<Error>>>,
+    message: Option<Error>,
 }
 
 impl Diagnostic {
-    pub(super) fn error(&self, message: Error) {
-        let mut base = self.message.borrow_mut();
-        if let Some(base) = &mut *base { base.combine(message) } else { *base = Some(message) }
+    pub(super) fn error(&mut self, message: Error) {
+        if let Some(base) = &mut self.message {
+            base.combine(message)
+        } else {
+            self.message = Some(message)
+        }
     }
 
     pub(super) fn get_inner(&self) -> Option<Error> {
-        self.message.borrow().clone()
+        self.message.clone()
     }
 }
 
@@ -73,7 +75,7 @@ pub(super) struct Context {
     /// The identifier of the marker macro of the current scope.
     pub(super) marker: Ident,
     /// All marker macro identifiers that may have effects on the current scope.
-    pub(super) markers: Rc<RefCell<Vec<String>>>,
+    pub(super) markers: Vec<String>,
 
     // depth: i32,
     /// Currently, this is basically the same as `self.markers.borrow().len() == 1`.
@@ -89,18 +91,12 @@ pub(super) struct Context {
     pub(super) diagnostic: Diagnostic,
 }
 
-impl Drop for Context {
-    fn drop(&mut self) {
-        self.markers.borrow_mut().pop();
-    }
-}
-
 impl Context {
     fn new(
         span: TokenStream,
         args: TokenStream,
         root: bool,
-        markers: Rc<RefCell<Vec<String>>>,
+        mut markers: Vec<String>,
         diagnostic: Diagnostic,
     ) -> Result<Self> {
         let Args { args, marker } = syn::parse2(args)?;
@@ -110,7 +106,7 @@ impl Context {
             // This should probably be more efficient than calling `to_string` for each comparison.
             // https://github.com/alexcrichton/proc-macro2/blob/1.0.1/src/wrapper.rs#L706
             let marker_string = marker.to_string();
-            if markers.borrow().contains(&marker_string) {
+            if markers.contains(&marker_string) {
                 return Err(error!(
                     marker,
                     "A custom marker name is specified that duplicated the name already used in the parent scope",
@@ -121,7 +117,7 @@ impl Context {
             (DEFAULT_MARKER.to_owned(), format_ident!("{}", DEFAULT_MARKER))
         };
 
-        markers.borrow_mut().push(marker_string);
+        markers.push(marker_string);
 
         Ok(Self {
             builder: Builder::new(),
@@ -138,16 +134,31 @@ impl Context {
     }
 
     pub(super) fn root(span: TokenStream, args: TokenStream) -> Result<Self> {
-        Self::new(span, args, true, Rc::default(), Diagnostic::default())
+        Self::new(span, args, true, Vec::new(), Diagnostic::default())
     }
 
-    pub(super) fn make_child(&self, span: TokenStream, args: TokenStream) -> Result<Self> {
-        Self::new(span, args, false, self.markers.clone(), self.diagnostic.clone())
+    pub(super) fn make_child(&mut self, span: TokenStream, args: TokenStream) -> Result<Self> {
+        Self::new(
+            span,
+            args,
+            false,
+            mem::replace(&mut self.markers, Vec::new()),
+            mem::replace(&mut self.diagnostic, Diagnostic::default()),
+        )
+    }
+
+    pub(super) fn join_child(&mut self, mut child: Self) {
+        debug_assert!(self.diagnostic.message.is_none());
+        debug_assert!(self.markers.is_empty());
+
+        child.markers.pop();
+        self.markers = child.markers;
+        self.diagnostic.message = child.diagnostic.message;
     }
 
     /// Returns `true` if one or more errors occurred.
     pub(super) fn failed(&self) -> bool {
-        self.diagnostic.message.borrow().is_some()
+        self.diagnostic.message.is_some()
     }
 
     pub(super) fn visit_last(&self) -> bool {
@@ -177,7 +188,7 @@ impl Context {
             return exact;
         }
 
-        self.markers.borrow().iter().any(|marker| mac.path.is_ident(marker))
+        self.markers.iter().any(|marker| mac.path.is_ident(marker))
     }
 
     /// Returns `true` if `mac` is the marker macro of the current scope.
