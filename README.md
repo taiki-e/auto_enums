@@ -87,6 +87,23 @@ Next, `#[enum_derive]` implements the specified traits.
 
 [Code like this will be generated](docs/example-1.md)
 
+`#[auto_enum]` can also parse nested arms/branches by using the `#[nested]` attribute.
+
+```rust
+use auto_enums::auto_enum;
+#[auto_enum(Iterator)]
+fn foo(x: i32) -> impl Iterator<Item = i32> {
+    match x {
+        0 => 1..10,
+        #[nested]
+        _ => match x {
+            1 => vec![5, 10].into_iter(),
+            _ => 0..=x,
+        },
+    }
+}
+```
+
 See [API Documentation](https://docs.rs/auto_enums/) for more details.
 
 ## Supported traits

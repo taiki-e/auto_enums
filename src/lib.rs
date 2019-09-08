@@ -100,6 +100,25 @@
 //!
 //! </details>
 //!
+//! `#[auto_enum]` can also parse nested arms/branches by using the `#[nested]` attribute.
+//!
+//! ```rust
+//! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
+//! # use auto_enums::auto_enum;
+//! #[auto_enum(Iterator)]
+//! fn foo(x: i32) -> impl Iterator<Item = i32> {
+//!     match x {
+//!         0 => 1..10,
+//!         #[nested]
+//!         _ => match x {
+//!             1 => vec![5, 10].into_iter(),
+//!             _ => 0..=x,
+//!         },
+//!     }
+//! }
+//! # fn main() { let _ = foo(0); }
+//! ```
+//!
 //! ### Positions where `#[auto_enum]` can be used.
 //!
 //! `#[auto_enum]` can be used in the following three places. However, since [stmt_expr_attributes](https://github.com/rust-lang/rust/issues/15701) and [proc_macro_hygiene](https://github.com/rust-lang/rust/issues/54727) are not stabilized, you need to use empty `#[auto_enum]` for functions except nightly.
@@ -400,27 +419,6 @@
 //!   }
 //!   # fn main() { let _ = expr_block(0); let _ = expr_method(0); let _ = expr_parentheses(0); }
 //!   ```
-//!
-//! ### Parse nested branches
-//!
-//! You can parse nested branches by `#[nested]` attribute.
-//!
-//! ```rust
-//! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
-//! # use auto_enums::auto_enum;
-//! #[auto_enum(Iterator)]
-//! fn foo(x: i32) -> impl Iterator<Item = i32> {
-//!     match x {
-//!         0 => 1..10,
-//!         #[nested]
-//!         _ => match x {
-//!             1 => vec![5, 10].into_iter(),
-//!             _ => 0..=x,
-//!         },
-//!     }
-//! }
-//! # fn main() { let _ = foo(0); }
-//! ```
 //!
 //! ### Expression that no value will be returned
 //!
