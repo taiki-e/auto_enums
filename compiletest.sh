@@ -8,4 +8,4 @@
 # . ./compiletest.sh
 # ```
 
-rm -rf target/debug/deps/libauto_enums* && RUSTFLAGS='--cfg compiletest' cargo test -p auto_enums --all-features --test compiletest
+rm -rf target/debug/deps/libauto_enums* && RUSTFLAGS='--cfg compiletest' cargo +nightly test -p auto_enums --all-features --test compiletest
