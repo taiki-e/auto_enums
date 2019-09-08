@@ -1,5 +1,9 @@
 # Unreleased
 
+# 0.6.1 - 2019-09-08
+
+* Improved documentation.
+
 # 0.6.0 - 2019-09-07
 
 * [Added `"unstable"` crate feature to separate unstable features from stable features.][56] When using features that depend on unstable APIs, the `"unstable"` feature must be explicitly enabled.
