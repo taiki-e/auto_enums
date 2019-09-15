@@ -35,12 +35,6 @@ enum Enum6<A> {
 }
 
 #[enum_derive(Clone)]
-enum Enum7<A> {
-    //~^ ERROR cannot be implemented for enums with less than two variants
-    A(A),
-}
-
-#[enum_derive(Clone)]
-enum Enum8 {} //~ ERROR cannot be implemented for enums with less than two variants
+enum Enum7 {} //~ ERROR cannot be implemented for enums with less than two variants
 
 fn main() {}
