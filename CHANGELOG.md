@@ -1,5 +1,12 @@
 # Unreleased
 
+# 0.6.3 - 2019-09-20
+
+* [Removed usage of mutable global state from `#[auto_enum]` for forward compatibility.][60] See also [rust-lang/rust#63831].
+
+[60]: https://github.com/taiki-e/auto_enums/pull/60
+[rust-lang/rust#63831]: https://github.com/rust-lang/rust/pull/63831
+
 # 0.6.2 - 2019-09-08
 
 * Fixed links to generated code.
