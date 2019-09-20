@@ -759,6 +759,18 @@ mod nightly {
             (if option { |x| x + 1 } else { |y| y - 1 }): _
         }
         assert_eq!(fn_traits2(true)(1), 2);
+
+        #[auto_enum(Iterator, Clone)]
+        let _y = match 0 {
+            0 => 2..8,
+            _ => 2..=10,
+        };
+
+        #[auto_enum(Iterator, Clone)]
+        let _x = match 0 {
+            0 => 2..8,
+            _ => 2..=10,
+        };
     }
 
     #[test]

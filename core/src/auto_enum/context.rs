@@ -1,13 +1,10 @@
 use std::{
-    cell::Cell,
     collections::hash_map::DefaultHasher,
-    hash::Hasher,
+    hash::{Hash, Hasher},
     iter, mem,
-    num::Wrapping,
-    sync::atomic::{AtomicUsize, Ordering},
 };
 
-use proc_macro2::TokenStream;
+use proc_macro2::{Delimiter, Spacing, TokenStream, TokenTree};
 use quote::format_ident;
 use syn::{
     parse::{Parse, ParseStream},
@@ -120,7 +117,7 @@ impl Context {
         markers.push(marker_string);
 
         Ok(Self {
-            builder: Builder::new(),
+            builder: Builder::new(&span),
             args,
             marker,
             markers,
@@ -338,8 +335,8 @@ struct Builder {
 }
 
 impl Builder {
-    fn new() -> Self {
-        Self { ident: format_ident!("___Enum{}", random()), variants: Vec::new() }
+    fn new(input: &TokenStream) -> Self {
+        Self { ident: format_ident!("__Enum{}", hash(input)), variants: Vec::new() }
     }
 
     fn iter(&self) -> impl Iterator<Item = &Ident> + '_ {
@@ -347,7 +344,7 @@ impl Builder {
     }
 
     fn next_expr(&mut self, attrs: Vec<Attribute>, expr: Expr) -> Expr {
-        let variant = format_ident!("___Variant{}", self.variants.len());
+        let variant = format_ident!("__Variant{}", self.variants.len());
 
         let path =
             path(iter::once(self.ident.clone().into()).chain(iter::once(variant.clone().into())));
@@ -373,37 +370,59 @@ impl Builder {
 }
 
 // =================================================================================================
-// RNG
+// Hash
 
-/// Pseudorandom number generator based on [xorshift*].
-///
-/// [xorshift*]: https://en.wikipedia.org/wiki/Xorshift#xorshift*
-fn random() -> u64 {
-    thread_local! {
-        static RNG: Cell<Wrapping<u64>> = Cell::new(Wrapping(prng_seed()));
-    }
+/// Returns the hash value of the input AST.
+fn hash(tokens: &TokenStream) -> u64 {
+    let tokens = TokenStreamHelper(tokens);
+    let mut hasher = DefaultHasher::new();
+    tokens.hash(&mut hasher);
+    hasher.finish()
+}
 
-    fn prng_seed() -> u64 {
-        static COUNTER: AtomicUsize = AtomicUsize::new(0);
+// Based on https://github.com/dtolnay/syn/blob/1.0.5/src/tt.rs
 
-        // Any non-zero seed will do -- this uses the hash of a global counter.
-        // Refs: https://github.com/rayon-rs/rayon/pull/571
-        let mut seed = 0;
-        while seed == 0 {
-            let mut hasher = DefaultHasher::new();
-            hasher.write_usize(COUNTER.fetch_add(1, Ordering::Relaxed));
-            seed = hasher.finish();
+struct TokenTreeHelper<'a>(&'a TokenTree);
+
+impl Hash for TokenTreeHelper<'_> {
+    fn hash<H: Hasher>(&self, h: &mut H) {
+        match self.0 {
+            TokenTree::Group(g) => {
+                0_u8.hash(h);
+                match g.delimiter() {
+                    Delimiter::Parenthesis => 0_u8.hash(h),
+                    Delimiter::Brace => 1_u8.hash(h),
+                    Delimiter::Bracket => 2_u8.hash(h),
+                    Delimiter::None => 3_u8.hash(h),
+                }
+
+                for tt in g.stream() {
+                    TokenTreeHelper(&tt).hash(h);
+                }
+                0xff_u8.hash(h); // terminator w/ a variant we don't normally hash
+            }
+            TokenTree::Punct(op) => {
+                1_u8.hash(h);
+                op.as_char().hash(h);
+                match op.spacing() {
+                    Spacing::Alone => 0_u8.hash(h),
+                    Spacing::Joint => 1_u8.hash(h),
+                }
+            }
+            TokenTree::Literal(lit) => (2_u8, lit.to_string()).hash(h),
+            TokenTree::Ident(word) => (3_u8, word).hash(h),
         }
-        seed
     }
+}
 
-    RNG.with(|rng| {
-        let mut x = rng.get();
-        debug_assert_ne!(x.0, 0);
-        x ^= x >> 12;
-        x ^= x << 25;
-        x ^= x >> 27;
-        rng.set(x);
-        x.0.wrapping_mul(0x2545_f491_4f6c_dd1d)
-    })
+struct TokenStreamHelper<'a>(&'a TokenStream);
+
+impl Hash for TokenStreamHelper<'_> {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        let tokens = self.0.clone().into_iter().collect::<Vec<_>>();
+        tokens.len().hash(state);
+        for tt in tokens {
+            TokenTreeHelper(&tt).hash(state);
+        }
+    }
 }
