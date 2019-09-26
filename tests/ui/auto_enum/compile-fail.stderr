@@ -1,39 +1,39 @@
 error: expected one of `)`, `,`, `.`, `?`, or an operator, found `..`
-  --> $DIR/compile-fail.rs:11:26
+  --> $DIR/compile-fail.rs:10:26
    |
-11 |         0 => marker!(1..8..), //~ ERROR expected one of `)`, `,`, `.`, `?`, or an operator, found `..`
+10 |         0 => marker!(1..8..), //~ ERROR expected one of `)`, `,`, `.`, `?`, or an operator, found `..`
    |                          ^^ expected one of `)`, `,`, `.`, `?`, or an operator here
 
 error: `if` expression missing an else clause
-  --> $DIR/compile-fail.rs:20:12
+  --> $DIR/compile-fail.rs:19:12
    |
-20 |     } else if x > 3 {
+19 |     } else if x > 3 {
    |            ^^
 
 error: `#[auto_enum]` is required two or more branches or marker macros in total, there is only one branch or marker macro in this statement
-  --> $DIR/compile-fail.rs:29:5
+  --> $DIR/compile-fail.rs:28:5
    |
-29 | /     let iter = match x {
-30 | |         //~^ ERROR `#[auto_enum]` is required two or more branches or marker macros in total, there is only one branch or marker macro in this statement
-31 | |         _ if y < 0 => return y..=0,
-32 | |         _ => 2..=10,
-33 | |     };
+28 | /     let iter = match x {
+29 | |         //~^ ERROR `#[auto_enum]` is required two or more branches or marker macros in total, there is only one branch or marker macro in this statement
+30 | |         _ if y < 0 => return y..=0,
+31 | |         _ => 2..=10,
+32 | |     };
    | |______^
 
 error: `#[auto_enum]` is required two or more branches or marker macros in total, there is no branch or marker macro in this statement
-  --> $DIR/compile-fail.rs:44:5
+  --> $DIR/compile-fail.rs:43:5
    |
-44 | /     let iter = match x {
-45 | |         //~^ ERROR `#[auto_enum]` is required two or more branches or marker macros in total, there is no branch or marker macro in this statement
-46 | |         _ if y < 0 => return y..=0,
-47 | |         _ => return 2..=10,
-48 | |     };
+43 | /     let iter = match x {
+44 | |         //~^ ERROR `#[auto_enum]` is required two or more branches or marker macros in total, there is no branch or marker macro in this statement
+45 | |         _ if y < 0 => return y..=0,
+46 | |         _ => return 2..=10,
+47 | |     };
    | |______^
 
 error[E0061]: this function takes 1 parameter but 2 parameters were supplied
- --> $DIR/compile-fail.rs:8:1
+ --> $DIR/compile-fail.rs:7:1
   |
-8 | #[auto_enum(Iterator)]
+7 | #[auto_enum(Iterator)]
   | ^^^^^^^^^^^^^^^^^^^^^^
   | |
   | defined here

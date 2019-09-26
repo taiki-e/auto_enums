@@ -8,26 +8,17 @@ publish = false
 [dependencies]
 
 [dev-dependencies]
-auto_enums = { path = "..", default-features = false }
+auto_enums = { path = "..", default-features = false, features = ["std", "rayon", "serde"] }
 futures-preview = "0.3.0-alpha.18"
 rand = "0.7" # for benches
-rayon = "1.1"
+rayon = "1.2"
 serde = "1.0"
 
 [features]
-default = ["external_libraries"]
-
-type_analysis = ["auto_enums/type_analysis"]
-
-external_libraries = [
-    "auto_enums/std",
-    "auto_enums/futures",
-    "auto_enums/rayon",
-    "auto_enums/serde",
-]
-
 unstable = [
-    "auto_enums/read_initializer",
-    "auto_enums/exact_size_is_empty",
+    "auto_enums/unstable",
+    "auto_enums/futures",
     "auto_enums/try_trait",
+    "auto_enums/exact_size_is_empty",
+    "auto_enums/read_initializer",
 ]

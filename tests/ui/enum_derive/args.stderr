@@ -1,23 +1,23 @@
 error: expected identifier
- --> $DIR/args.rs:7:22
+ --> $DIR/args.rs:5:22
   |
-7 | #[enum_derive(Clone, =>)] //~ ERROR expected identifier
+5 | #[enum_derive(Clone, =>)] //~ ERROR expected identifier
   |                      ^^
 
 error: expected identifier
-  --> $DIR/args.rs:13:25
+  --> $DIR/args.rs:11:25
    |
-13 | #[enum_derive(foo::bar::!)] //~ ERROR expected identifier
+11 | #[enum_derive(foo::bar::!)] //~ ERROR expected identifier
    |                         ^
 
 error: expected `,`
-  --> $DIR/args.rs:19:25
+  --> $DIR/args.rs:17:25
    |
-19 | #[enum_derive(Clone, Foo:)] //~ ERROR expected `,`
+17 | #[enum_derive(Clone, Foo:)] //~ ERROR expected `,`
    |                         ^
 
 error: expected `,`
-  --> $DIR/args.rs:25:21
+  --> $DIR/args.rs:23:21
    |
-25 | #[enum_derive(Clone Foo)] //~ ERROR expected `,`
+23 | #[enum_derive(Clone Foo)] //~ ERROR expected `,`
    |                     ^^^

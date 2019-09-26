@@ -504,13 +504,15 @@
 //!
 //! When using `#[auto_enum]` for expressions and statements, `#[auto_enum]` for function is unnecessary.
 //!
-//! ```rust
+#![cfg_attr(feature = "unstable", doc = "```rust")]
+#![cfg_attr(not(feature = "unstable"), doc = "```ignore")]
 //! // Add this to your crate root:
 //! #![feature(proc_macro_hygiene, stmt_expr_attributes)]
 //! # fn main() {}
 //! ```
 //!
-//! ```rust
+#![cfg_attr(feature = "unstable", doc = "```rust")]
+#![cfg_attr(not(feature = "unstable"), doc = "```ignore")]
 //! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //! # #![feature(proc_macro_hygiene, stmt_expr_attributes)]
 //! # use auto_enums::auto_enum;
@@ -528,13 +530,15 @@
 //!
 //! You can also return closures.
 //!
-//! ```rust
+#![cfg_attr(feature = "fn_traits", doc = "```rust")]
+#![cfg_attr(not(feature = "fn_traits"), doc = "```ignore")]
 //! // Add this to your crate root:
 //! #![feature(fn_traits, unboxed_closures)]
 //! # fn main() {}
 //! ```
 //!
-//! ```rust
+#![cfg_attr(feature = "fn_traits", doc = "```rust")]
+#![cfg_attr(not(feature = "fn_traits"), doc = "```ignore")]
 //! # #![feature(fn_traits, unboxed_closures)]
 //! # use auto_enums::auto_enum;
 //! #[auto_enum(Fn)]
