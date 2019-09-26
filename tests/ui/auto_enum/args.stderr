@@ -45,6 +45,3 @@ error: expected `,`
    |
 67 |     #[auto_enum(marker = f t, Iterator)] //~ ERROR expected `,`
    |                            ^
-
-error: aborting due to 8 previous errors
-

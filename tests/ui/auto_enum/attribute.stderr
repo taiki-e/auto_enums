@@ -15,6 +15,3 @@ error: #[rec] has been removed and replaced with #[nested]
    |
 32 |         #[rec] //~ ERROR #[rec] has been removed and replaced with #[nested]
    |         ^^^^^^
-
-error: aborting due to 3 previous errors
-

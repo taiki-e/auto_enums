@@ -8,4 +8,5 @@
 # . ./compiletest.sh
 # ```
 
-rm -rf target/debug/deps/libauto_enums* && RUSTFLAGS='--cfg compiletest' cargo +nightly test -p auto_enums --all-features --test compiletest
+TRYBUILD=overwrite RUSTFLAGS='--cfg compiletest' cargo +nightly test -p auto_enums --all-features --test compiletest
+# RUSTFLAGS='--cfg compiletest' cargo +nightly test -p auto_enums --all-features --test compiletest

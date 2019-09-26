@@ -7,6 +7,3 @@ error: `enum_derive(Transpose)` all fields need to be generics
 13 | |     B(B),
 14 | | }
    | |_^
-
-error: aborting due to previous error
-
