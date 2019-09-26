@@ -5,6 +5,7 @@
     feature = "transpose_methods",
     feature = "try_trait",
 ))]
+#![warn(rust_2018_idioms, single_use_lifetimes)]
 
 #[test]
 fn ui() {

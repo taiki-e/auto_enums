@@ -1,14 +1,14 @@
 error: expected `{`, found keyword `return`
-  --> $DIR/rejected-by-rustc.rs:12:12
+  --> $DIR/rejected-by-rustc.rs:11:12
    |
-12 |     } else return {
+11 |     } else return {
    |            ^^^^^^ expected `{`
 help: try placing this code inside a block
    |
-12 |     } else { return {
-13 |         //~^ ERROR expected `{`, found keyword `return`
-14 |         2..=10
-15 |     } }
+11 |     } else { return {
+12 |         //~^ ERROR expected `{`, found keyword `return`
+13 |         2..=10
+14 |     } }
    |
 
 error: `#[auto_enum]` is required two or more branches or marker macros in total, there is no branch or marker macro in this statement

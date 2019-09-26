@@ -1,17 +1,17 @@
 error: unexpected token
-  --> $DIR/attribute.rs:12:16
+  --> $DIR/attribute.rs:11:16
    |
-12 |         #[never(foo)] //~ ERROR unexpected token
+11 |         #[never(foo)] //~ ERROR unexpected token
    |                ^
 
 error: unexpected token
-  --> $DIR/attribute.rs:22:17
+  --> $DIR/attribute.rs:21:17
    |
-22 |         #[nested(foo)] //~ ERROR unexpected token
+21 |         #[nested(foo)] //~ ERROR unexpected token
    |                 ^
 
 error: #[rec] has been removed and replaced with #[nested]
-  --> $DIR/attribute.rs:32:9
+  --> $DIR/attribute.rs:31:9
    |
-32 |         #[rec] //~ ERROR #[rec] has been removed and replaced with #[nested]
+31 |         #[rec] //~ ERROR #[rec] has been removed and replaced with #[nested]
    |         ^^^^^^

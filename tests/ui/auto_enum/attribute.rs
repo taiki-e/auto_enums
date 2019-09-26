@@ -1,6 +1,5 @@
 // compile-fail
 
-#![deny(warnings)]
 #![feature(try_trait)]
 
 use auto_enums::auto_enum;

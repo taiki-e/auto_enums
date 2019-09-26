@@ -1,9 +1,9 @@
 error: `enum_derive(Transpose)` all fields need to be generics
-  --> $DIR/ty_impls.rs:10:1
+  --> $DIR/ty_impls.rs:8:1
    |
-10 | / enum Enum1<A, B> {
-11 | |     //~^ ERROR `enum_derive(Transpose)` all fields need to be generics
-12 | |     A(Foo<A>),
-13 | |     B(B),
-14 | | }
+8  | / enum Enum1<A, B> {
+9  | |     //~^ ERROR `enum_derive(Transpose)` all fields need to be generics
+10 | |     A(Foo<A>),
+11 | |     B(B),
+12 | | }
    | |_^
