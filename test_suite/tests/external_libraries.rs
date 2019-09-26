@@ -4,7 +4,6 @@
 
 use auto_enums::enum_derive;
 
-#[cfg(feature = "external_libraries")]
 #[test]
 fn stable_external() {
     #[enum_derive(
@@ -18,6 +17,7 @@ fn stable_external() {
         B(B),
     }
 
+    #[cfg(feature = "unstable")]
     #[enum_derive(
         Future,
         futures::Stream,
