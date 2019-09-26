@@ -21,7 +21,7 @@ auto_enums_core = { version = "=0.6.3", path = "core", default-features = false 
 auto_enums_derive = { version = "=0.6.3", path = "derive", default-features = false }
 
 [dev-dependencies]
-compiletest = { version = "=0.3.22", package = "compiletest_rs", features = ["stable", "tmp"] }
+trybuild = "1.0"
 
 [features]
 # Default features.

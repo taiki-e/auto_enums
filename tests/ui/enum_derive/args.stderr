@@ -21,6 +21,3 @@ error: expected `,`
    |
 25 | #[enum_derive(Clone Foo)] //~ ERROR expected `,`
    |                     ^^^
-
-error: aborting due to 4 previous errors
-

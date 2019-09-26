@@ -12,6 +12,3 @@ help: try placing this code inside a block
    |
 
 error: `#[auto_enum]` is required two or more branches or marker macros in total, there is no branch or marker macro in this statement
-
-error: aborting due to 2 previous errors
-

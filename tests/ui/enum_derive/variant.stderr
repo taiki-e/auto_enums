@@ -33,6 +33,3 @@ error: cannot be implemented for enums with no variants
    |
 38 | enum Enum7 {} //~ ERROR cannot be implemented for enums with less than two variants
    | ^^^^^^^^^^^^^
-
-error: aborting due to 6 previous errors
-
