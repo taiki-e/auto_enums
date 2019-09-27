@@ -9,7 +9,7 @@ publish = false
 
 [dev-dependencies]
 auto_enums = { path = "..", default-features = false, features = ["std", "rayon", "serde"] }
-futures-preview = "0.3.0-alpha.18"
+futures-preview = "0.3.0-alpha.19"
 rand = "0.7" # for benches
 rayon = "1.2"
 serde = "1.0"
