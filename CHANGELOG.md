@@ -1,5 +1,7 @@
 # Unreleased
 
+* Updated to support `futures-preview` 0.3.0-alpha.19.
+
 # 0.6.3 - 2019-09-20
 
 * [Removed usage of mutable global state from `#[auto_enum]` for forward compatibility.][60] See also [rust-lang/rust#63831].

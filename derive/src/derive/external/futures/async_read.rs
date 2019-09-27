@@ -11,8 +11,6 @@ pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
         parse_quote! {
             trait AsyncRead {
                 #[inline]
-                unsafe fn initializer(&self) -> #io::Initializer;
-                #[inline]
                 fn poll_read(
                     self: ::core::pin::Pin<&mut Self>,
                     cx: &mut ::core::task::Context<'_>,
