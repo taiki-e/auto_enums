@@ -1,5 +1,7 @@
 # Unreleased
 
+# 0.6.4 - 2019-09-28
+
 * Updated to support `futures-preview` 0.3.0-alpha.19.
 
 # 0.6.3 - 2019-09-20
