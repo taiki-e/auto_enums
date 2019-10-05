@@ -1,6 +1,6 @@
 use proc_macro2::TokenStream;
 use quote::ToTokens;
-use syn::{visit_mut::VisitMut, *};
+use syn::*;
 
 use crate::utils::*;
 
@@ -27,11 +27,14 @@ const EMPTY_ATTRS: &[&str] = &[NEVER, NESTED];
 const NESTED_OLD: &str = "rec";
 
 pub(crate) fn attribute(args: TokenStream, input: TokenStream) -> TokenStream {
-    expand(args, input).unwrap_or_else(|e| e.to_compile_error())
+    expand(args, input)
 }
 
-fn expand(args: TokenStream, input: TokenStream) -> Result<TokenStream> {
-    let mut cx = Context::root(input.clone(), args)?;
+fn expand(args: TokenStream, input: TokenStream) -> TokenStream {
+    let mut cx = match Context::root(input.clone(), args) {
+        Err(e) => return e.to_compile_error(),
+        Ok(cx) => cx,
+    };
 
     let res = match syn::parse2::<Stmt>(input.clone()) {
         Ok(mut stmt) => expand_parent_stmt(&mut stmt, &mut cx).map(|()| stmt.into_token_stream()),
@@ -48,9 +51,9 @@ fn expand(args: TokenStream, input: TokenStream) -> Result<TokenStream> {
     match res {
         Err(e) => cx.diagnostic.error(e),
         Ok(_) if cx.failed() => {}
-        Ok(tokens) => return Ok(tokens),
+        Ok(tokens) => return tokens,
     }
-    Err(cx.diagnostic.get_inner().unwrap())
+    cx.diagnostic.to_compile_error().unwrap()
 }
 
 fn visit_expr(expr: &mut Expr, cx: &mut Context) -> Result<()> {
@@ -58,13 +61,13 @@ fn visit_expr(expr: &mut Expr, cx: &mut Context) -> Result<()> {
         Expr::Closure(ExprClosure { body, .. }) if cx.visit_last() => {
             cx.visit_mode = VisitMode::Return;
             cx.visit_last_mode = VisitLastMode::Closure;
-            cx.find_try(|v| v.visit_expr_mut(body));
+            cx.find_try(&mut **body);
             &mut **body
         }
         _ => expr,
     };
 
-    child_expr(expr, cx).map(|()| cx.visitor(|v| v.visit_expr_mut(expr)))
+    child_expr(expr, cx).map(|()| cx.visitor(expr))
 }
 
 fn build_expr(expr: &mut Expr, item: ItemEnum) {
@@ -91,7 +94,7 @@ fn expand_parent_stmt(stmt: &mut Stmt, cx: &mut Context) -> Result<()> {
 
 fn expand_parent_expr(expr: &mut Expr, cx: &mut Context) -> Result<()> {
     if cx.is_dummy() {
-        cx.dummy(|v| v.visit_expr_mut(expr));
+        cx.dummy(expr);
         return Ok(());
     }
 
@@ -109,12 +112,12 @@ fn expand_parent_local(local: &mut Local, cx: &mut Context) -> Result<()> {
     }
 
     if cx.is_dummy() {
-        cx.dummy(|v| v.visit_local_mut(local));
+        cx.dummy(local);
         return Ok(());
     }
 
-    let expr = if let Some(expr) = local.init.as_mut().map(|(_, expr)| &mut **expr) {
-        expr
+    let expr = if let Some((_, expr)) = &mut local.init {
+        &mut **expr
     } else {
         return Err(error!(
             local,
@@ -149,7 +152,7 @@ fn expand_parent_item_fn(item: &mut ItemFn, cx: &mut Context) -> Result<()> {
                             GenericArgument::Type(Type::ImplTrait(_)),
                         ) = (&args[0], &args[1])
                         {
-                            cx.find_try(|v| v.visit_block_mut(&mut **block));
+                            cx.find_try(&mut **block);
                         }
                     }
                     _ => {}
@@ -164,7 +167,7 @@ fn expand_parent_item_fn(item: &mut ItemFn, cx: &mut Context) -> Result<()> {
     }
 
     if cx.is_dummy() {
-        cx.dummy(|v| v.visit_item_fn_mut(item));
+        cx.dummy(item);
         return Ok(());
     }
 
@@ -179,7 +182,7 @@ fn expand_parent_item_fn(item: &mut ItemFn, cx: &mut Context) -> Result<()> {
         }
     }
 
-    cx.visitor(|v| v.visit_item_fn_mut(item));
+    cx.visitor(item);
 
     cx.build(|i| item.block.stmts.insert(0, Stmt::Item(i.into())))
 }

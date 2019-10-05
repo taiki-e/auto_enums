@@ -211,7 +211,7 @@ impl VisitMut for Visitor<'_> {
                 self.cx.other_attr = true;
             }
 
-            visit_stmt(node, self, |this| this.cx);
+            visit_stmt(self, node);
 
             self.scope = tmp;
         }
@@ -219,6 +219,86 @@ impl VisitMut for Visitor<'_> {
 
     fn visit_item_mut(&mut self, _: &mut Item) {
         // Do not recurse into nested items.
+    }
+}
+
+impl VisitStmt for Visitor<'_> {
+    fn cx(&mut self) -> &mut Context {
+        self.cx
+    }
+}
+
+// =================================================================================================
+// Dummy visitor
+
+pub(super) struct Dummy<'a> {
+    cx: &'a mut Context,
+}
+
+impl<'a> Dummy<'a> {
+    pub(super) fn new(cx: &'a mut Context) -> Self {
+        Self { cx }
+    }
+}
+
+impl VisitMut for Dummy<'_> {
+    fn visit_stmt_mut(&mut self, node: &mut Stmt) {
+        if !self.cx.failed() {
+            if node.any_attr(NAME) {
+                self.cx.other_attr = true;
+            }
+
+            visit_stmt(self, node);
+        }
+    }
+
+    fn visit_item_mut(&mut self, _: &mut Item) {
+        // Do not recurse into nested items.
+    }
+}
+
+impl VisitStmt for Dummy<'_> {
+    fn cx(&mut self) -> &mut Context {
+        self.cx
+    }
+}
+
+// =================================================================================================
+// VisitStmt
+
+trait VisitStmt: VisitMut {
+    fn cx(&mut self) -> &mut Context;
+}
+
+fn visit_stmt(visitor: &mut impl VisitStmt, node: &mut Stmt) {
+    let attr = match node {
+        Stmt::Expr(expr) | Stmt::Semi(expr, _) => expr.find_remove_attr(NAME),
+        Stmt::Local(local) => local.find_remove_attr(NAME),
+        // Do not recurse into nested items.
+        Stmt::Item(_) => None,
+    };
+
+    if let Some(Attribute { tokens, .. }) = attr {
+        let res = syn::parse2::<Group>(tokens)
+            .and_then(|group| visitor.cx().make_child(node.to_token_stream(), group.stream()));
+
+        visit_mut::visit_stmt_mut(visitor, node);
+
+        match res {
+            Err(e) => {
+                visitor.cx().diagnostic.error(e);
+                *node = Stmt::Expr(expr_unimplemented());
+            }
+            Ok(mut cx) => {
+                super::expand_parent_stmt(node, &mut cx).unwrap_or_else(|e| {
+                    cx.diagnostic.error(e);
+                    *node = Stmt::Expr(expr_unimplemented());
+                });
+                visitor.cx().join_child(cx)
+            }
+        }
+    } else {
+        visit_mut::visit_stmt_mut(visitor, node);
     }
 }
 
@@ -278,69 +358,5 @@ impl VisitMut for FindTry<'_> {
 
     fn visit_item_mut(&mut self, _: &mut Item) {
         // Do not recurse into nested items.
-    }
-}
-
-// =================================================================================================
-// Dummy visitor
-
-pub(super) struct Dummy<'a> {
-    cx: &'a mut Context,
-}
-
-impl<'a> Dummy<'a> {
-    pub(super) fn new(cx: &'a mut Context) -> Self {
-        Self { cx }
-    }
-}
-
-impl VisitMut for Dummy<'_> {
-    fn visit_stmt_mut(&mut self, node: &mut Stmt) {
-        if !self.cx.failed() {
-            if node.any_attr(NAME) {
-                self.cx.other_attr = true;
-            }
-
-            visit_stmt(node, self, |this| this.cx);
-        }
-    }
-
-    fn visit_item_mut(&mut self, _: &mut Item) {
-        // Do not recurse into nested items.
-    }
-}
-
-fn visit_stmt<V>(node: &mut Stmt, visitor: &mut V, f: impl Fn(&mut V) -> &mut Context)
-where
-    V: VisitMut,
-{
-    let attr = match node {
-        Stmt::Expr(expr) | Stmt::Semi(expr, _) => expr.find_remove_attr(NAME),
-        Stmt::Local(local) => local.find_remove_attr(NAME),
-        // Do not recurse into nested items.
-        Stmt::Item(_) => None,
-    };
-
-    if let Some(Attribute { tokens, .. }) = attr {
-        let res = syn::parse2::<Group>(tokens)
-            .and_then(|group| f(visitor).make_child(node.to_token_stream(), group.stream()));
-
-        visit_mut::visit_stmt_mut(visitor, node);
-
-        match res {
-            Err(e) => {
-                f(visitor).diagnostic.error(e);
-                *node = Stmt::Expr(expr_unimplemented());
-            }
-            Ok(mut cx) => {
-                super::expand_parent_stmt(node, &mut cx).unwrap_or_else(|e| {
-                    cx.diagnostic.error(e);
-                    *node = Stmt::Expr(expr_unimplemented());
-                });
-                f(visitor).join_child(cx)
-            }
-        }
-    } else {
-        visit_mut::visit_stmt_mut(visitor, node);
     }
 }

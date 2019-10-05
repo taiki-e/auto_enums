@@ -11,7 +11,7 @@ use syn::{
     *,
 };
 
-use crate::utils::{expr_call, path, replace_expr, unit};
+use crate::utils::{expr_call, path, replace_expr, unit, VisitedNode};
 
 use super::visitor::{Dummy, FindTry, Visitor};
 
@@ -45,20 +45,20 @@ pub(super) enum VisitLastMode {
 
 #[derive(Clone, Default)]
 pub(super) struct Diagnostic {
-    message: Option<Error>,
+    messages: Vec<Error>,
 }
 
 impl Diagnostic {
     pub(super) fn error(&mut self, message: Error) {
-        if let Some(base) = &mut self.message {
-            base.combine(message)
-        } else {
-            self.message = Some(message)
-        }
+        self.messages.push(message);
     }
 
-    pub(super) fn get_inner(&self) -> Option<Error> {
-        self.message.clone()
+    pub(super) fn to_compile_error(&self) -> Option<TokenStream> {
+        if self.messages.is_empty() {
+            None
+        } else {
+            Some(self.messages.iter().map(Error::to_compile_error).collect())
+        }
     }
 }
 
@@ -145,17 +145,17 @@ impl Context {
     }
 
     pub(super) fn join_child(&mut self, mut child: Self) {
-        debug_assert!(self.diagnostic.message.is_none());
+        debug_assert!(self.diagnostic.messages.is_empty());
         debug_assert!(self.markers.is_empty());
 
         child.markers.pop();
         self.markers = child.markers;
-        self.diagnostic.message = child.diagnostic.message;
+        self.diagnostic = child.diagnostic;
     }
 
     /// Returns `true` if one or more errors occurred.
     pub(super) fn failed(&self) -> bool {
-        self.diagnostic.message.is_some()
+        !self.diagnostic.messages.is_empty()
     }
 
     pub(super) fn visit_last(&self) -> bool {
@@ -220,20 +220,20 @@ impl Context {
 
     // visitors
 
-    pub(super) fn visitor(&mut self, f: impl FnOnce(&mut Visitor<'_>)) {
-        f(&mut Visitor::new(self));
+    pub(super) fn visitor(&mut self, node: &mut impl VisitedNode) {
+        node.visited(&mut Visitor::new(self));
     }
 
-    pub(super) fn dummy(&mut self, f: impl FnOnce(&mut Dummy<'_>)) {
+    pub(super) fn dummy(&mut self, node: &mut impl VisitedNode) {
         debug_assert!(self.is_dummy());
 
-        f(&mut Dummy::new(self));
+        node.visited(&mut Dummy::new(self));
     }
 
-    pub(super) fn find_try(&mut self, f: impl FnOnce(&mut FindTry<'_>)) {
-        let mut find = FindTry::new(self);
-        f(&mut find);
-        if find.has {
+    pub(super) fn find_try(&mut self, node: &mut impl VisitedNode) {
+        let mut visitor = FindTry::new(self);
+        node.visited(&mut visitor);
+        if visitor.has {
             self.visit_mode = VisitMode::Try;
         }
     }
