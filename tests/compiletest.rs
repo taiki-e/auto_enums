@@ -1,11 +1,10 @@
-#![cfg(compiletest)]
 #![cfg(all(
     feature = "std",
     feature = "type_analysis",
     feature = "transpose_methods",
     feature = "try_trait",
 ))]
-#![warn(rust_2018_idioms, single_use_lifetimes)]
+#![warn(rust_2018_idioms)]
 
 #[test]
 fn ui() {
