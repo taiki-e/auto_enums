@@ -1,10 +1,7 @@
 use std::{iter, mem};
 
 use proc_macro2::TokenStream;
-use syn::{
-    punctuated::Punctuated, token, Attribute, Block, Expr, ExprBlock, ExprCall, ExprPath,
-    ExprTuple, Path, PathSegment, Stmt,
-};
+use syn::{punctuated::Punctuated, visit_mut::VisitMut, *};
 
 mod attrs;
 
@@ -67,6 +64,49 @@ pub(crate) fn replace_expr(this: &mut Expr, f: impl FnOnce(Expr) -> Expr) {
 
 pub(crate) fn replace_block(this: &mut Block, f: impl FnOnce(Block) -> Expr) {
     *this = block(vec![Stmt::Expr(f(mem::replace(this, block(Vec::new()))))]);
+}
+
+// =================================================================================================
+// Visited node
+
+pub(crate) trait VisitedNode {
+    fn visited(&mut self, visitor: &mut impl VisitMut);
+}
+
+impl VisitedNode for Stmt {
+    fn visited(&mut self, visitor: &mut impl VisitMut) {
+        visitor.visit_stmt_mut(self);
+    }
+}
+
+impl VisitedNode for Local {
+    fn visited(&mut self, visitor: &mut impl VisitMut) {
+        visitor.visit_local_mut(self);
+    }
+}
+
+impl VisitedNode for Expr {
+    fn visited(&mut self, visitor: &mut impl VisitMut) {
+        visitor.visit_expr_mut(self);
+    }
+}
+
+impl VisitedNode for Arm {
+    fn visited(&mut self, visitor: &mut impl VisitMut) {
+        visitor.visit_arm_mut(self);
+    }
+}
+
+impl VisitedNode for Block {
+    fn visited(&mut self, visitor: &mut impl VisitMut) {
+        visitor.visit_block_mut(self);
+    }
+}
+
+impl VisitedNode for ItemFn {
+    fn visited(&mut self, visitor: &mut impl VisitMut) {
+        visitor.visit_item_fn_mut(self);
+    }
 }
 
 // =================================================================================================

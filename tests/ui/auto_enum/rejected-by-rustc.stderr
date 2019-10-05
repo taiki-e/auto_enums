@@ -11,4 +11,8 @@ help: try placing this code inside a block
 14 |     } }
    |
 
-error: `#[auto_enum]` is required two or more branches or marker macros in total, there is no branch or marker macro in this statement
+error: attributes are not yet allowed on `if` expressions
+  --> $DIR/rejected-by-rustc.rs:22:9
+   |
+22 |         #[nested]
+   |         ^^^^^^^^^
