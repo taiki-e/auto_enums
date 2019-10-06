@@ -4,7 +4,8 @@
 //!
 //! * `#[auto_enum]`
 //!
-//!   Parses syntax, creates the enum, inserts variants, and passes specified traits to `#[enum_derive]`.
+//!   Parses syntax, creates the enum, inserts variants, and passes specified
+//!   traits to `#[enum_derive]`.
 //!
 //! * `#[enum_derive]`
 //!
@@ -12,7 +13,9 @@
 //!
 //! ## `#[auto_enum]`
 //!
-//! `#[auto_enum]`'s basic feature is to wrap the value returned by the obvious branches (`match`, `if`, `return`, etc..) by an enum that implemented the specified traits.
+//! `#[auto_enum]`'s basic feature is to wrap the value returned by the obvious
+//! branches (`match`, `if`, `return`, etc..) by an enum that implemented the
+//! specified traits.
 //!
 //! ```rust
 //! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
@@ -99,8 +102,10 @@
 //! ```
 //!
 //! </details>
+//! <br>
 //!
-//! `#[auto_enum]` can also parse nested arms/branches by using the `#[nested]` attribute.
+//! `#[auto_enum]` can also parse nested arms/branches by using the `#[nested]`
+//! attribute.
 //!
 //! ```rust
 //! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
@@ -121,7 +126,12 @@
 //!
 //! ### Positions where `#[auto_enum]` can be used.
 //!
-//! `#[auto_enum]` can be used in the following three places. However, since [stmt_expr_attributes](https://github.com/rust-lang/rust/issues/15701) and [proc_macro_hygiene](https://github.com/rust-lang/rust/issues/54727) are not stabilized, you need to use empty `#[auto_enum]` for functions except nightly.
+//! `#[auto_enum]` can be used in the following three places. However, since
+//! [stmt_expr_attributes] and [proc_macro_hygiene] are not stabilized, you need
+//! to use empty `#[auto_enum]` for functions except nightly.
+//!
+//! [stmt_expr_attributes]: https://github.com/rust-lang/rust/issues/15701
+//! [proc_macro_hygiene]: https://github.com/rust-lang/rust/issues/54727
 //!
 //! * functions
 //!
@@ -206,7 +216,8 @@
 //!
 //! * `loop`
 //!
-//!   Wrap each `break` with a variant. Nested loops and labeled `break` are also supported.
+//!   Wrap each `break` with a variant. Nested loops and labeled `break` are
+//!   also supported.
 //!
 //!   ```rust
 //!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]
@@ -324,7 +335,8 @@
 //!   # }
 //!   ```
 //!
-//!   When "try_trait" crate feature is enabled, `?` operator is expanded as follows (note that this uses [an unstable feature](https://github.com/rust-lang/rust/issues/42327)):
+//!   When "try_trait" crate feature is enabled, `?` operator is expanded as
+//!   follows (note that this uses [an unstable feature](https://github.com/rust-lang/rust/issues/42327)):
 //!
 //!   ```rust
 //!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]
@@ -348,7 +360,8 @@
 //!
 //!   `#[auto_enum]` can parse the `?` operator in the scope.
 //!
-//!   However, `#[auto_enum]` must be used directly for that closure (or the let binding of the closure).
+//!   However, `#[auto_enum]` must be used directly for that closure
+//!   (or the let binding of the closure).
 //!
 //!   ```rust
 //!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]
@@ -378,7 +391,8 @@
 //!
 //! * Block, unsafe block, method call, parentheses, and type ascription
 //!
-//!   The following expressions are recursively searched until an `if`, `match`, `loop` or unsupported expression is found.
+//!   The following expressions are recursively searched until an `if`, `match`,
+//!   `loop` or unsupported expression is found.
 //!
 //!   * blocks
 //!   * unsafe blocks
@@ -422,7 +436,8 @@
 //!
 //! ### Expression that no value will be returned
 //!
-//! If the last expression of a branch is one of the following, it is interpreted that no value will be returned (variant assignment is skipped).
+//! If the last expression of a branch is one of the following, it is
+//! interpreted that no value will be returned (variant assignment is skipped).
 //!
 //! * `panic!(..)`
 //! * `unreachable!(..)`
@@ -470,7 +485,8 @@
 //! ### Expression level marker (`marker!` macro)
 //!
 //! `#[auto_enum]` replaces `marker!` macros with variants.
-//! If values of two or more are specified by `marker!` macros, `#[auto_enum]` can be used for unsupported expressions and statements.
+//! If values of two or more are specified by `marker!` macros, `#[auto_enum]`
+//! can be used for unsupported expressions and statements.
 //!
 //! ```rust
 //! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
@@ -485,7 +501,8 @@
 //! # fn main() { let _ = foo(0); }
 //! ```
 //!
-//! The default name of the macro is `"marker"`, but you can change it by `marker` option.
+//! The default name of the macro is `"marker"`, but you can change it by
+//! `marker` option.
 //!
 //! ```rust
 //! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
@@ -502,7 +519,8 @@
 //!
 //! ## Rust Nightly
 //!
-//! When using `#[auto_enum]` for expressions and statements, `#[auto_enum]` for function is unnecessary.
+//! When using `#[auto_enum]` for expressions and statements, `#[auto_enum]` for
+//! function is unnecessary.
 //!
 #![cfg_attr(feature = "unstable", doc = "```rust")]
 #![cfg_attr(not(feature = "unstable"), doc = "```ignore")]
@@ -554,9 +572,12 @@
 //!
 //! ## `#[enum_derive]`
 //!
-//! `#[enum_derive]` implements the supported traits and passes unsupported traits to `#[derive]`.
+//! `#[enum_derive]` implements the supported traits and passes unsupported
+//! traits to `#[derive]`.
 //!
-//! If you want to use traits that are not supported by `#[enum_derive]`, you can use another crate that provides `proc_macro_derive`, or you can define `proc_macro_derive` yourself([derive_utils] probably can help it).
+//! If you want to use traits that are not supported by `#[enum_derive]`, you
+//! can use another crate that provides `proc_macro_derive`, or you can define
+//! `proc_macro_derive` yourself([derive_utils] probably can help it).
 //!
 //! Basic usage of `#[enum_derive]`
 //!
@@ -573,7 +594,8 @@
 //! # fn main() { let _: Foo<i32, i32> = Foo::A(0); }
 //! ```
 //!
-//! `#[enum_derive]` adds the dependency of the specified trait if it is not specified.
+//! `#[enum_derive]` adds the dependency of the specified trait if it is not
+//! specified.
 //!
 //! ```rust
 //! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
