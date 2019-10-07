@@ -1,7 +1,5 @@
 // compile-fail
 
-#![feature(try_trait)]
-
 use auto_enums::auto_enum;
 
 #[auto_enum(Iterator;)] //~ ERROR expected `,`

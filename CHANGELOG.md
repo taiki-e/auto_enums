@@ -1,5 +1,9 @@
 # Unreleased
 
+* [Removed unstable `"exact_size_is_empty"`, `"read_initializer"`, and `"try_trait"` crate features.][69]
+
+[69]: https://github.com/taiki-e/auto_enums/pull/69
+
 # 0.6.4 - 2019-09-28
 
 * Updated to support `futures-preview` 0.3.0-alpha.19.

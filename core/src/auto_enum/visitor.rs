@@ -6,8 +6,6 @@ use syn::{
     *,
 };
 
-#[cfg(feature = "try_trait")]
-use crate::utils::expr_call;
 use crate::utils::{expr_unimplemented, replace_expr, Attrs, AttrsMut};
 
 use super::{Context, VisitMode, DEFAULT_MARKER, NAME, NEVER};
@@ -84,16 +82,9 @@ impl<'a> Visitor<'a> {
                 {
                     // into:
                     //
-                    // match // If "try_trait" feature enabled
-                    //       Try::into_result(<expr>)
-                    //       // Otherwise
-                    //       <expr>
-                    // {
+                    // match <expr> {
                     //     Ok(val) => val,
-                    //     Err(err) => // If "try_trait" feature enabled
-                    //                 return Try::from_error(Enum::VariantN(err)),
-                    //                 // Otherwise
-                    //                 return Err(Enum::VariantN(err)),
+                    //     Err(err) => return Err(Enum::VariantN(err)),
                     // }
 
                     replace_expr(node, |expr| {
@@ -101,22 +92,10 @@ impl<'a> Visitor<'a> {
                         let ExprTry { attrs, mut expr, .. } =
                             if let Expr::Try(expr) = expr { expr } else { unreachable!() };
 
-                        #[cfg(feature = "try_trait")]
-                        replace_expr(&mut *expr, |expr| {
-                            expr_call(
-                                Vec::new(),
-                                syn::parse_quote!(::core::ops::Try::into_result),
-                                expr,
-                            )
-                        });
-
                         let mut arms = Vec::with_capacity(2);
                         arms.push(syn::parse_quote!(::core::result::Result::Ok(val) => val,));
 
                         let err = self.cx.next_expr(syn::parse_quote!(err));
-                        #[cfg(feature = "try_trait")]
-                        arms.push(syn::parse_quote!(::core::result::Result::Err(err) => return ::core::ops::Try::from_error(#err),));
-                        #[cfg(not(feature = "try_trait"))]
                         arms.push(syn::parse_quote!(::core::result::Result::Err(err) => return ::core::result::Result::Err(#err),));
 
                         Expr::Match(ExprMatch {

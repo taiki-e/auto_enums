@@ -1,6 +1,5 @@
 #![feature(test)]
 #![feature(box_syntax)]
-#![cfg_attr(feature = "unstable", feature(try_trait))]
 #![warn(unsafe_code)]
 #![warn(rust_2018_idioms)]
 

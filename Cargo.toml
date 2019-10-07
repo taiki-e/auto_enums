@@ -64,10 +64,7 @@ serde = ["auto_enums_derive/serde"]
 # Unstable features
 # These features are outside of the normal semver guarantees and require the
 # `unstable` feature as an explicit opt-in to unstable API.
-unstable = ["auto_enums_core/unstable", "auto_enums_derive/unstable"]
-
-# Make `?` operator support more flexible, and to make iterator implementation more effective.
-try_trait = ["auto_enums_core/try_trait", "auto_enums_derive/try_trait"]
+unstable = ["auto_enums_derive/unstable"]
 
 # external libraries
 
@@ -82,8 +79,3 @@ generator_trait = ["auto_enums_derive/generator_trait"]
 fn_traits = ["auto_enums_derive/fn_traits"]
 # Enable to use `[std|core]::iter::TrustedLen` trait.
 trusted_len = ["auto_enums_derive/trusted_len"]
-
-# Implements `ExactSizeIterator::is_empty`.
-exact_size_is_empty = ["auto_enums_derive/exact_size_is_empty"]
-# Implements `std::io::Read::read_initializer`.
-read_initializer = ["auto_enums_derive/read_initializer"]
