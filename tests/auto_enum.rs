@@ -1,13 +1,10 @@
 #![cfg_attr(
-    any(feature = "try_trait", feature = "fn_traits"),
+    feature = "fn_traits",
     feature(proc_macro_hygiene, stmt_expr_attributes, type_ascription)
 )]
-#![cfg_attr(feature = "try_trait", feature(try_trait))]
 #![cfg_attr(feature = "generator_trait", feature(generator_trait))]
 #![cfg_attr(feature = "fn_traits", feature(fn_traits, unboxed_closures))]
 #![cfg_attr(feature = "trusted_len", feature(trusted_len))]
-#![cfg_attr(feature = "exact_size_is_empty", feature(exact_size_is_empty))]
-#![cfg_attr(feature = "read_initializer", feature(read_initializer))]
 #![cfg_attr(not(feature = "std"), no_std)]
 #![warn(rust_2018_idioms)]
 
@@ -597,7 +594,7 @@ mod stable {
 }
 
 // nightly
-#[cfg(all(feature = "try_trait", feature = "fn_traits"))]
+#[cfg(feature = "fn_traits")]
 mod nightly {
     use auto_enums::auto_enum;
 
@@ -820,24 +817,5 @@ mod nightly {
         for (i, x) in ANS.iter().enumerate() {
             assert_eq!(marker2(i).clone().sum::<i32>(), *x - 1);
         }
-    }
-
-    #[test]
-    fn try_trait() {
-        #[auto_enum(Debug)]
-        fn try_operator(x: i32) -> Result<impl Iterator<Item = i32>, impl core::fmt::Debug> {
-            if x < 0 {
-                Err(1i32)?;
-            }
-
-            let iter = match x {
-                0 => Err(())?,
-                1 => None?,
-                _ => 2..=10,
-            };
-
-            Ok(iter)
-        }
-        assert_eq!(try_operator(10).unwrap().sum::<i32>(), 54);
     }
 }

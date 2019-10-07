@@ -1,18 +1,18 @@
 error: expected `{`, found keyword `return`
-  --> $DIR/rejected-by-rustc.rs:11:12
-   |
-11 |     } else return {
-   |            ^^^^^^ expected `{`
+ --> $DIR/rejected-by-rustc.rs:9:12
+  |
+9 |     } else return {
+  |            ^^^^^^ expected `{`
 help: try placing this code inside a block
-   |
-11 |     } else { return {
-12 |         //~^ ERROR expected `{`, found keyword `return`
-13 |         2..=10
-14 |     } }
-   |
+  |
+9 |     } else { return {
+10|         //~^ ERROR expected `{`, found keyword `return`
+11|         2..=10
+12|     } }
+  |
 
 error: attributes are not yet allowed on `if` expressions
-  --> $DIR/rejected-by-rustc.rs:22:9
+  --> $DIR/rejected-by-rustc.rs:20:9
    |
-22 |         #[nested]
+20 |         #[nested]
    |         ^^^^^^^^^

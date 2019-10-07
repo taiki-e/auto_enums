@@ -3,16 +3,9 @@ use crate::utils::*;
 pub(crate) const NAME: &[&str] = &["Iterator"];
 
 pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
-    #[cfg(feature = "try_trait")]
-    let try_trait = quote! {
-        #[inline]
-        fn try_fold<__U, __F, __R>(&mut self, init: __U, f: __F) -> __R
-        where
-            __F: ::core::ops::FnMut(__U, Self::Item) -> __R,
-            __R: ::core::ops::Try<Ok = __U>;
-    };
+    // TODO: When `try_trait` stabilized, add `try_fold` and remove `fold`, `find` etc. conditionally.
+
     // It is equally efficient if `try_fold` can be used.
-    #[cfg(not(feature = "try_trait"))]
     let try_trait = quote! {
         #[inline]
         fn fold<__U, __F>(self, init: __U, f: __F) -> __U

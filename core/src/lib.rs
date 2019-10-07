@@ -11,11 +11,6 @@
 #![warn(clippy::all, clippy::pedantic)]
 #![allow(clippy::use_self)]
 
-#[cfg(all(feature = "try_trait", not(feature = "unstable")))]
-compile_error!(
-    "The `try_trait` feature requires the `unstable` feature as an explicit opt-in to unstable features"
-);
-
 extern crate proc_macro;
 
 #[macro_use]

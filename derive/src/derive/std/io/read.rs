@@ -11,13 +11,7 @@ pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
         fn read_vectored(&mut self, bufs: &mut [::std::io::IoSliceMut<'_>]) -> ::std::io::Result<usize>;
     };
 
-    #[cfg(not(feature = "read_initializer"))]
-    let initializer = quote!();
-    #[cfg(feature = "read_initializer")]
-    let initializer = quote! {
-        #[inline]
-        unsafe fn initializer(&self) -> ::std::io::Initializer;
-    };
+    // TODO: When `read_initializer` stabilized, add `initializer` conditionally.
 
     derive_trait!(
         data,
@@ -33,7 +27,6 @@ pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
                 #[inline]
                 fn read_exact(&mut self, buf: &mut [u8]) -> ::std::io::Result<()>;
                 #vectored
-                #initializer
             }
         }?,
     )

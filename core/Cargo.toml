@@ -26,12 +26,3 @@ default = []
 
 # Analyze return type of function and `let` binding.
 type_analysis = ["syn/extra-traits"]
-
-# ==============================================================================
-# Unstable features
-# These features are outside of the normal semver guarantees and require the
-# `unstable` feature as an explicit opt-in to unstable API.
-unstable = []
-
-# Make `?` operator support more flexible.
-try_trait = []

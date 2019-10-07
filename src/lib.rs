@@ -18,7 +18,6 @@
 //! specified traits.
 //!
 //! ```rust
-//! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //! use auto_enums::auto_enum;
 //!
 //! #[auto_enum(Iterator)]
@@ -42,7 +41,6 @@
 //! Code like this will be generated:
 //!
 //! ```rust
-//! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //! fn foo(x: i32) -> impl Iterator<Item = i32> {
 //!     #[::auto_enums::enum_derive(Iterator)]
 //!     enum __Enum1<__T1, __T2> {
@@ -64,7 +62,6 @@
 //! <summary>Code like this will be generated:</summary>
 //!
 //! ```rust
-//! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //! fn foo(x: i32) -> impl Iterator<Item = i32> {
 //!     enum __Enum1<__T1, __T2> {
 //!         __T1(__T1),
@@ -108,7 +105,6 @@
 //! attribute.
 //!
 //! ```rust
-//! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //! # use auto_enums::auto_enum;
 //! #[auto_enum(Iterator)]
 //! fn foo(x: i32) -> impl Iterator<Item = i32> {
@@ -136,7 +132,6 @@
 //! * functions
 //!
 //!   ```rust
-//!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //!   # use auto_enums::auto_enum;
 //!   #[auto_enum(Iterator)]
 //!   fn func(x: i32) -> impl Iterator<Item=i32> {
@@ -152,7 +147,6 @@
 //! * expressions
 //!
 //!   ```rust
-//!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //!   # use auto_enums::auto_enum;
 //!   #[auto_enum] // Nightly does not need an empty attribute to the function.
 //!   fn expr(x: i32) -> impl Iterator<Item=i32> {
@@ -168,7 +162,6 @@
 //! * let binding
 //!
 //!   ```rust
-//!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //!   # use auto_enums::auto_enum;
 //!   #[auto_enum] // Nightly does not need an empty attribute to the function.
 //!   fn let_binding(x: i32) -> impl Iterator<Item=i32> {
@@ -189,7 +182,6 @@
 //!   Wrap each branch with a variant.
 //!
 //!   ```rust
-//!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //!   # use auto_enums::auto_enum;
 //!   // if
 //!   #[auto_enum(Iterator)]
@@ -220,7 +212,6 @@
 //!   also supported.
 //!
 //!   ```rust
-//!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //!   # use auto_enums::auto_enum;
 //!   #[auto_enum(Iterator)]
 //!   fn expr_loop(mut x: i32) -> impl Iterator<Item = i32> {
@@ -243,7 +234,6 @@
 //!   This analysis is valid only when the return type is `impl Trait`.
 //!
 //!   ```rust
-//!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //!   # use auto_enums::auto_enum;
 //!   // return (in functions)
 //!   #[auto_enum(Iterator)]
@@ -271,7 +261,6 @@
 //!     * `?` operator not used in the scope.
 //!
 //!   ```rust
-//!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //!   # use auto_enums::auto_enum;
 //!   // return (in closures)
 //!   #[auto_enum] // Nightly does not need an empty attribute to the function.
@@ -300,7 +289,6 @@
 //!   This analysis is valid only when the return type is `Result<T, impl Trait>`.
 //!
 //!   ```rust
-//!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //!   # use auto_enums::auto_enum;
 //!   use std::fmt::{Debug, Display};
 //!
@@ -335,27 +323,6 @@
 //!   # }
 //!   ```
 //!
-//!   When "try_trait" crate feature is enabled, `?` operator is expanded as
-//!   follows (note that this uses [an unstable feature](https://github.com/rust-lang/rust/issues/42327)):
-//!
-//!   ```rust
-//!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]
-//!   # #[cfg(feature = "try_trait")]
-//!   # use std::ops::Try;
-//!   # #[cfg(feature = "try_trait")]
-//!   # pub enum Enum<A> { Veriant(A) }
-//!   # #[cfg(feature = "try_trait")]
-//!   # pub fn a<T, E>(expr: Result<T, E>) -> Result<T, Enum<E>> {
-//!   # Ok(
-//!   match Try::into_result(expr) {
-//!       Ok(val) => val,
-//!       Err(err) => return Try::from_error(Enum::Veriant(err)),
-//!   }
-//!   # )
-//!   # }
-//!   # fn main() {}
-//!   ```
-//!
 //! * `?` operator (in closures)
 //!
 //!   `#[auto_enum]` can parse the `?` operator in the scope.
@@ -364,7 +331,6 @@
 //!   (or the let binding of the closure).
 //!
 //!   ```rust
-//!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //!   # use auto_enums::auto_enum;
 //!   use std::fmt::{Debug, Display};
 //!
@@ -401,7 +367,6 @@
 //!   * type ascriptions
 //!
 //!   ```rust
-//!   # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //!   # use auto_enums::auto_enum;
 //!   // block
 //!   #[auto_enum] // Nightly does not need an empty attribute to the function.
@@ -450,7 +415,6 @@
 //! * An item definition.
 //!
 //! ```rust
-//! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //! # use auto_enums::auto_enum;
 //! #[auto_enum(Iterator)]
 //! fn foo(x: i32) -> impl Iterator<Item = i32> {
@@ -466,7 +430,6 @@
 //! You can also skip that branch explicitly by `#[never]` attribute.
 //!
 //! ```rust
-//! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //! # use auto_enums::auto_enum;
 //! #[auto_enum(Iterator)]
 //! fn foo(x: i32) -> impl Iterator<Item = i32> {
@@ -489,7 +452,6 @@
 //! can be used for unsupported expressions and statements.
 //!
 //! ```rust
-//! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //! # use auto_enums::auto_enum;
 //! #[auto_enum(Iterator)]
 //! fn foo(x: i32) -> impl Iterator<Item = i32> {
@@ -505,7 +467,6 @@
 //! `marker` option.
 //!
 //! ```rust
-//! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //! # use auto_enums::auto_enum;
 //! #[auto_enum(marker = bar, Iterator)]
 //! fn foo(x: i32) -> impl Iterator<Item = i32> {
@@ -529,7 +490,6 @@
 //! ```
 //!
 //! ```rust
-//! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //! # #![feature(proc_macro_hygiene, stmt_expr_attributes)]
 //! # use auto_enums::auto_enum;
 //! fn foo(x: i32) -> i32 {
@@ -574,7 +534,6 @@
 //! Basic usage of `#[enum_derive]`
 //!
 //! ```rust
-//! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //! use auto_enums::enum_derive;
 //!
 //! // `#[enum_derive]` implements `Iterator`, and `#[derive]` implements `Clone`.
@@ -590,8 +549,6 @@
 //! specified.
 //!
 //! ```rust
-//! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
-//! # #![cfg_attr(feature = "exact_size_is_empty", feature(exact_size_is_empty))]
 //! use auto_enums::enum_derive;
 //!
 //! // `#[enum_derive]` implements `Iterator` and `ExactSizeIterator`.
@@ -760,7 +717,6 @@
 //!     Examples:
 //!
 //!     ```rust
-//!     # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //!     # #[cfg(feature = "type_analysis")]
 //!     # use auto_enums::auto_enum;
 //!     # #[cfg(feature = "type_analysis")]
@@ -782,11 +738,6 @@
 //! * `transpose_methods`
 //!   * Disabled by default.
 //!   * Enable to use `transpose*` methods.
-//!
-//! * `try_trait` *(requires `"unstable"` crate feature)*
-//!   * Disabled by default.
-//!   * Make `?` operator support more flexible, and to make iterator implementation more effective.
-//!   * This requires Rust Nightly and you need to enable the unstable [`try_trait`](https://github.com/rust-lang/rust/issues/42327) feature gate.
 //!
 //! ### Using external libraries (disabled by default)
 //!
@@ -810,12 +761,6 @@
 //!
 //! * [`trusted_len`](https://github.com/rust-lang/rust/issues/37572) - Enable to use `[std|core]::iter::TrustedLen` trait.
 //!
-//! * [`exact_size_is_empty`](https://github.com/rust-lang/rust/issues/35428) - Implements `ExactSizeIterator::is_empty`.
-//!
-//! * [`read_initializer`](https://github.com/rust-lang/rust/issues/42788) - Implements `std::io::Read::read_initializer`.
-//!
-//! * [`try_trait`](https://github.com/rust-lang/rust/issues/42327) - Make iterator implementation more effective.
-//!
 //! ## Known limitations
 //!
 //! * There needs to explicitly specify the trait to be implemented (`type_analysis` crate feature reduces this limitation).
@@ -833,11 +778,6 @@
 #![warn(rust_2018_idioms, single_use_lifetimes, unreachable_pub)]
 #![warn(clippy::all, clippy::pedantic)]
 #![allow(clippy::use_self)]
-
-#[cfg(all(feature = "try_trait", not(feature = "unstable")))]
-compile_error!(
-    "The `try_trait` feature requires the `unstable` feature as an explicit opt-in to unstable features"
-);
 
 #[cfg(all(feature = "futures", not(feature = "unstable")))]
 compile_error!(
@@ -857,16 +797,6 @@ compile_error!(
 #[cfg(all(feature = "trusted_len", not(feature = "unstable")))]
 compile_error!(
     "The `trusted_len` feature requires the `unstable` feature as an explicit opt-in to unstable features"
-);
-
-#[cfg(all(feature = "exact_size_is_empty", not(feature = "unstable")))]
-compile_error!(
-    "The `exact_size_is_empty` feature requires the `unstable` feature as an explicit opt-in to unstable features"
-);
-
-#[cfg(all(feature = "read_initializer", not(feature = "unstable")))]
-compile_error!(
-    "The `read_initializer` feature requires the `unstable` feature as an explicit opt-in to unstable features"
 );
 
 #[doc(hidden)]

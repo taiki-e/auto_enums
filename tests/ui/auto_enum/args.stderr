@@ -1,47 +1,47 @@
 error: expected `,`
- --> $DIR/args.rs:7:21
+ --> $DIR/args.rs:5:21
   |
-7 | #[auto_enum(Iterator;)] //~ ERROR expected `,`
+5 | #[auto_enum(Iterator;)] //~ ERROR expected `,`
   |                     ^
 
 error: expected identifier
-  --> $DIR/args.rs:15:22
+  --> $DIR/args.rs:13:22
    |
-15 | #[auto_enum(Iterator,;)] //~ ERROR expected identifier
+13 | #[auto_enum(Iterator,;)] //~ ERROR expected identifier
    |                      ^
 
 error: expected `,`
-  --> $DIR/args.rs:26:23
+  --> $DIR/args.rs:24:23
    |
-26 |     #[auto_enum(marker{f}, Iterator)] //~ ERROR expected `,`
+24 |     #[auto_enum(marker{f}, Iterator)] //~ ERROR expected `,`
    |                       ^^^
 
 error: expected `,`
-  --> $DIR/args.rs:34:23
+  --> $DIR/args.rs:32:23
    |
-34 |     #[auto_enum(marker[f], Iterator)] //~ ERROR expected `,`
+32 |     #[auto_enum(marker[f], Iterator)] //~ ERROR expected `,`
    |                       ^^^
 
 error: expected `,`
-  --> $DIR/args.rs:42:23
+  --> $DIR/args.rs:40:23
    |
-42 |     #[auto_enum(marker(f), Iterator)] //~ ERROR expected `,`
+40 |     #[auto_enum(marker(f), Iterator)] //~ ERROR expected `,`
    |                       ^^^
 
 error: duplicate `marker` argument
-  --> $DIR/args.rs:50:38
+  --> $DIR/args.rs:48:38
    |
-50 |     #[auto_enum(marker = f, marker = g, Iterator)] //~ ERROR duplicate `marker` argument
+48 |     #[auto_enum(marker = f, marker = g, Iterator)] //~ ERROR duplicate `marker` argument
    |                                      ^
 
 error: expected identifier
-  --> $DIR/args.rs:58:25
+  --> $DIR/args.rs:56:25
    |
-58 |     #[auto_enum(marker =, Iterator)] //~ ERROR expected identifier
+56 |     #[auto_enum(marker =, Iterator)] //~ ERROR expected identifier
    |                         ^
 
 error: expected `,`
-  --> $DIR/args.rs:66:28
+  --> $DIR/args.rs:64:28
    |
-66 |     #[auto_enum(marker = f t, Iterator)] //~ ERROR expected `,`
+64 |     #[auto_enum(marker = f t, Iterator)] //~ ERROR expected `,`
    |                            ^

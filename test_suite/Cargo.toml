@@ -18,7 +18,4 @@ serde = "1.0"
 unstable = [
     "auto_enums/unstable",
     "auto_enums/futures",
-    "auto_enums/try_trait",
-    "auto_enums/exact_size_is_empty",
-    "auto_enums/read_initializer",
 ]
