@@ -44,9 +44,9 @@ jobs:
       - name: cargo test
         if: matrix.rust != '1.31.0'
         run: |
-          cargo test --all --no-default-features
-          cargo test --all
-          cargo test --features type_analysis
+          cargo test --all --tests --no-default-features
+          cargo test --all --tests
+          cargo test --tests --features type_analysis
       - name: cargo test --all-features
         if: matrix.rust == 'nightly'
         run: |

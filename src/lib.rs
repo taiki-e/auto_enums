@@ -522,15 +522,13 @@
 //! When using `#[auto_enum]` for expressions and statements, `#[auto_enum]` for
 //! function is unnecessary.
 //!
-#![cfg_attr(feature = "unstable", doc = "```rust")]
-#![cfg_attr(not(feature = "unstable"), doc = "```ignore")]
+//! ```rust
 //! // Add this to your crate root:
 //! #![feature(proc_macro_hygiene, stmt_expr_attributes)]
 //! # fn main() {}
 //! ```
 //!
-#![cfg_attr(feature = "unstable", doc = "```rust")]
-#![cfg_attr(not(feature = "unstable"), doc = "```ignore")]
+//! ```rust
 //! # #![cfg_attr(feature = "try_trait", feature(try_trait))]
 //! # #![feature(proc_macro_hygiene, stmt_expr_attributes)]
 //! # use auto_enums::auto_enum;
@@ -548,24 +546,18 @@
 //!
 //! You can also return closures.
 //!
-#![cfg_attr(feature = "fn_traits", doc = "```rust")]
-#![cfg_attr(not(feature = "fn_traits"), doc = "```ignore")]
+//! ```rust
 //! // Add this to your crate root:
 //! #![feature(fn_traits, unboxed_closures)]
 //! # fn main() {}
 //! ```
 //!
-#![cfg_attr(feature = "fn_traits", doc = "```rust")]
-#![cfg_attr(not(feature = "fn_traits"), doc = "```ignore")]
+//! ```rust
 //! # #![feature(fn_traits, unboxed_closures)]
 //! # use auto_enums::auto_enum;
 //! #[auto_enum(Fn)]
 //! fn foo(x: bool) -> impl Fn(i32) -> i32 {
-//!     if x {
-//!         |y| y + 1
-//!     } else {
-//!         |z| z - 1
-//!     }
+//!     if x { |y| y + 1 } else { |z| z - 1 }
 //! }
 //! # fn main() { let _ = foo(false); }
 //! ```
@@ -829,7 +821,6 @@
 //! * There needs to explicitly specify the trait to be implemented (`type_analysis` crate feature reduces this limitation).
 //!
 //! * There needs to be marker macros for unsupported expressions.
-//!
 
 #![no_std]
 #![recursion_limit = "256"]
