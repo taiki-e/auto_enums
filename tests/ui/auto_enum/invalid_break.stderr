@@ -1,0 +1,16 @@
+error[E0267]: `break` inside of a closure
+ --> $DIR/invalid_break.rs:4:8
+  |
+4 |     || break
+  |     -- ^^^^^ cannot `break` inside of a closure
+  |     |
+  |     enclosing closure
+
+error[E0267]: `break` inside of an `async` block
+ --> $DIR/invalid_break.rs:8:13
+  |
+8 |     async { break }
+  |           --^^^^^--
+  |           | |
+  |           | cannot `break` inside of an `async` block
+  |           enclosing `async` block

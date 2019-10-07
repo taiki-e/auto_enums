@@ -22,7 +22,7 @@ fn nested() {
     }
 
     #[auto_enum(Iterator)]
-    fn match_in_match_2(x: usize) -> impl Iterator<Item = i32> {
+    fn match_in_match_nested(x: usize) -> impl Iterator<Item = i32> {
         match x {
             0 => 1..8,
             #[nested]
@@ -173,7 +173,7 @@ fn nested() {
     }
 
     #[auto_enum(Iterator)]
-    fn if_in_let_if_2(x: usize) -> impl Iterator<Item = i32> {
+    fn if_in_let_if_nested(x: usize) -> impl Iterator<Item = i32> {
         if x == 0 {
             1..8
         } else if x > 3 {
@@ -186,6 +186,68 @@ fn nested() {
                 (11..20).map(|x| x - 1)
             };
             x
+        } else {
+            (0..2).map(|x| x + 1)
+        }
+    }
+
+    #[auto_enum(Iterator)]
+    fn if_in_let_if_nested_nested(x: usize) -> impl Iterator<Item = i32> {
+        // 1 enum with 9 variants is generated.
+        if x == 0 {
+            1..8
+        } else if x != 1 {
+            #[nested]
+            let x = if x > 5 {
+                #[nested]
+                let x = if x > 10 {
+                    #[nested]
+                    let x =
+                        if x > 11 { (2..=10).flat_map(|x| 1..x) } else { (11..20).map(|x| x - 1) };
+                    x
+                } else {
+                    #[nested]
+                    let x = if x > 9 {
+                        (2..=10).flat_map(|x| 1..x)
+                    } else {
+                        #[nested]
+                        let x = if x > 6 {
+                            #[nested]
+                            let x = if x > 7 {
+                                (2..=10).flat_map(|x| 1..x)
+                            } else {
+                                (11..20).map(|x| x - 1)
+                            };
+                            x
+                        } else {
+                            (11..20).map(|x| x - 1)
+                        };
+                        x
+                    };
+                    x
+                };
+                x
+            } else {
+                (11..20).map(|x| x - 1)
+            };
+            x
+        } else {
+            (0..2).map(|x| x + 1)
+        }
+    }
+
+    #[auto_enum(Iterator)]
+    fn if_in_let_if_2(x: usize) -> impl Iterator<Item = i32> {
+        if x == 0 {
+            1..8
+        } else if x > 3 {
+            #[nested]
+            let y = if x > 4 { 2..=10 } else { (11..20).map(|x| x - 1) };
+
+            #[nested]
+            let z = if x < 4 { 2..10 } else { (11..20).map(|x| x - 1) };
+
+            if x > 5 { y } else { z }
         } else {
             (0..2).map(|x| x + 1)
         }

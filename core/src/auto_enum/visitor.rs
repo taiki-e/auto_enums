@@ -6,9 +6,12 @@ use syn::{
     *,
 };
 
-use crate::utils::{expr_unimplemented, replace_expr, Attrs, AttrsMut};
+use crate::utils::{replace_expr, Attrs};
 
 use super::{Context, VisitMode, DEFAULT_MARKER, NAME, NESTED, NEVER};
+
+/// The old annotation replaced by `#[nested]`.
+const NESTED_OLD: &str = "rec";
 
 // =================================================================================================
 // Visitor
@@ -33,7 +36,7 @@ impl<'a> Visitor<'a> {
         Self { cx, scope: Scope::default() }
     }
 
-    fn find_remove_attrs(&mut self, attrs: &mut impl AttrsMut) {
+    fn find_remove_attrs(&mut self, attrs: &mut impl Attrs) {
         if !self.scope.foreign {
             if let Some(attr) = attrs.find_remove_attr(NEVER) {
                 if let Err(e) = syn::parse2::<Nothing>(attr.tokens) {
@@ -41,12 +44,10 @@ impl<'a> Visitor<'a> {
                 }
             }
 
-            if let Some(old) = attrs.find_remove_attr(super::NESTED_OLD) {
+            if let Some(old) = attrs.find_remove_attr(NESTED_OLD) {
                 self.cx.diagnostic.error(error!(
                     old,
-                    "#[{}] has been removed and replaced with #[{}]",
-                    super::NESTED_OLD,
-                    super::NESTED
+                    "#[{}] has been removed and replaced with #[{}]", NESTED_OLD, NESTED
                 ));
             }
         }
@@ -74,27 +75,28 @@ impl<'a> Visitor<'a> {
 
                 // Desugar `ExprKind::Try`
                 // from: `<expr>?`
-                Expr::Try(ExprTry { expr, .. })
-                    // Skip if `<expr>` is a marker macro.
-                    if !self.cx.is_marker_expr(&**expr) =>
-                {
-                    // into:
-                    //
-                    // match <expr> {
-                    //     Ok(val) => val,
-                    //     Err(err) => return Err(Enum::VariantN(err)),
-                    // }
-
+                // into:
+                //
+                // match <expr> {
+                //     Ok(val) => val,
+                //     Err(err) => return Err(Enum::VariantN(err)),
+                // }
+                //
+                // Skip if `<expr>` is a marker macro.
+                Expr::Try(ExprTry { expr, .. }) if !self.cx.is_marker_expr(&**expr) => {
                     replace_expr(node, |expr| {
-                        #[allow(unused_mut)]
-                        let ExprTry { attrs, mut expr, .. } =
+                        let ExprTry { attrs, expr, .. } =
                             if let Expr::Try(expr) = expr { expr } else { unreachable!() };
 
                         let mut arms = Vec::with_capacity(2);
-                        arms.push(syn::parse_quote!(::core::result::Result::Ok(val) => val,));
+                        arms.push(syn::parse_quote! {
+                            ::core::result::Result::Ok(val) => val,
+                        });
 
                         let err = self.cx.next_expr(syn::parse_quote!(err));
-                        arms.push(syn::parse_quote!(::core::result::Result::Err(err) => return ::core::result::Result::Err(#err),));
+                        arms.push(syn::parse_quote! {
+                            ::core::result::Result::Err(err) => return ::core::result::Result::Err(#err),
+                        });
 
                         Expr::Match(ExprMatch {
                             attrs,
@@ -125,17 +127,19 @@ impl<'a> Visitor<'a> {
     fn visit_marker_macro(&mut self, node: &mut Expr) {
         debug_assert!(!self.scope.foreign || self.cx.marker != DEFAULT_MARKER);
 
-        match &node {
+        match node {
             // Desugar `marker!(<expr>)` into `Enum::VariantN(<expr>)`.
-            Expr::Macro(ExprMacro { mac, .. })
-                // Skip if `marker!` is not a marker macro.
-                if self.cx.is_marker_macro_exact(mac) =>
-            {
+            // Skip if `marker!` is not a marker macro.
+            Expr::Macro(ExprMacro { mac, .. }) if self.cx.is_marker_macro_exact(mac) => {
                 replace_expr(node, |expr| {
                     let expr = if let Expr::Macro(expr) = expr { expr } else { unreachable!() };
                     let args = syn::parse2(expr.mac.tokens).unwrap_or_else(|e| {
                         self.cx.diagnostic.error(e);
-                        expr_unimplemented()
+                        // Generate an expression to fill in where the error occurred during the visit.
+                        // These will eventually need to be replaced with the original error message.
+                        syn::parse_quote!(compile_error!(
+                            "#[auto_enum] failed to generate error message"
+                        ))
                     });
 
                     if self.cx.failed() {
@@ -295,15 +299,9 @@ fn visit_stmt(visitor: &mut impl VisitStmt, node: &mut Stmt) {
         visit_mut::visit_stmt_mut(visitor, node);
 
         match res {
-            Err(e) => {
-                visitor.cx().diagnostic.error(e);
-                *node = Stmt::Expr(expr_unimplemented());
-            }
+            Err(e) => visitor.cx().diagnostic.error(e),
             Ok(mut cx) => {
-                super::expand_parent_stmt(node, &mut cx).unwrap_or_else(|e| {
-                    cx.diagnostic.error(e);
-                    *node = Stmt::Expr(expr_unimplemented());
-                });
+                super::expand_parent_stmt(node, &mut cx).unwrap_or_else(|e| cx.diagnostic.error(e));
                 visitor.cx().join_child(cx)
             }
         }
@@ -380,7 +378,7 @@ impl VisitMut for FindTry<'_> {
     fn visit_expr_mut(&mut self, node: &mut Expr) {
         let tmp = self.scope;
 
-        if let Expr::Closure(_) = &node {
+        if let Expr::Closure(_) = node {
             self.scope.closure = true;
         }
 

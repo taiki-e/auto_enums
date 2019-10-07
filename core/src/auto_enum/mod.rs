@@ -17,20 +17,12 @@ use self::{
 
 /// The attribute name.
 const NAME: &str = "auto_enum";
-
 /// The annotation for recursively parsing.
 const NESTED: &str = "nested";
 /// The annotation for skipping branch.
 const NEVER: &str = "never";
 
-/// The old annotation replaced by `#[nested]`.
-const NESTED_OLD: &str = "rec";
-
 pub(crate) fn attribute(args: TokenStream, input: TokenStream) -> TokenStream {
-    expand(args, input)
-}
-
-fn expand(args: TokenStream, input: TokenStream) -> TokenStream {
     let mut cx = match Context::root(input.clone(), args) {
         Err(e) => return e.to_compile_error(),
         Ok(cx) => cx,
@@ -78,7 +70,7 @@ fn build_expr(expr: &mut Expr, item: ItemEnum) {
 // Expand statement or expression in which `#[auto_enum]` was directly used.
 
 fn expand_parent_stmt(stmt: &mut Stmt, cx: &mut Context) -> Result<()> {
-    if let Stmt::Semi(..) = &stmt {
+    if let Stmt::Semi(..) = stmt {
         cx.visit_last_mode = VisitLastMode::Never;
     }
 
@@ -139,14 +131,14 @@ fn expand_parent_item_fn(item: &mut ItemFn, cx: &mut Context) -> Result<()> {
 
             // `?` operator
             Type::Path(TypePath { qself: None, path }) if cx.visit_last() => {
-                let PathSegment { arguments, ident } = &path.segments[path.segments.len() - 1];
-                match arguments {
+                let ty = path.segments.last().unwrap();
+                match &ty.arguments {
                     // `Result<T, impl Trait>`
                     PathArguments::AngleBracketed(AngleBracketedGenericArguments {
                         colon2_token: None,
                         args,
                         ..
-                    }) if args.len() == 2 && ident == "Result" => {
+                    }) if args.len() == 2 && ty.ident == "Result" => {
                         if let (
                             GenericArgument::Type(_),
                             GenericArgument::Type(Type::ImplTrait(_)),
