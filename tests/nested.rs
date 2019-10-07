@@ -1,4 +1,3 @@
-#![cfg_attr(feature = "try_trait", feature(try_trait))]
 #![warn(rust_2018_idioms)]
 #![allow(dead_code)]
 
@@ -40,9 +39,6 @@ fn nested() {
             },
             _ => (0..2).map(|x| x + 1),
         }
-    }
-    for (i, x) in [28, 3].iter().enumerate() {
-        assert_eq!(match_in_match(i).sum::<i32>(), *x);
     }
 
     #[rustfmt::skip]
@@ -139,6 +135,28 @@ fn nested() {
     }
 
     #[auto_enum(Iterator)]
+    fn match_in_let_if_2(x: usize) -> impl Iterator<Item = i32> {
+        match x {
+            0 => 1..8,
+            3 => {
+                #[nested]
+                let x = if x > 4 {
+                    2..=10
+                } else {
+                    #[nested]
+                    let x = match x {
+                        4..=10 => 2..10,
+                        _ => (11..20).map(|x| x - 1),
+                    };
+                    x
+                };
+                x
+            }
+            _ => (0..2).map(|x| x + 1),
+        }
+    }
+
+    #[auto_enum(Iterator)]
     fn if_in_let_if(x: usize) -> impl Iterator<Item = i32> {
         if x == 0 {
             1..8
@@ -152,6 +170,25 @@ fn nested() {
     }
     for (i, x) in [28, 3].iter().enumerate() {
         assert_eq!(if_in_let_if(i).sum::<i32>(), *x);
+    }
+
+    #[auto_enum(Iterator)]
+    fn if_in_let_if_2(x: usize) -> impl Iterator<Item = i32> {
+        if x == 0 {
+            1..8
+        } else if x > 3 {
+            #[nested]
+            let x = if x > 4 {
+                #[nested]
+                let x = if x > 4 { (2..=10).flat_map(|x| 1..x) } else { core::iter::empty() };
+                x
+            } else {
+                (11..20).map(|x| x - 1)
+            };
+            x
+        } else {
+            (0..2).map(|x| x + 1)
+        }
     }
 
     #[auto_enum(Iterator)]

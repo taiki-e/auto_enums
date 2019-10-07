@@ -1,4 +1,4 @@
-#![cfg(all(feature = "std", feature = "type_analysis", feature = "transpose_methods",))]
+#![cfg(all(feature = "std", feature = "type_analysis", feature = "transpose_methods"))]
 #![warn(rust_2018_idioms)]
 
 #[test]
