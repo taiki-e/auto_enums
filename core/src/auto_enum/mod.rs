@@ -10,8 +10,10 @@ mod expr;
 mod type_analysis;
 mod visitor;
 
-use self::context::{Context, VisitLastMode, VisitMode, DEFAULT_MARKER};
-use self::expr::child_expr;
+use self::{
+    context::{Context, VisitLastMode, VisitMode, DEFAULT_MARKER},
+    expr::child_expr,
+};
 
 /// The attribute name.
 const NAME: &str = "auto_enum";
