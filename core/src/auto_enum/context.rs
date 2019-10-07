@@ -70,12 +70,12 @@ pub(super) struct Context {
     builder: Builder,
 
     /// The identifier of the marker macro of the current scope.
-    pub(super) marker: Ident,
+    pub(super) marker: String,
     /// All marker macro identifiers that may have effects on the current scope.
     pub(super) markers: Vec<String>,
 
     // depth: i32,
-    /// Currently, this is basically the same as `self.markers.borrow().len() == 1`.
+    /// Currently, this is basically the same as `self.markers.len() == 1`.
     root: bool,
     /// This is `true` if other `auto_enum` attribute exists in the current scope.
     pub(super) other_attr: bool,
@@ -98,7 +98,7 @@ impl Context {
     ) -> Result<Self> {
         let Args { args, marker } = syn::parse2(args)?;
 
-        let (marker_string, marker) = if let Some(marker) = marker {
+        let marker = if let Some(marker) = marker {
             // Currently, there is no reason to preserve the span, so convert `Ident` to `String`.
             // This should probably be more efficient than calling `to_string` for each comparison.
             // https://github.com/alexcrichton/proc-macro2/blob/1.0.1/src/wrapper.rs#L706
@@ -109,12 +109,12 @@ impl Context {
                     "A custom marker name is specified that duplicated the name already used in the parent scope",
                 ));
             }
-            (marker_string, marker)
+            marker_string
         } else {
-            (DEFAULT_MARKER.to_owned(), format_ident!("{}", DEFAULT_MARKER))
+            DEFAULT_MARKER.to_string()
         };
 
-        markers.push(marker_string);
+        markers.push(marker.clone());
 
         Ok(Self {
             builder: Builder::new(&span),

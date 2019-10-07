@@ -17,10 +17,8 @@ pub(super) fn child_expr(expr: &mut Expr, cx: &mut Context) -> Result<()> {
 
     match expr {
         Expr::Block(ExprBlock { block, .. }) | Expr::Unsafe(ExprUnsafe { block, .. }) => {
-            match block.stmts.last_mut() {
-                Some(Stmt::Expr(expr)) => return child_expr(expr, cx),
-                Some(Stmt::Item(_)) => unreachable!(),
-                _ => {}
+            if let Some(Stmt::Expr(expr)) = block.stmts.last_mut() {
+                return child_expr(expr, cx);
             }
         }
         _ => {}
@@ -142,7 +140,7 @@ fn visit_last_expr_if(cx: &mut Context, expr: &mut ExprIf) -> Result<()> {
 }
 
 fn visit_last_expr_loop(cx: &mut Context, expr: &mut ExprLoop) -> Result<()> {
-    LoopVisitor::new(expr, cx).visit_block_mut(&mut expr.body);
+    LoopVisitor::new(expr.label.as_ref(), cx).visit_block_mut(&mut expr.body);
     Ok(())
 }
 
@@ -151,19 +149,19 @@ fn visit_last_expr_loop(cx: &mut Context, expr: &mut ExprLoop) -> Result<()> {
 
 struct LoopVisitor<'a> {
     cx: &'a mut Context,
-    label: Option<Lifetime>,
+    label: Option<&'a Label>,
     nested: bool,
 }
 
 impl<'a> LoopVisitor<'a> {
-    fn new(expr: &ExprLoop, cx: &'a mut Context) -> Self {
-        Self { cx, label: expr.label.as_ref().map(|l| l.name.clone()), nested: false }
+    fn new(label: Option<&'a Label>, cx: &'a mut Context) -> Self {
+        Self { cx, label, nested: false }
     }
 
     fn compare_labels(&self, other: Option<&Lifetime>) -> bool {
-        match (&self.label, other) {
+        match (self.label, other) {
             (None, None) => true,
-            (Some(x), Some(y)) => x.ident == y.ident,
+            (Some(this), Some(other)) => this.name.ident == other.ident,
             _ => false,
         }
     }
@@ -177,8 +175,8 @@ impl VisitMut for LoopVisitor<'_> {
 
         let tmp = self.nested;
         match node {
-            // Stop at closure bounds
-            Expr::Closure(_) => return,
+            // Stop at closure / async block bounds
+            Expr::Closure(_) | Expr::Async(_) => return,
 
             // Other loop bounds
             Expr::Loop(_) | Expr::ForLoop(_) | Expr::While(_) => {
@@ -190,7 +188,7 @@ impl VisitMut for LoopVisitor<'_> {
 
             // Desugar `break <expr>` into `break Enum::VariantN(<expr>)`.
             Expr::Break(ExprBreak { label, expr, .. }) => {
-                if (!self.nested && label.is_none()) || self.compare_labels(label.as_ref()) {
+                if !self.nested && label.is_none() || self.compare_labels(label.as_ref()) {
                     self.cx.replace_boxed_expr(expr);
                 }
             }
