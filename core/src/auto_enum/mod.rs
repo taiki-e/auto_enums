@@ -22,8 +22,6 @@ const NAME: &str = "auto_enum";
 const NESTED: &str = "nested";
 /// The annotation for skipping branch.
 const NEVER: &str = "never";
-/// The annotations used by `#[auto_enum]`.
-const EMPTY_ATTRS: &[&str] = &[NEVER, NESTED];
 
 /// The old annotation replaced by `#[nested]`.
 const NESTED_OLD: &str = "rec";

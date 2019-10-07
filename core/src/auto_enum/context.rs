@@ -13,7 +13,7 @@ use syn::{
 
 use crate::utils::{expr_call, path, replace_expr, unit, VisitedNode};
 
-use super::visitor::{Dummy, FindTry, Visitor};
+use super::visitor::{Dummy, FindNested, FindTry, Visitor};
 
 // =================================================================================================
 // Context
@@ -228,6 +228,12 @@ impl Context {
         debug_assert!(self.is_dummy());
 
         node.visited(&mut Dummy::new(self));
+    }
+
+    pub(super) fn find_nested(&mut self, node: &mut impl VisitedNode) -> bool {
+        let mut visitor = FindNested::new();
+        node.visited(&mut visitor);
+        visitor.has
     }
 
     pub(super) fn find_try(&mut self, node: &mut impl VisitedNode) {

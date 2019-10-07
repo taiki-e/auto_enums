@@ -7,10 +7,7 @@
 #![cfg_attr(feature = "trusted_len", feature(trusted_len))]
 #![cfg_attr(not(feature = "std"), no_std)]
 #![warn(rust_2018_idioms)]
-
-#[allow(unused_imports)]
-#[macro_use]
-extern crate alloc;
+#![allow(dead_code)]
 
 mod stable {
     use auto_enums::auto_enum;
@@ -133,6 +130,15 @@ mod stable {
         }
         for (i, x) in ANS.iter().enumerate() {
             assert_eq!(no_return4(i).sum::<i32>(), *x);
+        }
+
+        #[auto_enum(fmt::Debug)]
+        fn no_return5(x: usize) -> impl core::fmt::Debug {
+            match x {
+                0 => 1..8,
+                3 => {}
+                _ => 0..=2,
+            }
         }
 
         #[auto_enum(Iterator)]
@@ -329,111 +335,6 @@ mod stable {
         }
         #[cfg(feature = "transpose_methods")]
         assert_eq!(transpose(0).unwrap().sum::<i32>(), 28);
-    }
-
-    #[test]
-    fn nested() {
-        #[auto_enum(Iterator)]
-        fn match_in_match(x: usize) -> impl Iterator<Item = i32> {
-            match x {
-                0 => 1..8,
-                #[nested]
-                n if n > 3 => match x {
-                    2..=10 => (1..x as _).map(|x| x - 1),
-                    _ => 2..=10,
-                },
-                _ => (0..2).map(|x| x + 1),
-            }
-        }
-        for (i, x) in ANS.iter().enumerate() {
-            assert_eq!(match_in_match(i).sum::<i32>(), *x);
-        }
-
-        #[rustfmt::skip]
-        #[allow(unused_unsafe)]
-        #[auto_enum(Iterator)]
-        fn in_block(x: usize) -> impl Iterator<Item = i32> {
-            {{{ unsafe {{{ unsafe { unsafe {{
-                match x {
-                    0 => 1..8,
-                    #[nested]
-                    n if n > 3 => {{{ unsafe {{
-                        if x > 10 {
-                            (-10..=x as _).map(|x| x - 4)
-                        } else {
-                            (1..=4).map(|x| x - 4)
-                        }
-                    }}}}}
-                    _ => (0..2).map(|x| x + 1),
-                }
-            }}}}}}}}}
-        }
-        for (i, x) in ANS.iter().enumerate() {
-            assert_eq!(in_block(i).sum::<i32>(), *x);
-        }
-
-        #[auto_enum(Iterator)]
-        fn match_in_if(x: usize) -> impl Iterator<Item = i32> {
-            if x == 0 {
-                1..8
-            } else if x > 3 {
-                #[nested]
-                match x {
-                    1..=4 => 2..=10,
-                    _ => (11..20).map(|x| x - 1),
-                }
-            } else {
-                (0..2).map(|x| x + 1)
-            }
-        }
-        for (i, x) in ANS.iter().enumerate() {
-            assert_eq!(match_in_if(i).sum::<i32>(), *x);
-        }
-
-        #[auto_enum(Iterator)]
-        fn if_in_if(x: usize) -> impl Iterator<Item = i32> {
-            if x == 0 {
-                1..8
-            } else if x > 3 {
-                #[nested]
-                {
-                    if x > 4 { 2..=10 } else { (11..20).map(|x| x - 1) }
-                }
-            } else {
-                (0..2).map(|x| x + 1)
-            }
-        }
-        for (i, x) in ANS.iter().enumerate() {
-            assert_eq!(if_in_if(i).sum::<i32>(), *x);
-        }
-
-        #[auto_enum(Iterator)]
-        fn nop(x: usize) -> impl Iterator<Item = i32> {
-            if x == 0 {
-                1..8
-            } else if x > 3 {
-                #[nested]
-                2..=10
-            } else {
-                (0..2).map(|x| x + 1)
-            }
-        }
-        for (i, x) in ANS.iter().enumerate() {
-            assert_eq!(nop(i).sum::<i32>(), *x);
-        }
-
-        #[auto_enum(Iterator)]
-        fn no_return(x: usize) -> impl Iterator<Item = i32> {
-            match x {
-                0 => 1..8,
-                #[nested]
-                3 => panic!(),
-                _ => (0..2).map(|x| x + 1),
-            }
-        }
-        for (i, x) in ANS.iter().enumerate() {
-            assert_eq!(no_return(i).sum::<i32>(), *x);
-        }
     }
 
     #[test]
@@ -768,27 +669,6 @@ mod nightly {
             0 => 2..8,
             _ => 2..=10,
         };
-    }
-
-    #[test]
-    fn nested() {
-        // nested
-        for (i, x) in ANS.iter().enumerate() {
-            #[auto_enum(Iterator)]
-            let iter = if i > 3 {
-                #[nested]
-                match i {
-                    1..=10 => (1..3).map(|x| x + 1),
-                    11..=20 => 4..=5,
-                    _ => (5..10).map(|x| x - 1),
-                }
-            } else if i == 0 {
-                1..8
-            } else {
-                vec![1, 2, 0].into_iter()
-            };
-            assert_eq!(iter.sum::<i32>(), *x);
-        }
     }
 
     #[test]

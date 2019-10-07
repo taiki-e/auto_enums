@@ -40,6 +40,7 @@ lazy_static! {
             <"DoubleEndedIterator", ["Iterator"]>,
             <"ExactSizeIterator", ["Iterator"]>,
             <"FusedIterator", ["Iterator"]>,
+            #[cfg(feature = "trusted_len")]
             <"TrustedLen", ["Iterator"]>,
             #[cfg(feature = "std")]
             <"BufRead", ["Read"]>,
@@ -150,6 +151,7 @@ lazy_static! {
             core::ops::fn_once,
             #[cfg(feature = "generator_trait")]
             core::ops::generator,
+            #[cfg(stable_1_36)]
             core::future,
             // std
             #[cfg(feature = "std")]
