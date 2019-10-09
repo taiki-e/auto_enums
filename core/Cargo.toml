@@ -15,14 +15,14 @@ This library provides an attribute macro for to allow multiple return types by a
 [lib]
 proc-macro = true
 
-[dependencies]
-proc-macro2 = "1.0"
-quote = "1.0"
-syn = { version = "1.0", features = ["full", "visit-mut"] }
-
 [features]
 # Default features.
 default = []
 
 # Analyze return type of function and `let` binding.
 type_analysis = ["syn/extra-traits"]
+
+[dependencies]
+proc-macro2 = "1.0"
+quote = "1.0"
+syn = { version = "1.0", features = ["full", "visit-mut"] }

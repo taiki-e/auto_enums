@@ -14,14 +14,7 @@ A library for to allow multiple return types by automatically generated enum.
 """
 
 [workspace]
-members = ["core", "derive", "test_suite"]
-
-[dependencies]
-auto_enums_core = { version = "=0.6.4", path = "core", default-features = false }
-auto_enums_derive = { version = "=0.6.4", path = "derive", default-features = false }
-
-[dev-dependencies]
-trybuild = "1.0"
+members = ["core", "derive"]
 
 [features]
 # Default features.
@@ -79,3 +72,14 @@ generator_trait = ["auto_enums_derive/generator_trait"]
 fn_traits = ["auto_enums_derive/fn_traits"]
 # Enable to use `[std|core]::iter::TrustedLen` trait.
 trusted_len = ["auto_enums_derive/trusted_len"]
+
+[dependencies]
+auto_enums_core = { version = "=0.6.4", path = "core", default-features = false }
+auto_enums_derive = { version = "=0.6.4", path = "derive", default-features = false }
+
+[dev-dependencies]
+trybuild = "1.0"
+futures-preview = "0.3.0-alpha.19"
+rayon_crate = { version = "1", package = "rayon" }
+serde_crate = { version = "1", package = "serde" }
+rand = "0.7"
