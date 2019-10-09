@@ -6,6 +6,11 @@
 #![warn(rust_2018_idioms)]
 #![allow(dead_code)]
 
+#[cfg(feature = "rayon")]
+extern crate rayon_crate as rayon;
+#[cfg(feature = "serde")]
+extern crate serde_crate as serde;
+
 use auto_enums::enum_derive;
 
 #[test]
@@ -105,6 +110,45 @@ fn stable_std() {
         A(A),
         B(B),
     }
+}
+
+#[cfg(feature = "std")]
+#[test]
+fn stable_external() {
+    #[cfg(feature = "rayon")]
+    #[enum_derive(rayon::ParallelIterator, rayon::IndexedParallelIterator, rayon::ParallelExtend)]
+    enum Rayon<A, B> {
+        A(A),
+        B(B),
+    }
+
+    #[cfg(feature = "serde")]
+    #[enum_derive(serde::Serialize)]
+    enum Serde<A, B> {
+        A(A),
+        B(B),
+    }
+
+    #[cfg(feature = "futures")]
+    #[enum_derive(
+        Future,
+        futures::Stream,
+        futures::Sink,
+        futures::AsyncRead,
+        futures::AsyncWrite,
+        futures::AsyncSeek,
+        futures::AsyncBufRead
+    )]
+    enum Futures<A, B> {
+        A(A),
+        B(B),
+    }
+
+    // #[enum_derive(futures01::Future, futures01::Sink, futures01::Stream)]
+    // enum Futures01<A, B> {
+    //     A(A),
+    //     B(B),
+    // }
 }
 
 // nightly

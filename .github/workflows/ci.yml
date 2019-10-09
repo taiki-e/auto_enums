@@ -51,6 +51,10 @@ jobs:
         if: matrix.rust == 'nightly'
         run: |
           cargo test --all --all-features
+      - name: cargo check --benches
+        if: matrix.rust == 'nightly'
+        run: |
+          cargo check --benches
       # Refs: https://github.com/rust-lang/cargo/issues/5657
       - name: cargo check -Zminimal-versions
         if: matrix.rust == 'nightly'
