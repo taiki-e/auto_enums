@@ -3,7 +3,7 @@
 #![cfg_attr(feature = "trusted_len", feature(trusted_len))]
 #![cfg_attr(not(feature = "std"), no_std)]
 #![warn(unsafe_code)]
-#![warn(rust_2018_idioms)]
+#![warn(rust_2018_idioms, single_use_lifetimes)]
 #![allow(dead_code)]
 
 #[cfg(feature = "rayon")]

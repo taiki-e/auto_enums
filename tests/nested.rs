@@ -1,4 +1,5 @@
-#![warn(rust_2018_idioms)]
+#![warn(unsafe_code)]
+#![warn(rust_2018_idioms, single_use_lifetimes)]
 #![allow(dead_code)]
 
 use auto_enums::auto_enum;
@@ -42,6 +43,7 @@ fn nested() {
     }
 
     #[rustfmt::skip]
+    #[allow(unsafe_code)]
     #[allow(unused_unsafe)]
     #[auto_enum(Iterator)]
     fn in_block(x: usize) -> impl Iterator<Item = i32> {

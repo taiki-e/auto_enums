@@ -6,7 +6,8 @@
 #![cfg_attr(feature = "fn_traits", feature(fn_traits, unboxed_closures))]
 #![cfg_attr(feature = "trusted_len", feature(trusted_len))]
 #![cfg_attr(not(feature = "std"), no_std)]
-#![warn(rust_2018_idioms)]
+#![warn(unsafe_code)]
+#![warn(rust_2018_idioms, single_use_lifetimes)]
 #![allow(dead_code)]
 
 mod stable {
@@ -30,6 +31,7 @@ mod stable {
 
         // block + unsafe block + parentheses
         #[rustfmt::skip]
+        #[allow(unsafe_code)]
         #[allow(unused_unsafe)]
         #[auto_enum(Iterator)]
         fn block(x: usize) -> impl Iterator<Item = i32> {
@@ -567,6 +569,59 @@ mod nightly {
             assert_eq!(iter.sum::<i32>(), *x);
         }
 
+        /*
+        This can not be supported. It is parsed as follows.
+            expected: ExprAssign { left: ExprPath, right: ExprMatch, .. }
+               found: ExprPath
+        #[auto_enum(Iterator, Clone)]
+        a = match x {
+            0 => 2..8,
+            _ if x < 2 => vec![2, 0].into_iter(),
+            _ => 2..=10,
+        };
+        */
+        fn assign(x: usize) -> impl Iterator<Item = i32> + Clone {
+            let a;
+            a = #[auto_enum(Iterator, Clone)]
+            match x {
+                0 => 2..8,
+                _ if x < 2 => vec![2, 0].into_iter(),
+                _ => 2..=10,
+            };
+            a
+        }
+        for (i, x) in ANS.iter().enumerate() {
+            assert_eq!(assign(i).sum::<i32>(), *x - 1);
+        }
+
+        #[auto_enum(Fn)]
+        fn fn_traits1(option: bool) -> impl Fn(i32) -> i32 {
+            if option { |x| x + 1 } else { |y| y - 1 }
+        }
+        assert_eq!(fn_traits1(true)(1), 2);
+
+        // parentheses and type ascription
+        #[auto_enum(Fn)]
+        fn fn_traits2(option: bool) -> impl Fn(i32) -> i32 {
+            (if option { |x| x + 1 } else { |y| y - 1 }): _
+        }
+        assert_eq!(fn_traits2(true)(1), 2);
+
+        #[auto_enum(Iterator, Clone)]
+        let _y = match 0 {
+            0 => 2..8,
+            _ => 2..=10,
+        };
+
+        #[auto_enum(Iterator, Clone)]
+        let _x = match 0 {
+            0 => 2..8,
+            _ => 2..=10,
+        };
+    }
+
+    #[test]
+    fn never() {
         // never attr
         for (i, x) in ANS.iter().enumerate() {
             #[rustfmt::skip]
@@ -619,56 +674,6 @@ mod nightly {
             };
             assert_eq!(iter.sum::<i32>(), *x);
         }
-
-        /*
-        This can not be supported. It is parsed as follows.
-            expected: ExprAssign { left: ExprPath, right: ExprMatch, .. }
-               found: ExprPath
-        #[auto_enum(Iterator, Clone)]
-        a = match x {
-            0 => 2..8,
-            _ if x < 2 => vec![2, 0].into_iter(),
-            _ => 2..=10,
-        };
-        */
-        fn assign(x: usize) -> impl Iterator<Item = i32> + Clone {
-            let a;
-            a = #[auto_enum(Iterator, Clone)]
-            match x {
-                0 => 2..8,
-                _ if x < 2 => vec![2, 0].into_iter(),
-                _ => 2..=10,
-            };
-            a
-        }
-        for (i, x) in ANS.iter().enumerate() {
-            assert_eq!(assign(i).sum::<i32>(), *x - 1);
-        }
-
-        #[auto_enum(Fn)]
-        fn fn_traits1(option: bool) -> impl Fn(i32) -> i32 {
-            if option { |x| x + 1 } else { |y| y - 1 }
-        }
-        assert_eq!(fn_traits1(true)(1), 2);
-
-        // parentheses and type ascription
-        #[auto_enum(Fn)]
-        fn fn_traits2(option: bool) -> impl Fn(i32) -> i32 {
-            (if option { |x| x + 1 } else { |y| y - 1 }): _
-        }
-        assert_eq!(fn_traits2(true)(1), 2);
-
-        #[auto_enum(Iterator, Clone)]
-        let _y = match 0 {
-            0 => 2..8,
-            _ => 2..=10,
-        };
-
-        #[auto_enum(Iterator, Clone)]
-        let _x = match 0 {
-            0 => 2..8,
-            _ => 2..=10,
-        };
     }
 
     #[test]

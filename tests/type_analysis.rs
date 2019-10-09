@@ -1,5 +1,6 @@
 #![cfg(feature = "type_analysis")]
-#![warn(rust_2018_idioms)]
+#![warn(unsafe_code)]
+#![warn(rust_2018_idioms, single_use_lifetimes)]
 #![allow(dead_code)]
 
 use auto_enums::auto_enum;

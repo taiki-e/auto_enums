@@ -1,5 +1,6 @@
 #![cfg(all(feature = "std", feature = "type_analysis", feature = "transpose_methods"))]
-#![warn(rust_2018_idioms)]
+#![warn(unsafe_code)]
+#![warn(rust_2018_idioms, single_use_lifetimes)]
 
 #[test]
 fn ui() {
