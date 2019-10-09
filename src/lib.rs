@@ -27,7 +27,6 @@
 //!         _ => vec![5, 10].into_iter(),
 //!     }
 //! }
-//! # fn main() { let _ = foo(0); }
 //! ```
 //!
 //! `#[auto_enum]` generates code in two stages.
@@ -53,7 +52,6 @@
 //!         _ => __Enum1::__T2(vec![5, 10].into_iter()),
 //!     }
 //! }
-//! # fn main() { let _ = foo(0); }
 //! ```
 //!
 //! Next, `#[enum_derive]` implements the specified traits.
@@ -95,7 +93,6 @@
 //!         _ => __Enum1::__T2(vec![5, 10].into_iter()),
 //!     }
 //! }
-//! # fn main() { let _ = foo(0); }
 //! ```
 //!
 //! </details>
@@ -117,7 +114,6 @@
 //!         },
 //!     }
 //! }
-//! # fn main() { let _ = foo(0); }
 //! ```
 //!
 //! `#[nested]` can be used basically in the same place as `#[auto_enum]`,
@@ -144,7 +140,6 @@
 //!           0..x
 //!       }
 //!   }
-//!   # fn main() { let _ = func(0); }
 //!   ```
 //!
 //! * expressions
@@ -159,7 +154,6 @@
 //!           _ => 0..x,
 //!       }
 //!   }
-//!   # fn main() { let _ = expr(0); }
 //!   ```
 //!
 //! * let binding
@@ -175,7 +169,6 @@
 //!       };
 //!       iter
 //!   }
-//!   # fn main() { let _ = let_binding(0); }
 //!   ```
 //!
 //! ### Supported syntax
@@ -206,7 +199,6 @@
 //!       };
 //!       iter
 //!   }
-//!   # fn main() { let _ = expr_if(0); let _ = expr_match(0); }
 //!   ```
 //!
 //! * `loop`
@@ -227,7 +219,6 @@
 //!           x -= 1;
 //!       }
 //!   }
-//!   # fn main() { let _ = expr_loop(0); }
 //!   ```
 //!
 //! * `return` (in functions)
@@ -251,7 +242,6 @@
 //!           x..=0
 //!       }
 //!   }
-//!   # fn main() { let _ = func(1); }
 //!   ```
 //!
 //! * `return` (in closures)
@@ -282,7 +272,6 @@
 //!       };
 //!       f(1)
 //!   }
-//!   # fn main() { let _ = closure(); }
 //!   ```
 //!
 //! * `?` operator (in functions)
@@ -309,14 +298,13 @@
 //!           Ok(x + 1)
 //!       }
 //!   }
-//!   # fn main() { let _ = func(1); }
 //!   ```
 //!
-//!   By default, `?` operator is expanded as follows:
+//!   `?` operator is expanded as follows:
 //!
 //!   ```rust
-//!   # pub enum Enum<A> { Veriant(A) }
-//!   # pub fn a<T, E>(expr: Result<T, E>) -> Result<T, Enum<E>> {
+//!   # enum Enum<A> { Veriant(A) }
+//!   # fn dox<T, E>(expr: Result<T, E>) -> Result<T, Enum<E>> {
 //!   # Ok(
 //!   match expr {
 //!       Ok(val) => val,
@@ -355,7 +343,6 @@
 //!       };
 //!       f(1)
 //!   }
-//!   # fn main() { let _ = closure(); }
 //!   ```
 //!
 //! * Block, unsafe block, method call, parentheses, and type ascription
@@ -399,7 +386,6 @@
 //!   fn expr_parentheses(x: i32) -> impl Iterator<Item=i32> {
 //!       (if x == 0 { Some(0).into_iter() } else { 0..x })
 //!   }
-//!   # fn main() { let _ = expr_block(0); let _ = expr_method(0); let _ = expr_parentheses(0); }
 //!   ```
 //!
 //! ### Expression that no value will be returned
@@ -430,7 +416,6 @@
 //!         _ => vec![5, 10].into_iter(),
 //!     }
 //! }
-//! # fn main() { let _ = foo(0); }
 //! ```
 //!
 //! You can also skip that branch explicitly by `#[never]` attribute.
@@ -448,7 +433,6 @@
 //!         _ => vec![5, 10].into_iter(),
 //!     }
 //! }
-//! # fn main() { let _ = foo(0); }
 //! ```
 //!
 //! ### Expression level marker (`marker!` macro)
@@ -466,7 +450,6 @@
 //!     }
 //!     marker!(1..10)
 //! }
-//! # fn main() { let _ = foo(0); }
 //! ```
 //!
 //! The default name of the macro is `"marker"`, but you can change it by
@@ -481,7 +464,6 @@
 //!     }
 //!     bar!(1..10)
 //! }
-//! # fn main() { let _ = foo(0); }
 //! ```
 //!
 //! ## Rust Nightly
@@ -492,11 +474,12 @@
 //! ```rust
 //! // Add this to your crate root:
 //! #![feature(proc_macro_hygiene, stmt_expr_attributes)]
-//! # fn main() {}
 //! ```
 //!
 //! ```rust
-//! # #![feature(proc_macro_hygiene, stmt_expr_attributes)]
+//! # #![cfg_attr(feature = "unstable", feature(proc_macro_hygiene, stmt_expr_attributes))]
+//! # #[cfg(feature = "unstable")]
+//! # fn dox() {
 //! # use auto_enums::auto_enum;
 //! fn foo(x: i32) -> i32 {
 //!     #[auto_enum(Iterator)]
@@ -507,7 +490,7 @@
 //!
 //!     iter.fold(0, |sum, x| sum + x)
 //! }
-//! # fn main() { let _ = foo(0); }
+//! # }
 //! ```
 //!
 //! You can also return closures.
@@ -515,17 +498,18 @@
 //! ```rust
 //! // Add this to your crate root:
 //! #![feature(fn_traits, unboxed_closures)]
-//! # fn main() {}
 //! ```
 //!
 //! ```rust
-//! # #![feature(fn_traits, unboxed_closures)]
+//! # #![cfg_attr(feature = "fn_traits", feature(fn_traits, unboxed_closures))]
+//! # #[cfg(feature = "fn_traits")]
+//! # fn dox() {
 //! # use auto_enums::auto_enum;
 //! #[auto_enum(Fn)]
 //! fn foo(x: bool) -> impl Fn(i32) -> i32 {
 //!     if x { |y| y + 1 } else { |z| z - 1 }
 //! }
-//! # fn main() { let _ = foo(false); }
+//! # }
 //! ```
 //!
 //! ## `#[enum_derive]`
@@ -548,7 +532,6 @@
 //!     A(A),
 //!     B(B),
 //! }
-//! # fn main() { let _: Foo<i32, i32> = Foo::A(0); }
 //! ```
 //!
 //! `#[enum_derive]` adds the dependency of the specified trait if it is not
@@ -563,7 +546,6 @@
 //!     A(A),
 //!     B(B),
 //! }
-//! # fn main() { let _: Foo<i32, i32> = Foo::A(0); }
 //! ```
 //!
 //! [derive_utils]: https://github.com/taiki-e/derive_utils
@@ -676,11 +658,10 @@
 //!
 //!     ```rust
 //!     # #[cfg(feature = "transpose_methods")]
+//!     # fn dox() {
 //!     # use auto_enums::auto_enum;
-//!     # #[cfg(feature = "transpose_methods")]
 //!     use std::{fs, io, path::Path};
 //!
-//!     # #[cfg(feature = "transpose_methods")]
 //!     #[auto_enum(Transpose, Write)]
 //!     fn output_stream(file: Option<&Path>) -> io::Result<impl io::Write> {
 //!         match file {
@@ -688,10 +669,7 @@
 //!             None => Ok(io::stdout()),
 //!         }.transpose_ok()
 //!     }
-//!     # #[cfg(feature = "transpose_methods")]
-//!     # fn main() { let _ = output_stream(None); }
-//!     # #[cfg(not(feature = "transpose_methods"))]
-//!     # fn main() {}
+//!     # }
 //!     ```
 //!
 //!   * `transpose_err` - convert from `enum<Result<T, E1>,..>` to `Result<T, enum<E1,..>>`
@@ -724,8 +702,8 @@
 //!
 //!     ```rust
 //!     # #[cfg(feature = "type_analysis")]
+//!     # fn dox() {
 //!     # use auto_enums::auto_enum;
-//!     # #[cfg(feature = "type_analysis")]
 //!     #[auto_enum] // there is no need to specify std library's traits
 //!     fn foo(x: i32) -> impl Iterator<Item = i32> {
 //!         match x {
@@ -733,10 +711,7 @@
 //!             _ => vec![5, 10].into_iter(),
 //!         }
 //!     }
-//!     # #[cfg(feature = "type_analysis")]
-//!     # fn main() { let _ = foo(0); }
-//!     # #[cfg(not(feature = "type_analysis"))]
-//!     # fn main() {}
+//!     # }
 //!     ```
 //!
 //!     Please be careful if you return another traits with the same name.
