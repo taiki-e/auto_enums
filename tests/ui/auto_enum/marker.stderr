@@ -1,11 +1,11 @@
 error: A custom marker name is specified that duplicated the name already used in the parent scope
- --> $DIR/marker.rs:7:36
+ --> $DIR/marker.rs:5:36
   |
-7 |     #[auto_enum(Iterator, marker = foo)]
+5 |     #[auto_enum(Iterator, marker = foo)]
   |                                    ^^^
 
 error: cannot find macro `marker` in this scope
-  --> $DIR/marker.rs:27:21
+  --> $DIR/marker.rs:25:21
    |
-27 |         2 => return marker!(1..9), //~ ERROR cannot find macro `marker!` in this scope
+25 |         2 => return marker!(1..9), //~ ERROR cannot find macro `marker!` in this scope
    |                     ^^^^^^

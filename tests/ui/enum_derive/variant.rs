@@ -1,5 +1,3 @@
-// compile-fail
-
 use auto_enums::enum_derive;
 
 #[enum_derive(Clone)]
