@@ -1,35 +1,35 @@
 error: an enum with units variant is not supported
- --> $DIR/variant.rs:7:5
+ --> $DIR/variant.rs:5:5
   |
-7 |     A, //~ ERROR an enum with units variant is not supported
+5 |     A, //~ ERROR an enum with units variant is not supported
   |     ^
 
 error: an enum with discriminants is not supported
-  --> $DIR/variant.rs:13:9
+  --> $DIR/variant.rs:11:9
    |
-13 |     A = 2, //~ ERROR an enum with discriminants is not supported
+11 |     A = 2, //~ ERROR an enum with discriminants is not supported
    |         ^
 
 error: an enum with named fields variant is not supported
-  --> $DIR/variant.rs:19:5
+  --> $DIR/variant.rs:17:5
    |
-19 |     A { x: A }, //~ ERROR an enum with named fields variant is not supported
+17 |     A { x: A }, //~ ERROR an enum with named fields variant is not supported
    |     ^^^^^^^^^^
 
 error: a variant with zero fields is not supported
-  --> $DIR/variant.rs:25:6
+  --> $DIR/variant.rs:23:6
    |
-25 |     A(), //~ ERROR a variant with zero fields is not supported
+23 |     A(), //~ ERROR a variant with zero fields is not supported
    |      ^^
 
 error: a variant with multiple fields is not supported
-  --> $DIR/variant.rs:32:6
+  --> $DIR/variant.rs:30:6
    |
-32 |     B(A, B), //~ ERROR a variant with multiple fields is not supported
+30 |     B(A, B), //~ ERROR a variant with multiple fields is not supported
    |      ^^^^^^
 
 error: cannot be implemented for enums with no variants
-  --> $DIR/variant.rs:36:1
+  --> $DIR/variant.rs:34:1
    |
-36 | enum Enum7 {} //~ ERROR cannot be implemented for enums with less than two variants
+34 | enum Enum7 {} //~ ERROR cannot be implemented for enums with less than two variants
    | ^^^^^^^^^^^^^

@@ -1,5 +1,3 @@
-// compile-fail
-
 use auto_enums::auto_enum;
 
 #[auto_enum(Iterator)]

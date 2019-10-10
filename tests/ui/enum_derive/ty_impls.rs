@@ -1,5 +1,3 @@
-// compile-fail
-
 use auto_enums::enum_derive;
 
 struct Foo<A>(A);

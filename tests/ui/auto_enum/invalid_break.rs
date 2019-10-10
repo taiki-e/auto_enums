@@ -1,5 +1,3 @@
-// compile-fail
-
 fn closure() -> impl Fn() {
     || break
 }
