@@ -1,4 +1,4 @@
-## [`AsyncBufRead`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.19/futures/io/trait.AsyncBufRead.html)
+## [`AsyncBufRead`](https://docs.rs/futures-preview/0.3.0-alpha.19/futures/io/trait.AsyncBufRead.html)
 
 When deriving for enum like the following:
 

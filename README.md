@@ -191,14 +191,14 @@ You can add support for external library by activating the each crate feature.
 
 [`futures(v0.3)`](https://github.com/rust-lang-nursery/futures-rs) *(requires `"futures"` and `"unstable"` crate features)*
 
-* [`futures::Stream`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.19/futures/stream/trait.Stream.html) - [generated code](docs/supported_traits/external/futures/stream.md)
-* [`futures::Sink`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.19/futures/sink/trait.Sink.html) - [generated code](docs/supported_traits/external/futures/sink.md)
-* [`futures::AsyncRead`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.19/futures/io/trait.AsyncRead.html) - [generated code](docs/supported_traits/external/futures/AsyncRead.md)
-* [`futures::AsyncWrite`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.19/futures/io/trait.AsyncWrite.html) - [generated code](docs/supported_traits/external/futures/AsyncWrite.md)
-* [`futures::AsyncSeek`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.19/futures/io/trait.AsyncSeek.html) - [generated code](docs/supported_traits/external/futures/AsyncSeek.md)
-* [`futures::AsyncBufRead`](https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.19/futures/io/trait.AsyncBufRead.html) - [generated code](docs/supported_traits/external/futures/AsyncBufRead.md)
+* [`futures::Stream`](https://docs.rs/futures-preview/0.3.0-alpha.19/futures/stream/trait.Stream.html) - [generated code](docs/supported_traits/external/futures/stream.md)
+* [`futures::Sink`](https://docs.rs/futures-preview/0.3.0-alpha.19/futures/sink/trait.Sink.html) - [generated code](docs/supported_traits/external/futures/sink.md)
+* [`futures::AsyncRead`](https://docs.rs/futures-preview/0.3.0-alpha.19/futures/io/trait.AsyncRead.html) - [generated code](docs/supported_traits/external/futures/AsyncRead.md)
+* [`futures::AsyncWrite`](https://docs.rs/futures-preview/0.3.0-alpha.19/futures/io/trait.AsyncWrite.html) - [generated code](docs/supported_traits/external/futures/AsyncWrite.md)
+* [`futures::AsyncSeek`](https://docs.rs/futures-preview/0.3.0-alpha.19/futures/io/trait.AsyncSeek.html) - [generated code](docs/supported_traits/external/futures/AsyncSeek.md)
+* [`futures::AsyncBufRead`](https://docs.rs/futures-preview/0.3.0-alpha.19/futures/io/trait.AsyncBufRead.html) - [generated code](docs/supported_traits/external/futures/AsyncBufRead.md)
 
-[`futures(v0.1)`](https://github.com/rust-lang-nursery/futures-rs) *(requires `"futures01"` crate feature)*
+[`futures(v0.1)`](https://github.com/rust-lang-nursery/futures-rs/tree/0.1) *(requires `"futures01"` crate feature)*
 
 * [`futures01::Future`](https://docs.rs/futures/0.1/futures/future/trait.Future.html)
 * [`futures01::Stream`](https://docs.rs/futures/0.1/futures/stream/trait.Stream.html)
@@ -206,9 +206,9 @@ You can add support for external library by activating the each crate feature.
 
 [`rayon`](https://github.com/rayon-rs/rayon) *(requires `"rayon"` crate feature)*
 
-* [`rayon::ParallelIterator`](https://docs.rs/rayon/1.0/rayon/iter/trait.ParallelIterator.html) - [generated code](docs/supported_traits/external/rayon/ParallelIterator.md)
-* [`rayon::IndexedParallelIterator`](https://docs.rs/rayon/1.0/rayon/iter/trait.IndexedParallelIterator.html) - [generated code](docs/supported_traits/external/rayon/IndexedParallelIterator.md)
-* [`rayon::ParallelExtend`](https://docs.rs/rayon/1.0/rayon/iter/trait.ParallelExtend.html) - [generated code](docs/supported_traits/external/rayon/ParallelExtend.md)
+* [`rayon::ParallelIterator`](https://docs.rs/rayon/1/rayon/iter/trait.ParallelIterator.html) - [generated code](docs/supported_traits/external/rayon/ParallelIterator.md)
+* [`rayon::IndexedParallelIterator`](https://docs.rs/rayon/1/rayon/iter/trait.IndexedParallelIterator.html) - [generated code](docs/supported_traits/external/rayon/IndexedParallelIterator.md)
+* [`rayon::ParallelExtend`](https://docs.rs/rayon/1/rayon/iter/trait.ParallelExtend.html) - [generated code](docs/supported_traits/external/rayon/ParallelExtend.md)
 
 [`serde`](https://github.com/serde-rs/serde) *(requires `"serde"` crate feature)*
 
