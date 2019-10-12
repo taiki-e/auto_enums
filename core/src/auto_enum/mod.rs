@@ -123,6 +123,9 @@ fn expand_parent_local(local: &mut Local, cx: &mut Context) -> Result<()> {
 }
 
 fn expand_parent_item_fn(item: &mut ItemFn, cx: &mut Context) -> Result<()> {
+    #[cfg(auto_enums_def_site_enum_ident)]
+    cx.update_enum_ident(item);
+
     let ItemFn { sig, block, .. } = item;
     if let ReturnType::Type(_, ty) = &mut sig.output {
         match &**ty {

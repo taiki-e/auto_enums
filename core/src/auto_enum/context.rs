@@ -153,6 +153,11 @@ impl Context {
         self.diagnostic = child.diagnostic;
     }
 
+    #[cfg(auto_enums_def_site_enum_ident)]
+    pub(super) fn update_enum_ident(&mut self, item: &ItemFn) {
+        self.builder.update_enum_ident(&item.sig.ident)
+    }
+
     /// Returns `true` if one or more errors occurred.
     pub(super) fn failed(&self) -> bool {
         !self.diagnostic.messages.is_empty()
@@ -345,8 +350,10 @@ impl Builder {
         Self { ident: format_ident!("__Enum{}", hash(input)), variants: Vec::new() }
     }
 
-    fn iter(&self) -> impl Iterator<Item = &Ident> + '_ {
-        self.variants.iter()
+    #[cfg(auto_enums_def_site_enum_ident)]
+    fn update_enum_ident(&mut self, ident: &Ident) {
+        debug_assert!(self.variants.is_empty());
+        self.ident = format_ident!("__Enum{}", ident, span = proc_macro::Span::def_site().into());
     }
 
     fn next_expr(&mut self, attrs: Vec<Attribute>, expr: Expr) -> Expr {
@@ -362,11 +369,12 @@ impl Builder {
 
     fn build(&self, args: &[Path]) -> ItemEnum {
         let ident = &self.ident;
-        let ty_generics = self.iter();
-        let variants = self.iter();
-        let fields = self.iter();
+        let ty_generics = &self.variants;
+        let variants = &self.variants;
+        let fields = &self.variants;
 
         syn::parse_quote! {
+            #[allow(non_camel_case_types)]
             #[::auto_enums::enum_derive(#(#args),*)]
             enum #ident<#(#ty_generics),*> {
                 #(#variants(#fields),)*
