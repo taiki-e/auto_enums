@@ -780,7 +780,7 @@ compile_error!(
     "The `trusted_len` feature requires the `unstable` feature as an explicit opt-in to unstable features"
 );
 
-#[doc(hidden)]
+#[doc(inline)]
 pub use auto_enums_core::auto_enum;
-#[doc(hidden)]
+#[doc(inline)]
 pub use auto_enums_derive::enum_derive;

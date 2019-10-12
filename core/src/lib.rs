@@ -1,3 +1,5 @@
+//! An internal crate to support auto_enums - **do not use directly**
+
 #![recursion_limit = "256"]
 #![doc(html_root_url = "https://docs.rs/auto_enums_core/0.6.4")]
 #![doc(test(
@@ -23,5 +25,5 @@ use proc_macro::TokenStream;
 /// An attribute macro for to allow multiple return types by automatically generated enum.
 #[proc_macro_attribute]
 pub fn auto_enum(args: TokenStream, input: TokenStream) -> TokenStream {
-    TokenStream::from(self::auto_enum::attribute(args.into(), input.into()))
+    crate::auto_enum::attribute(args.into(), input.into()).into()
 }

@@ -1,3 +1,5 @@
+//! An internal crate to support auto_enums - **do not use directly**
+
 #![recursion_limit = "256"]
 #![doc(html_root_url = "https://docs.rs/auto_enums_derive/0.6.4")]
 #![doc(test(
@@ -43,5 +45,5 @@ use proc_macro::TokenStream;
 /// the supported traits and passing unsupported traits to `#[derive]`.
 #[proc_macro_attribute]
 pub fn enum_derive(args: TokenStream, input: TokenStream) -> TokenStream {
-    TokenStream::from(self::enum_derive::attribute(args.into(), input.into()))
+    crate::enum_derive::attribute(args.into(), input.into()).into()
 }

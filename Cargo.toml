@@ -80,6 +80,6 @@ auto_enums_derive = { version = "=0.6.4", path = "derive", default-features = fa
 [dev-dependencies]
 trybuild = "1.0"
 futures-preview = "0.3.0-alpha.19"
-rayon_crate = { version = "1", package = "rayon" }
-serde_crate = { version = "1", package = "serde" }
+rayon_crate = { version = "1.2", package = "rayon" }
+serde_crate = { version = "1.0", package = "serde" }
 rand = "0.7"

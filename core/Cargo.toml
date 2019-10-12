@@ -9,7 +9,7 @@ documentation = "https://docs.rs/auto_enums_core/"
 keywords = ["enum", "macros", "derive", "attribute"]
 categories = ["rust-patterns"]
 description = """
-This library provides an attribute macro for to allow multiple return types by automatically generated enum.
+An internal crate to support auto_enums - do not use directly
 """
 
 [lib]
