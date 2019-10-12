@@ -31,10 +31,17 @@ error: `#[auto_enum]` is required two or more branches or marker macros in total
    | |______^
 
 error[E0061]: this function takes 1 parameter but 2 parameters were supplied
- --> $DIR/compile-fail.rs:3:1
-  |
-3 | #[auto_enum(Iterator)]
-  | ^^^^^^^^^^^^^^^^^^^^^^
-  | |
-  | defined here
-  | expected 1 parameter
+  --> $DIR/compile-fail.rs:3:1
+   |
+3  |   #[auto_enum(Iterator)]
+   |   ^---------------------
+   |   |
+   |  _defined here
+   | |
+4  | | fn unexpected_token_in_marker(x: usize) -> impl Iterator<Item = i32> {
+5  | |     match x {
+6  | |         0 => marker!(1..8..), //~ ERROR expected one of `)`, `,`, `.`, `?`, or an operator, found `..`
+...  |
+37 | | fn return0(x: i32, y: i32) -> impl Iterator<Item = i32> {
+38 | |     #[auto_enum(Iterator)]
+   | |_^ expected 1 parameter

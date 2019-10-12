@@ -19,3 +19,6 @@ RUSTFLAGS=-Dwarnings cargo +nightly test --all --all-features
 
 echo "Running 'cargo doc'"
 RUSTDOCFLAGS=-Dwarnings cargo +nightly doc --no-deps --all --all-features
+
+echo "Running 'compiletest'"
+. ./compiletest.sh

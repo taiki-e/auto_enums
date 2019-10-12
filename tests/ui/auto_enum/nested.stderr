@@ -1,0 +1,37 @@
+error[E0308]: match arms have incompatible types
+  --> $DIR/nested.rs:10:13
+   |
+3  |  / #[auto_enum(Iterator)]
+4  |  | fn match_nop(x: usize) -> impl Iterator<Item = i32> {
+5  |  |     match x {
+   |  |_____-
+6  | ||         0 => 1..8,
+7  | ||         3 => {
+8  | ||             // This strange formatting is a rustfmt bug.
+9  | || #[nested] //~ ERROR E0308
+10 | ||             2..=10
+   | ||             ^^^^^^ expected enum `match_nop::__Enummatch_nop`, found struct `std::ops::RangeInclusive`
+11 | ||         }
+12 | ||         _ => (0..2).map(|x| x + 1),
+13 | ||     }
+   | ||_____- `match` arms have incompatible types
+...   |
+   |
+   = note: expected type `match_nop::__Enummatch_nop<std::ops::Range<{integer}>, _>`
+              found type `std::ops::RangeInclusive<{integer}>`
+
+error[E0308]: if and else have incompatible types
+  --> $DIR/nested.rs:16:22
+   |
+16 |   #[auto_enum(Iterator)]
+   |  ______________________^
+17 | | fn if_nop(x: usize) -> impl Iterator<Item = i32> {
+18 | |     if x == 0 {
+19 | |         1..8
+...  |
+23 | |         2..=10
+   | |         ------ expected because of this
+...  |
+   |
+   = note: expected type `std::ops::RangeInclusive<{integer}>`
+              found type `if_nop::__Enumif_nop<_, std::iter::Map<std::ops::Range<{integer}>, [closure@$DIR/tests/ui/auto_enum/nested.rs:25:20: 25:29]>>`

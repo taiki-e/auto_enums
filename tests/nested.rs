@@ -288,10 +288,7 @@ fn nested() {
     fn match_nop(x: usize) -> impl Iterator<Item = i32> {
         match x {
             0 => 1..8,
-            3 => {
-                // #[nested] // no-op, E0308 error will occur if you uncomment this
-                2..=10
-            }
+            3 => 2..=10,
             _ => (0..2).map(|x| x + 1),
         }
     }
@@ -301,7 +298,6 @@ fn nested() {
         if x == 0 {
             1..8
         } else if x > 3 {
-            // #[nested] // no-op, E0308 error will occur if you uncomment this
             2..=10
         } else {
             (0..2).map(|x| x + 1)
