@@ -757,8 +757,7 @@
 ))]
 #![forbid(unsafe_code)]
 #![warn(rust_2018_idioms, single_use_lifetimes, unreachable_pub)]
-#![warn(clippy::all, clippy::pedantic)]
-#![allow(clippy::use_self)]
+#![warn(clippy::all)]
 
 #[cfg(all(feature = "futures", not(feature = "unstable")))]
 compile_error!(
