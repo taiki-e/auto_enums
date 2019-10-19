@@ -51,15 +51,32 @@ pub(crate) fn attribute(args: TokenStream, input: TokenStream) -> TokenStream {
 fn visit_expr(expr: &mut Expr, cx: &mut Context) -> Result<()> {
     let expr = match expr {
         Expr::Closure(ExprClosure { body, .. }) if cx.visit_last() => {
-            cx.visit_mode = VisitMode::Return;
-            cx.visit_last_mode = VisitLastMode::Closure;
-            cx.find_try(&mut **body);
+            let (count_try, count_return) = visitor::visit_fn(cx, &mut **body);
+            if count_try >= 2 {
+                cx.visit_mode = VisitMode::Try;
+            } else {
+                cx.visit_mode = VisitMode::Return(count_return);
+            }
             &mut **body
         }
         _ => expr,
     };
 
-    child_expr(expr, cx).map(|()| cx.visitor(expr))
+    child_expr(expr, cx)?;
+
+    #[cfg(feature = "type_analysis")]
+    {
+        if let VisitMode::Return(count) = cx.visit_mode {
+            if cx.args.is_empty() && cx.variant_is_empty() && count < 2 {
+                cx.dummy(expr);
+                return Ok(());
+            }
+        }
+    }
+
+    cx.visitor(expr);
+
+    Ok(())
 }
 
 fn build_expr(expr: &mut Expr, item: ItemEnum) {
@@ -130,10 +147,15 @@ fn expand_parent_item_fn(item: &mut ItemFn, cx: &mut Context) -> Result<()> {
     if let ReturnType::Type(_, ty) = &mut sig.output {
         match &**ty {
             // `return`
-            Type::ImplTrait(_) if cx.visit_last() => cx.visit_mode = VisitMode::Return,
+            Type::ImplTrait(_) if cx.visit_last_mode != VisitLastMode::Never => {
+                let (_, count_return) = visitor::visit_fn(cx, &mut **block);
+                cx.visit_mode = VisitMode::Return(count_return);
+            }
 
             // `?` operator
-            Type::Path(TypePath { qself: None, path }) if cx.visit_last() => {
+            Type::Path(TypePath { qself: None, path })
+                if cx.visit_last_mode != VisitLastMode::Never =>
+            {
                 let ty = path.segments.last().unwrap();
                 match &ty.arguments {
                     // `Result<T, impl Trait>`
@@ -147,7 +169,10 @@ fn expand_parent_item_fn(item: &mut ItemFn, cx: &mut Context) -> Result<()> {
                             GenericArgument::Type(Type::ImplTrait(_)),
                         ) = (&args[0], &args[1])
                         {
-                            cx.find_try(&mut **block);
+                            let (count_try, _) = visitor::visit_fn(cx, &mut **block);
+                            if count_try >= 2 {
+                                cx.visit_mode = VisitMode::Try;
+                            }
                         }
                     }
                     _ => {}
@@ -174,6 +199,16 @@ fn expand_parent_item_fn(item: &mut ItemFn, cx: &mut Context) -> Result<()> {
                 item.block,
                 "the `#[auto_enum]` attribute is not supported empty functions"
             ));
+        }
+    }
+
+    #[cfg(feature = "type_analysis")]
+    {
+        if let VisitMode::Return(count) = cx.visit_mode {
+            if cx.args.is_empty() && cx.variant_is_empty() && count < 2 {
+                cx.dummy(item);
+                return Ok(());
+            }
         }
     }
 

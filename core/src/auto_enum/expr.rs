@@ -5,7 +5,7 @@ use syn::{
 
 use crate::utils::{expr_block, replace_block, replace_expr, Attrs};
 
-use super::{Context, NAME, NESTED, NEVER};
+use super::{visitor, Context, NAME, NESTED, NEVER};
 
 /// Visits last expression.
 ///
@@ -96,7 +96,7 @@ fn visit_last_expr_match(cx: &mut Context, expr: &mut ExprMatch) -> Result<()> {
         arm.any_empty_attr(NEVER)
             || arm.any_empty_attr(NESTED)
             || is_unreachable(cx, &*arm.body)
-            || cx.find_nested(arm)
+            || visitor::find_nested(arm)
     }
 
     expr.arms.iter_mut().try_for_each(|arm| {
@@ -112,7 +112,9 @@ fn visit_last_expr_if(cx: &mut Context, expr: &mut ExprIf) -> Result<()> {
     fn skip(block: &mut Block, cx: &mut Context) -> bool {
         match block.stmts.last_mut() {
             Some(Stmt::Expr(expr)) => {
-                expr.any_empty_attr(NESTED) || is_unreachable(cx, expr) || cx.find_nested(block)
+                expr.any_empty_attr(NESTED)
+                    || is_unreachable(cx, expr)
+                    || visitor::find_nested(block)
             }
             _ => is_unreachable_stmt(cx, block.stmts.last()),
         }

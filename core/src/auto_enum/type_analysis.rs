@@ -6,28 +6,18 @@ use syn::{
 
 use crate::utils::*;
 
-pub(super) fn collect_impl_trait(args: &mut Vec<Path>, ty: &mut Type) {
-    fn to_trimed_string(path: &Path) -> String {
-        path.to_token_stream().to_string().replace(" ", "")
-    }
-
-    let mut traits = Vec::new();
-    CollectImplTrait::new(&mut traits).visit_type_mut(ty);
-
-    traits.into_iter().for_each(|t| {
-        if !args.contains(&t) && TRAITS.contains(&&*to_trimed_string(&t)) {
-            args.push(t);
-        }
-    });
+pub(super) fn collect_impl_trait(args: &[Path], traits: &mut Vec<Path>, ty: &mut Type) {
+    CollectImplTrait::new(args, traits).visit_type_mut(ty);
 }
 
 struct CollectImplTrait<'a> {
+    args: &'a [Path],
     traits: &'a mut Vec<Path>,
 }
 
 impl<'a> CollectImplTrait<'a> {
-    fn new(traits: &'a mut Vec<Path>) -> Self {
-        Self { traits }
+    fn new(args: &'a [Path], traits: &'a mut Vec<Path>) -> Self {
+        Self { args, traits }
     }
 }
 
@@ -37,10 +27,17 @@ impl VisitMut for CollectImplTrait<'_> {
 
         node.bounds.iter().for_each(|ty| {
             if let TypeParamBound::Trait(ty) = ty {
-                self.traits.push(path(ty.path.segments.iter().map(|ty| ty.ident.clone().into())));
+                let ty = path(ty.path.segments.iter().map(|ty| ty.ident.clone().into()));
+                if !self.args.contains(&ty) && TRAITS.contains(&&*to_trimed_string(&ty)) {
+                    self.traits.push(ty);
+                }
             }
         });
     }
+}
+
+fn to_trimed_string(path: &Path) -> String {
+    path.to_token_stream().to_string().replace(" ", "")
 }
 
 const TRAITS: &[&str] = &[
