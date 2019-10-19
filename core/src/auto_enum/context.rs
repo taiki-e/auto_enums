@@ -13,7 +13,7 @@ use syn::{
 
 use crate::utils::{expr_call, path, replace_expr, unit, VisitedNode};
 
-use super::visitor::{Dummy, FindNested, FindTry, Visitor};
+use super::visitor::{Dummy, Visitor};
 
 // =================================================================================================
 // Context
@@ -22,7 +22,7 @@ use super::visitor::{Dummy, FindNested, FindTry, Visitor};
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub(super) enum VisitMode {
     Default,
-    Return,
+    Return(/* count */ usize),
     Try,
 }
 
@@ -37,8 +37,6 @@ pub(super) enum VisitLastMode {
     not
     item_fn: `fn _() -> Fn*() { || {} }`
     */
-    /// Currently, this is handled as the same as `Default`.
-    Closure,
     /// `Stmt::Semi(..)` - never visit last expr
     Never,
 }
@@ -66,7 +64,6 @@ impl Diagnostic {
 pub(super) const DEFAULT_MARKER: &str = "marker";
 
 pub(super) struct Context {
-    args: Vec<Path>,
     builder: Builder,
 
     /// The identifier of the marker macro of the current scope.
@@ -74,7 +71,7 @@ pub(super) struct Context {
     /// All marker macro identifiers that may have effects on the current scope.
     pub(super) markers: Vec<String>,
 
-    // depth: i32,
+    // depth: isize,
     /// Currently, this is basically the same as `self.markers.len() == 1`.
     root: bool,
     /// This is `true` if other `auto_enum` attribute exists in the current scope.
@@ -86,6 +83,10 @@ pub(super) struct Context {
     /// Span passed to `syn::Error::new_spanned`.
     pub(super) span: TokenStream,
     pub(super) diagnostic: Diagnostic,
+
+    pub(super) args: Vec<Path>,
+    #[cfg(feature = "type_analysis")]
+    traits: Vec<Path>,
 }
 
 impl Context {
@@ -118,7 +119,6 @@ impl Context {
 
         Ok(Self {
             builder: Builder::new(&span),
-            args,
             marker,
             markers,
             root,
@@ -127,6 +127,9 @@ impl Context {
             visit_last_mode: VisitLastMode::Default,
             span,
             diagnostic,
+            args,
+            #[cfg(feature = "type_analysis")]
+            traits: Vec::new(),
         })
     }
 
@@ -172,7 +175,19 @@ impl Context {
     /// `auto_enum` attribute is handled as a dummy.
     pub(super) fn is_dummy(&self) -> bool {
         // `auto_enum` attribute with no argument is handled as a dummy.
-        self.args.is_empty()
+        #[cfg(not(feature = "type_analysis"))]
+        {
+            self.args.is_empty()
+        }
+        #[cfg(feature = "type_analysis")]
+        {
+            self.args.is_empty() && self.traits.is_empty()
+        }
+    }
+
+    #[cfg(feature = "type_analysis")]
+    pub(super) fn variant_is_empty(&self) -> bool {
+        self.builder.variants.is_empty()
     }
 
     /// Returns `true` if `expr` is the marker macro that may have effects on the current scope.
@@ -230,23 +245,12 @@ impl Context {
     }
 
     pub(super) fn dummy(&mut self, node: &mut impl VisitedNode) {
+        #[cfg(not(feature = "type_analysis"))]
         debug_assert!(self.is_dummy());
+        #[cfg(feature = "type_analysis")]
+        debug_assert!(self.args.is_empty());
 
         node.visited(&mut Dummy::new(self));
-    }
-
-    pub(super) fn find_nested(&mut self, node: &mut impl VisitedNode) -> bool {
-        let mut visitor = FindNested::new();
-        node.visited(&mut visitor);
-        visitor.has
-    }
-
-    pub(super) fn find_try(&mut self, node: &mut impl VisitedNode) {
-        let mut visitor = FindTry::new(self);
-        node.visited(&mut visitor);
-        if visitor.has {
-            self.visit_mode = VisitMode::Try;
-        }
     }
 
     // build
@@ -254,7 +258,7 @@ impl Context {
     pub(super) fn build(&mut self, f: impl FnOnce(ItemEnum)) -> Result<()> {
         fn err(cx: &Context) -> Error {
             let (msg1, msg2) = match cx.visit_last_mode {
-                VisitLastMode::Default | VisitLastMode::Closure => {
+                VisitLastMode::Default => {
                     ("branches or marker macros in total", "branch or marker macro")
                 }
                 VisitLastMode::Never => ("marker macros", "marker macro"),
@@ -279,7 +283,14 @@ impl Context {
         }
 
         if !self.builder.variants.is_empty() {
-            f(self.builder.build(&self.args))
+            #[cfg(not(feature = "type_analysis"))]
+            {
+                f(self.builder.build(&self.args, &[]));
+            }
+            #[cfg(feature = "type_analysis")]
+            {
+                f(self.builder.build(&self.args, &self.traits));
+            }
         }
         Ok(())
     }
@@ -288,7 +299,7 @@ impl Context {
 
     #[cfg(feature = "type_analysis")]
     pub(super) fn collect_trait(&mut self, ty: &mut Type) {
-        super::type_analysis::collect_impl_trait(&mut self.args, ty);
+        super::type_analysis::collect_impl_trait(&self.args, &mut self.traits, ty);
     }
 }
 
@@ -367,7 +378,8 @@ impl Builder {
         expr_call(attrs, path, expr)
     }
 
-    fn build(&self, args: &[Path]) -> ItemEnum {
+    fn build(&self, args: &[Path], traits: &[Path]) -> ItemEnum {
+        let derive = args.iter().chain(traits);
         let ident = &self.ident;
         let ty_generics = &self.variants;
         let variants = &self.variants;
@@ -375,7 +387,7 @@ impl Builder {
 
         syn::parse_quote! {
             #[allow(non_camel_case_types)]
-            #[::auto_enums::enum_derive(#(#args),*)]
+            #[::auto_enums::enum_derive(#(#derive),*)]
             enum #ident<#(#ty_generics),*> {
                 #(#variants(#fields),)*
             }

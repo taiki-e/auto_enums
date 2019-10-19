@@ -8,7 +8,7 @@ use syn::{
 
 use crate::utils::{replace_expr, Attrs};
 
-use super::{Context, VisitMode, DEFAULT_MARKER, NAME, NESTED, NEVER};
+use super::{Context, VisitMode, VisitedNode, DEFAULT_MARKER, NAME, NESTED, NEVER};
 
 /// The old annotation replaced by `#[nested]`.
 const NESTED_OLD: &str = "rec";
@@ -24,6 +24,18 @@ struct Scope {
     try_block: bool,
     /// in the other `auto_enum` attributes
     foreign: bool,
+}
+
+impl Scope {
+    // check this scope is in closures or try blocks.
+    fn check_expr(&mut self, expr: &Expr) {
+        match expr {
+            Expr::Closure(_) => self.closure = true,
+            // `?` operator in try blocks are not supported.
+            Expr::TryBlock(_) => self.try_block = true,
+            _ => {}
+        }
+    }
 }
 
 pub(super) struct Visitor<'a> {
@@ -54,13 +66,16 @@ impl<'a> Visitor<'a> {
     }
 
     /// `return` in functions or closures
-    fn visit_return(&mut self, node: &mut Expr) {
-        debug_assert!(self.cx.visit_mode == VisitMode::Return);
+    fn visit_return(&mut self, node: &mut Expr, count: usize) {
+        debug_assert!(self.cx.visit_mode == VisitMode::Return(count));
 
         if !self.scope.closure && !node.any_empty_attr(NEVER) {
             // Desugar `return <expr>` into `return Enum::VariantN(<expr>)`.
             if let Expr::Return(ExprReturn { expr, .. }) = node {
-                self.cx.replace_boxed_expr(expr);
+                // Skip if `<expr>` is a marker macro.
+                if expr.as_ref().map_or(true, |expr| !self.cx.is_marker_expr(&**expr)) {
+                    self.cx.replace_boxed_expr(expr);
+                }
             }
         }
     }
@@ -157,15 +172,10 @@ impl<'a> Visitor<'a> {
 impl VisitMut for Visitor<'_> {
     fn visit_expr_mut(&mut self, node: &mut Expr) {
         if !self.cx.failed() {
-            match node {
-                Expr::Closure(_) => self.scope.closure = true,
-                // `?` operator in try blocks are not supported.
-                Expr::TryBlock(_) => self.scope.try_block = true,
-                _ => {}
-            }
+            self.scope.check_expr(node);
 
             match self.cx.visit_mode {
-                VisitMode::Return => self.visit_return(node),
+                VisitMode::Return(count) => self.visit_return(node, count),
                 VisitMode::Try => self.visit_try(node),
                 VisitMode::Default => {}
             }
@@ -313,15 +323,15 @@ fn visit_stmt(visitor: &mut impl VisitStmt, node: &mut Stmt) {
 // =================================================================================================
 // FindNested
 
-/// Find `#[nested]` attribute.
-pub(super) struct FindNested {
-    pub(super) has: bool,
+pub(super) fn find_nested(node: &mut impl VisitedNode) -> bool {
+    let mut visitor = FindNested { has: false };
+    node.visited(&mut visitor);
+    visitor.has
 }
 
-impl FindNested {
-    pub(super) fn new() -> Self {
-        Self { has: false }
-    }
+/// Find `#[nested]` attribute.
+struct FindNested {
+    has: bool,
 }
 
 impl VisitMut for FindNested {
@@ -359,56 +369,63 @@ impl VisitMut for FindNested {
 }
 
 // =================================================================================================
-// FindTry
+// FnVisitor
 
-/// Find `?` operator.
-pub(super) struct FindTry<'a> {
+pub(super) fn visit_fn(cx: &Context, node: &mut impl VisitedNode) -> (usize, usize) {
+    let mut visitor = FnVisitor { cx, scope: Scope::default(), count_try: 0, count_return: 0 };
+    node.visited(&mut visitor);
+    (visitor.count_try, visitor.count_return)
+}
+
+struct FnVisitor<'a> {
     cx: &'a Context,
     scope: Scope,
-    pub(super) has: bool,
+    count_try: usize,
+    count_return: usize,
 }
 
-impl<'a> FindTry<'a> {
-    pub(super) fn new(cx: &'a Context) -> Self {
-        Self { cx, scope: Scope::default(), has: false }
-    }
-}
-
-impl VisitMut for FindTry<'_> {
+impl VisitMut for FnVisitor<'_> {
     fn visit_expr_mut(&mut self, node: &mut Expr) {
         let tmp = self.scope;
 
-        if let Expr::Closure(_) = node {
-            self.scope.closure = true;
-        }
+        self.scope.check_expr(node);
 
         if !self.scope.closure && !node.any_empty_attr(NEVER) {
-            if let Expr::Try(ExprTry { expr, .. }) = node {
-                // Skip if `<expr>` is a marker macro.
-                if !self.cx.is_marker_expr(&**expr) {
-                    self.has = true;
+            match node {
+                Expr::Try(ExprTry { expr, .. }) => {
+                    // Skip if `<expr>` is a marker macro.
+                    if !self.cx.is_marker_expr(&**expr) {
+                        self.count_try += 1;
+                    }
                 }
+                Expr::Return(ExprReturn { expr, .. }) => {
+                    // Skip if `<expr>` is a marker macro.
+                    if expr.as_ref().map_or(true, |expr| !self.cx.is_marker_expr(&**expr)) {
+                        self.count_return += 1;
+                    }
+                }
+                _ => {}
             }
         }
 
         if node.any_attr(NAME) {
             self.scope.foreign = true;
         }
-        if !self.has {
-            visit_mut::visit_expr_mut(self, node);
-        }
+
+        visit_mut::visit_expr_mut(self, node);
 
         self.scope = tmp;
     }
 
-    fn visit_local_mut(&mut self, node: &mut Local) {
+    fn visit_stmt_mut(&mut self, node: &mut Stmt) {
         let tmp = self.scope;
 
         if node.any_attr(NAME) {
             self.scope.foreign = true;
         }
 
-        visit_mut::visit_local_mut(self, node);
+        visit_mut::visit_stmt_mut(self, node);
+
         self.scope = tmp;
     }
 
