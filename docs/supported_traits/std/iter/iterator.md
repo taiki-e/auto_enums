@@ -58,31 +58,11 @@ where
     }
 
     #[inline]
-    fn nth(&mut self, n: usize) -> ::core::option::Option<Self::Item> {
-        match self {
-            Enum::A(x) => ::core::iter::Iterator::nth(x, n),
-            Enum::B(x) => ::core::iter::Iterator::nth(x, n),
-        }
-    }
-
-    #[inline]
     #[must_use = "if you really need to exhaust the iterator, consider `.for_each(drop)` instead"]
     fn collect<__U: ::core::iter::FromIterator<Self::Item>>(self) -> __U {
         match self {
             Enum::A(x) => ::core::iter::Iterator::collect(x),
             Enum::B(x) => ::core::iter::Iterator::collect(x),
-        }
-    }
-
-    #[inline]
-    fn partition<__U, __F>(self, f: __F) -> (__U, __U)
-    where
-        __U: ::core::default::Default + ::core::iter::Extend<Self::Item>,
-        __F: ::core::ops::FnMut(&Self::Item) -> bool
-    {
-        match self {
-            Enum::A(x) => ::core::iter::Iterator::partition(x, f),
-            Enum::B(x) => ::core::iter::Iterator::partition(x, f),
         }
     }
 }

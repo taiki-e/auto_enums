@@ -12,14 +12,6 @@ pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
         where
             __F: ::core::ops::FnMut(__U, Self::Item) -> __U;
         #[inline]
-        fn all<__F>(&mut self, f: __F) -> bool
-        where
-            __F: ::core::ops::FnMut(Self::Item) -> bool;
-        #[inline]
-        fn any<__F>(&mut self, f: __F) -> bool
-        where
-            __F: ::core::ops::FnMut(Self::Item) -> bool;
-        #[inline]
         fn find<__P>(&mut self, predicate: __P) -> ::core::option::Option<Self::Item>
         where
             __P: ::core::ops::FnMut(&Self::Item) -> bool;
@@ -27,10 +19,6 @@ pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
         fn find_map<__U, __F>(&mut self, f: __F) -> ::core::option::Option<__U>
         where
             __F: ::core::ops::FnMut(Self::Item) -> ::core::option::Option<__U>;
-        #[inline]
-        fn position<__P>(&mut self, predicate: __P) -> ::core::option::Option<usize>
-        where
-            __P: ::core::ops::FnMut(Self::Item) -> bool;
     };
 
     derive_trait!(
@@ -48,15 +36,8 @@ pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
                 #[inline]
                 fn last(self) -> ::core::option::Option<Self::Item>;
                 #[inline]
-                fn nth(&mut self, n: usize) -> ::core::option::Option<Self::Item>;
-                #[inline]
                 #[must_use = "if you really need to exhaust the iterator, consider `.for_each(drop)` instead"]
                 fn collect<__U: ::core::iter::FromIterator<Self::Item>>(self) -> __U;
-                #[inline]
-                fn partition<__U, __F>(self, f: __F) -> (__U, __U)
-                where
-                    __U: ::core::default::Default + ::core::iter::Extend<Self::Item>,
-                    __F: ::core::ops::FnMut(&Self::Item) -> bool;
                 #try_trait
             }
         }?,
