@@ -6,9 +6,9 @@
 [![rustc-badge]][rustc-url]
 
 [crates-badge]: https://img.shields.io/crates/v/auto_enums.svg
-[crates-url]: https://crates.io/crates/auto_enums/
+[crates-url]: https://crates.io/crates/auto_enums
 [docs-badge]: https://docs.rs/auto_enums/badge.svg
-[docs-url]: https://docs.rs/auto_enums/
+[docs-url]: https://docs.rs/auto_enums
 [license-badge]: https://img.shields.io/crates/l/auto_enums.svg
 [license]: #license
 [rustc-badge]: https://img.shields.io/badge/rustc-1.31+-lightgray.svg
@@ -101,7 +101,7 @@ fn foo(x: i32) -> impl Iterator<Item = i32> {
 }
 ```
 
-See [API Documentation](https://docs.rs/auto_enums/) for more details.
+See [API Documentation][docs-url] for more details.
 
 ## Supported traits
 
