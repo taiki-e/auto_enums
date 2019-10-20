@@ -1,7 +1,14 @@
 # Unreleased
 
+# 0.7.0 - 2019-10-20
+
+* [Support `#[nested]` for nested if expressions.][67]
+
+* Fixed bugs of `"type_analysis"` feature.
+
 * [Removed unstable `"exact_size_is_empty"`, `"read_initializer"`, and `"try_trait"` crate features.][69]
 
+[67]: https://github.com/taiki-e/auto_enums/pull/67
 [69]: https://github.com/taiki-e/auto_enums/pull/69
 
 # 0.6.4 - 2019-09-28
