@@ -8,14 +8,17 @@ on:
       - staging
       - trying
   schedule:
-    - cron: 00 01 * * 00 # Weekly
+    - cron: '00 01 * * *'
+
+env:
+  RUSTFLAGS: -Dwarnings
 
 jobs:
   test:
     name: test
     runs-on: ubuntu-latest
     env:
-      RUSTFLAGS: -Dwarnings
+      RUST_TOOLCHAIN: ${{ matrix.rust }}
     strategy:
       matrix:
         rust:
@@ -31,48 +34,49 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - name: Install Rust
+        shell: bash
         run: |
-          rustup self update # TODO: when default rustup is bumped to 1.20+, remove this.
-          rustup set profile minimal
-          rustup update ${{ matrix.rust }} && rustup default ${{ matrix.rust }}
+          . ./ci/install-rust.sh
+      - name: Install cargo-hack
+        if: matrix.rust == 'nightly'
+        run: |
+          cargo install cargo-hack
       - name: cargo check
         if: matrix.rust == '1.31.0'
         run: |
-          cargo check --all --no-default-features
           cargo check --all
-          cargo check --features type_analysis
       - name: cargo test
         if: matrix.rust != '1.31.0'
         run: |
-          cargo test --all --tests --no-default-features
           cargo test --all --tests
-          cargo test --tests --features type_analysis
       - name: cargo test --all-features
         if: matrix.rust == 'nightly'
         run: |
           cargo test --all --all-features
       - name: cargo test --cfg auto_enums_def_site_enum_ident
         if: matrix.rust == 'nightly'
-        run: |
-          cargo test --all --all-features -- -Zunstable-options --include-ignored
         env:
           RUSTFLAGS: -Dwarnings --cfg auto_enums_def_site_enum_ident
+        run: |
+          cargo test --all --all-features -- -Zunstable-options --include-ignored
       - name: cargo check --benches
         if: matrix.rust == 'nightly'
         run: |
           cargo check --benches
+      - name: cargo hack check --each-feature
+        if: matrix.rust == 'nightly'
+        run: |
+          cargo hack check --all --each-feature --no-dev-deps --features=unstable --ignore-unknown-features
       # Refs: https://github.com/rust-lang/cargo/issues/5657
       - name: cargo check -Zminimal-versions
         if: matrix.rust == 'nightly'
         run: |
           cargo update -Zminimal-versions
-          cargo check --all --all-features
+          cargo hack check --all --all-features --no-dev-deps --ignore-private
 
   style:
     name: style
     runs-on: ubuntu-latest
-    env:
-      RUSTFLAGS: -Dwarnings
     strategy:
       fail-fast: false
       matrix:
@@ -83,24 +87,14 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - name: Install Rust
+        shell: bash
         run: |
-          rustup self update # TODO: when default rustup is bumped to 1.20+, remove this.
-          rustup set profile minimal
-          rustup update nightly && rustup default nightly
+          . ./ci/install-rust.sh
       - name: Install component
         if: matrix.component != 'rustdoc'
+        shell: bash
         run: |
-          if ! rustup component add ${{ matrix.component }}; then
-            # If the component is unavailable on the latest nightly,
-            # use the latest toolchain with the component available.
-            # Refs: https://github.com/rust-lang/rustup-components-history#the-web-part
-            component=${{ matrix.component }}
-            target=`curl https://rust-lang.github.io/rustup-components-history/x86_64-unknown-linux-gnu/$component`
-            echo "'$component' is unavailable on the toolchain 'nightly', use the toolchain 'nightly-$target' instead"
-            rustup toolchain install nightly-$target
-            rustup default nightly-$target
-            rustup component add $component
-          fi
+          . ./ci/install-component.sh ${{ matrix.component }}
       - name: cargo clippy
         if: matrix.component == 'clippy'
         run: |
@@ -111,7 +105,7 @@ jobs:
           cargo fmt --all -- --check
       - name: cargo doc
         if: matrix.component == 'rustdoc'
-        run: |
-          cargo doc --no-deps --all --all-features
         env:
           RUSTDOCFLAGS: -Dwarnings
+        run: |
+          cargo doc --no-deps --all --all-features
