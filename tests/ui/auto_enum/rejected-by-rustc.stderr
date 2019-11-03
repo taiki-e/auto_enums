@@ -3,6 +3,7 @@ error: expected `{`, found keyword `return`
   |
 7 |     } else return {
   |            ^^^^^^ expected `{`
+  |
 help: try placing this code inside a block
   |
 7 |     } else { return {
