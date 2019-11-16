@@ -619,12 +619,12 @@
 //!
 //! [`futures(v0.3)`](https://github.com/rust-lang-nursery/futures-rs) *(requires `"futures"` and `"unstable"` crate feature)*
 //!
-//! * [`futures::Stream`](https://docs.rs/futures-preview/0.3.0-alpha.19/futures/stream/trait.Stream.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/futures/stream.md)
-//! * [`futures::Sink`](https://docs.rs/futures-preview/0.3.0-alpha.19/futures/sink/trait.Sink.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/futures/sink.md)
-//! * [`futures::AsyncRead`](https://docs.rs/futures-preview/0.3.0-alpha.19/futures/io/trait.AsyncRead.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/futures/AsyncRead.md)
-//! * [`futures::AsyncWrite`](https://docs.rs/futures-preview/0.3.0-alpha.19/futures/io/trait.AsyncWrite.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/futures/AsyncWrite.md)
-//! * [`futures::AsyncSeek`](https://docs.rs/futures-preview/0.3.0-alpha.19/futures/io/trait.AsyncSeek.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/futures/AsyncSeek.md)
-//! * [`futures::AsyncBufRead`](https://docs.rs/futures-preview/0.3.0-alpha.19/futures/io/trait.AsyncBufRead.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/futures/AsyncBufRead.md)
+//! * [`futures::Stream`](https://docs.rs/futures/0.3/futures/stream/trait.Stream.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/futures/stream.md)
+//! * [`futures::Sink`](https://docs.rs/futures/0.3/futures/sink/trait.Sink.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/futures/sink.md)
+//! * [`futures::AsyncRead`](https://docs.rs/futures/0.3/futures/io/trait.AsyncRead.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/futures/AsyncRead.md)
+//! * [`futures::AsyncWrite`](https://docs.rs/futures/0.3/futures/io/trait.AsyncWrite.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/futures/AsyncWrite.md)
+//! * [`futures::AsyncSeek`](https://docs.rs/futures/0.3/futures/io/trait.AsyncSeek.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/futures/AsyncSeek.md)
+//! * [`futures::AsyncBufRead`](https://docs.rs/futures/0.3/futures/io/trait.AsyncBufRead.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/futures/AsyncBufRead.md)
 //!
 //! [`futures(v0.1)`](https://github.com/rust-lang-nursery/futures-rs) *(requires `"futures01"` crate feature)*
 //!
@@ -759,11 +759,6 @@
 #![warn(rust_2018_idioms, single_use_lifetimes, unreachable_pub)]
 #![warn(clippy::all)]
 
-#[cfg(all(feature = "futures", not(feature = "unstable")))]
-compile_error!(
-    "The `futures` feature requires the `unstable` feature as an explicit opt-in to unstable features"
-);
-
 #[cfg(all(feature = "generator_trait", not(feature = "unstable")))]
 compile_error!(
     "The `generator_trait` feature requires the `unstable` feature as an explicit opt-in to unstable features"
@@ -781,5 +776,6 @@ compile_error!(
 
 #[doc(inline)]
 pub use auto_enums_core::auto_enum;
+
 #[doc(inline)]
 pub use auto_enums_derive::enum_derive;

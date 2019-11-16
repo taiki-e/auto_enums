@@ -6,6 +6,8 @@
 #![warn(rust_2018_idioms, single_use_lifetimes)]
 #![allow(dead_code)]
 
+#[cfg(feature = "futures")]
+extern crate futures_crate as futures;
 #[cfg(feature = "rayon")]
 extern crate rayon_crate as rayon;
 #[cfg(feature = "serde")]

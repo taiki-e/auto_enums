@@ -191,12 +191,12 @@ You can add support for external library by activating the each crate feature.
 
 [`futures(v0.3)`](https://github.com/rust-lang-nursery/futures-rs) *(requires `"futures"` and `"unstable"` crate features)*
 
-* [`futures::Stream`](https://docs.rs/futures-preview/0.3.0-alpha.19/futures/stream/trait.Stream.html) - [generated code](docs/supported_traits/external/futures/stream.md)
-* [`futures::Sink`](https://docs.rs/futures-preview/0.3.0-alpha.19/futures/sink/trait.Sink.html) - [generated code](docs/supported_traits/external/futures/sink.md)
-* [`futures::AsyncRead`](https://docs.rs/futures-preview/0.3.0-alpha.19/futures/io/trait.AsyncRead.html) - [generated code](docs/supported_traits/external/futures/AsyncRead.md)
-* [`futures::AsyncWrite`](https://docs.rs/futures-preview/0.3.0-alpha.19/futures/io/trait.AsyncWrite.html) - [generated code](docs/supported_traits/external/futures/AsyncWrite.md)
-* [`futures::AsyncSeek`](https://docs.rs/futures-preview/0.3.0-alpha.19/futures/io/trait.AsyncSeek.html) - [generated code](docs/supported_traits/external/futures/AsyncSeek.md)
-* [`futures::AsyncBufRead`](https://docs.rs/futures-preview/0.3.0-alpha.19/futures/io/trait.AsyncBufRead.html) - [generated code](docs/supported_traits/external/futures/AsyncBufRead.md)
+* [`futures::Stream`](https://docs.rs/futures/0.3/futures/stream/trait.Stream.html) - [generated code](docs/supported_traits/external/futures/stream.md)
+* [`futures::Sink`](https://docs.rs/futures/0.3/futures/sink/trait.Sink.html) - [generated code](docs/supported_traits/external/futures/sink.md)
+* [`futures::AsyncRead`](https://docs.rs/futures/0.3/futures/io/trait.AsyncRead.html) - [generated code](docs/supported_traits/external/futures/AsyncRead.md)
+* [`futures::AsyncWrite`](https://docs.rs/futures/0.3/futures/io/trait.AsyncWrite.html) - [generated code](docs/supported_traits/external/futures/AsyncWrite.md)
+* [`futures::AsyncSeek`](https://docs.rs/futures/0.3/futures/io/trait.AsyncSeek.html) - [generated code](docs/supported_traits/external/futures/AsyncSeek.md)
+* [`futures::AsyncBufRead`](https://docs.rs/futures/0.3/futures/io/trait.AsyncBufRead.html) - [generated code](docs/supported_traits/external/futures/AsyncBufRead.md)
 
 [`futures(v0.1)`](https://github.com/rust-lang-nursery/futures-rs/tree/0.1) *(requires `"futures01"` crate feature)*
 

@@ -21,10 +21,9 @@ error[E0308]: match arms have incompatible types
               found type `std::ops::RangeInclusive<{integer}>`
 
 error[E0308]: if and else have incompatible types
-  --> $DIR/nested.rs:16:22
+  --> $DIR/nested.rs:16:1
    |
-16 |   #[auto_enum(Iterator)]
-   |  ______________________^
+16 | / #[auto_enum(Iterator)]
 17 | | fn if_nop(x: usize) -> impl Iterator<Item = i32> {
 18 | |     if x == 0 {
 19 | |         1..8
