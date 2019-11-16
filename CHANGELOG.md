@@ -8,7 +8,7 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 ## [0.7.1] - 2019-11-16
 
-* Updated to support `futures` 0.3.0.
+* Updated to support `futures` 0.3.0. (futures feature is no longer unstable)
 
 ## [0.7.0] - 2019-10-20
 

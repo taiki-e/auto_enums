@@ -617,7 +617,7 @@
 //!
 //! You can add support for external library by activating the each crate feature.
 //!
-//! [`futures(v0.3)`](https://github.com/rust-lang-nursery/futures-rs) *(requires `"futures"` and `"unstable"` crate feature)*
+//! [`futures(v0.3)`](https://github.com/rust-lang-nursery/futures-rs) *(requires `"futures"` crate feature)*
 //!
 //! * [`futures::Stream`](https://docs.rs/futures/0.3/futures/stream/trait.Stream.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/futures/stream.md)
 //! * [`futures::Sink`](https://docs.rs/futures/0.3/futures/sink/trait.Sink.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/futures/sink.md)
