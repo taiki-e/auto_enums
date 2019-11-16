@@ -10,11 +10,6 @@
 #![warn(rust_2018_idioms, single_use_lifetimes, unreachable_pub)]
 #![warn(clippy::all)]
 
-#[cfg(all(feature = "futures", not(feature = "unstable")))]
-compile_error!(
-    "The `futures` feature requires the `unstable` feature as an explicit opt-in to unstable features"
-);
-
 #[cfg(all(feature = "generator_trait", not(feature = "unstable")))]
 compile_error!(
     "The `generator_trait` feature requires the `unstable` feature as an explicit opt-in to unstable features"

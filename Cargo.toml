@@ -44,6 +44,9 @@ fmt = ["auto_enums_derive/fmt"]
 # ==============================================================================
 # Using external libraries
 
+# futures(v0.3+)
+futures = ["auto_enums_derive/futures"]
+
 # futures(v0.1)
 futures01 = ["auto_enums_derive/futures01"]
 
@@ -58,11 +61,6 @@ serde = ["auto_enums_derive/serde"]
 # These features are outside of the normal semver guarantees and require the
 # `unstable` feature as an explicit opt-in to unstable API.
 unstable = ["auto_enums_derive/unstable"]
-
-# external libraries
-
-# futures(v0.3+)
-futures = ["auto_enums_derive/futures"]
 
 # Enable unstable features of [std|core] libraries
 
@@ -79,7 +77,7 @@ auto_enums_derive = { version = "=0.7.0", path = "derive", default-features = fa
 
 [dev-dependencies]
 trybuild = "1.0"
-futures-preview = "0.3.0-alpha.19"
+futures_crate = { version = "0.3", package = "futures" }
 rayon_crate = { version = "1.2", package = "rayon" }
 serde_crate = { version = "1.0", package = "serde" }
 rand = "0.7"

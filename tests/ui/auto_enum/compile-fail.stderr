@@ -2,7 +2,7 @@ error: expected one of `)`, `,`, `.`, `?`, or an operator, found `..`
  --> $DIR/compile-fail.rs:6:26
   |
 6 |         0 => marker!(1..8..), //~ ERROR expected one of `)`, `,`, `.`, `?`, or an operator, found `..`
-  |                          ^^ expected one of `)`, `,`, `.`, `?`, or an operator here
+  |                          ^^ expected one of `)`, `,`, `.`, `?`, or an operator
 
 error: `if` expression missing an else clause
   --> $DIR/compile-fail.rs:15:12

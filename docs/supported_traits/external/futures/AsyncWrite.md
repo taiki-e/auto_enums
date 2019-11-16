@@ -1,4 +1,4 @@
-## [`AsyncWrite`](https://docs.rs/futures-preview/0.3.0-alpha.19/futures/io/trait.AsyncWrite.html)
+## [`AsyncWrite`](https://docs.rs/futures/0.3/futures/io/trait.AsyncWrite.html)
 
 When deriving for enum like the following:
 
