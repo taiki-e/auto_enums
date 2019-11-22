@@ -18,7 +18,7 @@ error[E0308]: match arms have incompatible types
 ...   |
    |
    = note: expected type `match_nop::__Enummatch_nop<std::ops::Range<{integer}>, _>`
-              found type `std::ops::RangeInclusive<{integer}>`
+            found struct `std::ops::RangeInclusive<{integer}>`
 
 error[E0308]: if and else have incompatible types
   --> $DIR/nested.rs:16:1
@@ -33,4 +33,4 @@ error[E0308]: if and else have incompatible types
 ...  |
    |
    = note: expected type `std::ops::RangeInclusive<{integer}>`
-              found type `if_nop::__Enumif_nop<_, std::iter::Map<std::ops::Range<{integer}>, [closure@$DIR/tests/ui/auto_enum/nested.rs:25:20: 25:29]>>`
+              found enum `if_nop::__Enumif_nop<_, std::iter::Map<std::ops::Range<{integer}>, [closure@$DIR/tests/ui/auto_enum/nested.rs:25:20: 25:29]>>`
