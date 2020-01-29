@@ -2,7 +2,10 @@ error: expected one of `)`, `,`, `.`, `?`, or an operator, found `..`
  --> $DIR/compile-fail.rs:6:26
   |
 6 |         0 => marker!(1..8..), //~ ERROR expected one of `)`, `,`, `.`, `?`, or an operator, found `..`
-  |                          ^^ expected one of `)`, `,`, `.`, `?`, or an operator
+  |                          -^
+  |                          |
+  |                          expected one of `)`, `,`, `.`, `?`, or an operator
+  |                          help: missing `,`
 
 error: `if` expression missing an else clause
   --> $DIR/compile-fail.rs:15:12
@@ -42,6 +45,6 @@ error[E0061]: this function takes 1 parameter but 2 parameters were supplied
 5  | |     match x {
 6  | |         0 => marker!(1..8..), //~ ERROR expected one of `)`, `,`, `.`, `?`, or an operator, found `..`
 ...  |
-36 | | #[auto_enum(Iterator)]
-37 | | fn return0(x: i32, y: i32) -> impl Iterator<Item = i32> {
+40 | |         //~^ ERROR `#[auto_enum]` is required two or more branches or marker macros in total, there is no branch or marker macro in this statement
+41 | |         _ if y < 0 => return y..=0,
    | |_^ expected 1 parameter
