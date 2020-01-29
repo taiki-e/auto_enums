@@ -32,6 +32,7 @@ mod stable {
         // block + unsafe block + parentheses
         #[rustfmt::skip]
         #[allow(unsafe_code)]
+        #[allow(unused_parens)]
         #[allow(unused_unsafe)]
         #[auto_enum(Iterator)]
         fn block(x: usize) -> impl Iterator<Item = i32> {

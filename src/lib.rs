@@ -382,6 +382,7 @@
 //!   }
 //!
 //!   // parentheses
+//!   # #[allow(unused_parens)]
 //!   #[auto_enum(Iterator)]
 //!   fn expr_parentheses(x: i32) -> impl Iterator<Item=i32> {
 //!       (if x == 0 { Some(0).into_iter() } else { 0..x })
@@ -770,6 +771,8 @@
 #![forbid(unsafe_code)]
 #![warn(rust_2018_idioms, single_use_lifetimes, unreachable_pub)]
 #![warn(clippy::all)]
+// mem::take requires Rust 1.40
+#![allow(clippy::mem_replace_with_default)]
 
 #[cfg(all(feature = "generator_trait", not(feature = "unstable")))]
 compile_error!(

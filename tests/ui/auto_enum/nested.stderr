@@ -1,4 +1,4 @@
-error[E0308]: match arms have incompatible types
+error[E0308]: `match` arms have incompatible types
   --> $DIR/nested.rs:10:13
    |
 3  |  / #[auto_enum(Iterator)]
@@ -20,7 +20,7 @@ error[E0308]: match arms have incompatible types
    = note: expected type `match_nop::__Enummatch_nop<std::ops::Range<{integer}>, _>`
             found struct `std::ops::RangeInclusive<{integer}>`
 
-error[E0308]: if and else have incompatible types
+error[E0308]: `if` and `else` have incompatible types
   --> $DIR/nested.rs:16:1
    |
 16 | / #[auto_enum(Iterator)]

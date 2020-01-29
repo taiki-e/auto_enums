@@ -19,6 +19,7 @@ pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
         None,
         parse_quote! {
             trait Error {
+                #[allow(deprecated)]
                 fn description(&self) -> &str;
             }
         }?,
