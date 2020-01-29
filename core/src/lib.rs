@@ -11,6 +11,8 @@
 // It cannot be included in the published code because these lints have false positives in the minimum required version.
 #![cfg_attr(test, warn(single_use_lifetimes))]
 #![warn(clippy::all)]
+// mem::take requires Rust 1.40
+#![allow(clippy::mem_replace_with_default)]
 // `auto_enum` uses the hash value of the input AST to prevent access to the generated enum.
 // This works well for common use cases, but is inconvenient when testing error messages that contain enum names.
 // When this feature is enabled, `auto_enum` uses the enum name is based on the function name,
@@ -21,6 +23,8 @@
 // `--cfg auto_enums_def_site_enum_ident` in RUSTFLAGS.
 #![cfg_attr(auto_enums_def_site_enum_ident, feature(proc_macro_def_site))]
 
+// older compilers require explicit `extern crate`.
+#[allow(unused_extern_crates)]
 extern crate proc_macro;
 
 #[macro_use]

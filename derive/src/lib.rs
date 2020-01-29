@@ -9,6 +9,8 @@
 #![forbid(unsafe_code)]
 #![warn(rust_2018_idioms, single_use_lifetimes, unreachable_pub)]
 #![warn(clippy::all)]
+// mem::take requires Rust 1.40
+#![allow(clippy::mem_replace_with_default)]
 
 #[cfg(all(feature = "generator_trait", not(feature = "unstable")))]
 compile_error!(
@@ -25,6 +27,8 @@ compile_error!(
     "The `trusted_len` feature requires the `unstable` feature as an explicit opt-in to unstable features"
 );
 
+// older compilers require explicit `extern crate`.
+#[allow(unused_extern_crates)]
 extern crate proc_macro;
 
 #[macro_use]
