@@ -33,7 +33,7 @@ error: `#[auto_enum]` is required two or more branches or marker macros in total
 43 | |     };
    | |______^
 
-error[E0061]: this function takes 1 parameter but 2 parameters were supplied
+error[E0061]: this function takes 1 argument but 2 arguments were supplied
   --> $DIR/compile-fail.rs:3:1
    |
 3  |   #[auto_enum(Iterator)]
@@ -44,7 +44,10 @@ error[E0061]: this function takes 1 parameter but 2 parameters were supplied
 4  | | fn unexpected_token_in_marker(x: usize) -> impl Iterator<Item = i32> {
 5  | |     match x {
 6  | |         0 => marker!(1..8..), //~ ERROR expected one of `)`, `,`, `.`, `?`, or an operator, found `..`
+   | |                      ------ supplied 2 arguments
 ...  |
 40 | |         //~^ ERROR `#[auto_enum]` is required two or more branches or marker macros in total, there is no branch or marker macro in this statement
 41 | |         _ if y < 0 => return y..=0,
-   | |_^ expected 1 parameter
+   | |_^ expected 1 argument
+   |
+   = note: this error originates in an attribute macro (in Nightly builds, run with -Z macro-backtrace for more info)

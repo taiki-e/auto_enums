@@ -34,3 +34,4 @@ error[E0308]: `if` and `else` have incompatible types
    |
    = note: expected type `std::ops::RangeInclusive<{integer}>`
               found enum `if_nop::__Enumif_nop<_, std::iter::Map<std::ops::Range<{integer}>, [closure@$DIR/tests/ui/auto_enum/nested.rs:25:20: 25:29]>>`
+   = note: this error originates in an attribute macro (in Nightly builds, run with -Z macro-backtrace for more info)
