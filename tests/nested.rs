@@ -43,8 +43,10 @@ fn nested() {
     }
 
     #[rustfmt::skip]
+    #[allow(unknown_lints)]
     #[allow(unsafe_code)]
     #[allow(unused_unsafe)]
+    #[allow(unused_braces)]
     #[auto_enum(Iterator)]
     fn in_block(x: usize) -> impl Iterator<Item = i32> {
         {{{ unsafe {{{ unsafe { unsafe {{
