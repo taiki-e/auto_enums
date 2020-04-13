@@ -23,14 +23,21 @@ error[E0308]: `match` arms have incompatible types
 error[E0308]: `if` and `else` have incompatible types
   --> $DIR/nested.rs:16:1
    |
-16 | / #[auto_enum(Iterator)]
-17 | | fn if_nop(x: usize) -> impl Iterator<Item = i32> {
-18 | |     if x == 0 {
-19 | |         1..8
-...  |
-23 | |         2..=10
-   | |         ------ expected because of this
-...  |
+16 |  / #[auto_enum(Iterator)]
+17 |  | fn if_nop(x: usize) -> impl Iterator<Item = i32> {
+18 |  |     if x == 0 {
+19 |  |         1..8
+20 |  |     } else if x > 3 {
+   |  |____________-
+21 | ||         // This strange formatting is a rustfmt bug.
+22 | || #[nested] //~ ERROR E0308
+23 | ||         2..=10
+   | ||         ------ expected because of this
+24 | ||     } else {
+25 | ||         (0..2).map(|x| x + 1)
+26 | ||     }
+   | ||_____- `if` and `else` have incompatible types
+...   |
    |
    = note: expected type `std::ops::RangeInclusive<{integer}>`
               found enum `if_nop::__Enumif_nop<_, std::iter::Map<std::ops::Range<{integer}>, [closure@$DIR/tests/ui/auto_enum/nested.rs:25:20: 25:29]>>`
