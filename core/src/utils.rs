@@ -53,7 +53,11 @@ pub(crate) fn replace_expr(this: &mut Expr, f: impl FnOnce(Expr) -> Expr) {
 }
 
 pub(crate) fn replace_block(this: &mut Block, f: impl FnOnce(Block) -> Expr) {
-    *this = block(vec![Stmt::Expr(f(mem::replace(this, block(Vec::new()))))]);
+    // `brace_token` of the block that passed to `f` should have `call_site` span.
+    // If `f` generates unused braces containing the span of `this.brace_token`,
+    // this will cause confusing warnings: https://github.com/rust-lang/rust/issues/71080
+    let stmts = mem::replace(&mut this.stmts, Vec::new());
+    this.stmts = vec![Stmt::Expr(f(block(stmts)))];
 }
 
 // =================================================================================================
