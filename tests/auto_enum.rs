@@ -497,6 +497,11 @@ mod stable {
         }
         assert!(try_operator(None).unwrap_err().source().is_some());
     }
+
+    // This hack is needed until https://github.com/rust-lang/rust/pull/69201
+    // makes it way into stable.
+    #[rustversion::nightly]
+    include!("auto_enum_if_attr.rs.in");
 }
 
 // nightly
@@ -706,4 +711,22 @@ mod nightly {
             assert_eq!(marker2(i).clone().sum::<i32>(), *x - 1);
         }
     }
+
+    #[test]
+    fn non_stmt_expr() {
+        fn match_(x: bool) -> Option<impl Iterator<Item = u8>> {
+            Some(
+                #[auto_enum(Iterator)]
+                match x {
+                    true => std::iter::once(0),
+                    _ => std::iter::repeat(1),
+                },
+            )
+        }
+    }
+
+    // This hack is needed until https://github.com/rust-lang/rust/pull/69201
+    // makes it way into stable.
+    #[rustversion::nightly]
+    include!("auto_enum_if_attr_unstable.rs.in");
 }

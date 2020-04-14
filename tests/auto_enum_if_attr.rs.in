@@ -1,0 +1,23 @@
+// FIXME: Once https://github.com/rust-lang/rust/pull/69201 makes its
+// way into stable, move this back into `auto_enum.rs
+
+#[auto_enum]
+fn a(x: bool) -> impl Iterator<Item = u8> {
+    let res = {
+        #[auto_enum(Iterator)]
+        if x { std::iter::once(0) } else { std::iter::repeat(1) }
+    };
+    res
+}
+
+#[auto_enum(Iterator)]
+fn if_in_if(x: usize) -> impl Iterator<Item = i32> {
+    if x == 0 {
+        1..8
+    } else if x > 3 {
+        #[nested]
+        if x > 4 { 2..=10 } else { (11..20).map(|x| x - 1) }
+    } else {
+        (0..2).map(|x| x + 1)
+    }
+}
