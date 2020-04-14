@@ -78,6 +78,7 @@ auto_enums_derive = { version = "=0.7.2", path = "derive", default-features = fa
 
 [dev-dependencies]
 trybuild = "1.0"
+rustversion = "1.0"
 futures_crate = { version = "0.3", package = "futures" }
 rayon_crate = { version = "1.2", package = "rayon" }
 serde_crate = { version = "1.0", package = "serde" }
