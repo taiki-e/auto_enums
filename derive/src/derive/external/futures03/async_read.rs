@@ -3,11 +3,9 @@ use crate::utils::*;
 pub(crate) const NAME: &[&str] = &["futures::AsyncRead"];
 
 pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
-    let io = quote!(::futures::io);
-
     derive_trait!(
         data,
-        parse_quote!(#io::AsyncRead)?,
+        parse_quote!(::futures::io::AsyncRead)?,
         parse_quote! {
             trait AsyncRead {
                 #[inline]

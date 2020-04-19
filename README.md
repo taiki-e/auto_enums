@@ -195,7 +195,7 @@ Note that some traits have aliases.
 
 You can add support for external library by activating the each crate feature.
 
-[`futures(v0.3)`](https://github.com/rust-lang-nursery/futures-rs) *(requires `"futures"` crate feature)*
+[`futures(v0.3)`](https://github.com/rust-lang/futures-rs) *(requires `"futures03"` or `"futures"` crate feature)*
 
 * [`futures::Stream`](https://docs.rs/futures/0.3/futures/stream/trait.Stream.html) - [generated code](docs/supported_traits/external/futures/stream.md)
 * [`futures::Sink`](https://docs.rs/futures/0.3/futures/sink/trait.Sink.html) - [generated code](docs/supported_traits/external/futures/sink.md)
@@ -206,7 +206,7 @@ You can add support for external library by activating the each crate feature.
 
 *See also [futures-enum] crate.*
 
-[`futures(v0.1)`](https://github.com/rust-lang-nursery/futures-rs/tree/0.1) *(requires `"futures01"` crate feature)*
+[`futures(v0.1)`](https://github.com/rust-lang/futures-rs/tree/0.1) *(requires `"futures01"` crate feature)*
 
 * [`futures01::Future`](https://docs.rs/futures/0.1/futures/future/trait.Future.html)
 * [`futures01::Stream`](https://docs.rs/futures/0.1/futures/stream/trait.Stream.html)
@@ -221,6 +221,18 @@ You can add support for external library by activating the each crate feature.
 [`serde`](https://github.com/serde-rs/serde) *(requires `"serde"` crate feature)*
 
 * [`serde::Serialize`](https://docs.serde.rs/serde/trait.Serialize.html) - [generated code](docs/supported_traits/external/serde/serialize.md)
+
+[`tokio(v0.2)`](https://github.com/tokio-rs/tokio) *(requires `"tokio02"` crate feature)*
+
+* [`tokio02::AsyncRead`](https://docs.rs/tokio/0.2/tokio/io/trait.AsyncRead.html)
+* [`tokio02::AsyncWrite`](https://docs.rs/tokio/0.2/tokio/io/trait.AsyncWrite.html)
+* [`tokio02::AsyncSeek`](https://docs.rs/tokio/0.2/tokio/io/trait.AsyncSeek.html)
+* [`tokio02::AsyncBufRead`](https://docs.rs/tokio/0.2/tokio/io/trait.AsyncBufRead.html)
+
+[`tokio(v0.1)`](https://github.com/tokio-rs/tokio/tree/v0.1.x) *(requires `"tokio01"` crate feature)*
+
+* [`tokio01::AsyncRead`](https://docs.rs/tokio/0.1/tokio/io/trait.AsyncRead.html)
+* [`tokio01::AsyncWrite`](https://docs.rs/tokio/0.1/tokio/io/trait.AsyncWrite.html)
 
 [futures-enum]: https://github.com/taiki-e/futures-enum
 [io-enum]: https://github.com/taiki-e/io-enum

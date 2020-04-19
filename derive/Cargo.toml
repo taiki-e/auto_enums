@@ -28,30 +28,30 @@ transpose_methods = []
 
 # Enable to use `std` library's traits.
 std = []
-
 # Enable to use `[std|core]::ops`'s `Deref`, `DerefMut`, `Index`, `IndexMut`, and `RangeBounds` traits.
 ops = []
-
 # Enable to use `[std|core]::convert`'s `AsRef` and `AsMut` traits.
 convert = []
-
 # Enable to use `[std|core]::fmt`'s traits other than `Debug`, `Display` and `Write`
 fmt = []
 
 # ==============================================================================
 # external libraries
 
-# futures(v0.3+)
-futures = []
-
-# futures(v0.1)
+# https://docs.rs/futures/0.3
+futures03 = []
+# https://docs.rs/futures/0.1
 futures01 = []
-
-# rayon
+# https://docs.rs/futures/0.3
+futures = ["futures03"]
+# https://docs.rs/rayon/1
 rayon = []
-
-# serde
+# https://docs.rs/serde/1
 serde = []
+# https://docs.rs/tokio/0.1
+tokio01 = []
+# https://docs.rs/tokio/0.2
+tokio02 = []
 
 # ==============================================================================
 # Unstable features

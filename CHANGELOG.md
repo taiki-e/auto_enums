@@ -6,6 +6,12 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+* Added support for `tokio02::{AsyncRead, AsyncWrite, AsyncSeek, AsyncBufRead}`.
+
+* Added support for `tokio01::{AsyncRead, AsyncWrite}`.
+
+* Added `futures03` feature. This is an alias of `futures` feature.
+
 ## [0.7.2] - 2020-04-13
 
 * Fix unused braces warnings
