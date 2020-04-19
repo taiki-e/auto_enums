@@ -11,11 +11,9 @@ pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
         parse_quote! {
             trait ParallelIterator {
                 type Item;
-                #[inline]
                 fn drive_unindexed<__C>(self, consumer: __C) -> __C::Result
                 where
                     __C: #iter::plumbing::UnindexedConsumer<Self::Item>;
-                #[inline]
                 fn opt_len(&self) -> ::core::option::Option<usize>;
             }
         }?,

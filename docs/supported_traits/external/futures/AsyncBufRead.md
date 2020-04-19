@@ -24,7 +24,6 @@ where
     A: ::futures::io::AsyncBufRead,
     B: ::futures::io::AsyncBufRead,
 {
-    #[inline]
       fn poll_fill_buf<'__a>(
         self: ::core::pin::Pin<&'__a mut Self>,
         cx: &mut ::core::task::Context<'_>,
@@ -35,7 +34,6 @@ where
         }
     }
 
-    #[inline]
     fn consume(self: ::core::pin::Pin<&mut Self>, amt: usize) {
         match ::core::pin::Pin::get_unchecked_mut(self) {
             Enum::A(x) => ::futures::io::AsyncBufRead::consume(::core::pin::Pin::new_unchecked(x), amt),

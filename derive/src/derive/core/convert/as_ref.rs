@@ -8,7 +8,6 @@ pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
         parse_quote!(::core::convert::AsRef)?,
         parse_quote! {
             trait AsRef<__T: ?Sized> {
-                #[inline]
                 fn as_ref(&self) -> &__T;
             }
         }?,

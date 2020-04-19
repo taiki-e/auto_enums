@@ -24,7 +24,6 @@ where
     A: ::futures::io::AsyncRead,
     B: ::futures::io::AsyncRead,
 {
-    #[inline]
     fn poll_read(
         self: ::core::pin::Pin<&mut Self>,
         cx: &mut ::core::task::Context<'_>,
@@ -38,7 +37,6 @@ where
         }
     }
 
-    #[inline]
     fn poll_read_vectored(
         self: ::core::pin::Pin<&mut Self>,
         cx: &mut ::core::task::Context<'_>,

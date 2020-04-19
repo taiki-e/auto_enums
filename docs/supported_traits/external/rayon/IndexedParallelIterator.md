@@ -23,7 +23,6 @@ where
     A: ::rayon::iter::IndexedParallelIterator,
     B: ::rayon::iter::IndexedParallelIterator<Item = <A as ::rayon::iter::ParallelIterator>::Item>,
 {
-    #[inline]
     fn drive<__C>(self, consumer: __C) -> __C::Result
     where
         __C: ::rayon::iter::plumbing::Consumer<Self::Item>,
@@ -34,7 +33,6 @@ where
         }
     }
 
-    #[inline]
     fn len(&self) -> usize {
         match self {
             Enum::A(x) => ::rayon::iter::IndexedParallelIterator::len(x),
@@ -42,7 +40,6 @@ where
         }
     }
 
-    #[inline]
     fn with_producer<__CB>(self, callback: __CB) -> __CB::Output
     where
         __CB: ::rayon::iter::plumbing::ProducerCallback<Self::Item>,

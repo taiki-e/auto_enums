@@ -11,7 +11,6 @@ macro_rules! fmt_impl {
                     parse_quote!(::core::fmt::$Trait)?,
                     parse_quote! {
                         trait $Trait {
-                            #[inline]
                             fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result;
                         }
                     }?,

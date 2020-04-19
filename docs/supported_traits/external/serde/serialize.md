@@ -25,7 +25,6 @@ where
     A: ::serde::ser::Serialize,
     B: ::serde::ser::Serialize,
 {
-    #[inline]
     fn serialize<__S>(&self, serializer: __S) -> ::std::result::Result<__S::Ok, __S::Error>
     where
         __S: ::serde::ser::Serializer

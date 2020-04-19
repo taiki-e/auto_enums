@@ -11,7 +11,6 @@ pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
         parse_quote!(::core::iter::ExactSizeIterator)?,
         parse_quote! {
             trait ExactSizeIterator: ::core::iter::Iterator {
-                #[inline]
                 fn len(&self) -> usize;
             }
         }?,

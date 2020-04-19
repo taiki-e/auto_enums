@@ -23,7 +23,6 @@ where
     A: ::core::iter::Extend<__A>,
     B: ::core::iter::Extend<__A>,
 {
-    #[inline]
     fn extend<__T: ::core::iter::IntoIterator<Item = __A>>(&mut self, iter: __T) {
         match self {
             Enum::A(x) => ::core::iter::Extend::extend(x, iter),

@@ -21,7 +21,6 @@ pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
         .try_for_each(|f| parse_quote!(#f: #trait_).map(|f| impl_.push_where_predicate(f)))?;
 
     impl_.push_method(parse_quote! {
-        #[inline]
         extern "rust-call" fn call_mut(&mut self, args: (__T,)) -> Self::Output;
     }?)?;
 

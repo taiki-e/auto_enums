@@ -26,7 +26,6 @@ where
 {
     type Item = <A as ::futures::stream::Stream>::Item;
 
-    #[inline]
     fn poll_next(
         self: ::core::pin::Pin<&mut Self>,
         cx: &mut ::core::task::Context<'_>,
@@ -39,7 +38,6 @@ where
         }
     }
 
-    #[inline]
     fn size_hint(&self) -> (usize, ::core::option::Option<usize>) {
         match self {
             Enum::A(x) => ::futures::stream::Stream::size_hint(x),

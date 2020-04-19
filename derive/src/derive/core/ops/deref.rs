@@ -9,7 +9,6 @@ pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
         parse_quote! {
             trait Deref {
                 type Target;
-                #[inline]
                 fn deref(&self) -> &Self::Target;
             }
         }?,

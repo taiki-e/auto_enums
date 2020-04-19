@@ -26,7 +26,6 @@ where
 {
     type Output = <A as ::core::future::Future>::Output;
 
-    #[inline]
     fn poll(
         self: ::core::pin::Pin<&mut Self>,
         cx: &mut ::core::task::Context<'_>,

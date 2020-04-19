@@ -8,7 +8,6 @@ pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
         parse_quote!(::futures::io::AsyncSeek)?,
         parse_quote! {
             trait AsyncSeek {
-                #[inline]
                 fn poll_seek(
                     self: ::core::pin::Pin<&mut Self>,
                     cx: &mut ::core::task::Context<'_>,

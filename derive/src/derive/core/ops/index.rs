@@ -9,7 +9,6 @@ pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
         parse_quote! {
             trait Index<__Idx> {
                 type Output;
-                #[inline]
                 fn index(&self, index: __Idx) -> &Self::Output;
             }
         }?,

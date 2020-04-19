@@ -24,7 +24,6 @@ where
     A: ::futures::io::AsyncWrite,
     B: ::futures::io::AsyncWrite,
 {
-    #[inline]
     fn poll_write(
         self: ::core::pin::Pin<&mut Self>,
         cx: &mut ::core::task::Context<'_>,
@@ -38,7 +37,6 @@ where
         }
     }
 
-    #[inline]
     fn poll_write_vectored(
         self: ::core::pin::Pin<&mut Self>,
         cx: &mut ::core::task::Context<'_>,
@@ -52,7 +50,6 @@ where
         }
     }
 
-    #[inline]
     fn poll_flush(
         self: ::core::pin::Pin<&mut Self>,
         cx: &mut ::core::task::Context<'_>,
@@ -65,7 +62,6 @@ where
         }
     }
 
-    #[inline]
     fn poll_close(
         self: ::core::pin::Pin<&mut Self>,
         cx: &mut ::core::task::Context<'_>,

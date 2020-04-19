@@ -24,7 +24,6 @@ where
     A: ::futures::io::AsyncSeek,
     B: ::futures::io::AsyncSeek,
 {
-    #[inline]
     fn poll_seek(
         self: ::core::pin::Pin<&mut Self>,
         cx: &mut ::core::task::Context<'_>,

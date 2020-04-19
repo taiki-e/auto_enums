@@ -12,7 +12,6 @@ pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
             trait Future {
                 type Item;
                 type Error;
-                #[inline]
                 fn poll(&mut self) -> #crate_::Poll<Self::Item, Self::Error>;
             }
         }?,

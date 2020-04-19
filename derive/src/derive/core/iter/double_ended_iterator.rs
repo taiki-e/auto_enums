@@ -7,11 +7,9 @@ pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
 
     // It is equally efficient if `try_rfold` can be used.
     let try_trait = quote! {
-        #[inline]
         fn rfold<__U, __F>(self, accum: __U, f: __F) -> __U
         where
             __F: ::core::ops::FnMut(__U, Self::Item) -> __U;
-        #[inline]
         fn rfind<__P>(&mut self, predicate: __P) -> ::core::option::Option<Self::Item>
         where
             __P: ::core::ops::FnMut(&Self::Item) -> bool;
@@ -23,7 +21,6 @@ pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
         parse_quote!(::core::iter::DoubleEndedIterator)?,
         parse_quote! {
             trait DoubleEndedIterator: ::core::iter::Iterator {
-                #[inline]
                 fn next_back(&mut self) -> ::core::option::Option<Self::Item>;
                 #try_trait
             }

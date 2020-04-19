@@ -23,7 +23,6 @@ where
     A: ::std::io::Seek,
     B: ::std::io::Seek,
 {
-    #[inline]
     fn seek(&mut self, pos: ::std::io::SeekFrom) -> ::std::io::Result<u64> {
         match self {
             Enum::A(x) => ::std::io::Seek::seek(x, pos),

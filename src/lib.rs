@@ -72,14 +72,12 @@
 //!         __T2: ::core::iter::Iterator<Item = <__T1 as ::core::iter::Iterator>::Item>,
 //!     {
 //!         type Item = <__T1 as ::core::iter::Iterator>::Item;
-//!         #[inline]
 //!         fn next(&mut self) -> ::core::option::Option<Self::Item> {
 //!             match self {
 //!                 __Enum1::__T1(x) => x.next(),
 //!                 __Enum1::__T2(x) => x.next(),
 //!             }
 //!         }
-//!         #[inline]
 //!         fn size_hint(&self) -> (usize, ::core::option::Option<usize>) {
 //!             match self {
 //!                 __Enum1::__T1(x) => x.size_hint(),

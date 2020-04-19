@@ -10,7 +10,6 @@ pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
             trait Generator<R> {
                 type Yield;
                 type Return;
-                #[inline]
                 fn resume(
                     self: ::core::pin::Pin<&mut Self>,
                     arg: R,

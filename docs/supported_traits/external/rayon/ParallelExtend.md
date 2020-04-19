@@ -23,7 +23,6 @@ where
     A: ::rayon::iter::ParallelExtend<__T>,
     B: ::rayon::iter::ParallelExtend<__T>,
 {
-    #[inline]
     fn par_extend<__I>(&mut self, par_iter: __I)
     where
         __I: ::rayon::IntoParallelIterator<Item = __T>

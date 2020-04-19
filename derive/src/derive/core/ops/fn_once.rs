@@ -23,7 +23,6 @@ pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
     impl_.append_items_from_trait(parse_quote! {
         trait FnOnce {
             type Output;
-            #[inline]
             extern "rust-call" fn call_once(self, args: (__T,)) -> Self::Output;
         }
     }?)?;

@@ -10,7 +10,6 @@ pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
         parse_quote!(#ser::Serialize)?,
         parse_quote! {
             trait Serialize {
-                #[inline]
                 fn serialize<__S>(&self, serializer: __S) -> ::core::result::Result<__S::Ok, __S::Error>
                 where
                     __S: #ser::Serializer;

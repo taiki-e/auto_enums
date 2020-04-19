@@ -8,7 +8,6 @@ pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
         parse_quote!(::std::io::Seek)?,
         parse_quote! {
             trait Seek {
-                #[inline]
                 fn seek(&mut self, pos: ::std::io::SeekFrom) -> ::std::io::Result<u64>;
             }
         }?,

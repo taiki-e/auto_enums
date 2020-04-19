@@ -40,7 +40,6 @@ fn transpose_option(data: &Data) -> Result<ItemImpl> {
     let transpose = data.variants().iter().map(|v| quote!(#ident::#v(x) => x.map(#ident::#v)));
 
     items.push_item(parse_quote! {
-        #[inline]
         fn transpose(self) -> ::core::option::Option<#ident<#(#fields),*>> {
             match self { #(#transpose,)* }
         }
@@ -73,7 +72,6 @@ fn transpose_result(data: &Data) -> Result<ItemImpl> {
         .map(|v| quote!(#ident::#v(x) => x.map(#ident::#v).map_err(#ident::#v)));
 
     items.push_item(parse_quote! {
-        #[inline]
         fn transpose(self) -> ::core::result::Result<#ident<#(#fields),*>, #ident<#(#err_fields),*>> {
             match self { #(#transpose,)* }
         }
@@ -95,7 +93,6 @@ fn transpose_ok(data: &Data) -> Result<ItemImpl> {
 
     let transpose = data.variants().iter().map(|v| quote!(#ident::#v(x) => x.map(#ident::#v)));
     items.push_item(parse_quote! {
-        #[inline]
         fn transpose_ok(self) -> ::core::result::Result<#ident<#(#fields),*>, __E> {
             match self { #(#transpose,)* }
         }
@@ -117,7 +114,6 @@ fn transpose_err(data: &Data) -> Result<ItemImpl> {
 
     let transpose = data.variants().iter().map(|v| quote!(#ident::#v(x) => x.map_err(#ident::#v)));
     items.push_item(parse_quote! {
-        #[inline]
         fn transpose_err(self) -> ::core::result::Result<__T, #ident<#(#fields),*>> {
             match self { #(#transpose,)* }
         }

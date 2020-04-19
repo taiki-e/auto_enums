@@ -23,7 +23,6 @@ where
     A: ::std::io::Read,
     B: ::std::io::Read,
 {
-    #[inline]
     fn read(&mut self, buf: &mut [u8]) -> ::std::io::Result<usize> {
         match self {
             Enum::A(x) => ::std::io::Read::read(x, buf),
@@ -31,7 +30,6 @@ where
         }
     }
 
-    #[inline]
     fn read_to_end(&mut self, buf: &mut ::std::vec::Vec<u8>) -> ::std::io::Result<usize> {
         match self {
             Enum::A(x) => ::std::io::Read::read_to_end(x, buf),
@@ -39,7 +37,6 @@ where
         }
     }
 
-    #[inline]
     fn read_to_string(&mut self, buf: &mut ::std::string::String) -> ::std::io::Result<usize> {
         match self {
             Enum::A(x) => ::std::io::Read::read_to_string(x, buf),
@@ -47,7 +44,6 @@ where
         }
     }
 
-    #[inline]
     fn read_exact(&mut self, buf: &mut [u8]) -> ::std::io::Result<()> {
         match self {
             Enum::A(x) => ::std::io::Read::read_exact(x, buf),

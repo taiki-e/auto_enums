@@ -25,7 +25,6 @@ where
 {
     type Item = <A as ::core::iter::Iterator>::Item;
 
-    #[inline]
     fn next(&mut self) -> ::core::option::Option<Self::Item> {
         match self {
             Enum::A(x) => ::core::iter::Iterator::next(x),
@@ -33,7 +32,6 @@ where
         }
     }
 
-    #[inline]
     fn size_hint(&self) -> (usize, ::core::option::Option<usize>) {
         match self {
             Enum::A(x) => ::core::iter::Iterator::size_hint(x),
@@ -41,7 +39,6 @@ where
         }
     }
 
-    #[inline]
     fn count(self) -> usize;
         match self {
             Enum::A(x) => ::core::iter::Iterator::count(x),
@@ -49,7 +46,6 @@ where
         }
     }
 
-    #[inline]
     fn last(self) -> ::core::option::Option<Self::Item> {
         match self {
             Enum::A(x) => ::core::iter::Iterator::last(x, fmt),
@@ -57,7 +53,6 @@ where
         }
     }
 
-    #[inline]
     #[must_use = "if you really need to exhaust the iterator, consider `.for_each(drop)` instead"]
     fn collect<__U: ::core::iter::FromIterator<Self::Item>>(self) -> __U {
         match self {

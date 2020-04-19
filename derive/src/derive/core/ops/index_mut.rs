@@ -9,7 +9,6 @@ pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
         parse_quote!(::core::ops::IndexMut)?,
         parse_quote! {
             trait IndexMut<__Idx>: ::core::ops::Index<__Idx> {
-                #[inline]
                 fn index_mut(&mut self, index: __Idx) -> &mut Self::Output;
             }
         }?,

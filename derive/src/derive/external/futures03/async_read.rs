@@ -8,13 +8,11 @@ pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
         parse_quote!(::futures::io::AsyncRead)?,
         parse_quote! {
             trait AsyncRead {
-                #[inline]
                 fn poll_read(
                     self: ::core::pin::Pin<&mut Self>,
                     cx: &mut ::core::task::Context<'_>,
                     buf: &mut [u8],
                 ) -> ::core::task::Poll<::std::io::Result<usize>>;
-                #[inline]
                 fn poll_read_vectored(
                     self: ::core::pin::Pin<&mut Self>,
                     cx: &mut ::core::task::Context<'_>,

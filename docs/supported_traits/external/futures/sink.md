@@ -26,7 +26,6 @@ where
 {
     type Error = <A as ::futures::sink::Sink>::Error;
 
-    #[inline]
     fn poll_ready(
         self: ::core::pin::Pin<&mut Self>,
         cx: &mut ::core::task::Context<'_>,
@@ -39,7 +38,6 @@ where
         }
     }
 
-    #[inline]
     fn start_send(
         self: ::core::pin::Pin<&mut Self>,
         item: Item,
@@ -52,7 +50,6 @@ where
         }
     }
 
-    #[inline]
     fn poll_flush(
         self: ::core::pin::Pin<&mut Self>,
         cx: &mut ::core::task::Context<'_>,
@@ -65,7 +62,6 @@ where
         }
     }
 
-    #[inline]
     fn poll_close(
         self: ::core::pin::Pin<&mut Self>,
         cx: &mut ::core::task::Context<'_>,

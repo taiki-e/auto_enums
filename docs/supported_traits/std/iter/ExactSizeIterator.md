@@ -23,7 +23,6 @@ where
     A: ::core::iter::ExactSizeIterator,
     B: ::core::iter::ExactSizeIterator<Item = <A as ::core::iter::Iterator>::Item>,
 {
-    #[inline]
     fn len(&self) -> usize {
         match self {
             Enum::A(x) => ::core::iter::ExactSizeIterator::len(x),

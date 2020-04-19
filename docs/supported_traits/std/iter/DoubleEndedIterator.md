@@ -23,7 +23,6 @@ where
     A: ::core::iter::DoubleEndedIterator,
     B: ::core::iter::DoubleEndedIterator<Item = <A as ::core::iter::Iterator>::Item>,
 {
-    #[inline]
     fn next_back(&mut self) -> ::core::option::Option<Self::Item> {
         match self {
             Enum::A(x) => ::core::iter::DoubleEndedIterator::next_back(x),
