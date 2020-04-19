@@ -4,6 +4,18 @@ use proc_macro2::TokenStream;
 use syn::{punctuated::Punctuated, visit_mut::VisitMut, *};
 
 // =================================================================================================
+// Macros
+
+macro_rules! error {
+    ($span:expr, $msg:expr) => {
+        syn::Error::new_spanned(&$span, $msg)
+    };
+    ($span:expr, $($tt:tt)*) => {
+        error!($span, format!($($tt)*))
+    };
+}
+
+// =================================================================================================
 // Extension traits
 
 pub(crate) trait VecExt<T> {
@@ -58,6 +70,13 @@ pub(crate) fn replace_block(this: &mut Block, f: impl FnOnce(Block) -> Expr) {
     // this will cause confusing warnings: https://github.com/rust-lang/rust/issues/71080
     let stmts = mem::replace(&mut this.stmts, Vec::new());
     this.stmts = vec![Stmt::Expr(f(block(stmts)))];
+}
+
+/// Check if `tokens` is an empty `TokenStream`.
+/// This is almost equivalent to `syn::parse2::<Nothing>()`,
+/// but produces a better error message and does not require ownership of `tokens`.
+pub(crate) fn parse_as_empty(tokens: &TokenStream) -> Result<()> {
+    if tokens.is_empty() { Ok(()) } else { Err(error!(tokens, "unexpected token: {}", tokens)) }
 }
 
 // =================================================================================================
@@ -222,16 +241,4 @@ attrs_impl! {
     Unsafe(ExprUnsafe),
     While(ExprWhile),
     Yield(ExprYield),
-}
-
-// =================================================================================================
-// Macros
-
-macro_rules! error {
-    ($span:expr, $msg:expr) => {
-        syn::Error::new_spanned(&$span, $msg)
-    };
-    ($span:expr, $($tt:tt)*) => {
-        error!($span, format!($($tt)*))
-    };
 }

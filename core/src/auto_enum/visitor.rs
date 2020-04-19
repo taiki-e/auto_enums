@@ -1,12 +1,11 @@
 use proc_macro2::Group;
 use quote::ToTokens;
 use syn::{
-    parse::Nothing,
     visit_mut::{self, VisitMut},
     *,
 };
 
-use crate::utils::{replace_expr, Attrs};
+use crate::utils::{parse_as_empty, replace_expr, Attrs};
 
 use super::{Context, VisitMode, VisitedNode, DEFAULT_MARKER, NAME, NESTED, NEVER};
 
@@ -51,7 +50,7 @@ impl<'a> Visitor<'a> {
     fn find_remove_attrs(&mut self, attrs: &mut impl Attrs) {
         if !self.scope.foreign {
             if let Some(attr) = attrs.find_remove_attr(NEVER) {
-                if let Err(e) = syn::parse2::<Nothing>(attr.tokens) {
+                if let Err(e) = parse_as_empty(&attr.tokens) {
                     self.cx.diagnostic.error(e);
                 }
             }
@@ -132,7 +131,7 @@ impl<'a> Visitor<'a> {
         debug_assert!(!self.scope.foreign);
 
         if let Err(e) =
-            syn::parse2::<Nothing>(attr.tokens).and_then(|_| super::expr::child_expr(node, self.cx))
+            parse_as_empty(&attr.tokens).and_then(|_| super::expr::child_expr(node, self.cx))
         {
             self.cx.diagnostic.error(e);
         }
