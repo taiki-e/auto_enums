@@ -1,7 +1,7 @@
 //! An internal crate to support auto_enums - **do not use directly**
 
 #![recursion_limit = "256"]
-#![doc(html_root_url = "https://docs.rs/auto_enums_derive/0.7.2")]
+#![doc(html_root_url = "https://docs.rs/auto_enums_derive/0.7.3")]
 #![doc(test(
     no_crate_inject,
     attr(deny(warnings, rust_2018_idioms, single_use_lifetimes), allow(dead_code))
