@@ -6,12 +6,14 @@
 #![warn(rust_2018_idioms, single_use_lifetimes)]
 #![allow(dead_code)]
 
-#[cfg(feature = "futures")]
-extern crate futures_crate as futures;
+#[cfg(feature = "futures03")]
+extern crate futures03_crate as futures;
 #[cfg(feature = "rayon")]
 extern crate rayon_crate as rayon;
 #[cfg(feature = "serde")]
 extern crate serde_crate as serde;
+#[cfg(feature = "tokio02")]
+extern crate tokio02_crate as tokio;
 
 use auto_enums::enum_derive;
 
@@ -131,7 +133,7 @@ fn stable_external() {
         B(B),
     }
 
-    #[cfg(feature = "futures")]
+    #[cfg(any(feature = "futures03", feature = "futures"))]
     #[enum_derive(
         Future,
         futures::Stream,
@@ -141,13 +143,32 @@ fn stable_external() {
         futures::AsyncSeek,
         futures::AsyncBufRead
     )]
-    enum Futures<A, B> {
+    enum Futures03<A, B> {
         A(A),
         B(B),
     }
 
     // #[enum_derive(futures01::Future, futures01::Sink, futures01::Stream)]
     // enum Futures01<A, B> {
+    //     A(A),
+    //     B(B),
+    // }
+
+    #[cfg(feature = "tokio02")]
+    #[enum_derive(
+        tokio02::AsyncRead,
+        tokio02::AsyncWrite,
+        tokio02::AsyncSeek,
+        tokio02::AsyncBufRead
+    )]
+    enum Tokio02<A, B> {
+        A(A),
+        B(B),
+    }
+
+    // #[cfg(feature = "tokio01")]
+    // #[enum_derive(tokio01::AsyncRead, tokio01::AsyncWrite)]
+    // enum Tokio01<A, B> {
     //     A(A),
     //     B(B),
     // }

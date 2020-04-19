@@ -32,30 +32,30 @@ transpose_methods = ["auto_enums_derive/transpose_methods"]
 
 # Enable to use `std` library's traits.
 std = ["auto_enums_derive/std"]
-
 # Enable to use `[std|core]::ops`'s `Deref`, `DerefMut`, `Index`, `IndexMut`, and `RangeBounds` traits.
 ops = ["auto_enums_derive/ops"]
-
 # Enable to use `[std|core]::convert`'s `AsRef` and `AsMut` traits.
 convert = ["auto_enums_derive/convert"]
-
 # Enable to use `[std|core]::fmt`'s traits other than `Debug`, `Display` and `Write`
 fmt = ["auto_enums_derive/fmt"]
 
 # ==============================================================================
 # Using external libraries
 
-# futures(v0.3+)
-futures = ["auto_enums_derive/futures"]
-
-# futures(v0.1)
+# https://docs.rs/futures/0.3
+futures03 = ["auto_enums_derive/futures03"]
+# https://docs.rs/futures/0.1
 futures01 = ["auto_enums_derive/futures01"]
-
-# rayon
+# https://docs.rs/futures/0.3
+futures = ["auto_enums_derive/futures"]
+# https://docs.rs/rayon/1
 rayon = ["auto_enums_derive/rayon"]
-
-# serde
+# https://docs.rs/serde/1
 serde = ["auto_enums_derive/serde"]
+# https://docs.rs/tokio/0.2
+tokio02 = ["auto_enums_derive/tokio02"]
+# https://docs.rs/tokio/0.1
+tokio01 = ["auto_enums_derive/tokio01"]
 
 # ==============================================================================
 # Unstable features
@@ -79,7 +79,14 @@ auto_enums_derive = { version = "=0.7.2", path = "derive", default-features = fa
 [dev-dependencies]
 trybuild = "1.0"
 rustversion = "1.0"
-futures_crate = { version = "0.3", package = "futures" }
+
+# for `#[enum_derive]`
+futures03_crate = { version = "0.3", package = "futures", default-features = false, features = ["std"] }
+futures01_crate = { version = "0.1", package = "futures" }
+tokio02_crate = { version = "0.2", package = "tokio" }
+tokio01_crate = { version = "0.1", package = "tokio" }
 rayon_crate = { version = "1.2", package = "rayon" }
 serde_crate = { version = "1.0", package = "serde" }
+
+# for benches
 rand = "0.7"

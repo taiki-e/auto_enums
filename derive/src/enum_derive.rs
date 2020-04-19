@@ -169,19 +169,19 @@ lazy_static! {
             #[cfg(feature = "transpose_methods")]
             ty_impls::transpose,
 
-            // futures
-            #[cfg(feature = "futures")]
-            external::futures::stream,
-            #[cfg(feature = "futures")]
-            external::futures::sink,
-            #[cfg(feature = "futures")]
-            external::futures::async_read,
-            #[cfg(feature = "futures")]
-            external::futures::async_write,
-            #[cfg(feature = "futures")]
-            external::futures::async_seek,
-            #[cfg(feature = "futures")]
-            external::futures::async_buf_read,
+            // futures03
+            #[cfg(feature = "futures03")]
+            external::futures03::stream,
+            #[cfg(feature = "futures03")]
+            external::futures03::sink,
+            #[cfg(feature = "futures03")]
+            external::futures03::async_read,
+            #[cfg(feature = "futures03")]
+            external::futures03::async_write,
+            #[cfg(feature = "futures03")]
+            external::futures03::async_seek,
+            #[cfg(feature = "futures03")]
+            external::futures03::async_buf_read,
             // futures01
             #[cfg(feature = "futures01")]
             external::futures01::future,
@@ -199,6 +199,20 @@ lazy_static! {
             // serde
             #[cfg(feature = "serde")]
             external::serde::serialize,
+            // tokio02
+            #[cfg(feature = "tokio02")]
+            external::tokio02::async_read,
+            #[cfg(feature = "tokio02")]
+            external::tokio02::async_write,
+            #[cfg(feature = "tokio02")]
+            external::tokio02::async_seek,
+            #[cfg(feature = "tokio02")]
+            external::tokio02::async_buf_read,
+            // tokio01
+            #[cfg(feature = "tokio01")]
+            external::tokio01::async_read,
+            #[cfg(feature = "tokio01")]
+            external::tokio01::async_write,
         );
         map
     };
