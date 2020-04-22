@@ -9,9 +9,6 @@ use crate::utils::{parse_as_empty, replace_expr, Attrs};
 
 use super::{Context, VisitMode, VisitedNode, DEFAULT_MARKER, NAME, NESTED, NEVER};
 
-/// The old annotation replaced by `#[nested]`.
-const NESTED_OLD: &str = "rec";
-
 // =================================================================================================
 // Visitor
 
@@ -55,11 +52,11 @@ impl<'a> Visitor<'a> {
                 }
             }
 
-            if let Some(old) = attrs.find_remove_attr(NESTED_OLD) {
-                self.cx.diagnostic.error(error!(
-                    old,
-                    "#[{}] has been removed and replaced with #[{}]", NESTED_OLD, NESTED
-                ));
+            // The old annotation `#[rec]` is replaced with `#[nested]`.
+            if let Some(old) = attrs.find_remove_attr("rec") {
+                self.cx
+                    .diagnostic
+                    .error(error!(old, "#[rec] has been removed and replaced with #[{}]", NESTED));
             }
         }
     }
@@ -114,9 +111,9 @@ impl<'a> Visitor<'a> {
 
                         Expr::Match(ExprMatch {
                             attrs,
-                            match_token: token::Match::default(),
+                            match_token: Default::default(),
                             expr,
-                            brace_token: token::Brace::default(),
+                            brace_token: Default::default(),
                             arms,
                         })
                     })
@@ -127,7 +124,7 @@ impl<'a> Visitor<'a> {
     }
 
     /// `#[nested]`
-    fn visit_nested(&mut self, node: &mut Expr, attr: Attribute) {
+    fn visit_nested(&mut self, node: &mut Expr, attr: &Attribute) {
         debug_assert!(!self.scope.foreign);
 
         if let Err(e) =
@@ -181,7 +178,7 @@ impl VisitMut for Visitor<'_> {
 
             if !self.scope.foreign {
                 if let Some(attr) = node.find_remove_attr(NESTED) {
-                    self.visit_nested(node, attr);
+                    self.visit_nested(node, &attr);
                 }
             }
 
@@ -198,7 +195,7 @@ impl VisitMut for Visitor<'_> {
         if !self.cx.failed() {
             if !self.scope.foreign {
                 if let Some(attr) = node.find_remove_attr(NESTED) {
-                    self.visit_nested(&mut *node.body, attr);
+                    self.visit_nested(&mut *node.body, &attr);
                 }
             }
 
@@ -213,7 +210,7 @@ impl VisitMut for Visitor<'_> {
             if !self.scope.foreign {
                 if let Some(attr) = node.find_remove_attr(NESTED) {
                     if let Some((_, expr)) = &mut node.init {
-                        self.visit_nested(&mut **expr, attr);
+                        self.visit_nested(&mut **expr, &attr);
                     }
                 }
             }
@@ -301,8 +298,8 @@ fn visit_stmt(visitor: &mut impl VisitStmt, node: &mut Stmt) {
         Stmt::Item(_) => None,
     };
 
-    if let Some(Attribute { tokens, .. }) = attr {
-        let res = syn::parse2::<Group>(tokens)
+    if let Some(attr) = attr {
+        let res = syn::parse2::<Group>(attr.tokens)
             .and_then(|group| visitor.cx().make_child(node.to_token_stream(), group.stream()));
 
         visit_mut::visit_stmt_mut(visitor, node);
