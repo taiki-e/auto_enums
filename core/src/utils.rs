@@ -36,7 +36,7 @@ pub(crate) fn path(segments: impl IntoIterator<Item = PathSegment>) -> Path {
 }
 
 pub(crate) fn block(stmts: Vec<Stmt>) -> Block {
-    Block { brace_token: token::Brace::default(), stmts }
+    Block { brace_token: Default::default(), stmts }
 }
 
 pub(crate) fn expr_block(block: Block) -> Expr {
@@ -47,7 +47,7 @@ pub(crate) fn expr_call(attrs: Vec<Attribute>, path: Path, arg: Expr) -> Expr {
     Expr::Call(ExprCall {
         attrs,
         func: Box::new(Expr::Path(ExprPath { attrs: Vec::new(), qself: None, path })),
-        paren_token: token::Paren::default(),
+        paren_token: Default::default(),
         args: iter::once(arg).collect(),
     })
 }
@@ -55,7 +55,7 @@ pub(crate) fn expr_call(attrs: Vec<Attribute>, path: Path, arg: Expr) -> Expr {
 pub(crate) fn unit() -> Expr {
     Expr::Tuple(ExprTuple {
         attrs: Vec::new(),
-        paren_token: token::Paren::default(),
+        paren_token: Default::default(),
         elems: Punctuated::new(),
     })
 }
