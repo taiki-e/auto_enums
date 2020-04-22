@@ -1,10 +1,6 @@
-use std::{
-    collections::hash_map::DefaultHasher,
-    hash::{Hash, Hasher},
-    iter, mem,
-};
+use std::{collections::hash_map::DefaultHasher, hash::Hasher, iter, mem};
 
-use proc_macro2::{Delimiter, Spacing, TokenStream, TokenTree};
+use proc_macro2::TokenStream;
 use quote::format_ident;
 use syn::{
     parse::{Parse, ParseStream},
@@ -395,60 +391,9 @@ impl Builder {
     }
 }
 
-// =================================================================================================
-// Hash
-
 /// Returns the hash value of the input AST.
-fn hash(tokens: &TokenStream) -> u64 {
-    let tokens = TokenStreamHelper(tokens);
+fn hash(input: &TokenStream) -> u64 {
     let mut hasher = DefaultHasher::new();
-    tokens.hash(&mut hasher);
+    hasher.write(input.to_string().as_bytes());
     hasher.finish()
-}
-
-// Based on https://github.com/dtolnay/syn/blob/1.0.5/src/tt.rs
-
-struct TokenTreeHelper<'a>(&'a TokenTree);
-
-impl Hash for TokenTreeHelper<'_> {
-    fn hash<H: Hasher>(&self, h: &mut H) {
-        match self.0 {
-            TokenTree::Group(g) => {
-                0_u8.hash(h);
-                match g.delimiter() {
-                    Delimiter::Parenthesis => 0_u8.hash(h),
-                    Delimiter::Brace => 1_u8.hash(h),
-                    Delimiter::Bracket => 2_u8.hash(h),
-                    Delimiter::None => 3_u8.hash(h),
-                }
-
-                for tt in g.stream() {
-                    TokenTreeHelper(&tt).hash(h);
-                }
-                0xff_u8.hash(h); // terminator w/ a variant we don't normally hash
-            }
-            TokenTree::Punct(op) => {
-                1_u8.hash(h);
-                op.as_char().hash(h);
-                match op.spacing() {
-                    Spacing::Alone => 0_u8.hash(h),
-                    Spacing::Joint => 1_u8.hash(h),
-                }
-            }
-            TokenTree::Literal(lit) => (2_u8, lit.to_string()).hash(h),
-            TokenTree::Ident(word) => (3_u8, word).hash(h),
-        }
-    }
-}
-
-struct TokenStreamHelper<'a>(&'a TokenStream);
-
-impl Hash for TokenStreamHelper<'_> {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        let tokens = self.0.clone().into_iter().collect::<Vec<_>>();
-        tokens.len().hash(state);
-        for tt in tokens {
-            TokenTreeHelper(&tt).hash(state);
-        }
-    }
 }
