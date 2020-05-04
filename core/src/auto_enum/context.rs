@@ -4,7 +4,7 @@ use proc_macro2::TokenStream;
 use quote::format_ident;
 use syn::{
     parse::{Parse, ParseStream},
-    *,
+    Result, *,
 };
 
 use crate::utils::{expr_call, path, replace_expr, unit, VisitedNode};
@@ -67,6 +67,7 @@ pub(super) struct Context {
     /// All marker macro identifiers that may have effects on the current scope.
     pub(super) markers: Vec<String>,
 
+    // TODO: we may be able to replace some fields based on depth.
     // depth: isize,
     /// Currently, this is basically the same as `self.markers.len() == 1`.
     root: bool,
@@ -129,10 +130,12 @@ impl Context {
         })
     }
 
+    /// Make a new `Context` as a root.
     pub(super) fn root(span: TokenStream, args: TokenStream) -> Result<Self> {
         Self::new(span, args, true, Vec::new(), Diagnostic::default())
     }
 
+    /// Make a new `Context` as a child based on a parent context `self`.
     pub(super) fn make_child(&mut self, span: TokenStream, args: TokenStream) -> Result<Self> {
         Self::new(
             span,
@@ -143,6 +146,7 @@ impl Context {
         )
     }
 
+    /// Merge a child `Context` into a parent context `self`.
     pub(super) fn join_child(&mut self, mut child: Self) {
         debug_assert!(self.diagnostic.messages.is_empty());
         debug_assert!(self.markers.is_empty());
@@ -209,10 +213,12 @@ impl Context {
         mac.path.is_ident(&self.marker)
     }
 
+    /// from `<expr>` into `Enum::VariantN(<expr>)`
     pub(super) fn next_expr(&mut self, expr: Expr) -> Expr {
         self.next_expr_with_attrs(Vec::new(), expr)
     }
 
+    /// from `<expr>` into `<attrs> Enum::VariantN(<expr>)`
     pub(super) fn next_expr_with_attrs(&mut self, attrs: Vec<Attribute>, expr: Expr) -> Expr {
         self.builder.next_expr(attrs, expr)
     }

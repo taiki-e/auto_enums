@@ -5,12 +5,9 @@ use syn::{
     *,
 };
 
-use crate::utils::{parse_as_empty, replace_expr, Attrs};
+use crate::utils::{parse_as_empty, replace_expr, Attrs, VisitedNode};
 
-use super::{Context, VisitMode, VisitedNode, DEFAULT_MARKER, NAME, NESTED, NEVER};
-
-// =================================================================================================
-// Visitor
+use super::{Context, VisitMode, DEFAULT_MARKER, NAME, NESTED, NEVER};
 
 #[derive(Clone, Copy, Default)]
 struct Scope {
@@ -33,6 +30,9 @@ impl Scope {
         }
     }
 }
+
+// =================================================================================================
+// default visitor
 
 pub(super) struct Visitor<'a> {
     cx: &'a mut Context,
@@ -84,8 +84,7 @@ impl<'a> Visitor<'a> {
             match &node {
                 // https://github.com/rust-lang/rust/blob/1.35.0/src/librustc/hir/lowering.rs#L4578-L4682
 
-                // Desugar `ExprKind::Try`
-                // from: `<expr>?`
+                // Desugar `<expr>?`
                 // into:
                 //
                 // match <expr> {
@@ -163,31 +162,46 @@ impl<'a> Visitor<'a> {
             _ => {}
         }
     }
+
+    fn visit_expr(&mut self, node: &mut Expr, has_semi: bool) {
+        debug_assert!(!self.cx.failed());
+
+        let tmp = self.scope;
+
+        if node.any_attr(NAME) {
+            self.scope.foreign = true;
+            // Record whether other `auto_enum` attribute exists.
+            self.cx.other_attr = true;
+        }
+        self.scope.check_expr(node);
+
+        match self.cx.visit_mode {
+            VisitMode::Return(count) => self.visit_return(node, count),
+            VisitMode::Try => self.visit_try(node),
+            VisitMode::Default => {}
+        }
+
+        if !self.scope.foreign {
+            if let Some(attr) = node.find_remove_attr(NESTED) {
+                self.visit_nested(node, &attr);
+            }
+        }
+
+        VisitStmt::visit_expr(self, node, has_semi);
+
+        if !self.scope.foreign || self.cx.marker != DEFAULT_MARKER {
+            self.visit_marker_macro(node);
+            self.find_remove_attrs(node);
+        }
+
+        self.scope = tmp;
+    }
 }
 
 impl VisitMut for Visitor<'_> {
     fn visit_expr_mut(&mut self, node: &mut Expr) {
         if !self.cx.failed() {
-            self.scope.check_expr(node);
-
-            match self.cx.visit_mode {
-                VisitMode::Return(count) => self.visit_return(node, count),
-                VisitMode::Try => self.visit_try(node),
-                VisitMode::Default => {}
-            }
-
-            if !self.scope.foreign {
-                if let Some(attr) = node.find_remove_attr(NESTED) {
-                    self.visit_nested(node, &attr);
-                }
-            }
-
-            visit_mut::visit_expr_mut(self, node);
-
-            if !self.scope.foreign || self.cx.marker != DEFAULT_MARKER {
-                self.visit_marker_macro(node);
-                self.find_remove_attrs(node);
-            }
+            self.visit_expr(node, false);
         }
     }
 
@@ -223,17 +237,23 @@ impl VisitMut for Visitor<'_> {
 
     fn visit_stmt_mut(&mut self, node: &mut Stmt) {
         if !self.cx.failed() {
-            let tmp = self.scope;
+            match node {
+                Stmt::Expr(expr) => self.visit_expr(expr, false),
+                Stmt::Semi(expr, _) => self.visit_expr(expr, true),
+                _ => {
+                    let tmp = self.scope;
 
-            if node.any_attr(NAME) {
-                self.scope.foreign = true;
-                // Record whether other `auto_enum` attribute exists.
-                self.cx.other_attr = true;
+                    if node.any_attr(NAME) {
+                        self.scope.foreign = true;
+                        // Record whether other `auto_enum` attribute exists.
+                        self.cx.other_attr = true;
+                    }
+
+                    VisitStmt::visit_stmt(self, node);
+
+                    self.scope = tmp;
+                }
             }
-
-            visit_stmt(self, node);
-
-            self.scope = tmp;
         }
     }
 
@@ -249,7 +269,7 @@ impl VisitStmt for Visitor<'_> {
 }
 
 // =================================================================================================
-// Dummy visitor
+// dummy visitor
 
 pub(super) struct Dummy<'a> {
     cx: &'a mut Context,
@@ -267,8 +287,16 @@ impl VisitMut for Dummy<'_> {
             if node.any_attr(NAME) {
                 self.cx.other_attr = true;
             }
+            VisitStmt::visit_stmt(self, node);
+        }
+    }
 
-            visit_stmt(self, node);
+    fn visit_expr_mut(&mut self, node: &mut Expr) {
+        if !self.cx.failed() {
+            if node.any_attr(NAME) {
+                self.cx.other_attr = true;
+            }
+            VisitStmt::visit_expr(self, node, false);
         }
     }
 
@@ -288,144 +316,176 @@ impl VisitStmt for Dummy<'_> {
 
 trait VisitStmt: VisitMut {
     fn cx(&mut self) -> &mut Context;
-}
 
-fn visit_stmt(visitor: &mut impl VisitStmt, node: &mut Stmt) {
-    let attr = match node {
-        Stmt::Expr(expr) | Stmt::Semi(expr, _) => expr.find_remove_attr(NAME),
-        Stmt::Local(local) => local.find_remove_attr(NAME),
-        // Do not recurse into nested items.
-        Stmt::Item(_) => None,
-    };
+    fn visit_expr(visitor: &mut Self, node: &mut Expr, has_semi: bool) {
+        let attr = node.find_remove_attr(NAME);
 
-    if let Some(attr) = attr {
-        let res = syn::parse2::<Group>(attr.tokens)
-            .and_then(|group| visitor.cx().make_child(node.to_token_stream(), group.stream()));
+        let res = attr.map(|attr| {
+            syn::parse2::<Group>(attr.tokens)
+                .and_then(|group| visitor.cx().make_child(node.to_token_stream(), group.stream()))
+        });
+
+        visit_mut::visit_expr_mut(visitor, node);
+
+        match res {
+            Some(Err(e)) => visitor.cx().diagnostic.error(e),
+            Some(Ok(mut cx)) => {
+                super::expand_parent_expr(node, &mut cx, has_semi)
+                    .unwrap_or_else(|e| cx.diagnostic.error(e));
+                visitor.cx().join_child(cx)
+            }
+            None => {}
+        }
+    }
+
+    fn visit_stmt(visitor: &mut Self, node: &mut Stmt) {
+        let attr = match node {
+            Stmt::Expr(expr) => {
+                Self::visit_expr(visitor, expr, false);
+                return;
+            }
+            Stmt::Semi(expr, _) => {
+                Self::visit_expr(visitor, expr, true);
+                return;
+            }
+            Stmt::Local(local) => local.find_remove_attr(NAME),
+            // Do not recurse into nested items.
+            Stmt::Item(_) => return,
+        };
+
+        let res = attr.map(|attr| {
+            syn::parse2::<Group>(attr.tokens)
+                .and_then(|group| visitor.cx().make_child(node.to_token_stream(), group.stream()))
+        });
 
         visit_mut::visit_stmt_mut(visitor, node);
 
         match res {
-            Err(e) => visitor.cx().diagnostic.error(e),
-            Ok(mut cx) => {
+            Some(Err(e)) => visitor.cx().diagnostic.error(e),
+            Some(Ok(mut cx)) => {
                 super::expand_parent_stmt(node, &mut cx).unwrap_or_else(|e| cx.diagnostic.error(e));
                 visitor.cx().join_child(cx)
             }
+            None => {}
         }
-    } else {
-        visit_mut::visit_stmt_mut(visitor, node);
     }
 }
 
 // =================================================================================================
 // FindNested
 
+/// Find `#[nested]` attribute.
 pub(super) fn find_nested(node: &mut impl VisitedNode) -> bool {
+    struct FindNested {
+        has: bool,
+    }
+
+    impl VisitMut for FindNested {
+        fn visit_expr_mut(&mut self, node: &mut Expr) {
+            if !node.any_attr(NAME) {
+                if node.any_empty_attr(NESTED) {
+                    self.has = true;
+                } else {
+                    visit_mut::visit_expr_mut(self, node);
+                }
+            }
+        }
+
+        fn visit_arm_mut(&mut self, node: &mut Arm) {
+            if node.any_empty_attr(NESTED) {
+                self.has = true;
+            } else {
+                visit_mut::visit_arm_mut(self, node);
+            }
+        }
+
+        fn visit_local_mut(&mut self, node: &mut Local) {
+            if !node.any_attr(NAME) {
+                if node.any_empty_attr(NESTED) {
+                    self.has = true;
+                } else {
+                    visit_mut::visit_local_mut(self, node);
+                }
+            }
+        }
+
+        fn visit_item_mut(&mut self, _: &mut Item) {
+            // Do not recurse into nested items.
+        }
+    }
+
     let mut visitor = FindNested { has: false };
     node.visited(&mut visitor);
     visitor.has
 }
 
-/// Find `#[nested]` attribute.
-struct FindNested {
-    has: bool,
-}
-
-impl VisitMut for FindNested {
-    fn visit_expr_mut(&mut self, node: &mut Expr) {
-        if !node.any_attr(NAME) {
-            if node.any_empty_attr(NESTED) {
-                self.has = true;
-            } else {
-                visit_mut::visit_expr_mut(self, node);
-            }
-        }
-    }
-
-    fn visit_arm_mut(&mut self, node: &mut Arm) {
-        if node.any_empty_attr(NESTED) {
-            self.has = true;
-        } else {
-            visit_mut::visit_arm_mut(self, node);
-        }
-    }
-
-    fn visit_local_mut(&mut self, node: &mut Local) {
-        if !node.any_attr(NAME) {
-            if node.any_empty_attr(NESTED) {
-                self.has = true;
-            } else {
-                visit_mut::visit_local_mut(self, node);
-            }
-        }
-    }
-
-    fn visit_item_mut(&mut self, _: &mut Item) {
-        // Do not recurse into nested items.
-    }
-}
-
 // =================================================================================================
 // FnVisitor
 
-pub(super) fn visit_fn(cx: &Context, node: &mut impl VisitedNode) -> (usize, usize) {
-    let mut visitor = FnVisitor { cx, scope: Scope::default(), count_try: 0, count_return: 0 };
-    node.visited(&mut visitor);
-    (visitor.count_try, visitor.count_return)
+#[derive(Default)]
+pub(super) struct FnCount {
+    pub(super) try_: usize,
+    pub(super) return_: usize,
 }
 
-struct FnVisitor<'a> {
-    cx: &'a Context,
-    scope: Scope,
-    count_try: usize,
-    count_return: usize,
-}
+pub(super) fn visit_fn(cx: &Context, node: &mut impl VisitedNode) -> FnCount {
+    struct FnVisitor<'a> {
+        cx: &'a Context,
+        scope: Scope,
+        count: FnCount,
+    }
 
-impl VisitMut for FnVisitor<'_> {
-    fn visit_expr_mut(&mut self, node: &mut Expr) {
-        let tmp = self.scope;
+    impl VisitMut for FnVisitor<'_> {
+        fn visit_expr_mut(&mut self, node: &mut Expr) {
+            let tmp = self.scope;
 
-        self.scope.check_expr(node);
+            self.scope.check_expr(node);
 
-        if !self.scope.closure && !node.any_empty_attr(NEVER) {
-            match node {
-                Expr::Try(ExprTry { expr, .. }) => {
-                    // Skip if `<expr>` is a marker macro.
-                    if !self.cx.is_marker_expr(&**expr) {
-                        self.count_try += 1;
+            if !self.scope.closure && !node.any_empty_attr(NEVER) {
+                match node {
+                    Expr::Try(ExprTry { expr, .. }) => {
+                        // Skip if `<expr>` is a marker macro.
+                        if !self.cx.is_marker_expr(&**expr) {
+                            self.count.try_ += 1;
+                        }
                     }
-                }
-                Expr::Return(ExprReturn { expr, .. }) => {
-                    // Skip if `<expr>` is a marker macro.
-                    if expr.as_ref().map_or(true, |expr| !self.cx.is_marker_expr(&**expr)) {
-                        self.count_return += 1;
+                    Expr::Return(ExprReturn { expr, .. }) => {
+                        // Skip if `<expr>` is a marker macro.
+                        if expr.as_ref().map_or(true, |expr| !self.cx.is_marker_expr(&**expr)) {
+                            self.count.return_ += 1;
+                        }
                     }
+                    _ => {}
                 }
-                _ => {}
             }
+
+            if node.any_attr(NAME) {
+                self.scope.foreign = true;
+            }
+
+            visit_mut::visit_expr_mut(self, node);
+
+            self.scope = tmp;
         }
 
-        if node.any_attr(NAME) {
-            self.scope.foreign = true;
+        fn visit_stmt_mut(&mut self, node: &mut Stmt) {
+            let tmp = self.scope;
+
+            if node.any_attr(NAME) {
+                self.scope.foreign = true;
+            }
+
+            visit_mut::visit_stmt_mut(self, node);
+
+            self.scope = tmp;
         }
 
-        visit_mut::visit_expr_mut(self, node);
-
-        self.scope = tmp;
-    }
-
-    fn visit_stmt_mut(&mut self, node: &mut Stmt) {
-        let tmp = self.scope;
-
-        if node.any_attr(NAME) {
-            self.scope.foreign = true;
+        fn visit_item_mut(&mut self, _: &mut Item) {
+            // Do not recurse into nested items.
         }
-
-        visit_mut::visit_stmt_mut(self, node);
-
-        self.scope = tmp;
     }
 
-    fn visit_item_mut(&mut self, _: &mut Item) {
-        // Do not recurse into nested items.
-    }
+    let mut visitor = FnVisitor { cx, scope: Scope::default(), count: FnCount::default() };
+    node.visited(&mut visitor);
+    visitor.count
 }

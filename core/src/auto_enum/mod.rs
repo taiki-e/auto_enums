@@ -2,7 +2,7 @@ use proc_macro2::TokenStream;
 use quote::ToTokens;
 use syn::*;
 
-use crate::utils::*;
+use crate::utils::{block, expr_block, replace_expr};
 
 mod context;
 mod expr;
@@ -36,7 +36,7 @@ pub(crate) fn attribute(args: TokenStream, input: TokenStream) -> TokenStream {
                 error!(cx.span, "may only be used on expression, statement, or function")
             })
             .and_then(|mut expr| {
-                expand_parent_expr(&mut expr, &mut cx).map(|()| expr.into_token_stream())
+                expand_parent_expr(&mut expr, &mut cx, false).map(|()| expr.into_token_stream())
             }),
     };
 
@@ -48,14 +48,14 @@ pub(crate) fn attribute(args: TokenStream, input: TokenStream) -> TokenStream {
     cx.diagnostic.to_compile_error().unwrap()
 }
 
-fn visit_expr(expr: &mut Expr, cx: &mut Context) -> Result<()> {
+fn expand_expr(expr: &mut Expr, cx: &mut Context) -> Result<()> {
     let expr = match expr {
         Expr::Closure(ExprClosure { body, .. }) if cx.visit_last() => {
-            let (count_try, count_return) = visitor::visit_fn(cx, &mut **body);
-            if count_try >= 2 {
+            let count = visitor::visit_fn(cx, &mut **body);
+            if count.try_ >= 2 {
                 cx.visit_mode = VisitMode::Try;
             } else {
-                cx.visit_mode = VisitMode::Return(count_return);
+                cx.visit_mode = VisitMode::Return(count.return_);
             }
             &mut **body
         }
@@ -87,12 +87,9 @@ fn build_expr(expr: &mut Expr, item: ItemEnum) {
 // Expand statement or expression in which `#[auto_enum]` was directly used.
 
 fn expand_parent_stmt(stmt: &mut Stmt, cx: &mut Context) -> Result<()> {
-    if let Stmt::Semi(..) = stmt {
-        cx.visit_last_mode = VisitLastMode::Never;
-    }
-
     match stmt {
-        Stmt::Expr(expr) | Stmt::Semi(expr, _) => expand_parent_expr(expr, cx),
+        Stmt::Expr(expr) => expand_parent_expr(expr, cx, false),
+        Stmt::Semi(expr, _) => expand_parent_expr(expr, cx, true),
         Stmt::Local(local) => expand_parent_local(local, cx),
         Stmt::Item(Item::Fn(item)) => expand_parent_item_fn(item, cx),
         Stmt::Item(item) => {
@@ -101,13 +98,17 @@ fn expand_parent_stmt(stmt: &mut Stmt, cx: &mut Context) -> Result<()> {
     }
 }
 
-fn expand_parent_expr(expr: &mut Expr, cx: &mut Context) -> Result<()> {
+fn expand_parent_expr(expr: &mut Expr, cx: &mut Context, has_semi: bool) -> Result<()> {
+    if has_semi {
+        cx.visit_last_mode = VisitLastMode::Never;
+    }
+
     if cx.is_dummy() {
         cx.dummy(expr);
         return Ok(());
     }
 
-    visit_expr(expr, cx)?;
+    expand_expr(expr, cx)?;
 
     cx.build(|item| build_expr(expr, item))
 }
@@ -134,7 +135,7 @@ fn expand_parent_local(local: &mut Local, cx: &mut Context) -> Result<()> {
         ));
     };
 
-    visit_expr(expr, cx)?;
+    expand_expr(expr, cx)?;
 
     cx.build(|item| build_expr(expr, item))
 }
@@ -148,8 +149,8 @@ fn expand_parent_item_fn(item: &mut ItemFn, cx: &mut Context) -> Result<()> {
         match &**ty {
             // `return`
             Type::ImplTrait(_) if cx.visit_last_mode != VisitLastMode::Never => {
-                let (_, count_return) = visitor::visit_fn(cx, &mut **block);
-                cx.visit_mode = VisitMode::Return(count_return);
+                let count = visitor::visit_fn(cx, &mut **block);
+                cx.visit_mode = VisitMode::Return(count.return_);
             }
 
             // `?` operator
@@ -169,8 +170,8 @@ fn expand_parent_item_fn(item: &mut ItemFn, cx: &mut Context) -> Result<()> {
                             GenericArgument::Type(Type::ImplTrait(_)),
                         ) = (&args[0], &args[1])
                         {
-                            let (count_try, _) = visitor::visit_fn(cx, &mut **block);
-                            if count_try >= 2 {
+                            let count = visitor::visit_fn(cx, &mut **block);
+                            if count.try_ >= 2 {
                                 cx.visit_mode = VisitMode::Try;
                             }
                         }

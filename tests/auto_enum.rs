@@ -345,6 +345,7 @@ mod stable {
         #[auto_enum(Iterator)]
         fn marker3(x: i32, y: i32) -> impl Iterator<Item = i32> {
             let iter;
+            // if #[auto_enum] is used on Stmt::Semi, #[auto_enum] does not visit last expr
             #[auto_enum(Iterator)]
             match x {
                 0 => iter = marker!(2..8),
@@ -496,10 +497,45 @@ mod stable {
         assert!(try_operator(None).unwrap_err().source().is_some());
     }
 
-    // This hack is needed until https://github.com/rust-lang/rust/pull/69201
-    // makes it way into stable.
-    #[rustversion::nightly]
-    include!("auto_enum_if_attr.rs.in");
+    #[auto_enum]
+    fn if_attr(x: bool) -> impl Iterator<Item = u8> {
+        let res = {
+            #[auto_enum(Iterator)]
+            if x { std::iter::once(0) } else { std::iter::repeat(1) }
+        };
+        res
+    }
+
+    #[auto_enum(Iterator)]
+    fn if_attr_in_if(x: usize) -> impl Iterator<Item = i32> {
+        if x == 0 {
+            1..8
+        } else if x > 3 {
+            #[nested]
+            if x > 4 { 2..=10 } else { (11..20).map(|x| x - 1) }
+        } else {
+            (0..2).map(|x| x + 1)
+        }
+    }
+
+    #[auto_enum]
+    fn non_stmt_expr_match(x: bool) -> Option<impl Iterator<Item = u8>> {
+        Some(
+            #[auto_enum(Iterator)]
+            if x { std::iter::once(0) } else { std::iter::repeat(1) },
+        )
+    }
+
+    #[auto_enum]
+    fn non_stmt_expr_if(x: bool) -> Option<impl Iterator<Item = u8>> {
+        Some(
+            #[auto_enum(Iterator)]
+            match x {
+                true => std::iter::once(0),
+                _ => std::iter::repeat(1),
+            },
+        )
+    }
 }
 
 // nightly
@@ -575,17 +611,6 @@ mod nightly {
             assert_eq!(iter.sum::<i32>(), *x);
         }
 
-        /*
-        This can not be supported. It is parsed as follows.
-            expected: ExprAssign { left: ExprPath, right: ExprMatch, .. }
-               found: ExprPath
-        #[auto_enum(Iterator, Clone)]
-        a = match x {
-            0 => 2..8,
-            _ if x < 2 => vec![2, 0].into_iter(),
-            _ => 2..=10,
-        };
-        */
         fn assign(x: usize) -> impl Iterator<Item = i32> + Clone {
             let a;
             a = #[auto_enum(Iterator, Clone)]
@@ -599,6 +624,22 @@ mod nightly {
         for (i, x) in ANS.iter().enumerate() {
             assert_eq!(assign(i).sum::<i32>(), *x - 1);
         }
+
+        /*
+        This can not be supported. It is parsed as follows.
+            expected: ExprAssign { left: ExprPath, right: ExprMatch, .. }
+               found: ExprPath
+        fn assign2(x: usize) -> impl Iterator<Item = i32> + Clone {
+            let a;
+            #[auto_enum(Iterator, Clone)]
+            a = match x {
+                0 => 2..8,
+                _ if x < 2 => vec![2, 0].into_iter(),
+                _ => 2..=10,
+            };
+            a
+        }
+        */
 
         #[auto_enum(Fn)]
         fn fn_traits1(option: bool) -> impl Fn(i32) -> i32 {
@@ -721,10 +762,12 @@ mod nightly {
                 },
             )
         }
-    }
 
-    // This hack is needed until https://github.com/rust-lang/rust/pull/69201
-    // makes it way into stable.
-    #[rustversion::nightly]
-    include!("auto_enum_if_attr_unstable.rs.in");
+        fn if_(x: bool) -> Option<impl Iterator<Item = u8>> {
+            Some(
+                #[auto_enum(Iterator)]
+                if x { std::iter::once(0) } else { std::iter::repeat(1) },
+            )
+        }
+    }
 }
