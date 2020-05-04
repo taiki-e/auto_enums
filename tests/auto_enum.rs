@@ -6,7 +6,6 @@
 #![cfg_attr(feature = "fn_traits", feature(fn_traits, unboxed_closures))]
 #![cfg_attr(feature = "trusted_len", feature(trusted_len))]
 #![cfg_attr(not(feature = "std"), no_std)]
-#![warn(unsafe_code)]
 #![warn(rust_2018_idioms, single_use_lifetimes)]
 #![allow(dead_code)]
 
@@ -32,7 +31,6 @@ mod stable {
         // block + unsafe block + parentheses
         #[rustfmt::skip]
         #[allow(unknown_lints)]
-        #[allow(unsafe_code)]
         #[allow(unused_parens)]
         #[allow(unused_braces)]
         #[allow(unused_unsafe)]

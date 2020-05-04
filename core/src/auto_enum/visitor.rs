@@ -111,9 +111,9 @@ impl<'a> Visitor<'a> {
 
                         Expr::Match(ExprMatch {
                             attrs,
-                            match_token: Default::default(),
+                            match_token: token::Match::default(),
                             expr,
-                            brace_token: Default::default(),
+                            brace_token: token::Brace::default(),
                             arms,
                         })
                     })

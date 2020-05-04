@@ -101,7 +101,7 @@ fn visit_last_expr_match(cx: &mut Context, expr: &mut ExprMatch) -> Result<()> {
 
     expr.arms.iter_mut().try_for_each(|arm| {
         if !skip(arm, cx) {
-            arm.comma = Some(Default::default());
+            arm.comma = Some(token::Comma::default());
             replace_expr(&mut *arm.body, |x| cx.next_expr(x));
         }
         Ok(())

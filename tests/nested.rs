@@ -1,4 +1,3 @@
-#![warn(unsafe_code)]
 #![warn(rust_2018_idioms, single_use_lifetimes)]
 #![allow(dead_code)]
 
@@ -44,7 +43,6 @@ fn nested() {
 
     #[rustfmt::skip]
     #[allow(unknown_lints)]
-    #[allow(unsafe_code)]
     #[allow(unused_unsafe)]
     #[allow(unused_braces)]
     #[auto_enum(Iterator)]

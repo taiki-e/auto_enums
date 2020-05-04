@@ -1,5 +1,4 @@
 #![feature(test)]
-#![warn(unsafe_code)]
 #![warn(rust_2018_idioms, single_use_lifetimes)]
 
 extern crate test;

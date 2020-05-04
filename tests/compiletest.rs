@@ -1,6 +1,5 @@
 #![cfg(auto_enums_def_site_enum_ident)]
 #![cfg(all(feature = "std", feature = "type_analysis", feature = "transpose_methods"))]
-#![warn(unsafe_code)]
 #![warn(rust_2018_idioms, single_use_lifetimes)]
 
 #[ignore]
