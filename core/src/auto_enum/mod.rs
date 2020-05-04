@@ -2,7 +2,7 @@ use proc_macro2::TokenStream;
 use quote::ToTokens;
 use syn::*;
 
-use crate::utils::*;
+use crate::utils::{block, expr_block, replace_expr};
 
 mod context;
 mod expr;
@@ -48,14 +48,14 @@ pub(crate) fn attribute(args: TokenStream, input: TokenStream) -> TokenStream {
     cx.diagnostic.to_compile_error().unwrap()
 }
 
-fn visit_expr(expr: &mut Expr, cx: &mut Context) -> Result<()> {
+fn expand_expr(expr: &mut Expr, cx: &mut Context) -> Result<()> {
     let expr = match expr {
         Expr::Closure(ExprClosure { body, .. }) if cx.visit_last() => {
-            let (count_try, count_return) = visitor::visit_fn(cx, &mut **body);
-            if count_try >= 2 {
+            let count = visitor::visit_fn(cx, &mut **body);
+            if count.try_ >= 2 {
                 cx.visit_mode = VisitMode::Try;
             } else {
-                cx.visit_mode = VisitMode::Return(count_return);
+                cx.visit_mode = VisitMode::Return(count.return_);
             }
             &mut **body
         }
@@ -108,7 +108,7 @@ fn expand_parent_expr(expr: &mut Expr, cx: &mut Context, has_semi: bool) -> Resu
         return Ok(());
     }
 
-    visit_expr(expr, cx)?;
+    expand_expr(expr, cx)?;
 
     cx.build(|item| build_expr(expr, item))
 }
@@ -135,7 +135,7 @@ fn expand_parent_local(local: &mut Local, cx: &mut Context) -> Result<()> {
         ));
     };
 
-    visit_expr(expr, cx)?;
+    expand_expr(expr, cx)?;
 
     cx.build(|item| build_expr(expr, item))
 }
@@ -149,8 +149,8 @@ fn expand_parent_item_fn(item: &mut ItemFn, cx: &mut Context) -> Result<()> {
         match &**ty {
             // `return`
             Type::ImplTrait(_) if cx.visit_last_mode != VisitLastMode::Never => {
-                let (_, count_return) = visitor::visit_fn(cx, &mut **block);
-                cx.visit_mode = VisitMode::Return(count_return);
+                let count = visitor::visit_fn(cx, &mut **block);
+                cx.visit_mode = VisitMode::Return(count.return_);
             }
 
             // `?` operator
@@ -170,8 +170,8 @@ fn expand_parent_item_fn(item: &mut ItemFn, cx: &mut Context) -> Result<()> {
                             GenericArgument::Type(Type::ImplTrait(_)),
                         ) = (&args[0], &args[1])
                         {
-                            let (count_try, _) = visitor::visit_fn(cx, &mut **block);
-                            if count_try >= 2 {
+                            let count = visitor::visit_fn(cx, &mut **block);
+                            if count.try_ >= 2 {
                                 cx.visit_mode = VisitMode::Try;
                             }
                         }

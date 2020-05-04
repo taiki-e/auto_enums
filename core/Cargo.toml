@@ -24,7 +24,7 @@ proc-macro = true
 default = []
 
 # Analyze return type of function and `let` binding.
-type_analysis = ["syn/extra-traits"]
+type_analysis = []
 
 [dependencies]
 proc-macro2 = "1.0"

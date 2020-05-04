@@ -1,6 +1,6 @@
 use syn::{
     visit_mut::{self, VisitMut},
-    *,
+    Result, *,
 };
 
 use crate::utils::{expr_block, replace_block, replace_expr, Attrs};
@@ -18,24 +18,22 @@ pub(super) fn child_expr(expr: &mut Expr, cx: &mut Context) -> Result<()> {
     match expr {
         Expr::Block(ExprBlock { block, .. }) | Expr::Unsafe(ExprUnsafe { block, .. }) => {
             if let Some(Stmt::Expr(expr)) = block.stmts.last_mut() {
-                return child_expr(expr, cx);
+                child_expr(expr, cx)?;
             }
         }
-        _ => {}
-    }
 
-    match expr {
-        Expr::Match(expr) => visit_last_expr_match(cx, expr),
-        Expr::If(expr) => visit_last_expr_if(cx, expr),
+        Expr::Match(expr) => visit_last_expr_match(cx, expr)?,
+        Expr::If(expr) => visit_last_expr_if(cx, expr)?,
         Expr::Loop(expr) => visit_last_expr_loop(cx, expr),
 
         // Search recursively
         Expr::MethodCall(ExprMethodCall { receiver: expr, .. })
         | Expr::Paren(ExprParen { expr, .. })
-        | Expr::Type(ExprType { expr, .. }) => child_expr(expr, cx),
+        | Expr::Type(ExprType { expr, .. }) => child_expr(expr, cx)?,
 
-        _ => Ok(()),
+        _ => {}
     }
+    Ok(())
 }
 
 pub(super) fn is_unreachable(cx: &Context, expr: &Expr) -> bool {
@@ -141,68 +139,57 @@ fn visit_last_expr_if(cx: &mut Context, expr: &mut ExprIf) -> Result<()> {
     }
 }
 
-fn visit_last_expr_loop(cx: &mut Context, expr: &mut ExprLoop) -> Result<()> {
-    LoopVisitor::new(expr.label.as_ref(), cx).visit_block_mut(&mut expr.body);
-    Ok(())
-}
-
-// =================================================================================================
-// LoopVisitor
-
-struct LoopVisitor<'a> {
-    cx: &'a mut Context,
-    label: Option<&'a Label>,
-    nested: bool,
-}
-
-impl<'a> LoopVisitor<'a> {
-    fn new(label: Option<&'a Label>, cx: &'a mut Context) -> Self {
-        Self { cx, label, nested: false }
+fn visit_last_expr_loop(cx: &mut Context, expr: &mut ExprLoop) {
+    struct LoopVisitor<'a> {
+        cx: &'a mut Context,
+        label: Option<&'a Label>,
+        nested: bool,
     }
 
-    fn compare_labels(&self, other: Option<&Lifetime>) -> bool {
-        match (self.label, other) {
-            (None, None) => true,
-            (Some(this), Some(other)) => this.name.ident == other.ident,
-            _ => false,
+    impl LoopVisitor<'_> {
+        fn compare_labels(&self, other: Option<&Lifetime>) -> bool {
+            match (self.label, other) {
+                (None, None) => true,
+                (Some(this), Some(other)) => this.name.ident == other.ident,
+                _ => false,
+            }
         }
     }
-}
 
-impl VisitMut for LoopVisitor<'_> {
-    fn visit_expr_mut(&mut self, node: &mut Expr) {
-        if node.any_empty_attr(NEVER) {
-            return;
-        }
-
-        let tmp = self.nested;
-        match node {
-            // Stop at closure / async block bounds
-            Expr::Closure(_) | Expr::Async(_) => return,
-
-            // Other loop bounds
-            Expr::Loop(_) | Expr::ForLoop(_) | Expr::While(_) => {
-                if self.label.is_none() {
-                    return;
-                }
-                self.nested = true;
+    impl VisitMut for LoopVisitor<'_> {
+        fn visit_expr_mut(&mut self, node: &mut Expr) {
+            if node.any_empty_attr(NEVER) {
+                return;
             }
 
-            // Desugar `break <expr>` into `break Enum::VariantN(<expr>)`.
-            Expr::Break(ExprBreak { label, expr, .. }) => {
-                if !self.nested && label.is_none() || self.compare_labels(label.as_ref()) {
-                    self.cx.replace_boxed_expr(expr);
+            let tmp = self.nested;
+            match node {
+                // Stop at closure / async block bounds
+                Expr::Closure(_) | Expr::Async(_) => return,
+                // Other loop bounds
+                Expr::Loop(_) | Expr::ForLoop(_) | Expr::While(_) => {
+                    if self.label.is_none() {
+                        return;
+                    }
+                    self.nested = true;
                 }
+                // Desugar `break <expr>` into `break Enum::VariantN(<expr>)`.
+                Expr::Break(ExprBreak { label, expr, .. }) => {
+                    if !self.nested && label.is_none() || self.compare_labels(label.as_ref()) {
+                        self.cx.replace_boxed_expr(expr);
+                    }
+                }
+                _ => {}
             }
 
-            _ => {}
+            visit_mut::visit_expr_mut(self, node);
+            self.nested = tmp;
         }
 
-        visit_mut::visit_expr_mut(self, node);
-        self.nested = tmp;
+        fn visit_item_mut(&mut self, _: &mut Item) {
+            // Do not recurse into nested items.
+        }
     }
 
-    fn visit_item_mut(&mut self, _: &mut Item) {
-        // Do not recurse into nested items.
-    }
+    LoopVisitor { cx, label: expr.label.as_ref(), nested: false }.visit_block_mut(&mut expr.body);
 }
