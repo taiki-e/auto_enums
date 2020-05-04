@@ -1,9 +1,0 @@
-// FIXME: Once https://github.com/rust-lang/rust/pull/69201 makes its
-// way into stable, move this back into `auto_enum.rs
-
-fn if_(x: bool) -> Option<impl Iterator<Item = u8>> {
-    Some(
-        #[auto_enum(Iterator)]
-        if x { std::iter::once(0) } else { std::iter::repeat(1) },
-    )
-}

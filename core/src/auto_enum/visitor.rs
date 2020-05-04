@@ -163,11 +163,16 @@ impl<'a> Visitor<'a> {
             _ => {}
         }
     }
-}
 
-impl VisitMut for Visitor<'_> {
-    fn visit_expr_mut(&mut self, node: &mut Expr) {
+    fn visit_expr(&mut self, node: &mut Expr, has_semi: bool) {
         if !self.cx.failed() {
+            let tmp = self.scope;
+
+            if node.any_attr(NAME) {
+                self.scope.foreign = true;
+                // Record whether other `auto_enum` attribute exists.
+                self.cx.other_attr = true;
+            }
             self.scope.check_expr(node);
 
             match self.cx.visit_mode {
@@ -182,13 +187,21 @@ impl VisitMut for Visitor<'_> {
                 }
             }
 
-            visit_mut::visit_expr_mut(self, node);
+            visit_expr(self, node, has_semi);
 
             if !self.scope.foreign || self.cx.marker != DEFAULT_MARKER {
                 self.visit_marker_macro(node);
                 self.find_remove_attrs(node);
             }
+
+            self.scope = tmp;
         }
+    }
+}
+
+impl VisitMut for Visitor<'_> {
+    fn visit_expr_mut(&mut self, node: &mut Expr) {
+        self.visit_expr(node, false);
     }
 
     fn visit_arm_mut(&mut self, node: &mut Arm) {
@@ -222,18 +235,24 @@ impl VisitMut for Visitor<'_> {
     }
 
     fn visit_stmt_mut(&mut self, node: &mut Stmt) {
-        if !self.cx.failed() {
-            let tmp = self.scope;
+        match node {
+            Stmt::Expr(expr) => self.visit_expr(expr, false),
+            Stmt::Semi(expr, _) => self.visit_expr(expr, true),
+            _ => {
+                if !self.cx.failed() {
+                    let tmp = self.scope;
 
-            if node.any_attr(NAME) {
-                self.scope.foreign = true;
-                // Record whether other `auto_enum` attribute exists.
-                self.cx.other_attr = true;
+                    if node.any_attr(NAME) {
+                        self.scope.foreign = true;
+                        // Record whether other `auto_enum` attribute exists.
+                        self.cx.other_attr = true;
+                    }
+
+                    visit_stmt(self, node);
+
+                    self.scope = tmp;
+                }
             }
-
-            visit_stmt(self, node);
-
-            self.scope = tmp;
         }
     }
 
@@ -272,6 +291,16 @@ impl VisitMut for Dummy<'_> {
         }
     }
 
+    fn visit_expr_mut(&mut self, node: &mut Expr) {
+        if !self.cx.failed() {
+            if node.any_attr(NAME) {
+                self.cx.other_attr = true;
+            }
+
+            visit_expr(self, node, false);
+        }
+    }
+
     fn visit_item_mut(&mut self, _: &mut Item) {
         // Do not recurse into nested items.
     }
@@ -290,29 +319,56 @@ trait VisitStmt: VisitMut {
     fn cx(&mut self) -> &mut Context;
 }
 
+fn visit_expr(visitor: &mut impl VisitStmt, node: &mut Expr, has_semi: bool) {
+    let attr = node.find_remove_attr(NAME);
+
+    let res = attr.map(|attr| {
+        syn::parse2::<Group>(attr.tokens)
+            .and_then(|group| visitor.cx().make_child(node.to_token_stream(), group.stream()))
+    });
+
+    visit_mut::visit_expr_mut(visitor, node);
+
+    match res {
+        Some(Err(e)) => visitor.cx().diagnostic.error(e),
+        Some(Ok(mut cx)) => {
+            super::expand_parent_expr(node, &mut cx, has_semi)
+                .unwrap_or_else(|e| cx.diagnostic.error(e));
+            visitor.cx().join_child(cx)
+        }
+        None => {}
+    }
+}
+
 fn visit_stmt(visitor: &mut impl VisitStmt, node: &mut Stmt) {
     let attr = match node {
-        Stmt::Expr(expr) | Stmt::Semi(expr, _) => expr.find_remove_attr(NAME),
+        Stmt::Expr(expr) => {
+            visit_expr(visitor, expr, false);
+            return;
+        }
+        Stmt::Semi(expr, _) => {
+            visit_expr(visitor, expr, true);
+            return;
+        }
         Stmt::Local(local) => local.find_remove_attr(NAME),
         // Do not recurse into nested items.
-        Stmt::Item(_) => None,
+        Stmt::Item(_) => return,
     };
 
-    if let Some(attr) = attr {
-        let res = syn::parse2::<Group>(attr.tokens)
-            .and_then(|group| visitor.cx().make_child(node.to_token_stream(), group.stream()));
+    let res = attr.map(|attr| {
+        syn::parse2::<Group>(attr.tokens)
+            .and_then(|group| visitor.cx().make_child(node.to_token_stream(), group.stream()))
+    });
 
-        visit_mut::visit_stmt_mut(visitor, node);
+    visit_mut::visit_stmt_mut(visitor, node);
 
-        match res {
-            Err(e) => visitor.cx().diagnostic.error(e),
-            Ok(mut cx) => {
-                super::expand_parent_stmt(node, &mut cx).unwrap_or_else(|e| cx.diagnostic.error(e));
-                visitor.cx().join_child(cx)
-            }
+    match res {
+        Some(Err(e)) => visitor.cx().diagnostic.error(e),
+        Some(Ok(mut cx)) => {
+            super::expand_parent_stmt(node, &mut cx).unwrap_or_else(|e| cx.diagnostic.error(e));
+            visitor.cx().join_child(cx)
         }
-    } else {
-        visit_mut::visit_stmt_mut(visitor, node);
+        None => {}
     }
 }
 

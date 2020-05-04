@@ -36,7 +36,7 @@ pub(crate) fn attribute(args: TokenStream, input: TokenStream) -> TokenStream {
                 error!(cx.span, "may only be used on expression, statement, or function")
             })
             .and_then(|mut expr| {
-                expand_parent_expr(&mut expr, &mut cx).map(|()| expr.into_token_stream())
+                expand_parent_expr(&mut expr, &mut cx, false).map(|()| expr.into_token_stream())
             }),
     };
 
@@ -87,12 +87,9 @@ fn build_expr(expr: &mut Expr, item: ItemEnum) {
 // Expand statement or expression in which `#[auto_enum]` was directly used.
 
 fn expand_parent_stmt(stmt: &mut Stmt, cx: &mut Context) -> Result<()> {
-    if let Stmt::Semi(..) = stmt {
-        cx.visit_last_mode = VisitLastMode::Never;
-    }
-
     match stmt {
-        Stmt::Expr(expr) | Stmt::Semi(expr, _) => expand_parent_expr(expr, cx),
+        Stmt::Expr(expr) => expand_parent_expr(expr, cx, false),
+        Stmt::Semi(expr, _) => expand_parent_expr(expr, cx, true),
         Stmt::Local(local) => expand_parent_local(local, cx),
         Stmt::Item(Item::Fn(item)) => expand_parent_item_fn(item, cx),
         Stmt::Item(item) => {
@@ -101,7 +98,11 @@ fn expand_parent_stmt(stmt: &mut Stmt, cx: &mut Context) -> Result<()> {
     }
 }
 
-fn expand_parent_expr(expr: &mut Expr, cx: &mut Context) -> Result<()> {
+fn expand_parent_expr(expr: &mut Expr, cx: &mut Context, has_semi: bool) -> Result<()> {
+    if has_semi {
+        cx.visit_last_mode = VisitLastMode::Never;
+    }
+
     if cx.is_dummy() {
         cx.dummy(expr);
         return Ok(());

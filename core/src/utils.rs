@@ -3,9 +3,6 @@ use std::{iter, mem};
 use proc_macro2::TokenStream;
 use syn::{punctuated::Punctuated, visit_mut::VisitMut, *};
 
-// =================================================================================================
-// Macros
-
 macro_rules! error {
     ($span:expr, $msg:expr) => {
         syn::Error::new_spanned(&$span, $msg)
@@ -14,22 +11,6 @@ macro_rules! error {
         error!($span, format!($($tt)*))
     };
 }
-
-// =================================================================================================
-// Extension traits
-
-pub(crate) trait VecExt<T> {
-    fn find_remove(&mut self, predicate: impl FnMut(&T) -> bool) -> Option<T>;
-}
-
-impl<T> VecExt<T> for Vec<T> {
-    fn find_remove(&mut self, predicate: impl FnMut(&T) -> bool) -> Option<T> {
-        self.iter().position(predicate).map(|i| self.remove(i))
-    }
-}
-
-// =================================================================================================
-// Functions
 
 pub(crate) fn path(segments: impl IntoIterator<Item = PathSegment>) -> Path {
     Path { leading_colon: None, segments: segments.into_iter().collect() }
@@ -77,6 +58,19 @@ pub(crate) fn replace_block(this: &mut Block, f: impl FnOnce(Block) -> Expr) {
 /// but produces a better error message and does not require ownership of `tokens`.
 pub(crate) fn parse_as_empty(tokens: &TokenStream) -> Result<()> {
     if tokens.is_empty() { Ok(()) } else { Err(error!(tokens, "unexpected token: {}", tokens)) }
+}
+
+// =================================================================================================
+// extension traits
+
+pub(crate) trait VecExt<T> {
+    fn find_remove(&mut self, predicate: impl FnMut(&T) -> bool) -> Option<T>;
+}
+
+impl<T> VecExt<T> for Vec<T> {
+    fn find_remove(&mut self, predicate: impl FnMut(&T) -> bool) -> Option<T> {
+        self.iter().position(predicate).map(|i| self.remove(i))
+    }
 }
 
 // =================================================================================================
@@ -168,6 +162,7 @@ impl Attrs for Stmt {
         match self {
             Stmt::Expr(expr) | Stmt::Semi(expr, _) => expr.attrs(),
             Stmt::Local(local) => local.attrs(),
+            // Ignore nested items.
             Stmt::Item(_) => &[],
         }
     }
@@ -176,6 +171,7 @@ impl Attrs for Stmt {
         match self {
             Stmt::Expr(expr) | Stmt::Semi(expr, _) => expr.attrs_mut(f),
             Stmt::Local(local) => local.attrs_mut(f),
+            // Ignore nested items.
             Stmt::Item(_) => f(&mut Vec::new()),
         }
     }
