@@ -1,13 +1,13 @@
 use proc_macro2::Group;
 use quote::ToTokens;
 use syn::{
+    token,
     visit_mut::{self, VisitMut},
-    *,
+    Arm, Attribute, Expr, ExprMacro, ExprMatch, ExprReturn, ExprTry, Item, Local, Stmt,
 };
 
-use crate::utils::{parse_as_empty, replace_expr, Attrs, VisitedNode};
-
 use super::{Context, VisitMode, DEFAULT_MARKER, NAME, NESTED, NEVER};
+use crate::utils::{parse_as_empty, replace_expr, Attrs, VisitedNode};
 
 #[derive(Clone, Copy, Default)]
 struct Scope {

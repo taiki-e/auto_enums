@@ -1,15 +1,15 @@
-use std::{collections::hash_map::DefaultHasher, hash::Hasher, iter, mem};
-
 use proc_macro2::TokenStream;
 use quote::format_ident;
+use std::{collections::hash_map::DefaultHasher, hash::Hasher, iter, mem};
+#[cfg(feature = "type_analysis")]
+use syn::Type;
 use syn::{
     parse::{Parse, ParseStream},
-    Result, *,
+    token, Attribute, Error, Expr, Ident, ItemEnum, Macro, Path, Result,
 };
 
-use crate::utils::{expr_call, path, replace_expr, unit, VisitedNode};
-
 use super::visitor::{Dummy, Visitor};
+use crate::utils::{expr_call, path, replace_expr, unit, VisitedNode};
 
 // =================================================================================================
 // Context

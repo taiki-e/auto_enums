@@ -1,13 +1,12 @@
-use std::collections::HashMap;
-
 use lazy_static::lazy_static;
 use proc_macro2::TokenStream;
+use std::collections::HashMap;
 use syn::{
     parse::{Parse, ParseStream},
     token, ItemEnum, Path,
 };
 
-use crate::utils::*;
+use crate::utils::{Data, EnumData, ItemImpl, Result, ToTokens};
 
 pub(crate) fn attribute(args: TokenStream, input: TokenStream) -> TokenStream {
     expand(args, input).unwrap_or_else(|e| e.to_compile_error())

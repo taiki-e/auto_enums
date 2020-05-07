@@ -1,11 +1,13 @@
 use syn::{
+    token,
     visit_mut::{self, VisitMut},
-    Result, *,
+    Arm, Block, Expr, ExprBlock, ExprBreak, ExprCall, ExprIf, ExprLoop, ExprMacro, ExprMatch,
+    ExprMethodCall, ExprParen, ExprPath, ExprTry, ExprType, ExprUnsafe, Item, Label, Lifetime,
+    Result, Stmt,
 };
 
-use crate::utils::{expr_block, replace_block, replace_expr, Attrs};
-
 use super::{visitor, Context, NAME, NESTED, NEVER};
+use crate::utils::{expr_block, replace_block, replace_expr, Attrs};
 
 /// Visits last expression.
 ///

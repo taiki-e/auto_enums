@@ -1,6 +1,5 @@
-use std::ops::Deref;
-
 use proc_macro2::TokenStream;
+use std::ops::Deref;
 
 #[cfg(feature = "fn_traits")]
 pub(crate) use derive_utils::Trait;

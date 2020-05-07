@@ -1,14 +1,19 @@
-use proc_macro2::TokenStream;
-use quote::ToTokens;
-use syn::*;
-
-use crate::utils::{block, expr_block, replace_expr};
-
 mod context;
 mod expr;
 #[cfg(feature = "type_analysis")]
 mod type_analysis;
 mod visitor;
+
+use proc_macro2::TokenStream;
+use quote::ToTokens;
+#[cfg(feature = "type_analysis")]
+use syn::Pat;
+use syn::{
+    AngleBracketedGenericArguments, Expr, ExprClosure, GenericArgument, Item, ItemEnum, ItemFn,
+    Local, PathArguments, Result, ReturnType, Stmt, Type, TypePath,
+};
+
+use crate::utils::{block, expr_block, replace_expr};
 
 use self::{
     context::{Context, VisitLastMode, VisitMode, DEFAULT_MARKER},
@@ -116,8 +121,8 @@ fn expand_parent_expr(expr: &mut Expr, cx: &mut Context, has_semi: bool) -> Resu
 fn expand_parent_local(local: &mut Local, cx: &mut Context) -> Result<()> {
     #[cfg(feature = "type_analysis")]
     {
-        if let Pat::Type(PatType { ty, .. }) = &mut local.pat {
-            cx.collect_trait(&mut *ty);
+        if let Pat::Type(pat) = &mut local.pat {
+            cx.collect_trait(&mut pat.ty);
         }
     }
 

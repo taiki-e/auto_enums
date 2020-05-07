@@ -1,7 +1,9 @@
-use std::{iter, mem};
-
 use proc_macro2::TokenStream;
-use syn::{punctuated::Punctuated, visit_mut::VisitMut, *};
+use std::{iter, mem};
+use syn::{
+    punctuated::Punctuated, token, visit_mut::VisitMut, Arm, Attribute, Block, Expr, ExprBlock,
+    ExprCall, ExprPath, ExprTuple, ItemFn, Local, Path, PathSegment, Result, Stmt,
+};
 
 macro_rules! error {
     ($span:expr, $msg:expr) => {
