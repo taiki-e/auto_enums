@@ -8,7 +8,7 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 ## [0.7.4] - 2020-05-07
 
-* [Fixed an issue that `#[project]` on non-statement expression does not work without unstable features.][97]
+* [Fixed an issue that `#[auto_enum]` on non-statement expression does not work without unstable features.][97]
 
 [97]: https://github.com/taiki-e/auto_enums/pull/97
 
@@ -20,7 +20,7 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 * [Added `futures03` feature. This is an alias of `futures` feature.][92]
 
-[97]: https://github.com/taiki-e/auto_enums/pull/92
+[92]: https://github.com/taiki-e/auto_enums/pull/92
 
 ## [0.7.2] - 2020-04-13
 
