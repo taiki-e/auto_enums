@@ -7,22 +7,6 @@ pub(crate) use derive_utils::{derive_trait_internal as derive_trait, EnumData};
 pub(crate) use quote::{format_ident, quote, ToTokens};
 pub(crate) use syn::{parse2, ItemImpl, Result};
 
-pub(crate) struct Data {
-    pub(crate) data: EnumData,
-    pub(crate) span: TokenStream,
-}
-
-impl Deref for Data {
-    type Target = EnumData;
-
-    fn deref(&self) -> &Self::Target {
-        &self.data
-    }
-}
-
-// =================================================================================================
-// Macros
-
 #[cfg(any(feature = "fn_traits", feature = "transpose_methods"))]
 macro_rules! param_ident {
     ($($tt:tt)*) => {
@@ -50,4 +34,17 @@ macro_rules! error {
     ($span:expr, $($tt:tt)*) => {
         error!($span, format!($($tt)*))
     };
+}
+
+pub(crate) struct Data {
+    pub(crate) data: EnumData,
+    pub(crate) span: TokenStream,
+}
+
+impl Deref for Data {
+    type Target = EnumData;
+
+    fn deref(&self) -> &Self::Target {
+        &self.data
+    }
 }

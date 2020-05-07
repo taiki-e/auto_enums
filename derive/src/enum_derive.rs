@@ -228,10 +228,9 @@ impl Parse for Args {
         }
 
         let mut inner = Vec::new();
-
         while !input.is_empty() {
-            let value = input.parse()?;
-            inner.push((to_trimed_string(&value), value));
+            let path = input.parse()?;
+            inner.push((to_trimed_string(&path), path));
 
             if !input.is_empty() {
                 let _: token::Comma = input.parse()?;
