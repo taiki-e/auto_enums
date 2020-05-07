@@ -6,19 +6,29 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+## [0.7.4] - 2020-05-07
+
+* [Fixed an issue that `#[project]` on non-statement expression does not work without unstable features.][97]
+
+[97]: https://github.com/taiki-e/auto_enums/pull/97
+
 ## [0.7.3] - 2020-04-19
 
-* Added support for `tokio02::{AsyncRead, AsyncWrite, AsyncSeek, AsyncBufRead}`.
+* [Added support for `tokio02::{AsyncRead, AsyncWrite, AsyncSeek, AsyncBufRead}`.][92]
 
-* Added support for `tokio01::{AsyncRead, AsyncWrite}`.
+* [Added support for `tokio01::{AsyncRead, AsyncWrite}`.][92]
 
-* Added `futures03` feature. This is an alias of `futures` feature.
+* [Added `futures03` feature. This is an alias of `futures` feature.][92]
+
+[97]: https://github.com/taiki-e/auto_enums/pull/92
 
 ## [0.7.2] - 2020-04-13
 
-* Fix unused braces warnings
+* [Fix unused braces warnings.][88]
 
-* Update to support latest generator
+* Update to support latest generator.
+
+[88]: https://github.com/taiki-e/auto_enums/pull/88
 
 ## [0.7.1] - 2019-11-16
 
@@ -281,7 +291,8 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 Initial release
 
-[Unreleased]: https://github.com/taiki-e/auto_enums/compare/v0.7.3...HEAD
+[Unreleased]: https://github.com/taiki-e/auto_enums/compare/v0.7.4...HEAD
+[0.7.4]: https://github.com/taiki-e/auto_enums/compare/v0.7.3...v0.7.4
 [0.7.3]: https://github.com/taiki-e/auto_enums/compare/v0.7.2...v0.7.3
 [0.7.2]: https://github.com/taiki-e/auto_enums/compare/v0.7.1...v0.7.2
 [0.7.1]: https://github.com/taiki-e/auto_enums/compare/v0.7.0...v0.7.1
