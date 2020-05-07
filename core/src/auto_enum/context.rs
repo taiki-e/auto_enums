@@ -1,15 +1,15 @@
-use std::{collections::hash_map::DefaultHasher, hash::Hasher, iter, mem};
-
 use proc_macro2::TokenStream;
 use quote::format_ident;
+use std::{collections::hash_map::DefaultHasher, hash::Hasher, iter, mem};
+#[cfg(feature = "type_analysis")]
+use syn::Type;
 use syn::{
     parse::{Parse, ParseStream},
-    Result, *,
+    token, Attribute, Error, Expr, Ident, ItemEnum, Macro, Path, Result,
 };
 
-use crate::utils::{expr_call, path, replace_expr, unit, VisitedNode};
-
 use super::visitor::{Dummy, Visitor};
+use crate::utils::{expr_call, path, replace_expr, unit, VisitedNode};
 
 // =================================================================================================
 // Context
@@ -157,8 +157,8 @@ impl Context {
     }
 
     #[cfg(auto_enums_def_site_enum_ident)]
-    pub(super) fn update_enum_ident(&mut self, item: &ItemFn) {
-        self.builder.update_enum_ident(&item.sig.ident)
+    pub(super) fn update_enum_ident(&mut self, ident: &Ident) {
+        self.builder.update_enum_ident(ident)
     }
 
     /// Returns `true` if one or more errors occurred.
@@ -322,24 +322,17 @@ impl Parse for Args {
     fn parse(input: ParseStream<'_>) -> Result<Self> {
         let mut args = Vec::new();
         let mut marker = None;
-
         while !input.is_empty() {
-            if input.peek(kw::marker) && input.peek2(Token![=]) {
-                let _: kw::marker = input.parse()?;
-                let _: Token![=] = input.parse()?;
-                let i: Ident = input.parse()?;
-                if marker.is_some() {
+            if input.peek(kw::marker) && input.peek2(token::Eq) {
+                let i: kw::marker = input.parse()?;
+                let _: token::Eq = input.parse()?;
+                let ident: Ident = input.parse()?;
+                if marker.replace(ident).is_some() {
                     return Err(error!(i, "duplicate `marker` argument"));
-                } else {
-                    marker = Some(i);
-                    if !input.is_empty() {
-                        let _: token::Comma = input.parse()?;
-                    }
-                    continue;
                 }
+            } else {
+                args.push(input.parse()?);
             }
-
-            args.push(input.parse()?);
 
             if !input.is_empty() {
                 let _: token::Comma = input.parse()?;

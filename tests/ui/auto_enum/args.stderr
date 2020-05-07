@@ -29,10 +29,10 @@ error: expected `,`
    |                       ^
 
 error: duplicate `marker` argument
-  --> $DIR/args.rs:46:38
+  --> $DIR/args.rs:46:29
    |
 46 |     #[auto_enum(marker = f, marker = g, Iterator)] //~ ERROR duplicate `marker` argument
-   |                                      ^
+   |                             ^^^^^^
 
 error: expected identifier
   --> $DIR/args.rs:54:25
