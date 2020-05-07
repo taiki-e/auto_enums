@@ -519,21 +519,46 @@ mod stable {
     }
 
     #[auto_enum]
-    fn non_stmt_expr_match(x: bool) -> Option<impl Iterator<Item = u8>> {
-        Some(
-            #[auto_enum(Iterator)]
-            if x { std::iter::once(0) } else { std::iter::repeat(1) },
-        )
-    }
-
-    #[auto_enum]
-    fn non_stmt_expr_if(x: bool) -> Option<impl Iterator<Item = u8>> {
+    fn non_stmt_expr_match1(x: bool) -> Option<impl Iterator<Item = u8>> {
         Some(
             #[auto_enum(Iterator)]
             match x {
                 true => std::iter::once(0),
                 _ => std::iter::repeat(1),
             },
+        )
+    }
+
+    #[auto_enum]
+    fn non_stmt_expr_match2(x: bool) -> Option<impl Iterator<Item = u8>> {
+        Some({
+            #[auto_enum(Iterator)]
+            match x {
+                true => std::iter::once(0),
+                _ => std::iter::repeat(1),
+            }
+        })
+    }
+
+    #[auto_enum]
+    fn non_stmt_expr_match3(x: bool) {
+        loop {
+            let _ = {
+                #[auto_enum(Iterator)]
+                match x {
+                    true => std::iter::once(0),
+                    _ => std::iter::repeat(1),
+                }
+            };
+            break;
+        }
+    }
+
+    #[auto_enum]
+    fn non_stmt_expr_if(x: bool) -> Option<impl Iterator<Item = u8>> {
+        Some(
+            #[auto_enum(Iterator)]
+            if x { std::iter::once(0) } else { std::iter::repeat(1) },
         )
     }
 }
