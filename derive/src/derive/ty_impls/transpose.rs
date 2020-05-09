@@ -57,7 +57,7 @@ fn transpose_result(data: &Data) -> Result<ItemImpl> {
     let err_fields: &Vec<_> = &(0..fields.len())
         .map(|i| {
             let id = format_ident!("__E{}", i);
-            items.push_generic_param(param_ident!("{}", id));
+            items.push_generic_param(TypeParam::from(id.clone()).into());
             id
         })
         .collect();
@@ -88,7 +88,7 @@ fn transpose_ok(data: &Data) -> Result<ItemImpl> {
 
     let mut items = data.impl_with_capacity(1)?;
 
-    items.push_generic_param(param_ident!("__E"));
+    items.push_generic_param(TypeParam::from(format_ident!("__E")).into());
 
     let ty_generics = fields.iter().map(|f| quote!(::core::result::Result<#f, __E>));
     *items.self_ty() = parse_quote!(#ident<#(#ty_generics),*>)?;
@@ -110,7 +110,7 @@ fn transpose_err(data: &Data) -> Result<ItemImpl> {
 
     let mut items = data.impl_with_capacity(1)?;
 
-    items.push_generic_param(param_ident!("__T"));
+    items.push_generic_param(TypeParam::from(format_ident!("__T")).into());
 
     let ty_generics = fields.iter().map(|f| quote!(::core::result::Result<__T, #f>));
     *items.self_ty() = parse_quote!(#ident<#(#ty_generics),*>)?;
