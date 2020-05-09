@@ -11,8 +11,8 @@ pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
 
     *impl_.trait_() =
         Some(Trait::new(syn::parse2(trait_path.clone())?, parse_quote!(#trait_path<(__T,)>)?));
-    impl_.push_generic_param(param_ident!("__T"));
-    impl_.push_generic_param(param_ident!("__U"));
+    impl_.push_generic_param(TypeParam::from(format_ident!("__T")).into());
+    impl_.push_generic_param(TypeParam::from(format_ident!("__U")).into());
 
     impl_.push_where_predicate(parse_quote!(#fst: #trait_)?);
     data.fields()

@@ -5,21 +5,9 @@ use std::ops::Deref;
 pub(crate) use derive_utils::Trait;
 pub(crate) use derive_utils::{derive_trait_internal as derive_trait, EnumData};
 pub(crate) use quote::{format_ident, quote, ToTokens};
-pub(crate) use syn::{parse2, ItemImpl, Result};
-
 #[cfg(any(feature = "fn_traits", feature = "transpose_methods"))]
-macro_rules! param_ident {
-    ($($tt:tt)*) => {
-        syn::GenericParam::Type(syn::TypeParam {
-            attrs: Vec::new(),
-            ident:$crate::utils::format_ident!($($tt)*),
-            colon_token: None,
-            bounds: syn::punctuated::Punctuated::new(),
-            eq_token: None,
-            default: None,
-        })
-    };
-}
+pub(crate) use syn::TypeParam;
+pub(crate) use syn::{parse2, ItemImpl, Result};
 
 macro_rules! parse_quote {
     ($($tt:tt)*) => {
