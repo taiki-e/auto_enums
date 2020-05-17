@@ -25,10 +25,7 @@ jobs:
       matrix:
         rust:
           # This is the minimum supported Rust version of this crate.
-          # When updating this, the reminder to update the minimum supported
-          # Rust version in README.md.
-          #
-          # Tests are not run as tests may require newer versions of Rust.
+          # When updating this, the reminder to update the minimum supported Rust version in README.md.
           - 1.31.0
           - stable
           - beta
@@ -69,12 +66,10 @@ jobs:
         if: matrix.rust == 'nightly'
         run: |
           cargo hack check --all --each-feature --no-dev-deps --features=unstable --ignore-unknown-features
-      # Refs: https://github.com/rust-lang/cargo/issues/5657
-      - name: cargo check -Zminimal-versions
+      - name: cargo check (minimal versions)
         if: matrix.rust == 'nightly'
         run: |
-          cargo update -Zminimal-versions
-          cargo hack check --all --all-features --no-dev-deps --ignore-private
+          . ./ci/check-minimal-versions.sh
 
   style:
     name: style
@@ -92,7 +87,6 @@ jobs:
         run: |
           . ./ci/install-rust.sh
       - name: Install component
-        if: matrix.component != 'rustdoc'
         run: |
           . ./ci/install-component.sh ${{ matrix.component }}
       - name: cargo clippy
@@ -111,7 +105,9 @@ jobs:
         run: |
           cargo doc --no-deps --all --all-features
 
-  # Refs: https://github.com/rust-lang/crater/blob/9ab6f9697c901c4a44025cf0a39b73ad5b37d198/.github/workflows/bors.yml#L125-L149
+  # These jobs don't actually test anything, but they're used to tell bors the
+  # build completed, as there is no practical way to detect when a workflow is
+  # successful listening to webhooks only.
   #
   # ALL THE PREVIOUS JOBS NEEDS TO BE ADDED TO THE `needs` SECTION OF THIS JOB!
 
