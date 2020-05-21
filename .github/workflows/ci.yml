@@ -32,7 +32,7 @@ jobs:
           - nightly
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v2
       - name: Install Rust
         run: |
           . ./ci/install-rust.sh ${{ matrix.rust }}
@@ -82,7 +82,7 @@ jobs:
           - rustdoc
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v2
       - name: Install Rust
         run: |
           . ./ci/install-rust.sh
