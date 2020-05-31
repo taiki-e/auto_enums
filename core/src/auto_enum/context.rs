@@ -224,20 +224,14 @@ impl Context {
     }
 
     pub(super) fn replace_boxed_expr(&mut self, expr: &mut Option<Box<Expr>>) {
-        if expr.is_none() {
-            expr.replace(Box::new(unit()));
-        }
-
-        if let Some(expr) = expr {
-            replace_expr(&mut **expr, |expr| {
-                if self.is_marker_expr(&expr) {
-                    // Skip if `<expr>` is a marker macro.
-                    expr
-                } else {
-                    self.next_expr(expr)
-                }
-            });
-        }
+        replace_expr(&mut **expr.get_or_insert_with(|| Box::new(unit())), |expr| {
+            if self.is_marker_expr(&expr) {
+                // Skip if `<expr>` is a marker macro.
+                expr
+            } else {
+                self.next_expr(expr)
+            }
+        });
     }
 
     // visitors
