@@ -13,17 +13,13 @@ pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
         }
     }?;
 
-    let mut impl_ = data.impl_trait_with_capacity(
-        2,
-        parse_quote!(::std::error::Error)?,
-        None,
-        parse_quote! {
+    let mut impl_ =
+        data.impl_trait_with_capacity(2, parse_quote!(::std::error::Error)?, None, parse_quote! {
             trait Error {
                 #[allow(deprecated)]
                 fn description(&self) -> &str;
             }
-        }?,
-    )?;
+        }?)?;
 
     data.fields()
         .iter()
