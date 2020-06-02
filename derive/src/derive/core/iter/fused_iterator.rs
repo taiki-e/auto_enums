@@ -2,14 +2,13 @@ use crate::utils::*;
 
 pub(crate) const NAME: &[&str] = &["FusedIterator"];
 
-pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
-    derive_trait!(
+pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+    derive_trait(
         data,
+        parse_quote!(::core::iter::FusedIterator),
         Some(format_ident!("Item")),
-        parse_quote!(::core::iter::FusedIterator)?,
         parse_quote! {
             trait FusedIterator: ::core::iter::Iterator {}
-        }?,
+        },
     )
-    .map(|item| items.push(item))
 }

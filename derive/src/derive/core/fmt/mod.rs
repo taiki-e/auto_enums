@@ -5,18 +5,14 @@ macro_rules! fmt_impl {
 
             pub(crate) const NAME: &[&str] = &[$($name),*];
 
-            pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
-                derive_trait!(
-                    data,
-                    parse_quote!(::core::fmt::$Trait)?,
-                    parse_quote! {
-                        trait $Trait {
-                            #[inline]
-                            fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result;
-                        }
-                    }?,
-                )
-                .map(|item| items.push(item))
+            pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+                derive_trait(data, parse_quote!(::core::fmt::$Trait), None, parse_quote! {
+                    trait $Trait {
+                        #[inline]
+                        fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result;
+                    }
+                })
+
             }
         }
     };

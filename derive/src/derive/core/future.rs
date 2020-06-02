@@ -2,8 +2,8 @@ use crate::utils::*;
 
 pub(crate) const NAME: &[&str] = &["Future"];
 
-pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
-    derive_trait!(data, parse_quote!(::core::future::Future)?, parse_quote! {
+pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+    derive_trait(data, parse_quote!(::core::future::Future), None, parse_quote! {
         trait Future {
             type Output;
             #[inline]
@@ -12,6 +12,5 @@ pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
                 cx: &mut ::core::task::Context<'_>,
             ) -> ::core::task::Poll<Self::Output>;
         }
-    }?,)
-    .map(|item| items.push(item))
+    })
 }
