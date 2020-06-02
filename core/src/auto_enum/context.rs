@@ -328,9 +328,10 @@ impl Parse for Args {
                 args.push(input.parse()?);
             }
 
-            if !input.is_empty() {
-                let _: token::Comma = input.parse()?;
+            if input.is_empty() {
+                break;
             }
+            let _: token::Comma = input.parse()?;
         }
 
         Ok(Self { args, marker })

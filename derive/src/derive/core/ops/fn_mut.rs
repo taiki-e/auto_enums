@@ -1,30 +1,27 @@
+use derive_utils::EnumImpl;
+use syn::TypeParam;
+
 use crate::utils::*;
 
 pub(crate) const NAME: &[&str] = &["FnMut"];
 
-pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
+pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
     let trait_path = quote!(::core::ops::FnMut);
     let trait_ = quote!(#trait_path(__T) -> __U);
-    let fst = data.fields().iter().next();
+    let fst = data.field_types().next();
+    let mut impl_ = EnumImpl::new(data);
 
-    let mut impl_ = data.impl_with_capacity(1)?;
-
-    *impl_.trait_() =
-        Some(Trait::new(syn::parse2(trait_path.clone())?, parse_quote!(#trait_path<(__T,)>)?));
+    impl_.set_trait(parse_quote!(#trait_path<(__T,)>));
     impl_.push_generic_param(TypeParam::from(format_ident!("__T")).into());
     impl_.push_generic_param(TypeParam::from(format_ident!("__U")).into());
 
-    impl_.push_where_predicate(parse_quote!(#fst: #trait_)?);
-    data.fields()
-        .iter()
-        .skip(1)
-        .try_for_each(|f| parse_quote!(#f: #trait_).map(|f| impl_.push_where_predicate(f)))?;
+    impl_.push_where_predicate(parse_quote!(#fst: #trait_));
+    data.field_types().skip(1).for_each(|f| impl_.push_where_predicate(parse_quote!(#f: #trait_)));
 
     impl_.push_method(parse_quote! {
         #[inline]
         extern "rust-call" fn call_mut(&mut self, args: (__T,)) -> Self::Output;
-    }?)?;
+    })?;
 
-    items.push(impl_.build_item());
-    Ok(())
+    Ok(impl_.build())
 }

@@ -1,12 +1,12 @@
+use derive_utils::EnumData as Data;
 use lazy_static::lazy_static;
 use proc_macro2::TokenStream;
+use quote::ToTokens;
 use std::collections::HashMap;
 use syn::{
     parse::{Parse, ParseStream},
-    token, ItemEnum, Path,
+    parse_quote, token, ItemEnum, Path, Result,
 };
-
-use crate::utils::{Data, EnumData, ItemImpl, Result, ToTokens};
 
 pub(crate) fn attribute(args: TokenStream, input: TokenStream) -> TokenStream {
     expand(args, input).unwrap_or_else(|e| e.to_compile_error())
@@ -85,7 +85,7 @@ lazy_static! {
     };
 }
 
-type DeriveFn = fn(&'_ Data, &'_ mut Vec<ItemImpl>) -> Result<()>;
+type DeriveFn = fn(&'_ Data) -> Result<TokenStream>;
 
 macro_rules! derive_map {
     ($map:expr, $($(#[$meta:meta])* $($arm:ident)::*,)*) => {$(
@@ -232,9 +232,10 @@ impl Parse for Args {
             let path = input.parse()?;
             inner.push((to_trimed_string(&path), path));
 
-            if !input.is_empty() {
-                let _: token::Comma = input.parse()?;
+            if input.is_empty() {
+                break;
             }
+            let _: token::Comma = input.parse()?;
         }
 
         Ok(Self { inner })
@@ -246,17 +247,13 @@ fn expand(args: TokenStream, input: TokenStream) -> Result<TokenStream> {
         ALIAS_MAP.get(s).map_or(false, |x| v.iter().any(|(s, _)| s == x))
     }
 
-    let span = input.clone();
-    let mut item = syn::parse2::<ItemEnum>(input).map_err(|e| {
-        error!(span, "the `#[enum_derive]` attribute may only be used on enums: {}", e)
-    })?;
-    let data = Data { data: EnumData::new(&item)?, span };
+    let data = syn::parse2::<Data>(input)?;
     let args = syn::parse2::<Args>(args)?.inner;
     let args = args.iter().fold(Vec::new(), |mut v, (s, arg)| {
         if let Some(traits) = TRAIT_DEPENDENCIES.get(&&**s) {
             traits.iter().filter(|&x| !args.iter().any(|(s, _)| s == x)).for_each(|s| {
                 if !alias_exists(s, &v) {
-                    v.push((s, None))
+                    v.push((s, None));
                 }
             });
         }
@@ -267,21 +264,23 @@ fn expand(args: TokenStream, input: TokenStream) -> Result<TokenStream> {
     });
 
     let mut derive = Vec::new();
-    let mut items = Vec::new();
+    let mut items = TokenStream::new();
     for (s, arg) in args {
         match (DERIVE_MAP.get(&s), arg) {
-            (Some(f), _) => (&*f)(&data, &mut items)
-                .map_err(|e| error!(data.span, "`enum_derive({})` {}", s, e))?,
+            (Some(f), _) => {
+                items.extend((&*f)(&data).map_err(|e| error!(data, "`enum_derive({})` {}", s, e))?);
+            }
             (_, Some(arg)) => derive.push(arg),
             _ => {}
         }
     }
 
+    let mut item: ItemEnum = data.into();
     if !derive.is_empty() {
-        item.attrs.push(syn::parse_quote!(#[derive(#(#derive),*)]));
+        item.attrs.push(parse_quote!(#[derive(#(#derive),*)]));
     }
 
     let mut item = item.into_token_stream();
-    item.extend(items.into_iter().map(ToTokens::into_token_stream));
+    item.extend(items);
     Ok(item)
 }

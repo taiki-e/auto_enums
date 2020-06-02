@@ -2,8 +2,8 @@ use crate::utils::*;
 
 pub(crate) const NAME: &[&str] = &["futures::Sink"];
 
-pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
-    derive_trait!(data, parse_quote!(::futures::sink::Sink)?, parse_quote! {
+pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+    derive_trait(data, parse_quote!(::futures::sink::Sink), None, parse_quote! {
         trait Sink<Item> {
             type Error;
             #[inline]
@@ -27,6 +27,5 @@ pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
                 cx: &mut ::core::task::Context<'_>,
             ) -> ::core::task::Poll<::core::result::Result<(), Self::Error>>;
         }
-    }?,)
-    .map(|item| items.push(item))
+    })
 }

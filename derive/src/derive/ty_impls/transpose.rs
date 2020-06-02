@@ -1,127 +1,132 @@
+use derive_utils::EnumImpl;
 use proc_macro2::TokenStream;
+use quote::ToTokens;
+use syn::TypeParam;
 
 use crate::utils::*;
 
 pub(crate) const NAME: &[&str] = &["Transpose"];
 
 // Implementing this with `Into` requires many type annotations.
-pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
+pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
     check_fields(data)?;
-
-    items.push(transpose_option(data)?);
-    items.push(transpose_result(data)?);
-    items.push(transpose_ok(data)?);
-    items.push(transpose_err(data)?);
-
-    Ok(())
+    let mut items = TokenStream::new();
+    items.extend(transpose_option(data));
+    items.extend(transpose_result(data));
+    items.extend(transpose_ok(data));
+    items.extend(transpose_err(data));
+    Ok(items)
 }
 
 fn check_fields(data: &Data) -> Result<()> {
-    let generics = data.generics();
-    let fields = data.fields();
+    let generics = &data.generics;
+    let fields = data.field_types();
     let comma = if generics.params.empty_or_trailing() { quote!(,) } else { TokenStream::new() };
 
     if quote!(#generics).to_string() == quote!(<#(#fields),*#comma>).to_string() {
         Ok(())
     } else {
-        Err(error!(data.span, "all fields need to be generics"))
+        Err(error!(data, "all fields need to be generics"))
     }
 }
 
-fn transpose_option(data: &Data) -> Result<ItemImpl> {
-    let ident = data.ident();
-    let fields = data.fields();
+fn transpose_option(data: &Data) -> TokenStream {
+    let ident = &data.ident;
+    let mut impl_ = EnumImpl::new(data);
 
-    let mut items = data.impl_with_capacity(1)?;
+    let transpose = data.variant_idents().map(|v| quote!(#ident::#v(x) => x.map(#ident::#v)));
 
-    let ty_generics = fields.iter().map(|f| quote!(::core::option::Option<#f>));
-    *items.self_ty() = parse_quote!(#ident<#(#ty_generics),*>)?;
-
-    let transpose = data.variants().iter().map(|v| quote!(#ident::#v(x) => x.map(#ident::#v)));
-
-    items.push_item(parse_quote! {
+    let fields = data.field_types();
+    impl_.push_item(parse_quote! {
         #[inline]
         fn transpose(self) -> ::core::option::Option<#ident<#(#fields),*>> {
             match self { #(#transpose,)* }
         }
-    }?);
+    });
 
-    Ok(items.build_item())
+    let mut impl_ = impl_.build_impl();
+
+    let ty_generics = data.field_types().map(|f| quote!(::core::option::Option<#f>));
+    impl_.self_ty = parse_quote!(#ident<#(#ty_generics),*>);
+    impl_.into_token_stream()
 }
 
-fn transpose_result(data: &Data) -> Result<ItemImpl> {
-    let fields = data.fields();
+fn transpose_result(data: &Data) -> TokenStream {
+    let ident = &data.ident;
+    let fields = data.field_types();
+    let mut impl_ = EnumImpl::new(data);
 
-    let mut items = data.impl_with_capacity(1)?;
-
-    let err_fields: &Vec<_> = &(0..fields.len())
+    let err_fields: Vec<_> = (0..fields.len())
         .map(|i| {
             let id = format_ident!("__E{}", i);
-            items.push_generic_param(TypeParam::from(id.clone()).into());
+            impl_.push_generic_param(TypeParam::from(id.clone()).into());
             id
         })
         .collect();
 
-    let ident = data.ident();
-    let ty_generics =
-        fields.iter().zip(err_fields.iter()).map(|(f, ef)| quote!(::core::result::Result<#f, #ef>));
-    *items.self_ty() = parse_quote!(#ident<#(#ty_generics),*>)?;
-
     let transpose = data
-        .variants()
-        .iter()
+        .variant_idents()
         .map(|v| quote!(#ident::#v(x) => x.map(#ident::#v).map_err(#ident::#v)));
 
-    items.push_item(parse_quote! {
+    impl_.push_item(parse_quote! {
         #[inline]
-        fn transpose(self) -> ::core::result::Result<#ident<#(#fields),*>, #ident<#(#err_fields),*>> {
+        fn transpose(
+            self,
+        ) -> ::core::result::Result<#ident<#(#fields),*>, #ident<#(#err_fields),*>> {
             match self { #(#transpose,)* }
         }
-    }?);
+    });
 
-    Ok(items.build_item())
+    let mut impl_ = impl_.build_impl();
+
+    let ty_generics = data
+        .field_types()
+        .zip(err_fields.iter())
+        .map(|(f, ef)| quote!(::core::result::Result<#f, #ef>));
+    impl_.self_ty = parse_quote!(#ident<#(#ty_generics),*>);
+    impl_.into_token_stream()
 }
 
-fn transpose_ok(data: &Data) -> Result<ItemImpl> {
-    let ident = data.ident();
-    let fields = data.fields();
+fn transpose_ok(data: &Data) -> TokenStream {
+    let ident = &data.ident;
+    let fields = data.field_types();
+    let mut impl_ = EnumImpl::new(data);
 
-    let mut items = data.impl_with_capacity(1)?;
+    impl_.push_generic_param(TypeParam::from(format_ident!("__E")).into());
 
-    items.push_generic_param(TypeParam::from(format_ident!("__E")).into());
-
-    let ty_generics = fields.iter().map(|f| quote!(::core::result::Result<#f, __E>));
-    *items.self_ty() = parse_quote!(#ident<#(#ty_generics),*>)?;
-
-    let transpose = data.variants().iter().map(|v| quote!(#ident::#v(x) => x.map(#ident::#v)));
-    items.push_item(parse_quote! {
+    let transpose = data.variant_idents().map(|v| quote!(#ident::#v(x) => x.map(#ident::#v)));
+    impl_.push_item(parse_quote! {
         #[inline]
         fn transpose_ok(self) -> ::core::result::Result<#ident<#(#fields),*>, __E> {
             match self { #(#transpose,)* }
         }
-    }?);
+    });
 
-    Ok(items.build_item())
+    let mut impl_ = impl_.build_impl();
+
+    let ty_generics = data.field_types().map(|f| quote!(::core::result::Result<#f, __E>));
+    impl_.self_ty = parse_quote!(#ident<#(#ty_generics),*>);
+    impl_.into_token_stream()
 }
 
-fn transpose_err(data: &Data) -> Result<ItemImpl> {
-    let ident = data.ident();
-    let fields = data.fields();
+fn transpose_err(data: &Data) -> TokenStream {
+    let ident = &data.ident;
+    let fields = data.field_types();
+    let mut impl_ = EnumImpl::new(data);
 
-    let mut items = data.impl_with_capacity(1)?;
+    impl_.push_generic_param(TypeParam::from(format_ident!("__T")).into());
 
-    items.push_generic_param(TypeParam::from(format_ident!("__T")).into());
-
-    let ty_generics = fields.iter().map(|f| quote!(::core::result::Result<__T, #f>));
-    *items.self_ty() = parse_quote!(#ident<#(#ty_generics),*>)?;
-
-    let transpose = data.variants().iter().map(|v| quote!(#ident::#v(x) => x.map_err(#ident::#v)));
-    items.push_item(parse_quote! {
+    let transpose = data.variant_idents().map(|v| quote!(#ident::#v(x) => x.map_err(#ident::#v)));
+    impl_.push_item(parse_quote! {
         #[inline]
         fn transpose_err(self) -> ::core::result::Result<__T, #ident<#(#fields),*>> {
             match self { #(#transpose,)* }
         }
-    }?);
+    });
 
-    Ok(items.build_item())
+    let mut impl_ = impl_.build_impl();
+
+    let ty_generics = data.field_types().map(|f| quote!(::core::result::Result<__T, #f>));
+    impl_.self_ty = parse_quote!(#ident<#(#ty_generics),*>);
+    impl_.into_token_stream()
 }

@@ -105,7 +105,9 @@ impl<'a> Visitor<'a> {
 
                         let err = self.cx.next_expr(syn::parse_quote!(err));
                         arms.push(syn::parse_quote! {
-                            ::core::result::Result::Err(err) => return ::core::result::Result::Err(#err),
+                            ::core::result::Result::Err(err) => {
+                                return ::core::result::Result::Err(#err);
+                            }
                         });
 
                         Expr::Match(ExprMatch {

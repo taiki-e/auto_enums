@@ -2,8 +2,8 @@ use crate::utils::*;
 
 pub(crate) const NAME: &[&str] = &["tokio01::AsyncWrite"];
 
-pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
-    derive_trait!(data, parse_quote!(::tokio::io::AsyncWrite)?, parse_quote! {
+pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+    derive_trait(data, parse_quote!(::tokio::io::AsyncWrite), None, parse_quote! {
         trait AsyncWrite: ::std::io::Write {
             fn poll_write(&mut self, buf: &[u8]) -> ::tokio::prelude::Poll<usize, ::std::io::Error>;
             fn poll_flush(&mut self) -> ::tokio::prelude::Poll<(), ::std::io::Error>;
@@ -13,6 +13,5 @@ pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
             // where
             //     Self: Sized;
         }
-    }?,)
-    .map(|item| items.push(item))
+    })
 }

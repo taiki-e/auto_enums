@@ -2,8 +2,8 @@ use crate::utils::*;
 
 pub(crate) const NAME: &[&str] = &["futures::Stream"];
 
-pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
-    derive_trait!(data, parse_quote!(::futures::stream::Stream)?, parse_quote! {
+pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+    derive_trait(data, parse_quote!(::futures::stream::Stream), None, parse_quote! {
         trait Stream {
             type Item;
             #[inline]
@@ -14,6 +14,5 @@ pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
             #[inline]
             fn size_hint(&self) -> (usize, ::core::option::Option<usize>);
         }
-    }?,)
-    .map(|item| items.push(item))
+    })
 }

@@ -2,8 +2,8 @@ use crate::utils::*;
 
 pub(crate) const NAME: &[&str] = &["futures::AsyncBufRead"];
 
-pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
-    derive_trait!(data, parse_quote!(::futures::io::AsyncBufRead)?, parse_quote! {
+pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+    derive_trait(data, parse_quote!(::futures::io::AsyncBufRead), None, parse_quote! {
         trait AsyncBufRead {
             #[inline]
             fn poll_fill_buf<'__a>(
@@ -13,6 +13,5 @@ pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
             #[inline]
             fn consume(self: ::core::pin::Pin<&mut Self>, amt: usize);
         }
-    }?,)
-    .map(|item| items.push(item))
+    })
 }

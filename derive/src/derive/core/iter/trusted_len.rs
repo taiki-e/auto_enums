@@ -2,14 +2,13 @@ use crate::utils::*;
 
 pub(crate) const NAME: &[&str] = &["TrustedLen"];
 
-pub(crate) fn derive(data: &Data, items: &mut Vec<ItemImpl>) -> Result<()> {
-    derive_trait!(
+pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+    derive_trait(
         data,
+        parse_quote!(::core::iter::TrustedLen),
         Some(format_ident!("Item")),
-        parse_quote!(::core::iter::TrustedLen)?,
         parse_quote! {
             unsafe trait TrustedLen: ::core::iter::Iterator {}
-        }?,
+        },
     )
-    .map(|item| items.push(item))
 }

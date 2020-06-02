@@ -1,16 +1,16 @@
-error: an enum with units variant is not supported
+error: may not be used on enums with unit variants
  --> $DIR/variant.rs:5:5
   |
 5 |     A, //~ ERROR an enum with units variant is not supported
   |     ^
 
-error: an enum with discriminants is not supported
+error: may not be used on enums with discriminants
   --> $DIR/variant.rs:11:9
    |
 11 |     A = 2, //~ ERROR an enum with discriminants is not supported
    |         ^
 
-error: an enum with named fields variant is not supported
+error: may not be used on enums with struct variants
   --> $DIR/variant.rs:17:5
    |
 17 |     A { x: A }, //~ ERROR an enum with named fields variant is not supported
@@ -28,8 +28,8 @@ error: a variant with multiple fields is not supported
 30 |     B(A, B), //~ ERROR a variant with multiple fields is not supported
    |      ^^^^^^
 
-error: cannot be implemented for enums with no variants
-  --> $DIR/variant.rs:34:1
+error: may not be used on enums without variants
+  --> $DIR/variant.rs:34:12
    |
 34 | enum Enum7 {} //~ ERROR cannot be implemented for enums with less than two variants
-   | ^^^^^^^^^^^^^
+   |            ^^

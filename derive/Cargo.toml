@@ -72,7 +72,7 @@ fn_traits = []
 trusted_len = []
 
 [dependencies]
-derive_utils = { version = "0.9.1" }
+derive_utils = { version = "0.10" }
 lazy_static = "1.2"
 proc-macro2 = "1.0"
 quote = "1.0"
