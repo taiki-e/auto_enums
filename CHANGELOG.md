@@ -6,6 +6,10 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+## [0.7.5] - 2020-06-03
+
+* Updated `derive_utils` to 0.10.
+
 ## [0.7.4] - 2020-05-07
 
 * [Fixed an issue that `#[auto_enum]` on non-statement expression does not work without unstable features.][97]
@@ -291,7 +295,8 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 Initial release
 
-[Unreleased]: https://github.com/taiki-e/auto_enums/compare/v0.7.4...HEAD
+[Unreleased]: https://github.com/taiki-e/auto_enums/compare/v0.7.5...HEAD
+[0.7.5]: https://github.com/taiki-e/auto_enums/compare/v0.7.4...v0.7.5
 [0.7.4]: https://github.com/taiki-e/auto_enums/compare/v0.7.3...v0.7.4
 [0.7.3]: https://github.com/taiki-e/auto_enums/compare/v0.7.2...v0.7.3
 [0.7.2]: https://github.com/taiki-e/auto_enums/compare/v0.7.1...v0.7.2
