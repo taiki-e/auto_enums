@@ -122,8 +122,6 @@ enum Foo<A, B> {
 }
 ```
 
-[derive_utils]: https://github.com/taiki-e/derive_utils
-
 ### [std|core] libraries
 
 Some traits support is disabled by default.
@@ -234,9 +232,18 @@ You can add support for external library by activating the each crate feature.
 * [`tokio01::AsyncRead`](https://docs.rs/tokio/0.1/tokio/io/trait.AsyncRead.html)
 * [`tokio01::AsyncWrite`](https://docs.rs/tokio/0.1/tokio/io/trait.AsyncWrite.html)
 
+## Related Projects
+
+* [derive_utils]: A procedural macro helper for easily writing [derives macros][proc-macro-derive] for enums.
+* [futures-enum]: \#\[derive(Future, Stream, Sink, AsyncRead, AsyncWrite, AsyncSeek, AsyncBufRead)\] for enums.
+* [io-enum]: \#\[derive(Read, Write, Seek, BufRead)\] for enums.
+* [iter-enum]: \#\[derive(Iterator, DoubleEndedIterator, ExactSizeIterator, Extend)\] for enums.
+
+[derive_utils]: https://github.com/taiki-e/derive_utils
 [futures-enum]: https://github.com/taiki-e/futures-enum
 [io-enum]: https://github.com/taiki-e/io-enum
 [iter-enum]: https://github.com/taiki-e/iter-enum
+[proc-macro-derive]: https://doc.rust-lang.org/reference/procedural-macros.html#derive-macros
 
 ## License
 
