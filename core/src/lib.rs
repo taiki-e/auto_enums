@@ -1,6 +1,5 @@
 //! An internal crate to support auto_enums - **do not use directly**
 
-#![recursion_limit = "256"]
 #![doc(html_root_url = "https://docs.rs/auto_enums_core/0.7.5")]
 #![doc(test(
     no_crate_inject,

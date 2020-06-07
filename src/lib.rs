@@ -11,7 +11,7 @@
 //!
 //!   Implements specified traits to the enum.
 //!
-//! ## `#[auto_enum]`
+//! # `#[auto_enum]`
 //!
 //! `#[auto_enum]`'s basic feature is to wrap the value returned by the obvious
 //! branches (`match`, `if`, `return`, etc..) by an enum that implemented the
@@ -120,7 +120,7 @@
 //! `#[nested]` can be used basically in the same place as `#[auto_enum]`,
 //! except that `#[nested]` cannot be used in functions.
 //!
-//! ### Positions where `#[auto_enum]` can be used.
+//! ## Positions where `#[auto_enum]` can be used.
 //!
 //! `#[auto_enum]` can be used in the following three places. However, since
 //! [stmt_expr_attributes] and [proc_macro_hygiene] are not stabilized, you need
@@ -175,7 +175,7 @@
 //!   }
 //!   ```
 //!
-//! ### Supported syntax
+//! ## Supported syntax
 //!
 //! * `if` and `match`
 //!
@@ -398,7 +398,7 @@
 //!   }
 //!   ```
 //!
-//! ### Expression that no value will be returned
+//! ## Expression that no value will be returned
 //!
 //! If the last expression of a branch is one of the following, it is
 //! interpreted that no value will be returned (variant assignment is skipped).
@@ -447,7 +447,7 @@
 //! }
 //! ```
 //!
-//! ### Expression level marker (`marker!` macro)
+//! ## Expression level marker (`marker!` macro)
 //!
 //! `#[auto_enum]` replaces `marker!` macros with variants.
 //! If values of two or more are specified by `marker!` macros, `#[auto_enum]`
@@ -480,7 +480,7 @@
 //! }
 //! ```
 //!
-//! ## Rust Nightly
+//! # Rust Nightly
 //!
 //! When using `#[auto_enum]` for expressions and statements, `#[auto_enum]` for
 //! function is unnecessary.
@@ -528,7 +528,7 @@
 //! # }
 //! ```
 //!
-//! ## `#[enum_derive]`
+//! # `#[enum_derive]`
 //!
 //! `#[enum_derive]` implements the supported traits and passes unsupported
 //! traits to `#[derive]`.
@@ -566,14 +566,14 @@
 //!
 //! [derive_utils]: https://github.com/taiki-e/derive_utils
 //!
-//! ## Supported traits
+//! # Supported traits
 //!
 //! Some traits support is disabled by default.
 //! Note that some traits have aliases.
 //!
 //! *When using features that depend on unstable APIs, the `unstable` feature must be explicitly enabled*
 //!
-//! ### [std|core] libraries
+//! ## [std|core] libraries
 //!
 //! `[std|core]::iter`
 //!
@@ -635,7 +635,7 @@
 //!
 //! * [`Error`](https://doc.rust-lang.org/std/error/trait.Error.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/error.md)
 //!
-//! ### External libraries
+//! ## External libraries
 //!
 //! You can add support for external library by activating the each crate feature.
 //!
@@ -682,9 +682,9 @@
 //! [io-enum]: https://github.com/taiki-e/io-enum
 //! [iter-enum]: https://github.com/taiki-e/iter-enum
 //!
-//! ### Static methods
+//! ## Inherent methods
 //!
-//! These don't derive traits, but derive static methods instead.
+//! These don't derive traits, but derive inherent methods instead.
 //!
 //! * `Transpose` *(requires `"transpose_methods"` crate feature)* - this derives the following conversion methods.
 //!
@@ -714,7 +714,7 @@
 //!
 //!   * `transpose_err` - convert from `enum<Result<T, E1>,..>` to `Result<T, enum<E1,..>>`
 //!
-//! ## Crate Features
+//! # Crate Features
 //!
 //! * `std`
 //!   * Enabled by default.
@@ -761,7 +761,7 @@
 //!   * Disabled by default.
 //!   * Enable to use `transpose*` methods.
 //!
-//! ### Using external libraries (disabled by default)
+//! ## Using external libraries (disabled by default)
 //!
 //! * `futures` - [futures(v0.3)](https://github.com/rust-lang-nursery/futures-rs) *(requires `"unstable"` crate feature)*
 //!
@@ -771,7 +771,7 @@
 //!
 //! * `serde` - [serde](https://github.com/serde-rs/serde)
 //!
-//! ### Enable unstable features of [std|core] libraries (disabled by default, requires `"unstable"` crate feature)
+//! ## Enable unstable features of [std|core] libraries (disabled by default, requires `"unstable"` crate feature)
 //!
 //! For these features, you need to enable the unstable feature gate of the same name.
 //!
@@ -783,14 +783,13 @@
 //!
 //! * [`trusted_len`](https://github.com/rust-lang/rust/issues/37572) - Enable to use `[std|core]::iter::TrustedLen` trait.
 //!
-//! ## Known limitations
+//! # Known limitations
 //!
 //! * There needs to explicitly specify the trait to be implemented (`type_analysis` crate feature reduces this limitation).
 //!
 //! * There needs to be marker macros for unsupported expressions.
 
 #![no_std]
-#![recursion_limit = "256"]
 #![doc(html_root_url = "https://docs.rs/auto_enums/0.7.5")]
 #![doc(test(
     no_crate_inject,
