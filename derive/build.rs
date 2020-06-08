@@ -1,13 +1,14 @@
 #![forbid(unsafe_code)]
 #![warn(rust_2018_idioms, single_use_lifetimes)]
 
-use std::{env, process::Command};
+use std::{env, process::Command, str};
 
+// The rustc-cfg strings below are *not* public API. Please let us know by
+// opening a GitHub issue if your build environment requires some way to enable
+// these cfgs other than by executing our build script.
 fn main() {
-    println!("cargo:rerun-if-changed=build.rs");
-
     let minor = match rustc_minor_version() {
-        Some(x) => x,
+        Some(minor) => minor,
         None => return,
     };
 
@@ -17,14 +18,12 @@ fn main() {
 }
 
 fn rustc_minor_version() -> Option<u32> {
-    env::var_os("RUSTC")
-        .and_then(|rustc| Command::new(rustc).arg("--version").output().ok())
-        .and_then(|output| String::from_utf8(output.stdout).ok())
-        .and_then(|version| {
-            let mut pieces = version.split('.');
-            if pieces.next() != Some("rustc 1") {
-                return None;
-            }
-            pieces.next()?.parse().ok()
-        })
+    let rustc = env::var_os("RUSTC")?;
+    let output = Command::new(rustc).arg("--version").output().ok()?;
+    let version = str::from_utf8(&output.stdout).ok()?;
+    let mut pieces = version.split('.');
+    if pieces.next() != Some("rustc 1") {
+        return None;
+    }
+    pieces.next()?.parse().ok()
 }
