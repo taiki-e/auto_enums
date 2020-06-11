@@ -8,5 +8,4 @@
 # . ./compiletest.sh
 # ```
 
-TRYBUILD=overwrite RUSTFLAGS='--cfg auto_enums_def_site_enum_ident' cargo +nightly test -p auto_enums --all-features --test compiletest -- --ignored
-# RUSTFLAGS='--cfg auto_enums_def_site_enum_ident' cargo +nightly test -p auto_enums --all-features --test compiletest -- --ignored
+TRYBUILD=overwrite RUSTFLAGS='--cfg auto_enums_def_site_enum_ident' cargo +nightly test -p auto_enums --all-features --test compiletest
