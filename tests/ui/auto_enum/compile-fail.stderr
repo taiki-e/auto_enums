@@ -1,53 +1,25 @@
-error: expected one of `)`, `,`, `.`, `?`, or an operator, found `..`
- --> $DIR/compile-fail.rs:6:26
-  |
-6 |         0 => marker!(1..8..), //~ ERROR expected one of `)`, `,`, `.`, `?`, or an operator, found `..`
-  |                          -^
-  |                          |
-  |                          expected one of `)`, `,`, `.`, `?`, or an operator
-  |                          help: missing `,`
-
 error: `if` expression missing an else clause
-  --> $DIR/compile-fail.rs:15:12
-   |
-15 |     } else if x > 3 {
-   |            ^^
+ --> $DIR/compile-fail.rs:7:12
+  |
+7 |     } else if x > 3 {
+  |            ^^
 
 error: `#[auto_enum]` is required two or more branches or marker macros in total, there is only one branch or marker macro in this statement
-  --> $DIR/compile-fail.rs:24:5
+  --> $DIR/compile-fail.rs:16:5
    |
-24 | /     let iter = match x {
-25 | |         //~^ ERROR `#[auto_enum]` is required two or more branches or marker macros in total, there is only one branch or marker macro in this statement
-26 | |         _ if y < 0 => return y..=0,
-27 | |         _ => 2..=10,
-28 | |     };
+16 | /     let iter = match x {
+17 | |         //~^ ERROR `#[auto_enum]` is required two or more branches or marker macros in total, there is only one branch or marker macro in this statement
+18 | |         _ if y < 0 => return y..=0,
+19 | |         _ => 2..=10,
+20 | |     };
    | |______^
 
 error: `#[auto_enum]` is required two or more branches or marker macros in total, there is no branch or marker macro in this statement
-  --> $DIR/compile-fail.rs:39:5
+  --> $DIR/compile-fail.rs:31:5
    |
-39 | /     let iter = match x {
-40 | |         //~^ ERROR `#[auto_enum]` is required two or more branches or marker macros in total, there is no branch or marker macro in this statement
-41 | |         _ if y < 0 => return y..=0,
-42 | |         _ => return 2..=10,
-43 | |     };
+31 | /     let iter = match x {
+32 | |         //~^ ERROR `#[auto_enum]` is required two or more branches or marker macros in total, there is no branch or marker macro in this statement
+33 | |         _ if y < 0 => return y..=0,
+34 | |         _ => return 2..=10,
+35 | |     };
    | |______^
-
-error[E0061]: this function takes 1 argument but 2 arguments were supplied
-  --> $DIR/compile-fail.rs:3:1
-   |
-3  |   #[auto_enum(Iterator)]
-   |   ^---------------------
-   |   |
-   |  _defined here
-   | |
-4  | | fn unexpected_token_in_marker(x: usize) -> impl Iterator<Item = i32> {
-5  | |     match x {
-6  | |         0 => marker!(1..8..), //~ ERROR expected one of `)`, `,`, `.`, `?`, or an operator, found `..`
-   | |                      ------ supplied 2 arguments
-...  |
-42 | |         _ => return 2..=10,
-43 | |     };
-   | |_^ expected 1 argument
-   |
-   = note: this error originates in an attribute macro (in Nightly builds, run with -Z macro-backtrace for more info)

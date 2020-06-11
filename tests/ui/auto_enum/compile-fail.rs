@@ -1,14 +1,6 @@
 use auto_enums::auto_enum;
 
 #[auto_enum(Iterator)]
-fn unexpected_token_in_marker(x: usize) -> impl Iterator<Item = i32> {
-    match x {
-        0 => marker!(1..8..), //~ ERROR expected one of `)`, `,`, `.`, `?`, or an operator, found `..`
-        _ => (0..2).map(|x| x + 1),
-    }
-}
-
-#[auto_enum(Iterator)]
 fn if_missing_else(x: usize) -> impl Iterator<Item = i32> {
     if x == 0 {
         1..8
