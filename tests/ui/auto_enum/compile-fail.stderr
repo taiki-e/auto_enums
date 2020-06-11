@@ -46,8 +46,8 @@ error[E0061]: this function takes 1 argument but 2 arguments were supplied
 6  | |         0 => marker!(1..8..), //~ ERROR expected one of `)`, `,`, `.`, `?`, or an operator, found `..`
    | |                      ------ supplied 2 arguments
 ...  |
+41 | |         _ if y < 0 => return y..=0,
 42 | |         _ => return 2..=10,
-43 | |     };
    | |_^ expected 1 argument
    |
    = note: this error originates in an attribute macro (in Nightly builds, run with -Z macro-backtrace for more info)
