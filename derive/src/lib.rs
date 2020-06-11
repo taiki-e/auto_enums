@@ -42,6 +42,7 @@ use proc_macro::TokenStream;
 
 /// An attribute macro like a wrapper of `#[derive]`, implementing
 /// the supported traits and passing unsupported traits to `#[derive]`.
+/// See crate level documentation for details.
 #[proc_macro_attribute]
 pub fn enum_derive(args: TokenStream, input: TokenStream) -> TokenStream {
     crate::enum_derive::attribute(args.into(), input.into()).into()

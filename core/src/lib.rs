@@ -36,6 +36,7 @@ mod auto_enum;
 use proc_macro::TokenStream;
 
 /// An attribute macro for to allow multiple return types by automatically generated enum.
+/// See crate level documentation for details.
 #[proc_macro_attribute]
 pub fn auto_enum(args: TokenStream, input: TokenStream) -> TokenStream {
     crate::auto_enum::attribute(args.into(), input.into()).into()

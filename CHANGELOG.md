@@ -66,7 +66,7 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 ## [0.6.1] - 2019-09-08
 
-* Improved documentation.
+* Documentation improvements.
 
 ## [0.6.0] - 2019-09-07
 
@@ -92,7 +92,7 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 * Added `"trusted_len"` crate feature, and made `[std|core]::iter::TrustedLen` traits optional. *(nightly-only)*
 
-* Improved error messages.
+* Diagnostic improvements.
 
 (There are no changes since the 0.6.0-alpha.3 release.)
 
@@ -129,7 +129,7 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 * Added `"trusted_len"` crate feature, and made `[std|core]::iter::TrustedLen` traits optional. *(nightly-only)*
 
-* Improved error messages.
+* Diagnostic improvements.
 
 [48]: https://github.com/taiki-e/auto_enums/pull/48
 

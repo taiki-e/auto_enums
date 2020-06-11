@@ -56,8 +56,8 @@ pub(crate) fn replace_block(this: &mut Block, f: impl FnOnce(Block) -> Expr) {
 }
 
 /// Check if `tokens` is an empty `TokenStream`.
-/// This is almost equivalent to `syn::parse2::<Nothing>()`,
-/// but produces a better error message and does not require ownership of `tokens`.
+/// This is almost equivalent to `syn::parse2::<Nothing>()`, but produces
+/// a better error message and does not require ownership of `tokens`.
 pub(crate) fn parse_as_empty(tokens: &TokenStream) -> Result<()> {
     if tokens.is_empty() { Ok(()) } else { Err(error!(tokens, "unexpected token: {}", tokens)) }
 }

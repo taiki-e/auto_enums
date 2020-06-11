@@ -101,7 +101,7 @@ fn foo(x: i32) -> impl Iterator<Item = i32> {
 }
 ```
 
-See [API Documentation][docs-url] for more details.
+See [documentation][docs-url] for more details.
 
 ## Supported traits
 
