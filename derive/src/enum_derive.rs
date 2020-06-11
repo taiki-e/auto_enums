@@ -5,7 +5,7 @@ use quote::ToTokens;
 use std::collections::HashMap;
 use syn::{
     parse::{Parse, ParseStream},
-    parse_quote, token, ItemEnum, Path, Result,
+    parse_quote, ItemEnum, Path, Result, Token,
 };
 
 pub(crate) fn attribute(args: TokenStream, input: TokenStream) -> TokenStream {
@@ -235,7 +235,7 @@ impl Parse for Args {
             if input.is_empty() {
                 break;
             }
-            let _: token::Comma = input.parse()?;
+            let _: Token![,] = input.parse()?;
         }
 
         Ok(Self { inner })

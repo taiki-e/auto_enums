@@ -1,9 +1,8 @@
 use syn::{
-    token,
     visit_mut::{self, VisitMut},
     Arm, Block, Expr, ExprBlock, ExprBreak, ExprCall, ExprIf, ExprLoop, ExprMacro, ExprMatch,
     ExprMethodCall, ExprParen, ExprPath, ExprTry, ExprType, ExprUnsafe, Item, Label, Lifetime,
-    Result, Stmt,
+    Result, Stmt, Token,
 };
 
 use super::{visitor, Context, NAME, NESTED, NEVER};
@@ -101,7 +100,7 @@ fn visit_last_expr_match(cx: &mut Context, expr: &mut ExprMatch) -> Result<()> {
 
     expr.arms.iter_mut().try_for_each(|arm| {
         if !skip(arm, cx) {
-            arm.comma = Some(token::Comma::default());
+            arm.comma = Some(<Token![,]>::default());
             replace_expr(&mut *arm.body, |x| cx.next_expr(x));
         }
         Ok(())

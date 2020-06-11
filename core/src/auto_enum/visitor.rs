@@ -1,9 +1,9 @@
 use proc_macro2::Group;
 use quote::ToTokens;
 use syn::{
-    token,
+    parse_quote, token,
     visit_mut::{self, VisitMut},
-    Arm, Attribute, Expr, ExprMacro, ExprMatch, ExprReturn, ExprTry, Item, Local, Stmt,
+    Arm, Attribute, Expr, ExprMacro, ExprMatch, ExprReturn, ExprTry, Item, Local, Stmt, Token,
 };
 
 use super::{Context, VisitMode, DEFAULT_MARKER, NAME, NESTED, NEVER};
@@ -99,12 +99,12 @@ impl<'a> Visitor<'a> {
                             if let Expr::Try(expr) = expr { expr } else { unreachable!() };
 
                         let mut arms = Vec::with_capacity(2);
-                        arms.push(syn::parse_quote! {
+                        arms.push(parse_quote! {
                             ::core::result::Result::Ok(val) => val,
                         });
 
-                        let err = self.cx.next_expr(syn::parse_quote!(err));
-                        arms.push(syn::parse_quote! {
+                        let err = self.cx.next_expr(parse_quote!(err));
+                        arms.push(parse_quote! {
                             ::core::result::Result::Err(err) => {
                                 return ::core::result::Result::Err(#err);
                             }
@@ -112,7 +112,7 @@ impl<'a> Visitor<'a> {
 
                         Expr::Match(ExprMatch {
                             attrs,
-                            match_token: token::Match::default(),
+                            match_token: <Token![match]>::default(),
                             expr,
                             brace_token: token::Brace::default(),
                             arms,
@@ -149,7 +149,7 @@ impl<'a> Visitor<'a> {
                         self.cx.diagnostic.error(e);
                         // Generate an expression to fill in where the error occurred during the visit.
                         // These will eventually need to be replaced with the original error message.
-                        syn::parse_quote!(compile_error!(
+                        parse_quote!(compile_error!(
                             "#[auto_enum] failed to generate error message"
                         ))
                     });

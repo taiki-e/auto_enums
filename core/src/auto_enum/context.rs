@@ -5,7 +5,7 @@ use std::{collections::hash_map::DefaultHasher, hash::Hasher, iter, mem};
 use syn::Type;
 use syn::{
     parse::{Parse, ParseStream},
-    token, Attribute, Error, Expr, Ident, ItemEnum, Macro, Path, Result,
+    parse_quote, Attribute, Error, Expr, Ident, ItemEnum, Macro, Path, Result, Token,
 };
 
 use super::visitor::{Dummy, Visitor};
@@ -317,9 +317,9 @@ impl Parse for Args {
         let mut args = Vec::new();
         let mut marker = None;
         while !input.is_empty() {
-            if input.peek(kw::marker) && input.peek2(token::Eq) {
+            if input.peek(kw::marker) && input.peek2(Token![=]) {
                 let i: kw::marker = input.parse()?;
-                let _: token::Eq = input.parse()?;
+                let _: Token![=] = input.parse()?;
                 let ident: Ident = input.parse()?;
                 if marker.replace(ident).is_some() {
                     return Err(error!(i, "duplicate `marker` argument"));
@@ -331,7 +331,7 @@ impl Parse for Args {
             if input.is_empty() {
                 break;
             }
-            let _: token::Comma = input.parse()?;
+            let _: Token![,] = input.parse()?;
         }
 
         Ok(Self { args, marker })
@@ -375,7 +375,7 @@ impl Builder {
         let variants = &self.variants;
         let fields = &self.variants;
 
-        syn::parse_quote! {
+        parse_quote! {
             #[allow(non_camel_case_types)]
             #[::auto_enums::enum_derive(#(#derive),*)]
             enum #ident<#(#ty_generics),*> {
