@@ -10,8 +10,6 @@
 #![warn(clippy::all, clippy::default_trait_access)]
 // mem::take and #[non_exhaustive] requires Rust 1.40
 #![allow(clippy::mem_replace_with_default, clippy::manual_non_exhaustive)]
-// https://github.com/rust-lang/rust-clippy/issues/5704
-#![allow(clippy::unnested_or_patterns)]
 
 #[cfg(all(feature = "generator_trait", not(feature = "unstable")))]
 compile_error!(
