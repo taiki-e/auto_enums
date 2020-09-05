@@ -10,15 +10,15 @@ error[E0308]: `match` arms have incompatible types
 8  | ||             // This strange formatting is a rustfmt bug.
 9  | || #[nested] //~ ERROR E0308
 10 | ||             2..=10
-   | ||             ^^^^^^ expected enum `match_nop::__Enummatch_nop`, found struct `std::ops::RangeInclusive`
+   | ||             ^^^^^^ expected enum `__Enummatch_nop`, found struct `RangeInclusive`
 11 | ||         }
 12 | ||         _ => (0..2).map(|x| x + 1),
 13 | ||     }
    | ||_____- `match` arms have incompatible types
 ...   |
    |
-   = note: expected type `match_nop::__Enummatch_nop<std::ops::Range<{integer}>, _>`
-            found struct `std::ops::RangeInclusive<{integer}>`
+   = note: expected type `__Enummatch_nop<std::ops::Range<{integer}>, _>`
+            found struct `RangeInclusive<{integer}>`
 
 error[E0308]: `if` and `else` have incompatible types
   --> $DIR/nested.rs:16:1
@@ -39,6 +39,6 @@ error[E0308]: `if` and `else` have incompatible types
    | ||_____- `if` and `else` have incompatible types
 ...   |
    |
-   = note: expected type `std::ops::RangeInclusive<{integer}>`
-              found enum `if_nop::__Enumif_nop<_, std::iter::Map<std::ops::Range<{integer}>, [closure@$DIR/tests/ui/auto_enum/nested.rs:25:20: 25:29]>>`
+   = note: expected type `RangeInclusive<{integer}>`
+              found enum `__Enumif_nop<_, Map<std::ops::Range<{integer}>, [closure@$DIR/tests/ui/auto_enum/nested.rs:25:20: 25:29]>>`
    = note: this error originates in an attribute macro (in Nightly builds, run with -Z macro-backtrace for more info)
