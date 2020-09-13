@@ -1,5 +1,5 @@
-error[E0433]: failed to resolve: use of undeclared type or module `__Enumdef_site`
+error[E0433]: failed to resolve: use of undeclared crate or module `__Enumdef_site`
  --> $DIR/def_site.rs:9:20
   |
 9 |             return __Enumdef_site::__Variant0(2..4);
-  |                    ^^^^^^^^^^^^^^ use of undeclared type or module `__Enumdef_site`
+  |                    ^^^^^^^^^^^^^^ use of undeclared crate or module `__Enumdef_site`
