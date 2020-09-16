@@ -52,12 +52,6 @@ jobs:
         if: matrix.rust == 'nightly'
         run: |
           cargo test --all --all-features
-      - name: cargo test --cfg auto_enums_def_site_enum_ident
-        if: matrix.rust == 'nightly'
-        env:
-          RUSTFLAGS: -Dwarnings --cfg auto_enums_def_site_enum_ident
-        run: |
-          cargo test --all --all-features
       - name: cargo check --benches
         if: matrix.rust == 'nightly'
         run: |

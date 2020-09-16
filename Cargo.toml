@@ -80,6 +80,7 @@ auto_enums_core = { version = "=0.7.5", path = "core", default-features = false 
 auto_enums_derive = { version = "=0.7.5", path = "derive", default-features = false }
 
 [dev-dependencies]
+rustversion = "1.0"
 trybuild = "1.0"
 
 # for `#[enum_derive]`

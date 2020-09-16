@@ -156,11 +156,6 @@ impl Context {
         self.diagnostic = child.diagnostic;
     }
 
-    #[cfg(auto_enums_def_site_enum_ident)]
-    pub(super) fn update_enum_ident(&mut self, ident: &Ident) {
-        self.builder.update_enum_ident(ident)
-    }
-
     /// Returns `true` if one or more errors occurred.
     pub(super) fn failed(&self) -> bool {
         !self.diagnostic.messages.is_empty()
@@ -349,12 +344,6 @@ struct Builder {
 impl Builder {
     fn new(input: &TokenStream) -> Self {
         Self { ident: format_ident!("__Enum{}", hash(input)), variants: Vec::new() }
-    }
-
-    #[cfg(auto_enums_def_site_enum_ident)]
-    fn update_enum_ident(&mut self, ident: &Ident) {
-        debug_assert!(self.variants.is_empty());
-        self.ident = format_ident!("__Enum{}", ident, span = proc_macro::Span::def_site().into());
     }
 
     fn next_expr(&mut self, attrs: Vec<Attribute>, expr: Expr) -> Expr {

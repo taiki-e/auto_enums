@@ -16,15 +16,6 @@
     clippy::manual_non_exhaustive,
     clippy::match_like_matches_macro
 )]
-// `auto_enum` uses the hash value of the input AST to prevent access to the generated enum.
-// This works well for common use cases, but is inconvenient when testing error messages that contain enum names.
-// When this feature is enabled, `auto_enum` uses the enum name is based on the function name,
-// and access to the enum is prevented by using `Span::def_site()`.
-// Currently, this feature only affects when `auto_enum` is used in function position.
-//
-// This is disabled by default and can be enabled using
-// `--cfg auto_enums_def_site_enum_ident` in RUSTFLAGS.
-#![cfg_attr(auto_enums_def_site_enum_ident, feature(proc_macro_def_site))]
 
 // older compilers require explicit `extern crate`.
 #[allow(unused_extern_crates)]
