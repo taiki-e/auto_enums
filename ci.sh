@@ -19,6 +19,3 @@ cargo +nightly test --all --all-features
 
 echo "Running 'cargo doc'"
 cargo +nightly doc --no-deps --all --all-features
-
-echo "Running 'compiletest'"
-. ./compiletest.sh
