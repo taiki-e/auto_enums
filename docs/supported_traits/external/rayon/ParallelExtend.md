@@ -1,4 +1,4 @@
-## [`rayon::ParallelExtend`](https://docs.rs/rayon/1.0/rayon/iter/trait.ParallelExtend.html)
+## [`rayon::ParallelExtend`](https://docs.rs/rayon/1/rayon/iter/trait.ParallelExtend.html)
 
 When deriving for enum like the following:
 

@@ -658,9 +658,9 @@
 //!
 //! [`rayon`](https://github.com/rayon-rs/rayon) *(requires `"rayon"` crate feature)*
 //!
-//! * [`rayon::ParallelIterator`](https://docs.rs/rayon/1.0/rayon/iter/trait.ParallelIterator.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/rayon/ParallelIterator.md)
-//! * [`rayon::IndexedParallelIterator`](https://docs.rs/rayon/1.0/rayon/iter/trait.IndexedParallelIterator.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/rayon/IndexedParallelIterator.md)
-//! * [`rayon::ParallelExtend`](https://docs.rs/rayon/1.0/rayon/iter/trait.ParallelExtend.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/rayon/ParallelExtend.md)
+//! * [`rayon::ParallelIterator`](https://docs.rs/rayon/1/rayon/iter/trait.ParallelIterator.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/rayon/ParallelIterator.md)
+//! * [`rayon::IndexedParallelIterator`](https://docs.rs/rayon/1/rayon/iter/trait.IndexedParallelIterator.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/rayon/IndexedParallelIterator.md)
+//! * [`rayon::ParallelExtend`](https://docs.rs/rayon/1/rayon/iter/trait.ParallelExtend.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/rayon/ParallelExtend.md)
 //!
 //! [`serde`](https://github.com/serde-rs/serde) *(requires `"serde"` crate feature)*
 //!

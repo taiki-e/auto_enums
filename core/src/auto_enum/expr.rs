@@ -132,7 +132,7 @@ fn visit_last_expr_if(cx: &mut Context, expr: &mut ExprIf) -> Result<()> {
         }
         Some(Expr::If(expr)) => visit_last_expr_if(cx, expr),
 
-        // TODO: https://docs.rs/proc-macro2/0.4/proc_macro2/struct.Span.html#method.join
+        // TODO: https://docs.rs/proc-macro2/1/proc_macro2/struct.Span.html#method.join
         // `expr.span().join(expr.then_branch.span()).unwrap_or_else(|| expr.span())``
         None => Err(error!(expr.if_token, "`if` expression missing an else clause")),
 
