@@ -1,4 +1,4 @@
-use proc_macro2::Group;
+use proc_macro2::{Group, TokenStream};
 use quote::ToTokens;
 use syn::{
     parse_quote, token,
@@ -356,8 +356,12 @@ trait VisitStmt: VisitMut {
         };
 
         let res = attr.map(|attr| {
-            syn::parse2::<Group>(attr.tokens)
-                .and_then(|group| visitor.cx().make_child(node.to_token_stream(), group.stream()))
+            let args = if attr.tokens.is_empty() {
+                TokenStream::new()
+            } else {
+                syn::parse2::<Group>(attr.tokens)?.stream()
+            };
+            visitor.cx().make_child(node.to_token_stream(), args)
         });
 
         visit_mut::visit_stmt_mut(visitor, node);
