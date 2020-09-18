@@ -6,6 +6,22 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+## [0.7.6] - 2020-09-18
+
+* [`type_analysis` feature can now support impl trait in bindings.](https://github.com/taiki-e/auto_enums/pull/108)
+
+  ```rust
+  #[auto_enum]
+  fn foo(x: i32) {
+    // Unlike `feature(impl_trait_in_bindings)`, this works on stable compilers.
+    #[auto_enum]
+    let iter: impl Iterator<Item = i32> = match x {
+        0 => Some(0).into_iter(),
+        _ => 0..x,
+    };
+  }
+  ```
+
 ## [0.7.5] - 2020-06-03
 
 * Updated `derive_utils` to 0.10.
@@ -295,7 +311,8 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 Initial release
 
-[Unreleased]: https://github.com/taiki-e/auto_enums/compare/v0.7.5...HEAD
+[Unreleased]: https://github.com/taiki-e/auto_enums/compare/v0.7.6...HEAD
+[0.7.6]: https://github.com/taiki-e/auto_enums/compare/v0.7.5...v0.7.6
 [0.7.5]: https://github.com/taiki-e/auto_enums/compare/v0.7.4...v0.7.5
 [0.7.4]: https://github.com/taiki-e/auto_enums/compare/v0.7.3...v0.7.4
 [0.7.3]: https://github.com/taiki-e/auto_enums/compare/v0.7.2...v0.7.3
