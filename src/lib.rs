@@ -714,7 +714,7 @@
 //!
 //!   * `transpose_err` - convert from `enum<Result<T, E1>,..>` to `Result<T, enum<E1,..>>`
 //!
-//! # Crate Features
+//! # Optional features
 //!
 //! * `std`
 //!   * Enabled by default.
@@ -732,34 +732,44 @@
 //!   * Disabled by default.
 //!   * Enable to use `[std|core]::fmt`'s traits other than `Debug`, `Display` and `Write`.
 //!
-//! * `type_analysis`
-//!   * Disabled by default.
-//!   * Analyze return type of function and `let` binding.
-//!
-//!     **Note that this feature is still experimental.**
-//!
-//!     Examples:
-//!
-//!     ```rust
-//!     # #[cfg(feature = "type_analysis")]
-//!     # fn dox() {
-//!     use auto_enums::auto_enum;
-//!
-//!     #[auto_enum] // there is no need to specify std library's traits
-//!     fn foo(x: i32) -> impl Iterator<Item = i32> {
-//!         match x {
-//!             0 => 1..10,
-//!             _ => vec![5, 10].into_iter(),
-//!         }
-//!     }
-//!     # }
-//!     ```
-//!
-//!     Please be careful if you return another traits with the same name.
-//!
 //! * `transpose_methods`
 //!   * Disabled by default.
 //!   * Enable to use `transpose*` methods.
+//!
+//! ## `type_analysis` feature (disabled by default)
+//!
+//! Analyze return type of function and `let` binding.
+//!
+//! *Note that this feature is still experimental.*
+//!
+//! Examples:
+//!
+//! ```rust
+//! # #[cfg(feature = "type_analysis")]
+//! # fn dox() {
+//! use auto_enums::auto_enum;
+//!
+//! #[auto_enum] // there is no need to specify std library's traits
+//! fn func(x: i32) -> impl Iterator<Item = i32> {
+//!     match x {
+//!         0 => 1..10,
+//!         _ => vec![5, 10].into_iter(),
+//!     }
+//! }
+//!
+//! #[auto_enum]
+//! fn bar(x: i32) {
+//!     // Unlike `feature(impl_trait_in_bindings)`, this works on stable compilers.
+//!     #[auto_enum]
+//!     let _iter: impl Iterator<Item = i32> = match x {
+//!         0 => Some(0).into_iter(),
+//!         _ => 0..x,
+//!     };
+//! }
+//! # }
+//! ```
+//!
+//! Please be careful if you return another traits with the same name.
 //!
 //! ## Using external libraries (disabled by default)
 //!
