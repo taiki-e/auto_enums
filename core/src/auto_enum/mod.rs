@@ -122,7 +122,9 @@ fn expand_parent_local(local: &mut Local, cx: &mut Context) -> Result<()> {
     #[cfg(feature = "type_analysis")]
     {
         if let Pat::Type(pat) = &mut local.pat {
-            cx.collect_trait(&mut pat.ty);
+            if cx.collect_impl_trait(&mut pat.ty) {
+                local.pat = (*pat.pat).clone()
+            }
         }
     }
 
@@ -186,7 +188,7 @@ fn expand_parent_item_fn(item: &mut ItemFn, cx: &mut Context) -> Result<()> {
         }
 
         #[cfg(feature = "type_analysis")]
-        cx.collect_trait(&mut *ty);
+        cx.collect_impl_trait(&mut *ty);
     }
 
     if cx.is_dummy() {

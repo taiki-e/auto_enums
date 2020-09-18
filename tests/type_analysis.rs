@@ -3,9 +3,10 @@
 #![allow(dead_code)]
 
 use auto_enums::auto_enum;
+use std::fmt;
 
 #[test]
-fn type_analysis() {
+fn func() {
     #[auto_enum] // there is no need to specify std library's traits
     fn test1(x: i32) -> impl Iterator<Item = i32> {
         match x {
@@ -64,5 +65,27 @@ fn type_analysis() {
             }
             x -= 1;
         }
+    }
+}
+
+#[test]
+fn local() {
+    #[auto_enum]
+    fn test1(x: i32) {
+        #[auto_enum]
+        let _y: impl Iterator<Item = i32> = match x {
+            0 => 1..10,
+            _ => vec![5, 10].into_iter(),
+        };
+    }
+
+    #[auto_enum]
+    fn test2(x: i32) -> impl Iterator<Item = i32> + fmt::Debug {
+        #[auto_enum(fmt::Debug)]
+        let y: impl Iterator<Item = i32> = match x {
+            0 => 1..10,
+            _ => vec![5, 10].into_iter(),
+        };
+        y
     }
 }

@@ -289,8 +289,8 @@ impl Context {
     // type_analysis feature
 
     #[cfg(feature = "type_analysis")]
-    pub(super) fn collect_trait(&mut self, ty: &mut Type) {
-        super::type_analysis::collect_impl_trait(&self.args, &mut self.traits, ty);
+    pub(super) fn collect_impl_trait(&mut self, ty: &mut Type) -> bool {
+        super::type_analysis::collect_impl_trait(&self.args, &mut self.traits, ty)
     }
 }
 

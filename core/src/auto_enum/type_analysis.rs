@@ -6,10 +6,11 @@ use syn::{
 
 use crate::utils::path;
 
-pub(super) fn collect_impl_trait(args: &[Path], traits: &mut Vec<Path>, ty: &mut Type) {
+pub(super) fn collect_impl_trait(args: &[Path], traits: &mut Vec<Path>, ty: &mut Type) -> bool {
     struct CollectImplTrait<'a> {
         args: &'a [Path],
         traits: &'a mut Vec<Path>,
+        has_impl_trait: bool,
     }
 
     impl VisitMut for CollectImplTrait<'_> {
@@ -24,6 +25,7 @@ pub(super) fn collect_impl_trait(args: &[Path], traits: &mut Vec<Path>, ty: &mut
                     if TRAITS.contains(&&*ty_trimed)
                         && !self.args.iter().any(|x| x.to_token_stream().to_string() == ty_str)
                     {
+                        self.has_impl_trait = true;
                         self.traits.push(ty);
                     }
                 }
@@ -31,7 +33,9 @@ pub(super) fn collect_impl_trait(args: &[Path], traits: &mut Vec<Path>, ty: &mut
         }
     }
 
-    CollectImplTrait { args, traits }.visit_type_mut(ty);
+    let mut visitor = CollectImplTrait { args, traits, has_impl_trait: false };
+    visitor.visit_type_mut(ty);
+    visitor.has_impl_trait
 }
 
 const TRAITS: &[&str] = &[
