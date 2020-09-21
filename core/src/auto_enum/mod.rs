@@ -37,7 +37,7 @@ pub(crate) fn attribute(args: TokenStream, input: TokenStream) -> TokenStream {
         Ok(mut stmt) => expand_parent_stmt(&mut stmt, &mut cx).map(|()| stmt.into_token_stream()),
         Err(e) => syn::parse2::<Expr>(input)
             .map_err(|_e| {
-                cx.diagnostic.error(e);
+                cx.error(e);
                 error!(cx.span, "may only be used on expression, statement, or function")
             })
             .and_then(|mut expr| {
@@ -46,11 +46,11 @@ pub(crate) fn attribute(args: TokenStream, input: TokenStream) -> TokenStream {
     };
 
     match res {
-        Err(e) => cx.diagnostic.error(e),
-        Ok(_) if cx.failed() => {}
+        Err(e) => cx.error(e),
+        Ok(_) if cx.has_error() => {}
         Ok(tokens) => return tokens,
     }
-    cx.diagnostic.to_compile_error().unwrap()
+    cx.compile_error().unwrap()
 }
 
 fn expand_expr(expr: &mut Expr, cx: &mut Context) -> Result<()> {

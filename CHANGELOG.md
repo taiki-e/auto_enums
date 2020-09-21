@@ -6,6 +6,10 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+* Fix panic when multiple errors occur.
+
+* Diagnostic improvements.
+
 ## [0.7.6] - 2020-09-18
 
 * [`type_analysis` feature can now support impl trait in bindings.](https://github.com/taiki-e/auto_enums/pull/108)

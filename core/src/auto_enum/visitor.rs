@@ -48,14 +48,13 @@ impl<'a> Visitor<'a> {
         if !self.scope.foreign {
             if let Some(attr) = attrs.find_remove_attr(NEVER) {
                 if let Err(e) = parse_as_empty(&attr.tokens) {
-                    self.cx.diagnostic.error(e);
+                    self.cx.error(e);
                 }
             }
 
             // The old annotation `#[rec]` is replaced with `#[nested]`.
             if let Some(old) = attrs.find_remove_attr("rec") {
                 self.cx
-                    .diagnostic
                     .error(error!(old, "#[rec] has been removed and replaced with #[{}]", NESTED));
             }
         }
@@ -131,7 +130,7 @@ impl<'a> Visitor<'a> {
         if let Err(e) =
             parse_as_empty(&attr.tokens).and_then(|_| super::expr::child_expr(node, self.cx))
         {
-            self.cx.diagnostic.error(e);
+            self.cx.error(e);
         }
     }
 
@@ -146,7 +145,7 @@ impl<'a> Visitor<'a> {
                 replace_expr(node, |expr| {
                     let expr = if let Expr::Macro(expr) = expr { expr } else { unreachable!() };
                     let args = syn::parse2(expr.mac.tokens).unwrap_or_else(|e| {
-                        self.cx.diagnostic.error(e);
+                        self.cx.error(e);
                         // Generate an expression to fill in where the error occurred during the visit.
                         // These will eventually need to be replaced with the original error message.
                         parse_quote!(compile_error!(
@@ -154,7 +153,7 @@ impl<'a> Visitor<'a> {
                         ))
                     });
 
-                    if self.cx.failed() {
+                    if self.cx.has_error() {
                         args
                     } else {
                         self.cx.next_expr_with_attrs(expr.attrs, args)
@@ -166,7 +165,7 @@ impl<'a> Visitor<'a> {
     }
 
     fn visit_expr(&mut self, node: &mut Expr, has_semi: bool) {
-        debug_assert!(!self.cx.failed());
+        debug_assert!(!self.cx.has_error());
 
         let tmp = self.scope;
 
@@ -202,13 +201,13 @@ impl<'a> Visitor<'a> {
 
 impl VisitMut for Visitor<'_> {
     fn visit_expr_mut(&mut self, node: &mut Expr) {
-        if !self.cx.failed() {
+        if !self.cx.has_error() {
             self.visit_expr(node, false);
         }
     }
 
     fn visit_arm_mut(&mut self, node: &mut Arm) {
-        if !self.cx.failed() {
+        if !self.cx.has_error() {
             if !self.scope.foreign {
                 if let Some(attr) = node.find_remove_attr(NESTED) {
                     self.visit_nested(&mut *node.body, &attr);
@@ -222,7 +221,7 @@ impl VisitMut for Visitor<'_> {
     }
 
     fn visit_local_mut(&mut self, node: &mut Local) {
-        if !self.cx.failed() {
+        if !self.cx.has_error() {
             if !self.scope.foreign {
                 if let Some(attr) = node.find_remove_attr(NESTED) {
                     if let Some((_, expr)) = &mut node.init {
@@ -238,7 +237,7 @@ impl VisitMut for Visitor<'_> {
     }
 
     fn visit_stmt_mut(&mut self, node: &mut Stmt) {
-        if !self.cx.failed() {
+        if !self.cx.has_error() {
             match node {
                 Stmt::Expr(expr) => self.visit_expr(expr, false),
                 Stmt::Semi(expr, _) => self.visit_expr(expr, true),
@@ -285,7 +284,7 @@ impl<'a> Dummy<'a> {
 
 impl VisitMut for Dummy<'_> {
     fn visit_stmt_mut(&mut self, node: &mut Stmt) {
-        if !self.cx.failed() {
+        if !self.cx.has_error() {
             if node.any_attr(NAME) {
                 self.cx.other_attr = true;
             }
@@ -294,7 +293,7 @@ impl VisitMut for Dummy<'_> {
     }
 
     fn visit_expr_mut(&mut self, node: &mut Expr) {
-        if !self.cx.failed() {
+        if !self.cx.has_error() {
             if node.any_attr(NAME) {
                 self.cx.other_attr = true;
             }
@@ -330,10 +329,9 @@ trait VisitStmt: VisitMut {
         visit_mut::visit_expr_mut(visitor, node);
 
         match res {
-            Some(Err(e)) => visitor.cx().diagnostic.error(e),
+            Some(Err(e)) => visitor.cx().error(e),
             Some(Ok(mut cx)) => {
-                super::expand_parent_expr(node, &mut cx, has_semi)
-                    .unwrap_or_else(|e| cx.diagnostic.error(e));
+                super::expand_parent_expr(node, &mut cx, has_semi).unwrap_or_else(|e| cx.error(e));
                 visitor.cx().join_child(cx)
             }
             None => {}
@@ -367,9 +365,9 @@ trait VisitStmt: VisitMut {
         visit_mut::visit_stmt_mut(visitor, node);
 
         match res {
-            Some(Err(e)) => visitor.cx().diagnostic.error(e),
+            Some(Err(e)) => visitor.cx().error(e),
             Some(Ok(mut cx)) => {
-                super::expand_parent_stmt(node, &mut cx).unwrap_or_else(|e| cx.diagnostic.error(e));
+                super::expand_parent_stmt(node, &mut cx).unwrap_or_else(|e| cx.error(e));
                 visitor.cx().join_child(cx)
             }
             None => {}

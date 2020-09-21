@@ -37,23 +37,9 @@ pub(super) enum VisitLastMode {
     Never,
 }
 
-#[derive(Clone, Default)]
-pub(super) struct Diagnostic {
-    messages: Vec<Error>,
-}
-
-impl Diagnostic {
-    pub(super) fn error(&mut self, message: Error) {
-        self.messages.push(message);
-    }
-
-    pub(super) fn to_compile_error(&self) -> Option<TokenStream> {
-        if self.messages.is_empty() {
-            None
-        } else {
-            Some(self.messages.iter().map(Error::to_compile_error).collect())
-        }
-    }
+#[derive(Default)]
+struct Diagnostic {
+    message: Option<Error>,
 }
 
 /// The default identifier of expression level marker.
@@ -79,7 +65,7 @@ pub(super) struct Context {
 
     /// Span passed to `syn::Error::new_spanned`.
     pub(super) span: TokenStream,
-    pub(super) diagnostic: Diagnostic,
+    diagnostic: Diagnostic,
 
     pub(super) args: Vec<Path>,
     #[cfg(feature = "type_analysis")]
@@ -148,17 +134,29 @@ impl Context {
 
     /// Merge a child `Context` into a parent context `self`.
     pub(super) fn join_child(&mut self, mut child: Self) {
-        debug_assert!(self.diagnostic.messages.is_empty());
         debug_assert!(self.markers.is_empty());
-
         child.markers.pop();
         self.markers = child.markers;
-        self.diagnostic = child.diagnostic;
+
+        if let Some(message) = child.diagnostic.message {
+            self.error(message);
+        }
+    }
+
+    pub(super) fn error(&mut self, message: Error) {
+        match &mut self.diagnostic.message {
+            Some(base) => base.combine(message),
+            None => self.diagnostic.message = Some(message),
+        }
+    }
+
+    pub(super) fn compile_error(&self) -> Option<TokenStream> {
+        self.diagnostic.message.as_ref().map(Error::to_compile_error)
     }
 
     /// Returns `true` if one or more errors occurred.
-    pub(super) fn failed(&self) -> bool {
-        !self.diagnostic.messages.is_empty()
+    pub(super) fn has_error(&self) -> bool {
+        self.diagnostic.message.is_some()
     }
 
     pub(super) fn visit_last(&self) -> bool {
@@ -265,7 +263,7 @@ impl Context {
         }
 
         // As we know that an error will occur, it does not matter if there are not enough variants.
-        if !self.failed() {
+        if !self.has_error() {
             match self.builder.variants.len() {
                 1 => return Err(err(self)),
                 0 if !self.other_attr => return Err(err(self)),
