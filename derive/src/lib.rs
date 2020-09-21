@@ -1,6 +1,6 @@
 //! An internal crate to support auto_enums - **do not use directly**
 
-#![doc(html_root_url = "https://docs.rs/auto_enums_derive/0.7.6")]
+#![doc(html_root_url = "https://docs.rs/auto_enums_derive/0.7.7")]
 #![doc(test(
     no_crate_inject,
     attr(deny(warnings, rust_2018_idioms, single_use_lifetimes), allow(dead_code))

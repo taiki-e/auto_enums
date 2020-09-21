@@ -6,7 +6,9 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
-* Fix panic when multiple errors occur.
+## [0.7.7] - 2020-09-21
+
+* [Fix panic when multiple errors occur.](https://github.com/taiki-e/auto_enums/pull/111)
 
 * Diagnostic improvements.
 
@@ -315,7 +317,8 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 Initial release
 
-[Unreleased]: https://github.com/taiki-e/auto_enums/compare/v0.7.6...HEAD
+[Unreleased]: https://github.com/taiki-e/auto_enums/compare/v0.7.7...HEAD
+[0.7.7]: https://github.com/taiki-e/auto_enums/compare/v0.7.6...v0.7.7
 [0.7.6]: https://github.com/taiki-e/auto_enums/compare/v0.7.5...v0.7.6
 [0.7.5]: https://github.com/taiki-e/auto_enums/compare/v0.7.4...v0.7.5
 [0.7.4]: https://github.com/taiki-e/auto_enums/compare/v0.7.3...v0.7.4
