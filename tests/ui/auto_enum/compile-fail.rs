@@ -40,4 +40,27 @@ fn return0(x: i32, y: i32) -> impl Iterator<Item = i32> {
     }
 }
 
+#[auto_enum(Iterator)]
+fn multi_error(x: i32, y: i32) -> impl Iterator<Item = i32> {
+    #[auto_enum(Iterator)]
+    let iter = match x {
+        //~^ ERROR `#[auto_enum]` is required two or more branches or marker macros in total, there is only one branch or marker macro in this statement
+        _ if y < 0 => return y..=0,
+        _ => {
+            #[auto_enum(Iterator)]
+            let _iter = match x {
+                //~^ ERROR `#[auto_enum]` is required two or more branches or marker macros in total, there is only one branch or marker macro in this statement
+                _ if y < 0 => return y..=0,
+                _ => 2..=10,
+            };
+            2..=10
+        }
+    };
+
+    match y {
+        0 => iter.flat_map(|x| 0..x),
+        _ => iter.map(|x| x + 1),
+    }
+}
+
 fn main() {}

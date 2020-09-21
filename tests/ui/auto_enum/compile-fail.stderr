@@ -23,3 +23,25 @@ error: `#[auto_enum]` is required two or more branches or marker macros in total
 34 | |         _ => return 2..=10,
 35 | |     };
    | |______^
+
+error: `#[auto_enum]` is required two or more branches or marker macros in total, there is only one branch or marker macro in this statement
+  --> $DIR/compile-fail.rs:51:13
+   |
+51 | / ...   let _iter = match x {
+52 | | ...       //~^ ERROR `#[auto_enum]` is required two or more branches or marker macros in total, there is only one branch or marker macro ...
+53 | | ...       _ if y < 0 => return y..=0,
+54 | | ...       _ => 2..=10,
+55 | | ...   };
+   | |________^
+
+error: `#[auto_enum]` is required two or more branches or marker macros in total, there is only one branch or marker macro in this statement
+  --> $DIR/compile-fail.rs:46:5
+   |
+46 | /     let iter = match x {
+47 | |         //~^ ERROR `#[auto_enum]` is required two or more branches or marker macros in total, there is only one branch or marker macro in...
+48 | |         _ if y < 0 => return y..=0,
+49 | |         _ => {
+...  |
+57 | |         }
+58 | |     };
+   | |______^
