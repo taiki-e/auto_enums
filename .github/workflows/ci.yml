@@ -99,6 +99,15 @@ jobs:
         run: |
           cargo doc --no-deps --all --all-features
 
+  shellcheck:
+    name: shellcheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: shellcheck
+        run: |
+          shellcheck ci/*.sh scripts/*.sh
+
   # These jobs don't actually test anything, but they're used to tell bors the
   # build completed, as there is no practical way to detect when a workflow is
   # successful listening to webhooks only.
@@ -113,6 +122,7 @@ jobs:
       - clippy
       - rustfmt
       - rustdoc
+      - shellcheck
     runs-on: ubuntu-latest
     steps:
       - name: Mark the job as a success
@@ -125,6 +135,7 @@ jobs:
       - clippy
       - rustfmt
       - rustdoc
+      - shellcheck
     runs-on: ubuntu-latest
     steps:
       - name: Mark the job as a failure
