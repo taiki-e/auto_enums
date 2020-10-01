@@ -2,11 +2,11 @@
 
 # A script to run a simplified version of the checks done by CI.
 #
-# Usage
+# Usage:
+#     bash scripts/ci.sh
 #
-# ```sh
-# . ./ci.sh
-# ```
+
+set -euo pipefail
 
 echo "Running 'cargo fmt'"
 cargo +nightly fmt --all
