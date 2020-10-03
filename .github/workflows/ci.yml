@@ -62,7 +62,7 @@ jobs:
       - name: cargo check (minimal versions)
         if: matrix.rust == 'nightly'
         run: |
-          bash ci/check-minimal-versions.sh
+          bash scripts/check-minimal-versions.sh
 
   clippy:
     name: clippy
