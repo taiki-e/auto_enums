@@ -18,7 +18,7 @@ A library for to allow multiple return types by automatically generated enum.
 targets = ["x86_64-unknown-linux-gnu"]
 
 [workspace]
-members = ["core", "derive"]
+members = ["core", "derive", "tests/doc"]
 
 [features]
 # Default features.
