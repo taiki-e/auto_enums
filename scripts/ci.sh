@@ -5,14 +5,20 @@
 # Usage:
 #     bash scripts/ci.sh
 #
-# Note: This script requires nightly Rust, rustfmt, clippy, and cargo-expand
+# Note: This script requires nightly Rust, rustfmt, and clippy
 
 set -euo pipefail
 
 if [[ "${1:-none}" == "+"* ]]; then
     toolchain="${1}"
 else
+    cargo +nightly -V >/dev/null || exit 1
     toolchain="+nightly"
+fi
+
+if [[ "${toolchain:-nightly}" != "+nightly"* ]] || ! rustfmt -V &>/dev/null || ! cargo clippy -V &>/dev/null; then
+    echo "error: ci.sh requires nightly Rust, rustfmt, and clippy"
+    exit 1
 fi
 
 echo "Running 'cargo ${toolchain} fmt --all'"
