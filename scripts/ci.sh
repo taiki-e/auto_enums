@@ -16,7 +16,7 @@ else
     toolchain="+nightly"
 fi
 
-if [[ "${toolchain:-nightly}" != "+nightly"* ]] || ! rustfmt -V &>/dev/null || ! cargo clippy -V &>/dev/null; then
+if [[ "${toolchain:-+nightly}" != "+nightly"* ]] || ! rustfmt -V &>/dev/null || ! cargo clippy -V &>/dev/null; then
     echo "error: ci.sh requires nightly Rust, rustfmt, and clippy"
     exit 1
 fi

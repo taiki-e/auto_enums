@@ -23,7 +23,7 @@ elif [[ "${CI:-false}" != "true" ]]; then
     toolchain="+nightly"
 fi
 
-if [[ "${toolchain:-nightly}" != "+nightly"* ]] || ! cargo hack -V &>/dev/null; then
+if [[ "${toolchain:-+nightly}" != "+nightly"* ]] || ! cargo hack -V &>/dev/null; then
     echo "error: check-minimal-versions.sh requires nightly Rust and cargo-hack"
     exit 1
 fi
