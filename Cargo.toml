@@ -15,6 +15,7 @@ A library for to allow multiple return types by automatically generated enum.
 """
 
 [package.metadata.docs.rs]
+all-features = true
 targets = ["x86_64-unknown-linux-gnu"]
 
 [workspace]

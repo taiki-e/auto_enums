@@ -14,6 +14,7 @@ An internal crate to support auto_enums - do not use directly
 """
 
 [package.metadata.docs.rs]
+all-features = true
 targets = ["x86_64-unknown-linux-gnu"]
 
 [lib]
