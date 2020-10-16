@@ -6,10 +6,10 @@ pub(crate) mod futures01;
 pub(crate) mod futures03;
 /// https://docs.rs/rayon/1
 #[cfg(feature = "rayon")]
-pub(crate) mod rayon;
+pub(crate) mod rayon1;
 /// https://docs.rs/serde/1
 #[cfg(feature = "serde")]
-pub(crate) mod serde;
+pub(crate) mod serde1;
 /// https://docs.rs/tokio/0.1
 #[cfg(feature = "tokio01")]
 pub(crate) mod tokio01;
