@@ -5,11 +5,6 @@
 #![warn(rust_2018_idioms, single_use_lifetimes)]
 #![allow(dead_code)]
 
-#[cfg(feature = "rayon")]
-extern crate rayon_crate as rayon;
-#[cfg(feature = "serde")]
-extern crate serde_crate as serde;
-
 use auto_enums::enum_derive;
 
 #[test]
@@ -106,24 +101,6 @@ fn stable_std() {
         Ord, Hash
     )]
     enum Stable<A, B> {
-        A(A),
-        B(B),
-    }
-}
-
-#[cfg(feature = "std")]
-#[test]
-fn stable_external() {
-    #[cfg(feature = "rayon")]
-    #[enum_derive(rayon::ParallelIterator, rayon::IndexedParallelIterator, rayon::ParallelExtend)]
-    enum Rayon<A, B> {
-        A(A),
-        B(B),
-    }
-
-    #[cfg(feature = "serde")]
-    #[enum_derive(serde::Serialize)]
-    enum Serde<A, B> {
         A(A),
         B(B),
     }
