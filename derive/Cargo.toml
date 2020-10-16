@@ -46,16 +46,18 @@ fmt = []
 futures03 = []
 # https://docs.rs/futures/0.1
 futures01 = []
-# https://docs.rs/futures/0.3
+# TODO: remove this in favor of futures03.
 futures = ["futures03"]
 # https://docs.rs/rayon/1
 rayon = []
 # https://docs.rs/serde/1
 serde = []
-# https://docs.rs/tokio/0.1
-tokio01 = []
+# https://docs.rs/tokio/0.3
+tokio03 = []
 # https://docs.rs/tokio/0.2
 tokio02 = []
+# https://docs.rs/tokio/0.1
+tokio01 = []
 
 # ==============================================================================
 # Unstable features
@@ -74,6 +76,6 @@ trusted_len = []
 
 [dependencies]
 derive_utils = { version = "0.10" }
-proc-macro2 = "1.0"
-quote = "1.0"
-syn = { version = "1.0", features = ["full"] }
+proc-macro2 = "1"
+quote = "1"
+syn = { version = "1", features = ["full"] }

@@ -6,6 +6,8 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+* Add support for `tokio03::{AsyncRead, AsyncWrite, AsyncSeek, AsyncBufRead}`.
+
 ## [0.7.7] - 2020-09-21
 
 * [Fix panic when multiple errors occur.](https://github.com/taiki-e/auto_enums/pull/111)

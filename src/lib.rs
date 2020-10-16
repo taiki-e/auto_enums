@@ -588,7 +588,7 @@
 //!
 //! `[std|core]::future`
 //!
-//! * [`Future`](https://doc.rust-lang.org/nightly/std/future/trait.Future.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/future.md)
+//! * [`Future`](https://doc.rust-lang.org/std/future/trait.Future.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/future.md)
 //!
 //! *See also [futures-enum] crate.*
 //!
@@ -665,6 +665,13 @@
 //! [`serde`](https://github.com/serde-rs/serde) *(requires `"serde"` crate feature)*
 //!
 //! * [`serde::Serialize`](https://docs.serde.rs/serde/trait.Serialize.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/serde/serialize.md)
+//!
+//! [`tokio(v0.3)`](https://github.com/tokio-rs/tokio) *(requires `"tokio03"` crate feature)*
+//!
+//! * [`tokio03::AsyncRead`](https://docs.rs/tokio/0.3/tokio/io/trait.AsyncRead.html)
+//! * [`tokio03::AsyncWrite`](https://docs.rs/tokio/0.3/tokio/io/trait.AsyncWrite.html)
+//! * [`tokio03::AsyncSeek`](https://docs.rs/tokio/0.3/tokio/io/trait.AsyncSeek.html)
+//! * [`tokio03::AsyncBufRead`](https://docs.rs/tokio/0.3/tokio/io/trait.AsyncBufRead.html)
 //!
 //! [`tokio(v0.2)`](https://github.com/tokio-rs/tokio) *(requires `"tokio02"` crate feature)*
 //!

@@ -118,6 +118,15 @@ fn get_derive(s: &str) -> Option<DeriveFn> {
         // serde
         #[cfg(feature = "serde")]
         external::serde::serialize,
+        // tokio03
+        #[cfg(feature = "tokio03")]
+        external::tokio03::async_read,
+        #[cfg(feature = "tokio03")]
+        external::tokio03::async_write,
+        #[cfg(feature = "tokio03")]
+        external::tokio03::async_seek,
+        #[cfg(feature = "tokio03")]
+        external::tokio03::async_buf_read,
         // tokio02
         #[cfg(feature = "tokio02")]
         external::tokio02::async_read,
