@@ -807,7 +807,7 @@
 //! * There needs to be marker macros for unsupported expressions.
 
 #![no_std]
-#![doc(html_root_url = "https://docs.rs/auto_enums/0.7.7")]
+#![doc(html_root_url = "https://docs.rs/auto_enums/0.7.8")]
 #![doc(test(
     no_crate_inject,
     attr(deny(warnings, rust_2018_idioms, single_use_lifetimes), allow(dead_code))

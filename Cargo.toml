@@ -1,6 +1,6 @@
 [package]
 name = "auto_enums"
-version = "0.7.7"
+version = "0.7.8"
 authors = ["Taiki Endo <te316e89@gmail.com>"]
 edition = "2018"
 license = "Apache-2.0 OR MIT"
@@ -79,8 +79,8 @@ fn_traits = ["auto_enums_derive/fn_traits"]
 trusted_len = ["auto_enums_derive/trusted_len"]
 
 [dependencies]
-auto_enums_core = { version = "=0.7.7", path = "core", default-features = false }
-auto_enums_derive = { version = "=0.7.7", path = "derive", default-features = false }
+auto_enums_core = { version = "=0.7.8", path = "core", default-features = false }
+auto_enums_derive = { version = "=0.7.8", path = "derive", default-features = false }
 
 [dev-dependencies]
 rustversion = "1"
