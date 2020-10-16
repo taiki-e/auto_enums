@@ -1,6 +1,6 @@
 use crate::utils::*;
 
-pub(crate) const NAME: &[&str] = &["tokio02::AsyncWrite"];
+pub(crate) const NAME: &[&str] = &["tokio03::AsyncWrite"];
 
 pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
     derive_trait(data, parse_quote!(::tokio::io::AsyncWrite), None, parse_quote! {
@@ -18,14 +18,6 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
                 self: ::core::pin::Pin<&mut Self>,
                 cx: &mut ::core::task::Context<'_>,
             ) -> ::core::task::Poll<::std::io::Result<()>>;
-            // tokio02 seems does not reexport Buf.
-            // fn poll_write_buf<__B: Buf>(
-            //     self: ::core::pin::Pin<&mut Self>,
-            //     cx: &mut ::core::task::Context<'_>,
-            //     buf: &mut __B,
-            // ) -> ::core::task::Poll<::std::io::Result<usize>>
-            // where
-            //     Self: Sized;
         }
     })
 }

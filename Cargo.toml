@@ -50,12 +50,14 @@ fmt = ["auto_enums_derive/fmt"]
 futures03 = ["auto_enums_derive/futures03"]
 # https://docs.rs/futures/0.1
 futures01 = ["auto_enums_derive/futures01"]
-# https://docs.rs/futures/0.3
+# TODO: remove this in favor of futures03.
 futures = ["auto_enums_derive/futures"]
 # https://docs.rs/rayon/1
 rayon = ["auto_enums_derive/rayon"]
 # https://docs.rs/serde/1
 serde = ["auto_enums_derive/serde"]
+# https://docs.rs/tokio/0.3
+tokio03 = ["auto_enums_derive/tokio03"]
 # https://docs.rs/tokio/0.2
 tokio02 = ["auto_enums_derive/tokio02"]
 # https://docs.rs/tokio/0.1
@@ -81,16 +83,17 @@ auto_enums_core = { version = "=0.7.7", path = "core", default-features = false 
 auto_enums_derive = { version = "=0.7.7", path = "derive", default-features = false }
 
 [dev-dependencies]
-rustversion = "1.0"
-trybuild = "1.0"
+rustversion = "1"
+trybuild = "1"
 
 # for `#[enum_derive]`
 futures03_crate = { version = "0.3", package = "futures", default-features = false, features = ["std"] }
 futures01_crate = { version = "0.1", package = "futures" }
+tokio03_crate = { version = "0.3", package = "tokio" }
 tokio02_crate = { version = "0.2", package = "tokio" }
 tokio01_crate = { version = "0.1", package = "tokio" }
-rayon_crate = { version = "1.2", package = "rayon" }
-serde_crate = { version = "1.0", package = "serde" }
+rayon_crate = { version = "1", package = "rayon" }
+serde_crate = { version = "1", package = "serde" }
 
 # for benches
 rand = "0.7"

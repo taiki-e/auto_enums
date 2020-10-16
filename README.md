@@ -220,7 +220,14 @@ You can add support for external library by activating the each crate feature.
 
 * [`serde::Serialize`](https://docs.serde.rs/serde/trait.Serialize.html) - [generated code](docs/supported_traits/external/serde/serialize.md)
 
-[`tokio(v0.2)`](https://github.com/tokio-rs/tokio) *(requires `"tokio02"` crate feature)*
+[`tokio(v0.3)`](https://github.com/tokio-rs/tokio) *(requires `"tokio03"` crate feature)*
+
+* [`tokio03::AsyncRead`](https://docs.rs/tokio/0.3/tokio/io/trait.AsyncRead.html)
+* [`tokio03::AsyncWrite`](https://docs.rs/tokio/0.3/tokio/io/trait.AsyncWrite.html)
+* [`tokio03::AsyncSeek`](https://docs.rs/tokio/0.3/tokio/io/trait.AsyncSeek.html)
+* [`tokio03::AsyncBufRead`](https://docs.rs/tokio/0.3/tokio/io/trait.AsyncBufRead.html)
+
+[`tokio(v0.2)`](https://github.com/tokio-rs/tokio/tree/v0.2.x) *(requires `"tokio02"` crate feature)*
 
 * [`tokio02::AsyncRead`](https://docs.rs/tokio/0.2/tokio/io/trait.AsyncRead.html)
 * [`tokio02::AsyncWrite`](https://docs.rs/tokio/0.2/tokio/io/trait.AsyncWrite.html)

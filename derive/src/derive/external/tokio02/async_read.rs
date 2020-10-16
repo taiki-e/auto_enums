@@ -14,11 +14,6 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
                 cx: &mut ::core::task::Context<'_>,
                 buf: &mut [u8],
             ) -> ::core::task::Poll<::std::io::Result<usize>>;
-            // fn poll_read_vectored(
-            //     self: ::core::pin::Pin<&mut Self>,
-            //     cx: &mut ::core::task::Context<'_>,
-            //     bufs: &mut [::std::io::IoSliceMut<'_>],
-            // ) -> ::core::task::Poll<::std::io::Result<usize>>;
             // tokio02 seems does not reexport BufMut.
             // fn poll_read_buf<__B: BufMut>(
             //     self: ::core::pin::Pin<&mut Self>,

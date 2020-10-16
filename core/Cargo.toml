@@ -28,6 +28,6 @@ default = []
 type_analysis = []
 
 [dependencies]
-proc-macro2 = "1.0"
-quote = "1.0"
-syn = { version = "1.0", features = ["full", "visit-mut"] }
+proc-macro2 = "1"
+quote = "1"
+syn = { version = "1", features = ["full", "visit-mut"] }
