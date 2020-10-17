@@ -11,7 +11,7 @@ use crate::utils::{expr_block, replace_block, replace_expr, Attrs};
 /// Visits last expression.
 ///
 /// Note that do not use this after `cx.visitor()`.
-pub(super) fn child_expr(expr: &mut Expr, cx: &mut Context) -> Result<()> {
+pub(super) fn child_expr(cx: &mut Context, expr: &mut Expr) -> Result<()> {
     if !cx.visit_last() || is_unreachable(cx, expr) {
         return Ok(());
     }
@@ -19,7 +19,7 @@ pub(super) fn child_expr(expr: &mut Expr, cx: &mut Context) -> Result<()> {
     match expr {
         Expr::Block(ExprBlock { block, .. }) | Expr::Unsafe(ExprUnsafe { block, .. }) => {
             if let Some(Stmt::Expr(expr)) = block.stmts.last_mut() {
-                child_expr(expr, cx)?;
+                child_expr(cx, expr)?;
             }
         }
 
@@ -30,7 +30,7 @@ pub(super) fn child_expr(expr: &mut Expr, cx: &mut Context) -> Result<()> {
         // Search recursively
         Expr::MethodCall(ExprMethodCall { receiver: expr, .. })
         | Expr::Paren(ExprParen { expr, .. })
-        | Expr::Type(ExprType { expr, .. }) => child_expr(expr, cx)?,
+        | Expr::Type(ExprType { expr, .. }) => child_expr(cx, expr)?,
 
         _ => {}
     }
@@ -91,7 +91,7 @@ fn is_unreachable_stmt(cx: &Context, stmt: Option<&Stmt>) -> bool {
 }
 
 fn visit_last_expr_match(cx: &mut Context, expr: &mut ExprMatch) -> Result<()> {
-    fn skip(arm: &mut Arm, cx: &mut Context) -> bool {
+    fn skip(cx: &mut Context, arm: &mut Arm) -> bool {
         arm.any_empty_attr(NEVER)
             || arm.any_empty_attr(NESTED)
             || is_unreachable(cx, &*arm.body)
@@ -99,7 +99,7 @@ fn visit_last_expr_match(cx: &mut Context, expr: &mut ExprMatch) -> Result<()> {
     }
 
     expr.arms.iter_mut().try_for_each(|arm| {
-        if !skip(arm, cx) {
+        if !skip(cx, arm) {
             arm.comma = Some(<Token![,]>::default());
             replace_expr(&mut *arm.body, |x| cx.next_expr(x));
         }
@@ -108,7 +108,7 @@ fn visit_last_expr_match(cx: &mut Context, expr: &mut ExprMatch) -> Result<()> {
 }
 
 fn visit_last_expr_if(cx: &mut Context, expr: &mut ExprIf) -> Result<()> {
-    fn skip(block: &mut Block, cx: &mut Context) -> bool {
+    fn skip(cx: &mut Context, block: &mut Block) -> bool {
         match block.stmts.last_mut() {
             Some(Stmt::Expr(expr)) => {
                 expr.any_empty_attr(NESTED)
@@ -119,13 +119,13 @@ fn visit_last_expr_if(cx: &mut Context, expr: &mut ExprIf) -> Result<()> {
         }
     }
 
-    if !skip(&mut expr.then_branch, cx) {
+    if !skip(cx, &mut expr.then_branch) {
         replace_block(&mut expr.then_branch, |b| cx.next_expr(expr_block(b)));
     }
 
     match expr.else_branch.as_mut().map(|(_, expr)| &mut **expr) {
         Some(Expr::Block(expr)) => {
-            if !skip(&mut expr.block, cx) {
+            if !skip(cx, &mut expr.block) {
                 replace_block(&mut expr.block, |b| cx.next_expr(expr_block(b)));
             }
             Ok(())

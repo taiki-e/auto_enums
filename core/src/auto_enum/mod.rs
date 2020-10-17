@@ -34,14 +34,14 @@ pub(crate) fn attribute(args: TokenStream, input: TokenStream) -> TokenStream {
     };
 
     let res = match syn::parse2::<Stmt>(input.clone()) {
-        Ok(mut stmt) => expand_parent_stmt(&mut stmt, &mut cx).map(|()| stmt.into_token_stream()),
+        Ok(mut stmt) => expand_parent_stmt(&mut cx, &mut stmt).map(|()| stmt.into_token_stream()),
         Err(e) => syn::parse2::<Expr>(input)
             .map_err(|_e| {
                 cx.error(e);
                 error!(cx.span, "may only be used on expression, statement, or function")
             })
             .and_then(|mut expr| {
-                expand_parent_expr(&mut expr, &mut cx, false).map(|()| expr.into_token_stream())
+                expand_parent_expr(&mut cx, &mut expr, false).map(|()| expr.into_token_stream())
             }),
     };
 
@@ -53,7 +53,7 @@ pub(crate) fn attribute(args: TokenStream, input: TokenStream) -> TokenStream {
     cx.compile_error().unwrap()
 }
 
-fn expand_expr(expr: &mut Expr, cx: &mut Context) -> Result<()> {
+fn expand_expr(cx: &mut Context, expr: &mut Expr) -> Result<()> {
     let expr = match expr {
         Expr::Closure(ExprClosure { body, .. }) if cx.visit_last() => {
             let count = visitor::visit_fn(cx, &mut **body);
@@ -67,7 +67,7 @@ fn expand_expr(expr: &mut Expr, cx: &mut Context) -> Result<()> {
         _ => expr,
     };
 
-    child_expr(expr, cx)?;
+    child_expr(cx, expr)?;
 
     #[cfg(feature = "type_analysis")]
     {
@@ -91,19 +91,19 @@ fn build_expr(expr: &mut Expr, item: ItemEnum) {
 // =================================================================================================
 // Expand statement or expression in which `#[auto_enum]` was directly used.
 
-fn expand_parent_stmt(stmt: &mut Stmt, cx: &mut Context) -> Result<()> {
+fn expand_parent_stmt(cx: &mut Context, stmt: &mut Stmt) -> Result<()> {
     match stmt {
-        Stmt::Expr(expr) => expand_parent_expr(expr, cx, false),
-        Stmt::Semi(expr, _) => expand_parent_expr(expr, cx, true),
-        Stmt::Local(local) => expand_parent_local(local, cx),
-        Stmt::Item(Item::Fn(item)) => expand_parent_item_fn(item, cx),
+        Stmt::Expr(expr) => expand_parent_expr(cx, expr, false),
+        Stmt::Semi(expr, _) => expand_parent_expr(cx, expr, true),
+        Stmt::Local(local) => expand_parent_local(cx, local),
+        Stmt::Item(Item::Fn(item)) => expand_parent_item_fn(cx, item),
         Stmt::Item(item) => {
             Err(error!(item, "may only be used on expression, statement, or function"))
         }
     }
 }
 
-fn expand_parent_expr(expr: &mut Expr, cx: &mut Context, has_semi: bool) -> Result<()> {
+fn expand_parent_expr(cx: &mut Context, expr: &mut Expr, has_semi: bool) -> Result<()> {
     if has_semi {
         cx.visit_last_mode = VisitLastMode::Never;
     }
@@ -113,12 +113,12 @@ fn expand_parent_expr(expr: &mut Expr, cx: &mut Context, has_semi: bool) -> Resu
         return Ok(());
     }
 
-    expand_expr(expr, cx)?;
+    expand_expr(cx, expr)?;
 
     cx.build(|item| build_expr(expr, item))
 }
 
-fn expand_parent_local(local: &mut Local, cx: &mut Context) -> Result<()> {
+fn expand_parent_local(cx: &mut Context, local: &mut Local) -> Result<()> {
     #[cfg(feature = "type_analysis")]
     {
         if let Pat::Type(pat) = &mut local.pat {
@@ -142,12 +142,12 @@ fn expand_parent_local(local: &mut Local, cx: &mut Context) -> Result<()> {
         ));
     };
 
-    expand_expr(expr, cx)?;
+    expand_expr(cx, expr)?;
 
     cx.build(|item| build_expr(expr, item))
 }
 
-fn expand_parent_item_fn(item: &mut ItemFn, cx: &mut Context) -> Result<()> {
+fn expand_parent_item_fn(cx: &mut Context, item: &mut ItemFn) -> Result<()> {
     let ItemFn { sig, block, .. } = item;
     if let ReturnType::Type(_, ty) = &mut sig.output {
         match &**ty {
@@ -197,7 +197,7 @@ fn expand_parent_item_fn(item: &mut ItemFn, cx: &mut Context) -> Result<()> {
     }
 
     match item.block.stmts.last_mut() {
-        Some(Stmt::Expr(expr)) => child_expr(expr, cx)?,
+        Some(Stmt::Expr(expr)) => child_expr(cx, expr)?,
         Some(_) => {}
         None => {
             return Err(error!(
