@@ -55,14 +55,25 @@ jobs:
         if: matrix.rust == 'nightly'
         run: |
           cargo check --benches
-      - name: cargo hack check --each-feature
-        if: matrix.rust == 'nightly'
-        run: |
-          cargo hack check --all --each-feature --no-dev-deps --features=unstable --ignore-unknown-features
       - name: cargo check (minimal versions)
         if: matrix.rust == 'nightly'
         run: |
           bash scripts/check-minimal-versions.sh
+
+  check-features:
+    name: check-features
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Rust
+        run: ci/install-rust.sh
+      - name: Install cargo-hack
+        run: |
+          cargo install cargo-hack
+      - name: cargo hack check --feature-powerset
+        run: |
+          cargo hack check --all --feature-powerset --depth 2 --no-dev-deps \
+            --features unstable --skip unstable --ignore-unknown-features
 
   clippy:
     name: clippy
@@ -123,6 +134,7 @@ jobs:
       - rustfmt
       - rustdoc
       - shellcheck
+      - check-features
     runs-on: ubuntu-latest
     steps:
       - name: Mark the job as a success
@@ -136,6 +148,7 @@ jobs:
       - rustfmt
       - rustdoc
       - shellcheck
+      - check-features
     runs-on: ubuntu-latest
     steps:
       - name: Mark the job as a failure
