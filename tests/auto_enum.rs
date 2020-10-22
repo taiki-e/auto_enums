@@ -702,7 +702,6 @@ mod nightly {
     fn never() {
         // never attr
         for (i, x) in ANS.iter().enumerate() {
-            #[rustfmt::skip]
             #[auto_enum(Iterator)]
             let iter = match i {
                 0 => 1..8,
@@ -710,19 +709,17 @@ mod nightly {
                 5..=10 => loop {
                     panic!()
                 },
-                _ => {
-                    match i {
-                        #[never]
-                        5..=10 => loop {
-                            panic!()
-                        },
-                        #[never]
-                        11..=20 => loop {
-                            panic!()
-                        },
-                        _ => vec![1, 2, 0].into_iter(),
-                    }
-                }
+                _ => match i {
+                    #[never]
+                    5..=10 => loop {
+                        panic!()
+                    },
+                    #[never]
+                    11..=20 => loop {
+                        panic!()
+                    },
+                    _ => vec![1, 2, 0].into_iter(),
+                },
             };
             assert_eq!(iter.sum::<i32>(), *x);
         }
