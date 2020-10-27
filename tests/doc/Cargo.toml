@@ -8,7 +8,5 @@ publish = false
 [lib]
 path = "lib.rs"
 
-[dependencies]
-
 [dev-dependencies]
 auto_enums = { path = "../.." }
