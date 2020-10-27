@@ -1,8 +1,9 @@
-use proc_macro2::TokenStream;
+use proc_macro2::{Span, TokenStream};
+use quote::ToTokens;
 use std::{iter, mem};
 use syn::{
-    punctuated::Punctuated, token, visit_mut::VisitMut, Arm, Attribute, Block, Expr, ExprBlock,
-    ExprCall, ExprPath, ExprTuple, ItemFn, Local, Path, PathSegment, Result, Stmt,
+    parse::Parse, punctuated::Punctuated, token, visit_mut::VisitMut, Arm, Attribute, Block, Expr,
+    ExprBlock, ExprCall, ExprPath, ExprTuple, ItemFn, Local, Path, PathSegment, Result, Stmt,
 };
 
 macro_rules! error {
@@ -60,6 +61,25 @@ pub(crate) fn replace_block(this: &mut Block, f: impl FnOnce(Block) -> Expr) {
 /// a better error message and does not require ownership of `tokens`.
 pub(crate) fn parse_as_empty(tokens: &TokenStream) -> Result<()> {
     if tokens.is_empty() { Ok(()) } else { Err(error!(tokens, "unexpected token: {}", tokens)) }
+}
+
+pub(crate) fn respan<T>(node: &T, span: Span) -> T
+where
+    T: ToTokens + Parse,
+{
+    let tokens = node.to_token_stream();
+    let respanned = respan_tokens(tokens, span);
+    syn::parse2(respanned).unwrap()
+}
+
+fn respan_tokens(tokens: TokenStream, span: Span) -> TokenStream {
+    tokens
+        .into_iter()
+        .map(|mut token| {
+            token.set_span(span);
+            token
+        })
+        .collect()
 }
 
 // =================================================================================================

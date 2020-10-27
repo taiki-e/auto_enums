@@ -1,15 +1,17 @@
 use proc_macro2::TokenStream;
 use quote::format_ident;
-use std::{collections::hash_map::DefaultHasher, hash::Hasher, iter, mem};
+use std::{collections::hash_map::DefaultHasher, hash::Hasher, mem};
 #[cfg(feature = "type_analysis")]
 use syn::Type;
 use syn::{
     parse::{Parse, ParseStream},
-    parse_quote, Attribute, Error, Expr, Ident, ItemEnum, Macro, Path, Result, Token,
+    parse_quote,
+    spanned::Spanned,
+    Attribute, Error, Expr, Ident, ItemEnum, Macro, Path, Result, Token,
 };
 
 use super::visitor::{Dummy, Visitor};
-use crate::utils::{expr_call, path, replace_expr, unit, VisitedNode};
+use crate::utils::{expr_call, replace_expr, respan, unit, VisitedNode};
 
 // =================================================================================================
 // Context
@@ -299,7 +301,7 @@ mod kw {
     syn::custom_keyword!(marker);
 }
 
-#[allow(dead_code)] // https://github.com/rust-lang/rust/issues/56750
+#[allow(dead_code)] // false positive that fixed in Rust 1.39
 struct Args {
     args: Vec<Path>,
     marker: Option<Ident>,
@@ -346,9 +348,9 @@ impl Builder {
 
     fn next_expr(&mut self, attrs: Vec<Attribute>, expr: Expr) -> Expr {
         let variant = format_ident!("__Variant{}", self.variants.len());
-
-        let path =
-            path(iter::once(self.ident.clone().into()).chain(iter::once(variant.clone().into())));
+        let ident = &self.ident;
+        let span = expr.span();
+        let path = respan(&parse_quote!(#ident::#variant), span);
 
         self.variants.push(variant);
 

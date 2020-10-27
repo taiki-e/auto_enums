@@ -6,6 +6,8 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+* Diagnostic improvements.
+
 ## [0.7.8] - 2020-10-16
 
 * [Add support for `tokio03::{AsyncRead, AsyncWrite, AsyncSeek, AsyncBufRead}`.](https://github.com/taiki-e/auto_enums/pull/114)
