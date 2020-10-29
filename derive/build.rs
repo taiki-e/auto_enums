@@ -14,7 +14,6 @@ fn main() {
             return;
         }
     };
-    println!("cargo:warning={}: unable to determine rustc version", env!("CARGO_PKG_NAME"));
 
     if minor >= 36 {
         println!("cargo:rustc-cfg=stable_1_36");
