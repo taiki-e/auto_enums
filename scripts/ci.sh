@@ -28,7 +28,7 @@ echo "Running 'cargo ${toolchain} clippy --all --all-features --all-targets'"
 cargo "${toolchain}" clippy --all --all-features --all-targets -Zunstable-options
 
 echo "Running 'cargo ${toolchain} test --all --all-features'"
-TRYBUILD=overwrite cargo "${toolchain}" test --all --all-features
+cargo "${toolchain}" test --all --all-features
 
 echo "Running 'cargo ${toolchain} doc --no-deps --all --all-features'"
 cargo "${toolchain}" doc --no-deps --all --all-features
