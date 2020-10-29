@@ -9,8 +9,12 @@ use std::{env, process::Command, str};
 fn main() {
     let minor = match rustc_minor_version() {
         Some(minor) => minor,
-        None => return,
+        None => {
+            println!("cargo:warning={}: unable to determine rustc version", env!("CARGO_PKG_NAME"));
+            return;
+        }
     };
+    println!("cargo:warning={}: unable to determine rustc version", env!("CARGO_PKG_NAME"));
 
     if minor >= 36 {
         println!("cargo:rustc-cfg=stable_1_36");
