@@ -74,6 +74,9 @@ fn_traits = []
 # Enable to use `[std|core]::iter::TrustedLen` trait.
 trusted_len = []
 
+[build-dependencies]
+autocfg = "1"
+
 [dependencies]
 derive_utils = { version = "0.10" }
 proc-macro2 = "1"
