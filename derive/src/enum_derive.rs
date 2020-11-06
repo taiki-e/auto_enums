@@ -173,8 +173,7 @@ impl Parse for Args {
 fn get_trait_deps(s: &str) -> Option<&'static [&'static str]> {
     Some(match s {
         "Copy" => &["Clone"],
-        "Eq" => &["PartialEq"],
-        "PartialOrd" => &["PartialEq"],
+        "Eq" | "PartialOrd" => &["PartialEq"],
         "Ord" => &["PartialOrd", "Eq", "PartialEq"],
         #[cfg(feature = "ops")]
         "DerefMut" => &["Deref"],
@@ -184,15 +183,11 @@ fn get_trait_deps(s: &str) -> Option<&'static [&'static str]> {
         "Fn" => &["FnMut", "FnOnce"],
         #[cfg(feature = "fn_traits")]
         "FnMut" => &["FnOnce"],
-        "DoubleEndedIterator" => &["Iterator"],
-        "ExactSizeIterator" => &["Iterator"],
-        "FusedIterator" => &["Iterator"],
+        "DoubleEndedIterator" | "ExactSizeIterator" | "FusedIterator" => &["Iterator"],
         #[cfg(feature = "trusted_len")]
         "TrustedLen" => &["Iterator"],
         #[cfg(feature = "std")]
-        "BufRead" => &["Read"],
-        #[cfg(feature = "std")]
-        "io::BufRead" => &["io::Read"],
+        "BufRead" | "io::BufRead" => &["Read"],
         #[cfg(feature = "std")]
         "Error" => &["Display", "Debug"],
         #[cfg(feature = "rayon")]

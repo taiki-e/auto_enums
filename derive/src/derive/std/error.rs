@@ -21,7 +21,7 @@ pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
                 #[allow(deprecated)]
                 fn description(&self) -> &str;
             }
-        })?;
+        });
 
     data.field_types().for_each(|f| impl_.push_where_predicate(parse_quote!(#f: 'static)));
     impl_.push_item(source);

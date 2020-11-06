@@ -6,13 +6,12 @@ macro_rules! derive_fmt {
             pub(crate) const NAME: &[&str] = &[$($name),*];
 
             pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
-                derive_trait(data, parse_quote!(::core::fmt::$Trait), None, parse_quote! {
+                Ok(derive_trait(data, parse_quote!(::core::fmt::$Trait), None, parse_quote! {
                     trait $Trait {
                         #[inline]
                         fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result;
                     }
-                })
-
+                }))
             }
         }
     };
@@ -42,7 +41,7 @@ pub(crate) mod write {
     pub(crate) const NAME: &[&str] = &["fmt::Write"];
 
     pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
-        derive_trait(data, parse_quote!(::core::fmt::Write), None, parse_quote! {
+        Ok(derive_trait(data, parse_quote!(::core::fmt::Write), None, parse_quote! {
             trait Write {
                 #[inline]
                 fn write_str(&mut self, s: &str) -> ::core::fmt::Result;
@@ -51,6 +50,6 @@ pub(crate) mod write {
                 #[inline]
                 fn write_fmt(&mut self, args: ::core::fmt::Arguments<'_>) -> ::core::fmt::Result;
             }
-        })
+        }))
     }
 }

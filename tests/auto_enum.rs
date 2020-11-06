@@ -257,7 +257,7 @@ mod stable {
         #[auto_enum(Debug, Display)]
         fn try_operator1(x: i32) -> Result<impl Iterator<Item = i32>, impl core::fmt::Debug> {
             if x < 0 {
-                Err(1i32)?;
+                Err(1_i32)?;
             }
 
             let iter = match x {
@@ -272,7 +272,7 @@ mod stable {
         #[auto_enum(Debug)]
         fn try_operator2(x: i32) -> Result<impl Iterator<Item = i32>, impl core::fmt::Debug> {
             if x < 0 {
-                Err(1i32)?;
+                Err(1_i32)?;
             }
 
             match x {

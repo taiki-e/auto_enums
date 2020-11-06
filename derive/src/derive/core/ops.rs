@@ -5,13 +5,13 @@ pub(crate) mod deref {
     pub(crate) const NAME: &[&str] = &["Deref"];
 
     pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
-        derive_trait(data, parse_quote!(::core::ops::Deref), None, parse_quote! {
+        Ok(derive_trait(data, parse_quote!(::core::ops::Deref), None, parse_quote! {
             trait Deref {
                 type Target;
                 #[inline]
                 fn deref(&self) -> &Self::Target;
             }
-        })
+        }))
     }
 }
 
@@ -22,7 +22,7 @@ pub(crate) mod deref_mut {
     pub(crate) const NAME: &[&str] = &["DerefMut"];
 
     pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
-        derive_trait(
+        Ok(derive_trait(
             data,
             parse_quote!(::core::ops::DerefMut),
             Some(format_ident!("Target")),
@@ -32,7 +32,7 @@ pub(crate) mod deref_mut {
                     fn deref_mut(&mut self) -> &mut Self::Target;
                 }
             },
-        )
+        ))
     }
 }
 
@@ -43,13 +43,13 @@ pub(crate) mod index {
     pub(crate) const NAME: &[&str] = &["Index"];
 
     pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
-        derive_trait(data, parse_quote!(::core::ops::Index), None, parse_quote! {
+        Ok(derive_trait(data, parse_quote!(::core::ops::Index), None, parse_quote! {
             trait Index<__Idx> {
                 type Output;
                 #[inline]
                 fn index(&self, index: __Idx) -> &Self::Output;
             }
-        })
+        }))
     }
 }
 
@@ -60,7 +60,7 @@ pub(crate) mod index_mut {
     pub(crate) const NAME: &[&str] = &["IndexMut"];
 
     pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
-        derive_trait(
+        Ok(derive_trait(
             data,
             parse_quote!(::core::ops::IndexMut),
             Some(format_ident!("Output")),
@@ -70,7 +70,7 @@ pub(crate) mod index_mut {
                     fn index_mut(&mut self, index: __Idx) -> &mut Self::Output;
                 }
             },
-        )
+        ))
     }
 }
 
@@ -81,14 +81,14 @@ pub(crate) mod range_bounds {
     pub(crate) const NAME: &[&str] = &["RangeBounds"];
 
     pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
-        derive_trait(data, parse_quote!(::core::ops::RangeBounds), None, parse_quote! {
+        Ok(derive_trait(data, parse_quote!(::core::ops::RangeBounds), None, parse_quote! {
             trait RangeBounds<__T: ?Sized> {
                 #[inline]
                 fn start_bound(&self) -> ::core::ops::Bound<&__T>;
                 #[inline]
                 fn end_bound(&self) -> ::core::ops::Bound<&__T>;
             }
-        })
+        }))
     }
 }
 
@@ -99,7 +99,7 @@ pub(crate) mod generator {
     pub(crate) const NAME: &[&str] = &["Generator"];
 
     pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
-        derive_trait(data, parse_quote!(::core::ops::Generator), None, parse_quote! {
+        Ok(derive_trait(data, parse_quote!(::core::ops::Generator), None, parse_quote! {
             trait Generator<R> {
                 type Yield;
                 type Return;
@@ -109,7 +109,7 @@ pub(crate) mod generator {
                     arg: R,
                 ) -> ::core::ops::GeneratorState<Self::Yield, Self::Return>;
             }
-        })
+        }))
     }
 }
 
@@ -140,7 +140,7 @@ pub(crate) mod fn_ {
         impl_.push_method(parse_quote! {
             #[inline]
             extern "rust-call" fn call(&self, args: (__T,)) -> Self::Output;
-        })?;
+        });
 
         Ok(impl_.build())
     }
@@ -173,7 +173,7 @@ pub(crate) mod fn_mut {
         impl_.push_method(parse_quote! {
             #[inline]
             extern "rust-call" fn call_mut(&mut self, args: (__T,)) -> Self::Output;
-        })?;
+        });
 
         Ok(impl_.build())
     }
@@ -209,7 +209,7 @@ pub(crate) mod fn_once {
                 #[inline]
                 extern "rust-call" fn call_once(self, args: (__T,)) -> Self::Output;
             }
-        })?;
+        });
 
         Ok(impl_.build())
     }

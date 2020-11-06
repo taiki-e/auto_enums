@@ -78,7 +78,7 @@ trusted_len = []
 autocfg = "1"
 
 [dependencies]
-derive_utils = { version = "0.10" }
+derive_utils = { version = "0.11" }
 proc-macro2 = "1"
 quote = "1"
 syn = { version = "1", features = ["full"] }
