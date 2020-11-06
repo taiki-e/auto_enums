@@ -17,7 +17,7 @@ pub(crate) mod read {
 
         // TODO: When `read_initializer` or alternative stabilized, add that conditionally.
 
-        derive_trait(data, parse_quote!(::std::io::Read), None, parse_quote! {
+        Ok(derive_trait(data, parse_quote!(::std::io::Read), None, parse_quote! {
             trait Read {
                 #[inline]
                 fn read(&mut self, buf: &mut [u8]) -> ::std::io::Result<usize>;
@@ -35,7 +35,7 @@ pub(crate) mod read {
                 fn read_exact(&mut self, buf: &mut [u8]) -> ::std::io::Result<()>;
                 #vectored
             }
-        })
+        }))
     }
 }
 
@@ -45,7 +45,7 @@ pub(crate) mod buf_read {
     pub(crate) const NAME: &[&str] = &["BufRead", "io::BufRead"];
 
     pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
-        derive_trait(data, parse_quote!(::std::io::BufRead), None, parse_quote! {
+        Ok(derive_trait(data, parse_quote!(::std::io::BufRead), None, parse_quote! {
             trait BufRead {
                 #[inline]
                 fn fill_buf(&mut self) -> ::std::io::Result<&[u8]>;
@@ -62,7 +62,7 @@ pub(crate) mod buf_read {
                     buf: &mut ::std::string::String,
                 ) -> ::std::io::Result<usize>;
             }
-        })
+        }))
     }
 }
 
@@ -72,12 +72,12 @@ pub(crate) mod seek {
     pub(crate) const NAME: &[&str] = &["Seek", "io::Seek"];
 
     pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
-        derive_trait(data, parse_quote!(::std::io::Seek), None, parse_quote! {
+        Ok(derive_trait(data, parse_quote!(::std::io::Seek), None, parse_quote! {
             trait Seek {
                 #[inline]
                 fn seek(&mut self, pos: ::std::io::SeekFrom) -> ::std::io::Result<u64>;
             }
-        })
+        }))
     }
 }
 
@@ -98,7 +98,7 @@ pub(crate) mod write {
             ) -> ::std::io::Result<usize>;
         };
 
-        derive_trait(data, parse_quote!(::std::io::Write), None, parse_quote! {
+        Ok(derive_trait(data, parse_quote!(::std::io::Write), None, parse_quote! {
             trait Write {
                 #[inline]
                 fn write(&mut self, buf: &[u8]) -> ::std::io::Result<usize>;
@@ -113,6 +113,6 @@ pub(crate) mod write {
                 ) -> ::std::io::Result<()>;
                 #vectored
             }
-        })
+        }))
     }
 }

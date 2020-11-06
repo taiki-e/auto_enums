@@ -4,7 +4,7 @@ pub(crate) mod serialize {
     pub(crate) const NAME: &[&str] = &["serde::Serialize"];
 
     pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
-        derive_trait(data, parse_quote!(::serde::ser::Serialize), None, parse_quote! {
+        Ok(derive_trait(data, parse_quote!(::serde::ser::Serialize), None, parse_quote! {
             trait Serialize {
                 #[inline]
                 fn serialize<__S>(
@@ -14,6 +14,6 @@ pub(crate) mod serialize {
                 where
                     __S: ::serde::ser::Serializer;
             }
-        })
+        }))
     }
 }

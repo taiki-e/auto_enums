@@ -4,7 +4,7 @@ pub(crate) mod async_buf_read {
     pub(crate) const NAME: &[&str] = &["tokio03::AsyncBufRead"];
 
     pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
-        derive_trait(data, parse_quote!(::tokio::io::AsyncBufRead), None, parse_quote! {
+        Ok(derive_trait(data, parse_quote!(::tokio::io::AsyncBufRead), None, parse_quote! {
             trait AsyncBufRead {
                 fn poll_fill_buf<'__a>(
                     self: ::core::pin::Pin<&'__a mut Self>,
@@ -12,7 +12,7 @@ pub(crate) mod async_buf_read {
                 ) -> ::core::task::Poll<::std::io::Result<&'__a [u8]>>;
                 fn consume(self: ::core::pin::Pin<&mut Self>, amt: usize);
             }
-        })
+        }))
     }
 }
 
@@ -22,7 +22,7 @@ pub(crate) mod async_read {
     pub(crate) const NAME: &[&str] = &["tokio03::AsyncRead"];
 
     pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
-        derive_trait(data, parse_quote!(::tokio::io::AsyncRead), None, parse_quote! {
+        Ok(derive_trait(data, parse_quote!(::tokio::io::AsyncRead), None, parse_quote! {
             trait AsyncRead {
                 fn poll_read(
                     self: ::core::pin::Pin<&mut Self>,
@@ -30,7 +30,7 @@ pub(crate) mod async_read {
                     buf: &mut ::tokio::io::ReadBuf<'_>,
                 ) -> ::core::task::Poll<::std::io::Result<()>>;
             }
-        })
+        }))
     }
 }
 
@@ -40,7 +40,7 @@ pub(crate) mod async_seek {
     pub(crate) const NAME: &[&str] = &["tokio03::AsyncSeek"];
 
     pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
-        derive_trait(data, parse_quote!(::tokio::io::AsyncSeek), None, parse_quote! {
+        Ok(derive_trait(data, parse_quote!(::tokio::io::AsyncSeek), None, parse_quote! {
             trait AsyncSeek {
                 fn start_seek(
                     self: ::core::pin::Pin<&mut Self>,
@@ -51,7 +51,7 @@ pub(crate) mod async_seek {
                     cx: &mut ::core::task::Context<'_>,
                 ) -> ::core::task::Poll<::std::io::Result<u64>>;
             }
-        })
+        }))
     }
 }
 
@@ -61,7 +61,7 @@ pub(crate) mod async_write {
     pub(crate) const NAME: &[&str] = &["tokio03::AsyncWrite"];
 
     pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
-        derive_trait(data, parse_quote!(::tokio::io::AsyncWrite), None, parse_quote! {
+        Ok(derive_trait(data, parse_quote!(::tokio::io::AsyncWrite), None, parse_quote! {
             trait AsyncWrite {
                 fn poll_write(
                     self: ::core::pin::Pin<&mut Self>,
@@ -77,6 +77,6 @@ pub(crate) mod async_write {
                     cx: &mut ::core::task::Context<'_>,
                 ) -> ::core::task::Poll<::std::io::Result<()>>;
             }
-        })
+        }))
     }
 }

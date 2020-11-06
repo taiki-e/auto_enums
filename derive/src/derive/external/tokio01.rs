@@ -4,7 +4,7 @@ pub(crate) mod async_read {
     pub(crate) const NAME: &[&str] = &["tokio01::AsyncRead"];
 
     pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
-        derive_trait(data, parse_quote!(::tokio::io::AsyncRead), None, parse_quote! {
+        Ok(derive_trait(data, parse_quote!(::tokio::io::AsyncRead), None, parse_quote! {
             trait AsyncRead: ::std::io::Read {
                 unsafe fn prepare_uninitialized_buffer(&self, buf: &mut [u8]) -> bool;
                 fn poll_read(
@@ -20,7 +20,7 @@ pub(crate) mod async_read {
                 // where
                 //     Self: Sized;
             }
-        })
+        }))
     }
 }
 
@@ -30,7 +30,7 @@ pub(crate) mod async_write {
     pub(crate) const NAME: &[&str] = &["tokio01::AsyncWrite"];
 
     pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
-        derive_trait(data, parse_quote!(::tokio::io::AsyncWrite), None, parse_quote! {
+        Ok(derive_trait(data, parse_quote!(::tokio::io::AsyncWrite), None, parse_quote! {
             trait AsyncWrite: ::std::io::Write {
                 fn poll_write(
                     &mut self,
@@ -43,6 +43,6 @@ pub(crate) mod async_write {
                 // where
                 //     Self: Sized;
             }
-        })
+        }))
     }
 }

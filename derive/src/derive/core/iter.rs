@@ -22,7 +22,7 @@ pub(crate) mod iterator {
                 __F: ::core::ops::FnMut(Self::Item) -> ::core::option::Option<__U>;
         };
 
-        derive_trait(data, parse_quote!(::core::iter::Iterator), None, parse_quote! {
+        Ok(derive_trait(data, parse_quote!(::core::iter::Iterator), None, parse_quote! {
             trait Iterator {
                 type Item;
                 #[inline]
@@ -38,7 +38,7 @@ pub(crate) mod iterator {
                 fn collect<__U: ::core::iter::FromIterator<Self::Item>>(self) -> __U;
                 #try_trait
             }
-        })
+        }))
     }
 }
 
@@ -62,7 +62,7 @@ pub(crate) mod double_ended_iterator {
                 __P: ::core::ops::FnMut(&Self::Item) -> bool;
         };
 
-        derive_trait(
+        Ok(derive_trait(
             data,
             parse_quote!(::core::iter::DoubleEndedIterator),
             Some(format_ident!("Item")),
@@ -73,7 +73,7 @@ pub(crate) mod double_ended_iterator {
                     #try_trait
                 }
             },
-        )
+        ))
     }
 }
 
@@ -85,7 +85,7 @@ pub(crate) mod exact_size_iterator {
     pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
         // TODO: When `exact_size_is_empty` stabilized, add `is_empty` conditionally.
 
-        derive_trait(
+        Ok(derive_trait(
             data,
             parse_quote!(::core::iter::ExactSizeIterator),
             Some(format_ident!("Item")),
@@ -95,7 +95,7 @@ pub(crate) mod exact_size_iterator {
                     fn len(&self) -> usize;
                 }
             },
-        )
+        ))
     }
 }
 
@@ -105,14 +105,14 @@ pub(crate) mod fused_iterator {
     pub(crate) const NAME: &[&str] = &["FusedIterator"];
 
     pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
-        derive_trait(
+        Ok(derive_trait(
             data,
             parse_quote!(::core::iter::FusedIterator),
             Some(format_ident!("Item")),
             parse_quote! {
                 trait FusedIterator: ::core::iter::Iterator {}
             },
-        )
+        ))
     }
 }
 
@@ -123,14 +123,14 @@ pub(crate) mod trusted_len {
     pub(crate) const NAME: &[&str] = &["TrustedLen"];
 
     pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
-        derive_trait(
+        Ok(derive_trait(
             data,
             parse_quote!(::core::iter::TrustedLen),
             Some(format_ident!("Item")),
             parse_quote! {
                 unsafe trait TrustedLen: ::core::iter::Iterator {}
             },
-        )
+        ))
     }
 }
 
@@ -140,11 +140,11 @@ pub(crate) mod extend {
     pub(crate) const NAME: &[&str] = &["Extend"];
 
     pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
-        derive_trait(data, parse_quote!(::core::iter::Extend), None, parse_quote! {
+        Ok(derive_trait(data, parse_quote!(::core::iter::Extend), None, parse_quote! {
             trait Extend<__A> {
                 #[inline]
                 fn extend<__T: ::core::iter::IntoIterator<Item = __A>>(&mut self, iter: __T);
             }
-        })
+        }))
     }
 }

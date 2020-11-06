@@ -4,7 +4,7 @@ pub(crate) mod async_buf_read {
     pub(crate) const NAME: &[&str] = &["futures::AsyncBufRead"];
 
     pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
-        derive_trait(data, parse_quote!(::futures::io::AsyncBufRead), None, parse_quote! {
+        Ok(derive_trait(data, parse_quote!(::futures::io::AsyncBufRead), None, parse_quote! {
             trait AsyncBufRead {
                 #[inline]
                 fn poll_fill_buf<'__a>(
@@ -14,7 +14,7 @@ pub(crate) mod async_buf_read {
                 #[inline]
                 fn consume(self: ::core::pin::Pin<&mut Self>, amt: usize);
             }
-        })
+        }))
     }
 }
 
@@ -24,7 +24,7 @@ pub(crate) mod async_read {
     pub(crate) const NAME: &[&str] = &["futures::AsyncRead"];
 
     pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
-        derive_trait(data, parse_quote!(::futures::io::AsyncRead), None, parse_quote! {
+        Ok(derive_trait(data, parse_quote!(::futures::io::AsyncRead), None, parse_quote! {
             trait AsyncRead {
                 #[inline]
                 fn poll_read(
@@ -39,7 +39,7 @@ pub(crate) mod async_read {
                     bufs: &mut [::std::io::IoSliceMut<'_>],
                 ) -> ::core::task::Poll<::std::io::Result<usize>>;
             }
-        })
+        }))
     }
 }
 
@@ -49,7 +49,7 @@ pub(crate) mod async_seek {
     pub(crate) const NAME: &[&str] = &["futures::AsyncSeek"];
 
     pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
-        derive_trait(data, parse_quote!(::futures::io::AsyncSeek), None, parse_quote! {
+        Ok(derive_trait(data, parse_quote!(::futures::io::AsyncSeek), None, parse_quote! {
             trait AsyncSeek {
                 #[inline]
                 fn poll_seek(
@@ -58,7 +58,7 @@ pub(crate) mod async_seek {
                     pos: ::std::io::SeekFrom,
                 ) -> ::core::task::Poll<::std::io::Result<u64>>;
             }
-        })
+        }))
     }
 }
 
@@ -68,7 +68,7 @@ pub(crate) mod async_write {
     pub(crate) const NAME: &[&str] = &["futures::AsyncWrite"];
 
     pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
-        derive_trait(data, parse_quote!(::futures::io::AsyncWrite), None, parse_quote! {
+        Ok(derive_trait(data, parse_quote!(::futures::io::AsyncWrite), None, parse_quote! {
             trait AsyncWrite {
                 #[inline]
                 fn poll_write(
@@ -93,7 +93,7 @@ pub(crate) mod async_write {
                     cx: &mut ::core::task::Context<'_>,
                 ) -> ::core::task::Poll<::std::io::Result<()>>;
             }
-        })
+        }))
     }
 }
 
@@ -103,7 +103,7 @@ pub(crate) mod sink {
     pub(crate) const NAME: &[&str] = &["futures::Sink"];
 
     pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
-        derive_trait(data, parse_quote!(::futures::sink::Sink), None, parse_quote! {
+        Ok(derive_trait(data, parse_quote!(::futures::sink::Sink), None, parse_quote! {
             trait Sink<Item> {
                 type Error;
                 #[inline]
@@ -127,7 +127,7 @@ pub(crate) mod sink {
                     cx: &mut ::core::task::Context<'_>,
                 ) -> ::core::task::Poll<::core::result::Result<(), Self::Error>>;
             }
-        })
+        }))
     }
 }
 
@@ -137,7 +137,7 @@ pub(crate) mod stream {
     pub(crate) const NAME: &[&str] = &["futures::Stream"];
 
     pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
-        derive_trait(data, parse_quote!(::futures::stream::Stream), None, parse_quote! {
+        Ok(derive_trait(data, parse_quote!(::futures::stream::Stream), None, parse_quote! {
             trait Stream {
                 type Item;
                 #[inline]
@@ -148,6 +148,6 @@ pub(crate) mod stream {
                 #[inline]
                 fn size_hint(&self) -> (usize, ::core::option::Option<usize>);
             }
-        })
+        }))
     }
 }
