@@ -17,7 +17,7 @@ use std::env;
 #[rustversion::attr(not(nightly), ignore)]
 #[test]
 fn ui() {
-    if !env::var_os("CI").map_or(false, |v| v == "true") {
+    if !env::var("CI").is_ok() {
         env::set_var("TRYBUILD", "overwrite");
     }
 
