@@ -132,10 +132,10 @@ pub(crate) trait Attrs {
         self.attrs().iter().any(|attr| attr.path.is_ident(ident) && attr.tokens.is_empty())
     }
 
-    fn attrs_mut<T>(&mut self, f: impl FnOnce(&mut Vec<Attribute>) -> T) -> T;
+    fn attrs_mut(&mut self) -> Option<&mut Vec<Attribute>>;
 
     fn find_remove_attr(&mut self, ident: &str) -> Option<Attribute> {
-        self.attrs_mut(|attrs| attrs.find_remove(|attr| attr.path.is_ident(ident)))
+        self.attrs_mut()?.find_remove(|attr| attr.path.is_ident(ident))
     }
 }
 
@@ -144,8 +144,8 @@ impl Attrs for Arm {
         &self.attrs
     }
 
-    fn attrs_mut<T>(&mut self, f: impl FnOnce(&mut Vec<Attribute>) -> T) -> T {
-        f(&mut self.attrs)
+    fn attrs_mut(&mut self) -> Option<&mut Vec<Attribute>> {
+        Some(&mut self.attrs)
     }
 }
 
@@ -154,8 +154,8 @@ impl Attrs for Local {
         &self.attrs
     }
 
-    fn attrs_mut<T>(&mut self, f: impl FnOnce(&mut Vec<Attribute>) -> T) -> T {
-        f(&mut self.attrs)
+    fn attrs_mut(&mut self) -> Option<&mut Vec<Attribute>> {
+        Some(&mut self.attrs)
     }
 }
 
@@ -169,12 +169,12 @@ impl Attrs for Stmt {
         }
     }
 
-    fn attrs_mut<T>(&mut self, f: impl FnOnce(&mut Vec<Attribute>) -> T) -> T {
+    fn attrs_mut(&mut self) -> Option<&mut Vec<Attribute>> {
         match self {
-            Stmt::Expr(expr) | Stmt::Semi(expr, _) => expr.attrs_mut(f),
-            Stmt::Local(local) => local.attrs_mut(f),
+            Stmt::Expr(expr) | Stmt::Semi(expr, _) => expr.attrs_mut(),
+            Stmt::Local(local) => local.attrs_mut(),
             // Ignore nested items.
-            Stmt::Item(_) => f(&mut Vec::new()),
+            Stmt::Item(_) => None,
         }
     }
 }
@@ -189,10 +189,10 @@ macro_rules! attrs_impl {
                 }
             }
 
-            fn attrs_mut<T>(&mut self, f: impl FnOnce(&mut Vec<Attribute>) -> T) -> T {
+            fn attrs_mut(&mut self) -> Option<&mut Vec<Attribute>> {
                 match self {
-                    $(Expr::$Expr(syn::$Struct { attrs, .. }))|* => f(attrs),
-                    _ => f(&mut Vec::new()),
+                    $(Expr::$Expr(syn::$Struct { attrs, .. }))|* => Some(attrs),
+                    _ => None,
                 }
             }
         }
