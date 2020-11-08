@@ -1,6 +1,6 @@
 use derive_utils::EnumImpl;
 
-use crate::utils::*;
+use crate::derive::*;
 
 pub(crate) const NAME: &[&str] = &["Error"];
 

@@ -1,5 +1,5 @@
 pub(crate) mod read {
-    use crate::utils::*;
+    use crate::derive::*;
 
     pub(crate) const NAME: &[&str] = &["Read", "io::Read"];
 
@@ -40,7 +40,7 @@ pub(crate) mod read {
 }
 
 pub(crate) mod buf_read {
-    use crate::utils::*;
+    use crate::derive::*;
 
     pub(crate) const NAME: &[&str] = &["BufRead", "io::BufRead"];
 
@@ -67,7 +67,7 @@ pub(crate) mod buf_read {
 }
 
 pub(crate) mod seek {
-    use crate::utils::*;
+    use crate::derive::*;
 
     pub(crate) const NAME: &[&str] = &["Seek", "io::Seek"];
 
@@ -82,7 +82,7 @@ pub(crate) mod seek {
 }
 
 pub(crate) mod write {
-    use crate::utils::*;
+    use crate::derive::*;
 
     pub(crate) const NAME: &[&str] = &["Write", "io::Write"];
 

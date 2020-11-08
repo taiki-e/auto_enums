@@ -1,5 +1,5 @@
 pub(crate) mod async_buf_read {
-    use crate::utils::*;
+    use crate::derive::*;
 
     pub(crate) const NAME: &[&str] = &["tokio02::AsyncBufRead"];
 
@@ -17,7 +17,7 @@ pub(crate) mod async_buf_read {
 }
 
 pub(crate) mod async_read {
-    use crate::utils::*;
+    use crate::derive::*;
 
     pub(crate) const NAME: &[&str] = &["tokio02::AsyncRead"];
 
@@ -47,7 +47,7 @@ pub(crate) mod async_read {
 }
 
 pub(crate) mod async_seek {
-    use crate::utils::*;
+    use crate::derive::*;
 
     pub(crate) const NAME: &[&str] = &["tokio02::AsyncSeek"];
 
@@ -69,7 +69,7 @@ pub(crate) mod async_seek {
 }
 
 pub(crate) mod async_write {
-    use crate::utils::*;
+    use crate::derive::*;
 
     pub(crate) const NAME: &[&str] = &["tokio02::AsyncWrite"];
 

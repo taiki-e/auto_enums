@@ -1,5 +1,5 @@
 pub(crate) mod par_iter {
-    use crate::utils::*;
+    use crate::derive::*;
 
     pub(crate) const NAME: &[&str] = &["rayon::ParallelIterator"];
 
@@ -19,7 +19,7 @@ pub(crate) mod par_iter {
 }
 
 pub(crate) mod indexed_par_iter {
-    use crate::utils::*;
+    use crate::derive::*;
 
     pub(crate) const NAME: &[&str] = &["rayon::IndexedParallelIterator"];
 
@@ -47,7 +47,7 @@ pub(crate) mod indexed_par_iter {
 }
 
 pub(crate) mod par_extend {
-    use crate::utils::*;
+    use crate::derive::*;
 
     pub(crate) const NAME: &[&str] = &["rayon::ParallelExtend"];
 

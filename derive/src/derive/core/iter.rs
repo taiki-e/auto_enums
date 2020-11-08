@@ -1,5 +1,5 @@
 pub(crate) mod iterator {
-    use crate::utils::*;
+    use crate::derive::*;
 
     pub(crate) const NAME: &[&str] = &["Iterator"];
 
@@ -43,7 +43,7 @@ pub(crate) mod iterator {
 }
 
 pub(crate) mod double_ended_iterator {
-    use crate::utils::*;
+    use crate::derive::*;
 
     pub(crate) const NAME: &[&str] = &["DoubleEndedIterator"];
 
@@ -78,7 +78,7 @@ pub(crate) mod double_ended_iterator {
 }
 
 pub(crate) mod exact_size_iterator {
-    use crate::utils::*;
+    use crate::derive::*;
 
     pub(crate) const NAME: &[&str] = &["ExactSizeIterator"];
 
@@ -100,7 +100,7 @@ pub(crate) mod exact_size_iterator {
 }
 
 pub(crate) mod fused_iterator {
-    use crate::utils::*;
+    use crate::derive::*;
 
     pub(crate) const NAME: &[&str] = &["FusedIterator"];
 
@@ -118,7 +118,7 @@ pub(crate) mod fused_iterator {
 
 #[cfg(feature = "trusted_len")]
 pub(crate) mod trusted_len {
-    use crate::utils::*;
+    use crate::derive::*;
 
     pub(crate) const NAME: &[&str] = &["TrustedLen"];
 
@@ -135,7 +135,7 @@ pub(crate) mod trusted_len {
 }
 
 pub(crate) mod extend {
-    use crate::utils::*;
+    use crate::derive::*;
 
     pub(crate) const NAME: &[&str] = &["Extend"];
 

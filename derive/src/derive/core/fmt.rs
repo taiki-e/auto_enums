@@ -1,7 +1,7 @@
 macro_rules! derive_fmt {
     ($trait:ident, $Trait:ident, [$($name:expr),*]) => {
         pub(crate) mod $trait {
-            use crate::utils::*;
+            use crate::derive::*;
 
             pub(crate) const NAME: &[&str] = &[$($name),*];
 
@@ -36,7 +36,7 @@ derive_fmt!(upper_exp, UpperExp, ["fmt::UpperExp"]);
 derive_fmt!(upper_hex, UpperHex, ["fmt::UpperHex"]);
 
 pub(crate) mod write {
-    use crate::utils::*;
+    use crate::derive::*;
 
     pub(crate) const NAME: &[&str] = &["fmt::Write"];
 

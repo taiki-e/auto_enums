@@ -1,5 +1,5 @@
 pub(crate) mod as_ref {
-    use crate::utils::*;
+    use crate::derive::*;
 
     pub(crate) const NAME: &[&str] = &["AsRef"];
 
@@ -14,7 +14,7 @@ pub(crate) mod as_ref {
 }
 
 pub(crate) mod as_mut {
-    use crate::utils::*;
+    use crate::derive::*;
 
     pub(crate) const NAME: &[&str] = &["AsMut"];
 

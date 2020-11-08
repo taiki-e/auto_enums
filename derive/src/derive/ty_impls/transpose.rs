@@ -3,7 +3,7 @@ use proc_macro2::TokenStream;
 use quote::ToTokens;
 use syn::TypeParam;
 
-use crate::utils::*;
+use crate::derive::*;
 
 pub(crate) const NAME: &[&str] = &["Transpose"];
 

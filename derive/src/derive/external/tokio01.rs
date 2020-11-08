@@ -1,5 +1,5 @@
 pub(crate) mod async_read {
-    use crate::utils::*;
+    use crate::derive::*;
 
     pub(crate) const NAME: &[&str] = &["tokio01::AsyncRead"];
 
@@ -25,7 +25,7 @@ pub(crate) mod async_read {
 }
 
 pub(crate) mod async_write {
-    use crate::utils::*;
+    use crate::derive::*;
 
     pub(crate) const NAME: &[&str] = &["tokio01::AsyncWrite"];
 

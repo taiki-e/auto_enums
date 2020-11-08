@@ -1,5 +1,5 @@
 pub(crate) mod serialize {
-    use crate::utils::*;
+    use crate::derive::*;
 
     pub(crate) const NAME: &[&str] = &["serde::Serialize"];
 

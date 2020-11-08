@@ -1,4 +1,4 @@
-use crate::utils::*;
+use crate::derive::*;
 
 pub(crate) const NAME: &[&str] = &["Future"];
 

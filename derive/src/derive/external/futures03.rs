@@ -1,5 +1,5 @@
 pub(crate) mod async_buf_read {
-    use crate::utils::*;
+    use crate::derive::*;
 
     pub(crate) const NAME: &[&str] = &["futures::AsyncBufRead"];
 
@@ -19,7 +19,7 @@ pub(crate) mod async_buf_read {
 }
 
 pub(crate) mod async_read {
-    use crate::utils::*;
+    use crate::derive::*;
 
     pub(crate) const NAME: &[&str] = &["futures::AsyncRead"];
 
@@ -44,7 +44,7 @@ pub(crate) mod async_read {
 }
 
 pub(crate) mod async_seek {
-    use crate::utils::*;
+    use crate::derive::*;
 
     pub(crate) const NAME: &[&str] = &["futures::AsyncSeek"];
 
@@ -63,7 +63,7 @@ pub(crate) mod async_seek {
 }
 
 pub(crate) mod async_write {
-    use crate::utils::*;
+    use crate::derive::*;
 
     pub(crate) const NAME: &[&str] = &["futures::AsyncWrite"];
 
@@ -98,7 +98,7 @@ pub(crate) mod async_write {
 }
 
 pub(crate) mod sink {
-    use crate::utils::*;
+    use crate::derive::*;
 
     pub(crate) const NAME: &[&str] = &["futures::Sink"];
 
@@ -132,7 +132,7 @@ pub(crate) mod sink {
 }
 
 pub(crate) mod stream {
-    use crate::utils::*;
+    use crate::derive::*;
 
     pub(crate) const NAME: &[&str] = &["futures::Stream"];
 

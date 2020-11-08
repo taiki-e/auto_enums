@@ -1,5 +1,5 @@
 pub(crate) mod future {
-    use crate::utils::*;
+    use crate::derive::*;
 
     pub(crate) const NAME: &[&str] = &["futures01::Future"];
 
@@ -16,7 +16,7 @@ pub(crate) mod future {
 }
 
 pub(crate) mod stream {
-    use crate::utils::*;
+    use crate::derive::*;
 
     pub(crate) const NAME: &[&str] = &["futures01::Stream"];
 
@@ -35,7 +35,7 @@ pub(crate) mod stream {
 }
 
 pub(crate) mod sink {
-    use crate::utils::*;
+    use crate::derive::*;
 
     pub(crate) const NAME: &[&str] = &["futures01::Sink"];
 

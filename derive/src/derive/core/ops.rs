@@ -1,6 +1,6 @@
 #[cfg(feature = "ops")]
 pub(crate) mod deref {
-    use crate::utils::*;
+    use crate::derive::*;
 
     pub(crate) const NAME: &[&str] = &["Deref"];
 
@@ -17,7 +17,7 @@ pub(crate) mod deref {
 
 #[cfg(feature = "ops")]
 pub(crate) mod deref_mut {
-    use crate::utils::*;
+    use crate::derive::*;
 
     pub(crate) const NAME: &[&str] = &["DerefMut"];
 
@@ -38,7 +38,7 @@ pub(crate) mod deref_mut {
 
 #[cfg(feature = "ops")]
 pub(crate) mod index {
-    use crate::utils::*;
+    use crate::derive::*;
 
     pub(crate) const NAME: &[&str] = &["Index"];
 
@@ -55,7 +55,7 @@ pub(crate) mod index {
 
 #[cfg(feature = "ops")]
 pub(crate) mod index_mut {
-    use crate::utils::*;
+    use crate::derive::*;
 
     pub(crate) const NAME: &[&str] = &["IndexMut"];
 
@@ -76,7 +76,7 @@ pub(crate) mod index_mut {
 
 #[cfg(feature = "ops")]
 pub(crate) mod range_bounds {
-    use crate::utils::*;
+    use crate::derive::*;
 
     pub(crate) const NAME: &[&str] = &["RangeBounds"];
 
@@ -94,7 +94,7 @@ pub(crate) mod range_bounds {
 
 #[cfg(feature = "generator_trait")]
 pub(crate) mod generator {
-    use crate::utils::*;
+    use crate::derive::*;
 
     pub(crate) const NAME: &[&str] = &["Generator"];
 
@@ -118,7 +118,7 @@ pub(crate) mod fn_ {
     use derive_utils::EnumImpl;
     use syn::TypeParam;
 
-    use crate::utils::*;
+    use crate::derive::*;
 
     pub(crate) const NAME: &[&str] = &["Fn"];
 
@@ -151,7 +151,7 @@ pub(crate) mod fn_mut {
     use derive_utils::EnumImpl;
     use syn::TypeParam;
 
-    use crate::utils::*;
+    use crate::derive::*;
 
     pub(crate) const NAME: &[&str] = &["FnMut"];
 
@@ -184,7 +184,7 @@ pub(crate) mod fn_once {
     use derive_utils::EnumImpl;
     use syn::TypeParam;
 
-    use crate::utils::*;
+    use crate::derive::*;
 
     pub(crate) const NAME: &[&str] = &["FnOnce"];
 
