@@ -16,7 +16,7 @@
 # - The generated link to the release notes will be broken when the version
 #   yanked if the project adheres to the Keep a Changelog's yanking style.
 #   Consider adding a note like the following instead of using the "[YANKED]" tag:
-#   "**Note: This version was yanked. See $LINK_TO_YANKED_REASON for details.**"
+#   "**Note: This release has been yanked.** See $LINK_TO_YANKED_REASON for details."
 
 set -euo pipefail
 IFS=$'\n\t'
