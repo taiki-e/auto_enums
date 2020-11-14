@@ -1,4 +1,4 @@
-extern crate rayon1_crate as rayon;
+extern crate rayon_crate as rayon;
 
 use auto_enums::enum_derive;
 

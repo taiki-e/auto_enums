@@ -1,4 +1,4 @@
-extern crate serde1_crate as serde;
+extern crate serde_crate as serde;
 
 use auto_enums::enum_derive;
 

@@ -109,14 +109,14 @@ fn get_derive(s: &str) -> Option<DeriveFn> {
         external::futures01::sink,
         // rayon
         #[cfg(feature = "rayon")]
-        external::rayon1::par_iter,
+        external::rayon::par_iter,
         #[cfg(feature = "rayon")]
-        external::rayon1::indexed_par_iter,
+        external::rayon::indexed_par_iter,
         #[cfg(feature = "rayon")]
-        external::rayon1::par_extend,
+        external::rayon::par_extend,
         // serde
         #[cfg(feature = "serde")]
-        external::serde1::serialize,
+        external::serde::serialize,
         // tokio03
         #[cfg(feature = "tokio03")]
         external::tokio03::async_read,

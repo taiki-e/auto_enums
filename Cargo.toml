@@ -92,8 +92,8 @@ futures01_crate = { version = "0.1", package = "futures" }
 tokio03_crate = { version = "0.3", package = "tokio" }
 tokio02_crate = { version = "0.2", package = "tokio" }
 tokio01_crate = { version = "0.1", package = "tokio" }
-rayon1_crate = { version = "1", package = "rayon" }
-serde1_crate = { version = "1", package = "serde" }
+rayon_crate = { version = "1", package = "rayon" }
+serde_crate = { version = "1", package = "serde" }
 
 # for benches
 rand = "0.7"
