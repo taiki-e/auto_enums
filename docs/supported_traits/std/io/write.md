@@ -1,4 +1,4 @@
-## [`Write`](https://doc.rust-lang.org/std/io/trait.Write.html)
+# [`Write`](https://doc.rust-lang.org/std/io/trait.Write.html)
 
 When deriving for enum like the following:
 

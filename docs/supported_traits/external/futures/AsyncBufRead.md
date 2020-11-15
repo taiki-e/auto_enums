@@ -1,4 +1,4 @@
-## [`AsyncBufRead`](https://docs.rs/futures/0.3/futures/io/trait.AsyncBufRead.html)
+# [`AsyncBufRead`](https://docs.rs/futures/0.3/futures/io/trait.AsyncBufRead.html)
 
 When deriving for enum like the following:
 

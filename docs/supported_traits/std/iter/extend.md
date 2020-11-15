@@ -1,4 +1,4 @@
-## [`Extend`](https://doc.rust-lang.org/std/iter/trait.Extend.html)
+# [`Extend`](https://doc.rust-lang.org/std/iter/trait.Extend.html)
 
 When deriving for enum like the following:
 

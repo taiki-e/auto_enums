@@ -1,4 +1,4 @@
-## [`Error`](https://doc.rust-lang.org/std/error/trait.Error.html)
+# [`Error`](https://doc.rust-lang.org/std/error/trait.Error.html)
 
 When deriving for enum like the following:
 

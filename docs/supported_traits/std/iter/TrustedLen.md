@@ -1,4 +1,4 @@
-## [`TrustedLen`](https://doc.rust-lang.org/std/iter/trait.TrustedLen.html)
+# [`TrustedLen`](https://doc.rust-lang.org/std/iter/trait.TrustedLen.html)
 
 When deriving for enum like the following:
 

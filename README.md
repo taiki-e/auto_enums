@@ -107,7 +107,9 @@ See [documentation][docs-url] for more details.
 
 `#[enum_derive]` implements the supported traits and passes unsupported traits to `#[derive]`.
 
-If you want to use traits that are not supported by `#[enum_derive]`, you can use another crate that provides `proc_macro_derive`, or you can define `proc_macro_derive` yourself ([derive_utils] probably can help it).
+`#[enum_derive]` supports many of the standard library traits and some popular third-party libraries traits such as [rayon], [futures][futures03], [tokio][tokio03]. **See [documentation](https://docs.rs/auto_enums/0.7/auto_enums/#supported-traits) for a complete list of supported traits.**
+
+If you want to use traits that are not supported by `#[enum_derive]`, you can use another crate that provides [derives macros][proc-macro-derive], or you can define derives macros yourself ([derive_utils] probably can help it).
 
 Basic usage of `#[enum_derive]`
 
@@ -122,122 +124,86 @@ enum Foo<A, B> {
 }
 ```
 
-### [std|core] libraries
+## Optional features
 
-Some traits support is disabled by default.
-Note that some traits have aliases.
+* **`std`** *(enabled by default)*
+  * Enable to use `std` library's traits.
+* **`ops`**
+  * Enable to use `[std|core]::ops`'s `Deref`, `DerefMut`, `Index`, `IndexMut`, and `RangeBounds` traits.
+* **`convert`**
+  * Enable to use `[std|core]::convert`'s `AsRef` and `AsMut` traits.
+* **`fmt`**
+  * Enable to use `[std|core]::fmt`'s traits other than `Debug`, `Display` and `Write`.
+* **`transpose_methods`**
+  * Enable to use `transpose*` methods.
+* **`futures03`**
+  * Enable to use [futures 0.3][futures03] traits.
+* **`futures01`**
+  * Enable to use [futures 0.1][futures01] traits.
+* **`rayon`**
+  * Enable to use [rayon] traits.
+* **`serde`**
+  * Enable to use [serde] traits.
+* **`tokio03`**
+  * Enable to use [tokio 0.3][tokio03] traits.
+* **`tokio02`**
+  * Enable to use [tokio 0.2][tokio02] traits.
+* **`tokio01`**
+  * Enable to use [tokio 0.1][tokio01] traits.
+* **`generator_trait`**
+  * Enable to use `[std|core]::ops::Generator` trait.
+  * Note that this feature is unstable and may cause incompatible changes between patch versions.
+* **`fn_traits`**
+  * Enable to use `[std|core]::ops`'s `Fn`, `FnMut`, and `FnOnce` traits.
+  * Note that this feature is unstable and may cause incompatible changes between patch versions.
+* **`trusted_len`**
+  * Enable to use `[std|core]::iter::TrustedLen` trait.
+  * Note that this feature is unstable and may cause incompatible changes between patch versions.
 
-*When using features that depend on unstable APIs, the `"unstable"` feature must be explicitly enabled*
+### `type_analysis` feature
 
-`[std|core]::iter`
+Analyze return type of function and `let` binding.
 
-* [`Iterator`](https://doc.rust-lang.org/std/iter/trait.Iterator.html) - [generated code](docs/supported_traits/std/iter/iterator.md)
-* [`DoubleEndedIterator`](https://doc.rust-lang.org/std/iter/trait.DoubleEndedIterator.html) - [generated code](docs/supported_traits/std/iter/DoubleEndedIterator.md)
-* [`ExactSizeIterator`](https://doc.rust-lang.org/std/iter/trait.ExactSizeIterator.html) - [generated code](docs/supported_traits/std/iter/ExactSizeIterator.md)
-* [`FusedIterator`](https://doc.rust-lang.org/std/iter/trait.FusedIterator.html) - [generated code](docs/supported_traits/std/iter/FusedIterator.md)
-* [`Extend`](https://doc.rust-lang.org/std/iter/trait.Extend.html) - [generated code](docs/supported_traits/std/iter/extend.md)
-* [`TrustedLen`](https://doc.rust-lang.org/std/iter/trait.TrustedLen.html) - [generated code](docs/supported_traits/std/iter/TrustedLen.md) *(requires `"trusted_len"` and `"unstable"` crate features)*
+*Note that this feature is still experimental.*
 
-*See also [iter-enum] crate.*
+Examples:
 
-`[std|core]::future`
+```rust
+use auto_enums::auto_enum;
 
-* [`Future`](https://doc.rust-lang.org/nightly/std/future/trait.Future.html) - [generated code](docs/supported_traits/std/future.md)
+#[auto_enum] // there is no need to specify std library's traits
+fn func1(x: i32) -> impl Iterator<Item = i32> {
+    match x {
+        0 => 1..10,
+        _ => vec![5, 10].into_iter(),
+    }
+}
 
-*See also [futures-enum] crate.*
+#[auto_enum]
+fn func2(x: i32) {
+    // Unlike `feature(impl_trait_in_bindings)`, this works on stable compilers.
+    #[auto_enum]
+    let _iter: impl Iterator<Item = i32> = match x {
+        0 => Some(0).into_iter(),
+        _ => 0..x,
+    };
+}
+```
 
-`std::io`
+Please be careful if you return another traits with the same name.
 
-* [`Read`](https://doc.rust-lang.org/std/io/trait.Read.html) (alias: `io::Read`) - [generated code](docs/supported_traits/std/io/read.md)
-* [`BufRead`](https://doc.rust-lang.org/std/io/trait.BufRead.html) (alias: `io::BufRead`) - [generated code](docs/supported_traits/std/io/BufRead.md)
-* [`Write`](https://doc.rust-lang.org/std/io/trait.Write.html) (alias: `io::Write`) - [generated code](docs/supported_traits/std/io/write.md)
-* [`Seek`](https://doc.rust-lang.org/std/io/trait.Seek.html) (alias: `io::Seek`) - [generated code](docs/supported_traits/std/io/seek.md)
-
-*See also [io-enum] crate.*
-
-`[std|core]::ops`
-
-* [`Deref`](https://doc.rust-lang.org/std/ops/trait.Deref.html) *(requires `"ops"` crate feature)*
-* [`DerefMut`](https://doc.rust-lang.org/std/ops/trait.DerefMut.html) *(requires `"ops"` crate feature)*
-* [`Index`](https://doc.rust-lang.org/std/ops/trait.Index.html) *(requires `"ops"` crate feature)*
-* [`IndexMut`](https://doc.rust-lang.org/std/ops/trait.IndexMut.html) *(requires `"ops"` crate feature)*
-* [`RangeBounds`](https://doc.rust-lang.org/std/ops/trait.RangeBounds.html) *(requires `"ops"` crate feature)*
-* [`Fn`](https://doc.rust-lang.org/std/ops/trait.Fn.html) *(requires `"fn_traits"` and `"unstable"` crate features)*
-* [`FnMut`](https://doc.rust-lang.org/std/ops/trait.FnMut.html) *(requires `"fn_traits"` and `"unstable"` crate features)*
-* [`FnOnce`](https://doc.rust-lang.org/std/ops/trait.FnOnce.html) *(requires `"fn_traits"` and `"unstable"` crate features)*
-* [`Generator`](https://doc.rust-lang.org/nightly/std/ops/trait.Generator.html) *(requires `"generator_trait"` and `"unstable"` crate features)*
-
-`[std|core]::convert`
-
-* [`AsRef`](https://doc.rust-lang.org/std/convert/trait.AsRef.html) *(requires `"convert"` crate feature)*
-* [`AsMut`](https://doc.rust-lang.org/std/convert/trait.AsMut.html) *(requires `"convert"` crate feature)*
-
-`[std|core]::fmt`
-
-* [`Debug`](https://doc.rust-lang.org/std/fmt/trait.Debug.html) (alias: `fmt::Debug`) - [generated code](docs/supported_traits/std/debug.md)
-* [`Display`](https://doc.rust-lang.org/std/fmt/trait.Display.html) (alias: `fmt::Display`)
-* [`fmt::Binary`](https://doc.rust-lang.org/std/fmt/trait.Binary.html) *(requires `"fmt"` crate feature)*
-* [`fmt::LowerExp`](https://doc.rust-lang.org/std/fmt/trait.LowerExp.html) *(requires `"fmt"` crate feature)*
-* [`fmt::LowerHex`](https://doc.rust-lang.org/std/fmt/trait.LowerHex.html) *(requires `"fmt"` crate feature)*
-* [`fmt::Octal`](https://doc.rust-lang.org/std/fmt/trait.Octal.html) *(requires `"fmt"` crate feature)*
-* [`fmt::Pointer`](https://doc.rust-lang.org/std/fmt/trait.Pointer.html) *(requires `"fmt"` crate feature)*
-* [`fmt::UpperExp`](https://doc.rust-lang.org/std/fmt/trait.UpperExp.html) *(requires `"fmt"` crate feature)*
-* [`fmt::UpperHex`](https://doc.rust-lang.org/std/fmt/trait.UpperHex.html) *(requires `"fmt"` crate feature)*
-* [`fmt::Write`](https://doc.rust-lang.org/std/fmt/trait.Write.html)
-
-`std::error`
-
-* [`Error`](https://doc.rust-lang.org/std/error/trait.Error.html) - [generated code](docs/supported_traits/std/error.md)
-
-### External libraries
-
-You can add support for external library by activating the each crate feature.
-
-[`futures(v0.3)`](https://github.com/rust-lang/futures-rs) *(requires `"futures03"` or `"futures"` crate feature)*
-
-* [`futures::Stream`](https://docs.rs/futures/0.3/futures/stream/trait.Stream.html) - [generated code](docs/supported_traits/external/futures/stream.md)
-* [`futures::Sink`](https://docs.rs/futures/0.3/futures/sink/trait.Sink.html) - [generated code](docs/supported_traits/external/futures/sink.md)
-* [`futures::AsyncRead`](https://docs.rs/futures/0.3/futures/io/trait.AsyncRead.html) - [generated code](docs/supported_traits/external/futures/AsyncRead.md)
-* [`futures::AsyncWrite`](https://docs.rs/futures/0.3/futures/io/trait.AsyncWrite.html) - [generated code](docs/supported_traits/external/futures/AsyncWrite.md)
-* [`futures::AsyncSeek`](https://docs.rs/futures/0.3/futures/io/trait.AsyncSeek.html) - [generated code](docs/supported_traits/external/futures/AsyncSeek.md)
-* [`futures::AsyncBufRead`](https://docs.rs/futures/0.3/futures/io/trait.AsyncBufRead.html) - [generated code](docs/supported_traits/external/futures/AsyncBufRead.md)
-
-*See also [futures-enum] crate.*
-
-[`futures(v0.1)`](https://github.com/rust-lang/futures-rs/tree/0.1) *(requires `"futures01"` crate feature)*
-
-* [`futures01::Future`](https://docs.rs/futures/0.1/futures/future/trait.Future.html)
-* [`futures01::Stream`](https://docs.rs/futures/0.1/futures/stream/trait.Stream.html)
-* [`futures01::Sink`](https://docs.rs/futures/0.1/futures/sink/trait.Sink.html)
-
-[`rayon`](https://github.com/rayon-rs/rayon) *(requires `"rayon"` crate feature)*
-
-* [`rayon::ParallelIterator`](https://docs.rs/rayon/1/rayon/iter/trait.ParallelIterator.html) - [generated code](docs/supported_traits/external/rayon/ParallelIterator.md)
-* [`rayon::IndexedParallelIterator`](https://docs.rs/rayon/1/rayon/iter/trait.IndexedParallelIterator.html) - [generated code](docs/supported_traits/external/rayon/IndexedParallelIterator.md)
-* [`rayon::ParallelExtend`](https://docs.rs/rayon/1/rayon/iter/trait.ParallelExtend.html) - [generated code](docs/supported_traits/external/rayon/ParallelExtend.md)
-
-[`serde`](https://github.com/serde-rs/serde) *(requires `"serde"` crate feature)*
-
-* [`serde::Serialize`](https://docs.serde.rs/serde/trait.Serialize.html) - [generated code](docs/supported_traits/external/serde/serialize.md)
-
-[`tokio(v0.3)`](https://github.com/tokio-rs/tokio) *(requires `"tokio03"` crate feature)*
-
-* [`tokio03::AsyncRead`](https://docs.rs/tokio/0.3/tokio/io/trait.AsyncRead.html)
-* [`tokio03::AsyncWrite`](https://docs.rs/tokio/0.3/tokio/io/trait.AsyncWrite.html)
-* [`tokio03::AsyncSeek`](https://docs.rs/tokio/0.3/tokio/io/trait.AsyncSeek.html)
-* [`tokio03::AsyncBufRead`](https://docs.rs/tokio/0.3/tokio/io/trait.AsyncBufRead.html)
-
-[`tokio(v0.2)`](https://github.com/tokio-rs/tokio/tree/v0.2.x) *(requires `"tokio02"` crate feature)*
-
-* [`tokio02::AsyncRead`](https://docs.rs/tokio/0.2/tokio/io/trait.AsyncRead.html)
-* [`tokio02::AsyncWrite`](https://docs.rs/tokio/0.2/tokio/io/trait.AsyncWrite.html)
-* [`tokio02::AsyncSeek`](https://docs.rs/tokio/0.2/tokio/io/trait.AsyncSeek.html)
-* [`tokio02::AsyncBufRead`](https://docs.rs/tokio/0.2/tokio/io/trait.AsyncBufRead.html)
-
-[`tokio(v0.1)`](https://github.com/tokio-rs/tokio/tree/v0.1.x) *(requires `"tokio01"` crate feature)*
-
-* [`tokio01::AsyncRead`](https://docs.rs/tokio/0.1/tokio/io/trait.AsyncRead.html)
-* [`tokio01::AsyncWrite`](https://docs.rs/tokio/0.1/tokio/io/trait.AsyncWrite.html)
+[derive_utils]: https://github.com/taiki-e/derive_utils
+[futures-enum]: https://github.com/taiki-e/futures-enum
+[futures01]: https://docs.rs/futures/0.1
+[futures03]: https://docs.rs/futures/0.3
+[io-enum]: https://github.com/taiki-e/io-enum
+[iter-enum]: https://github.com/taiki-e/iter-enum
+[proc-macro-derive]: https://doc.rust-lang.org/reference/procedural-macros.html#derive-macros
+[rayon]: https://docs.rs/rayon/1
+[serde]: https://docs.rs/serde/1
+[tokio01]: https://docs.rs/tokio/0.1
+[tokio02]: https://docs.rs/tokio/0.2
+[tokio03]: https://docs.rs/tokio/0.3
 
 ## Related Projects
 
@@ -245,12 +211,6 @@ You can add support for external library by activating the each crate feature.
 * [futures-enum]: \#\[derive(Future, Stream, Sink, AsyncRead, AsyncWrite, AsyncSeek, AsyncBufRead)\] for enums.
 * [io-enum]: \#\[derive(Read, Write, Seek, BufRead)\] for enums.
 * [iter-enum]: \#\[derive(Iterator, DoubleEndedIterator, ExactSizeIterator, Extend)\] for enums.
-
-[derive_utils]: https://github.com/taiki-e/derive_utils
-[futures-enum]: https://github.com/taiki-e/futures-enum
-[io-enum]: https://github.com/taiki-e/io-enum
-[iter-enum]: https://github.com/taiki-e/iter-enum
-[proc-macro-derive]: https://doc.rust-lang.org/reference/procedural-macros.html#derive-macros
 
 ## License
 

@@ -1,4 +1,4 @@
-## [`BufRead`](https://doc.rust-lang.org/std/io/trait.BufRead.html)
+# [`BufRead`](https://doc.rust-lang.org/std/io/trait.BufRead.html)
 
 When deriving for enum like the following:
 

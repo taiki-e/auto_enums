@@ -1,4 +1,4 @@
-## [`Stream`](https://docs.rs/futures/0.3/futures/stream/trait.Stream.html)
+# [`Stream`](https://docs.rs/futures/0.3/futures/stream/trait.Stream.html)
 
 When deriving for enum like the following:
 
