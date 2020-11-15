@@ -837,7 +837,7 @@
 //! [tokio03]: https://docs.rs/tokio/0.3
 
 #![no_std]
-#![doc(html_root_url = "https://docs.rs/auto_enums/0.7.9")]
+#![doc(html_root_url = "https://docs.rs/auto_enums/0.7.10")]
 #![doc(test(
     no_crate_inject,
     attr(deny(warnings, rust_2018_idioms, single_use_lifetimes), allow(dead_code))
