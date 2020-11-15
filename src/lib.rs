@@ -98,6 +98,8 @@
 //! </details>
 //! <br>
 //!
+//! ## Nested arms/branches
+//!
 //! `#[auto_enum]` can also parse nested arms/branches by using the `#[nested]`
 //! attribute.
 //!
@@ -119,6 +121,30 @@
 //!
 //! `#[nested]` can be used basically in the same place as `#[auto_enum]`,
 //! except that `#[nested]` cannot be used in functions.
+//!
+//! ## Recursion
+//!
+//! If an error due to recursion occurs, you need to box branches where recursion occurs.
+//!
+//! ```rust
+//! use auto_enums::auto_enum;
+//!
+//! struct Type {
+//!     child: Vec<Type>,
+//! }
+//!
+//! impl Type {
+//!     #[auto_enum(Iterator)]
+//!     fn method(&self) -> impl Iterator<Item = ()> + '_ {
+//!         if self.child.is_empty() {
+//!             Some(()).into_iter()
+//!         } else {
+//!             // Boxing is only needed on branches where recursion occurs.
+//!             Box::new(self.child.iter().flat_map(|c| c.method())) as Box<dyn Iterator<Item = _>>
+//!         }
+//!     }
+//! }
+//! ```
 //!
 //! ## Positions where `#[auto_enum]` can be used.
 //!
@@ -480,7 +506,7 @@
 //! }
 //! ```
 //!
-//! # Rust Nightly
+//! ## Rust Nightly
 //!
 //! When using `#[auto_enum]` for expressions and statements, `#[auto_enum]` for
 //! function is unnecessary.
@@ -491,9 +517,7 @@
 //! ```
 //!
 //! ```rust
-//! # #![cfg_attr(feature = "unstable", feature(proc_macro_hygiene, stmt_expr_attributes))]
-//! # #[cfg(feature = "unstable")]
-//! # fn dox() {
+//! # #![feature(proc_macro_hygiene, stmt_expr_attributes)]
 //! use auto_enums::auto_enum;
 //!
 //! fn foo(x: i32) -> i32 {
@@ -505,7 +529,6 @@
 //!
 //!     iter.fold(0, |sum, x| sum + x)
 //! }
-//! # }
 //! ```
 //!
 //! You can also return closures.
@@ -516,16 +539,13 @@
 //! ```
 //!
 //! ```rust
-//! # #![cfg_attr(feature = "fn_traits", feature(fn_traits, unboxed_closures))]
-//! # #[cfg(feature = "fn_traits")]
-//! # fn dox() {
+//! # #![feature(fn_traits, unboxed_closures)]
 //! use auto_enums::auto_enum;
 //!
 //! #[auto_enum(Fn)]
 //! fn foo(x: bool) -> impl Fn(i32) -> i32 {
 //!     if x { |y| y + 1 } else { |z| z - 1 }
 //! }
-//! # }
 //! ```
 //!
 //! # `#[enum_derive]`
@@ -534,8 +554,8 @@
 //! traits to `#[derive]`.
 //!
 //! If you want to use traits that are not supported by `#[enum_derive]`, you
-//! can use another crate that provides `proc_macro_derive`, or you can define
-//! `proc_macro_derive` yourself([derive_utils] probably can help it).
+//! can use another crate that provides [derives macros][proc-macro-derive],
+//! or you can define derives macros yourself ([derive_utils] probably can help it).
 //!
 //! Basic usage of `#[enum_derive]`
 //!
@@ -573,9 +593,9 @@
 //!
 //! *When using features that depend on unstable APIs, the `unstable` feature must be explicitly enabled*
 //!
-//! ## [std|core] libraries
+//! ## The standard library (`std`, `core`)
 //!
-//! `[std|core]::iter`
+//! ### `[std|core]::iter`
 //!
 //! * [`Iterator`](https://doc.rust-lang.org/std/iter/trait.Iterator.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/iter/iterator.md)
 //! * [`DoubleEndedIterator`](https://doc.rust-lang.org/std/iter/trait.DoubleEndedIterator.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/iter/DoubleEndedIterator.md)
@@ -586,13 +606,13 @@
 //!
 //! *See also [iter-enum] crate.*
 //!
-//! `[std|core]::future`
+//! ### `[std|core]::future`
 //!
 //! * [`Future`](https://doc.rust-lang.org/std/future/trait.Future.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/future.md)
 //!
 //! *See also [futures-enum] crate.*
 //!
-//! `std::io` *(requires `"std"` crate feature)*
+//! ### `std::io` *(requires `"std"` crate feature)*
 //!
 //! * [`Read`](https://doc.rust-lang.org/std/io/trait.Read.html) (alias: `io::Read`) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/io/read.md)
 //! * [`BufRead`](https://doc.rust-lang.org/std/io/trait.BufRead.html) (alias: `io::BufRead`) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/io/BufRead.md)
@@ -601,7 +621,7 @@
 //!
 //! *See also [io-enum] crate.*
 //!
-//! `[std|core]::ops`
+//! ### `[std|core]::ops`
 //!
 //! * [`Deref`](https://doc.rust-lang.org/std/ops/trait.Deref.html) *(requires `"ops"` crate feature)*
 //! * [`DerefMut`](https://doc.rust-lang.org/std/ops/trait.DerefMut.html) *(requires `"ops"` crate feature)*
@@ -613,12 +633,12 @@
 //! * [`FnOnce`](https://doc.rust-lang.org/std/ops/trait.FnOnce.html) *(requires `"fn_traits"` and `"unstable"` crate features)*
 //! * [`Generator`](https://doc.rust-lang.org/nightly/std/ops/trait.Generator.html) *(requires `"generator_trait"` and `"unstable"` crate features)*
 //!
-//! `[std|core]::convert`
+//! ### `[std|core]::convert`
 //!
 //! * [`AsRef`](https://doc.rust-lang.org/std/convert/trait.AsRef.html) *(requires `"convert"` crate feature)*
 //! * [`AsMut`](https://doc.rust-lang.org/std/convert/trait.AsMut.html) *(requires `"convert"` crate feature)*
 //!
-//! `[std|core]::fmt`
+//! ### `[std|core]::fmt`
 //!
 //! * [`Debug`](https://doc.rust-lang.org/std/fmt/trait.Debug.html) (alias: `fmt::Debug`) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/debug.md)
 //! * [`Display`](https://doc.rust-lang.org/std/fmt/trait.Display.html) (alias: `fmt::Display`)
@@ -631,63 +651,75 @@
 //! * [`fmt::UpperHex`](https://doc.rust-lang.org/std/fmt/trait.UpperHex.html) *(requires `"fmt"` crate feature)*
 //! * [`fmt::Write`](https://doc.rust-lang.org/std/fmt/trait.Write.html)
 //!
-//! `std::error` *(requires `"std"` crate feature)*
+//! ### `std::error` *(requires `"std"` crate feature)*
 //!
 //! * [`Error`](https://doc.rust-lang.org/std/error/trait.Error.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/error.md)
 //!
 //! ## External libraries
 //!
-//! You can add support for external library by activating the each crate feature.
+//! You can use support for external library traits by activating each crate feature.
 //!
-//! [`futures(v0.3)`](https://github.com/rust-lang-nursery/futures-rs) *(requires `"futures03"` or `"futures"` crate feature)*
+//! To use support for external library traits, you need to use the path starting with the feature name. For example:
 //!
-//! * [`futures::Stream`](https://docs.rs/futures/0.3/futures/stream/trait.Stream.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/futures/stream.md)
-//! * [`futures::Sink`](https://docs.rs/futures/0.3/futures/sink/trait.Sink.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/futures/sink.md)
-//! * [`futures::AsyncRead`](https://docs.rs/futures/0.3/futures/io/trait.AsyncRead.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/futures/AsyncRead.md)
-//! * [`futures::AsyncWrite`](https://docs.rs/futures/0.3/futures/io/trait.AsyncWrite.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/futures/AsyncWrite.md)
-//! * [`futures::AsyncSeek`](https://docs.rs/futures/0.3/futures/io/trait.AsyncSeek.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/futures/AsyncSeek.md)
-//! * [`futures::AsyncBufRead`](https://docs.rs/futures/0.3/futures/io/trait.AsyncBufRead.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/futures/AsyncBufRead.md)
+//! ```rust
+//! # extern crate rayon_crate as rayon;
+//! use auto_enums::auto_enum;
+//! use rayon::prelude::*;
+//!
+//! #[auto_enum(rayon::ParallelIterator)] // Note that this is not `#[auto_enum(ParallelIterator)]`
+//! fn func(x: i32) -> impl ParallelIterator {
+//!     match x {
+//!         0 => (1..10).into_par_iter(),
+//!         _ => vec![5, 10].into_par_iter(),
+//!     }
+//! }
+//! ```
+//!
+//! ### [futures 0.3][futures03] *(requires `"futures03"` or `"futures"` crate feature)*
+//!
+//! * [`futures03::Stream`](https://docs.rs/futures/0.3/futures/stream/trait.Stream.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/futures/stream.md)
+//! * [`futures03::Sink`](https://docs.rs/futures/0.3/futures/sink/trait.Sink.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/futures/sink.md)
+//! * [`futures03::AsyncRead`](https://docs.rs/futures/0.3/futures/io/trait.AsyncRead.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/futures/AsyncRead.md)
+//! * [`futures03::AsyncWrite`](https://docs.rs/futures/0.3/futures/io/trait.AsyncWrite.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/futures/AsyncWrite.md)
+//! * [`futures03::AsyncSeek`](https://docs.rs/futures/0.3/futures/io/trait.AsyncSeek.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/futures/AsyncSeek.md)
+//! * [`futures03::AsyncBufRead`](https://docs.rs/futures/0.3/futures/io/trait.AsyncBufRead.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/futures/AsyncBufRead.md)
 //!
 //! *See also [futures-enum] crate.*
 //!
-//! [`futures(v0.1)`](https://github.com/rust-lang-nursery/futures-rs) *(requires `"futures01"` crate feature)*
+//! ### [futures 0.1][futures01] *(requires `"futures01"` crate feature)*
 //!
 //! * [`futures01::Future`](https://docs.rs/futures/0.1/futures/future/trait.Future.html)
 //! * [`futures01::Stream`](https://docs.rs/futures/0.1/futures/stream/trait.Stream.html)
 //! * [`futures01::Sink`](https://docs.rs/futures/0.1/futures/sink/trait.Sink.html)
 //!
-//! [`rayon`](https://github.com/rayon-rs/rayon) *(requires `"rayon"` crate feature)*
+//! ### [rayon] *(requires `"rayon"` crate feature)*
 //!
 //! * [`rayon::ParallelIterator`](https://docs.rs/rayon/1/rayon/iter/trait.ParallelIterator.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/rayon/ParallelIterator.md)
 //! * [`rayon::IndexedParallelIterator`](https://docs.rs/rayon/1/rayon/iter/trait.IndexedParallelIterator.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/rayon/IndexedParallelIterator.md)
 //! * [`rayon::ParallelExtend`](https://docs.rs/rayon/1/rayon/iter/trait.ParallelExtend.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/rayon/ParallelExtend.md)
 //!
-//! [`serde`](https://github.com/serde-rs/serde) *(requires `"serde"` crate feature)*
+//! ### [serde] *(requires `"serde"` crate feature)*
 //!
-//! * [`serde::Serialize`](https://docs.serde.rs/serde/trait.Serialize.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/serde/serialize.md)
+//! * [`serde::Serialize`](https://docs.rs/serde/1/serde/trait.Serialize.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/serde/serialize.md)
 //!
-//! [`tokio(v0.3)`](https://github.com/tokio-rs/tokio) *(requires `"tokio03"` crate feature)*
+//! ### [tokio 0.3][tokio03] *(requires `"tokio03"` crate feature)*
 //!
 //! * [`tokio03::AsyncRead`](https://docs.rs/tokio/0.3/tokio/io/trait.AsyncRead.html)
 //! * [`tokio03::AsyncWrite`](https://docs.rs/tokio/0.3/tokio/io/trait.AsyncWrite.html)
 //! * [`tokio03::AsyncSeek`](https://docs.rs/tokio/0.3/tokio/io/trait.AsyncSeek.html)
 //! * [`tokio03::AsyncBufRead`](https://docs.rs/tokio/0.3/tokio/io/trait.AsyncBufRead.html)
 //!
-//! [`tokio(v0.2)`](https://github.com/tokio-rs/tokio) *(requires `"tokio02"` crate feature)*
+//! ### [tokio 0.2][tokio02] *(requires `"tokio02"` crate feature)*
 //!
 //! * [`tokio02::AsyncRead`](https://docs.rs/tokio/0.2/tokio/io/trait.AsyncRead.html)
 //! * [`tokio02::AsyncWrite`](https://docs.rs/tokio/0.2/tokio/io/trait.AsyncWrite.html)
 //! * [`tokio02::AsyncSeek`](https://docs.rs/tokio/0.2/tokio/io/trait.AsyncSeek.html)
 //! * [`tokio02::AsyncBufRead`](https://docs.rs/tokio/0.2/tokio/io/trait.AsyncBufRead.html)
 //!
-//! [`tokio(v0.1)`](https://github.com/tokio-rs/tokio/tree/v0.1.x) *(requires `"tokio01"` crate feature)*
+//! ### [tokio 0.1][tokio01] *(requires `"tokio01"` crate feature)*
 //!
 //! * [`tokio01::AsyncRead`](https://docs.rs/tokio/0.1/tokio/io/trait.AsyncRead.html)
 //! * [`tokio01::AsyncWrite`](https://docs.rs/tokio/0.1/tokio/io/trait.AsyncWrite.html)
-//!
-//! [futures-enum]: https://github.com/taiki-e/futures-enum
-//! [io-enum]: https://github.com/taiki-e/io-enum
-//! [iter-enum]: https://github.com/taiki-e/iter-enum
 //!
 //! ## Inherent methods
 //!
@@ -695,17 +727,15 @@
 //!
 //! * `Transpose` *(requires `"transpose_methods"` crate feature)* - this derives the following conversion methods.
 //!
-//!   * `transpose` - convert from `enum<Option<T1>,..>` to `Option<enum<T1,..>>`
+//!   * `transpose` — convert from `enum<Option<T1>,..>` to `Option<enum<T1,..>>`
 //!
-//!   * `transpose` - convert from `enum<Result<T1, E1>,..>` to `Result<enum<T1,..>, enum<E1,..>>`
+//!   * `transpose` — convert from `enum<Result<T1, E1>,..>` to `Result<enum<T1,..>, enum<E1,..>>`
 //!
-//!   * `transpose_ok` - convert from `enum<Result<T1, E>,..>` to `Option<enum<T1,..>, E>`
+//!   * `transpose_ok` — convert from `enum<Result<T1, E>,..>` to `Option<enum<T1,..>, E>`
 //!
 //!     Examples:
 //!
 //!     ```rust
-//!     # #[cfg(feature = "transpose_methods")]
-//!     # fn dox() {
 //!     use auto_enums::auto_enum;
 //!     use std::{fs, io, path::Path};
 //!
@@ -716,34 +746,47 @@
 //!             None => Ok(io::stdout()),
 //!         }.transpose_ok()
 //!     }
-//!     # }
 //!     ```
 //!
-//!   * `transpose_err` - convert from `enum<Result<T, E1>,..>` to `Result<T, enum<E1,..>>`
+//!   * `transpose_err` — convert from `enum<Result<T, E1>,..>` to `Result<T, enum<E1,..>>`
 //!
 //! # Optional features
 //!
-//! * `std`
-//!   * Enabled by default.
+//! * **`std`** *(enabled by default)*
 //!   * Enable to use `std` library's traits.
-//!
-//! * `ops`
-//!   * Disabled by default.
+//! * **`ops`**
 //!   * Enable to use `[std|core]::ops`'s `Deref`, `DerefMut`, `Index`, `IndexMut`, and `RangeBounds` traits.
-//!
-//! * `convert`
-//!   * Disabled by default.
+//! * **`convert`**
 //!   * Enable to use `[std|core]::convert`'s `AsRef` and `AsMut` traits.
-//!
-//! * `fmt`
-//!   * Disabled by default.
+//! * **`fmt`**
 //!   * Enable to use `[std|core]::fmt`'s traits other than `Debug`, `Display` and `Write`.
-//!
-//! * `transpose_methods`
-//!   * Disabled by default.
+//! * **`transpose_methods`**
 //!   * Enable to use `transpose*` methods.
+//! * **`futures03`**
+//!   * Enable to use [futures 0.3][futures03] traits.
+//! * **`futures01`**
+//!   * Enable to use [futures 0.1][futures01] traits.
+//! * **`rayon`**
+//!   * Enable to use [rayon] traits.
+//! * **`serde`**
+//!   * Enable to use [serde] traits.
+//! * **`tokio03`**
+//!   * Enable to use [tokio 0.3][tokio03] traits.
+//! * **`tokio02`**
+//!   * Enable to use [tokio 0.2][tokio02] traits.
+//! * **`tokio01`**
+//!   * Enable to use [tokio 0.1][tokio01] traits.
+//! * **`generator_trait`**
+//!   * Enable to use `[std|core]::ops::Generator` trait.
+//!   * Note that this feature is unstable and may cause incompatible changes between patch versions.
+//! * **`fn_traits`**
+//!   * Enable to use `[std|core]::ops`'s `Fn`, `FnMut`, and `FnOnce` traits.
+//!   * Note that this feature is unstable and may cause incompatible changes between patch versions.
+//! * **`trusted_len`**
+//!   * Enable to use `[std|core]::iter::TrustedLen` trait.
+//!   * Note that this feature is unstable and may cause incompatible changes between patch versions.
 //!
-//! ## `type_analysis` feature (disabled by default)
+//! ## `type_analysis` feature
 //!
 //! Analyze return type of function and `let` binding.
 //!
@@ -752,12 +795,10 @@
 //! Examples:
 //!
 //! ```rust
-//! # #[cfg(feature = "type_analysis")]
-//! # fn dox() {
 //! use auto_enums::auto_enum;
 //!
 //! #[auto_enum] // there is no need to specify std library's traits
-//! fn func(x: i32) -> impl Iterator<Item = i32> {
+//! fn func1(x: i32) -> impl Iterator<Item = i32> {
 //!     match x {
 //!         0 => 1..10,
 //!         _ => vec![5, 10].into_iter(),
@@ -765,7 +806,7 @@
 //! }
 //!
 //! #[auto_enum]
-//! fn bar(x: i32) {
+//! fn func2(x: i32) {
 //!     // Unlike `feature(impl_trait_in_bindings)`, this works on stable compilers.
 //!     #[auto_enum]
 //!     let _iter: impl Iterator<Item = i32> = match x {
@@ -773,38 +814,27 @@
 //!         _ => 0..x,
 //!     };
 //! }
-//! # }
 //! ```
 //!
 //! Please be careful if you return another traits with the same name.
 //!
-//! ## Using external libraries (disabled by default)
-//!
-//! * `futures` - [futures(v0.3)](https://github.com/rust-lang-nursery/futures-rs) *(requires `"unstable"` crate feature)*
-//!
-//! * `futures01` - [futures(v0.1)](https://github.com/rust-lang-nursery/futures-rs)
-//!
-//! * `rayon` - [rayon](https://github.com/rayon-rs/rayon)
-//!
-//! * `serde` - [serde](https://github.com/serde-rs/serde)
-//!
-//! ## Enable unstable features of [std|core] libraries (disabled by default, requires `"unstable"` crate feature)
-//!
-//! For these features, you need to enable the unstable feature gate of the same name.
-//!
-//! Note that support for these features are unstable and may cause incompatible changes between patch versions.
-//!
-//! * [`generator_trait`](https://github.com/rust-lang/rust/issues/43122) - Enable to use `[std|core]::ops::Generator` trait.
-//!
-//! * [`fn_traits`](https://github.com/rust-lang/rust/issues/29625) - Enable to use `[std|core]::ops`'s `Fn`, `FnMut`, and `FnOnce` traits.
-//!
-//! * [`trusted_len`](https://github.com/rust-lang/rust/issues/37572) - Enable to use `[std|core]::iter::TrustedLen` trait.
-//!
 //! # Known limitations
 //!
 //! * There needs to explicitly specify the trait to be implemented (`type_analysis` crate feature reduces this limitation).
-//!
 //! * There needs to be marker macros for unsupported expressions.
+//!
+//! [derive_utils]: https://github.com/taiki-e/derive_utils
+//! [futures-enum]: https://github.com/taiki-e/futures-enum
+//! [futures01]: https://docs.rs/futures/0.1
+//! [futures03]: https://docs.rs/futures/0.3
+//! [io-enum]: https://github.com/taiki-e/io-enum
+//! [iter-enum]: https://github.com/taiki-e/iter-enum
+//! [proc-macro-derive]: https://doc.rust-lang.org/reference/procedural-macros.html#derive-macros
+//! [rayon]: https://docs.rs/rayon/1
+//! [serde]: https://docs.rs/serde/1
+//! [tokio01]: https://docs.rs/tokio/0.1
+//! [tokio02]: https://docs.rs/tokio/0.2
+//! [tokio03]: https://docs.rs/tokio/0.3
 
 #![no_std]
 #![doc(html_root_url = "https://docs.rs/auto_enums/0.7.9")]

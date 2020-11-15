@@ -1,4 +1,4 @@
-## [`FusedIterator`](https://doc.rust-lang.org/std/iter/trait.FusedIterator.html)
+# [`FusedIterator`](https://doc.rust-lang.org/std/iter/trait.FusedIterator.html)
 
 When deriving for enum like the following:
 

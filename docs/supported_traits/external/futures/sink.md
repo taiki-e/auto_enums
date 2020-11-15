@@ -1,4 +1,4 @@
-## [`Sink`](https://docs.rs/futures/0.3/futures/sink/trait.Sink.html)
+# [`Sink`](https://docs.rs/futures/0.3/futures/sink/trait.Sink.html)
 
 When deriving for enum like the following:
 

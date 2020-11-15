@@ -1,4 +1,4 @@
-## [`Seek`](https://doc.rust-lang.org/std/io/trait.Seek.html)
+# [`Seek`](https://doc.rust-lang.org/std/io/trait.Seek.html)
 
 When deriving for enum like the following:
 

@@ -1,4 +1,4 @@
-## [`AsyncSeek`](https://docs.rs/futures/0.3/futures/io/trait.AsyncSeek.html)
+# [`AsyncSeek`](https://docs.rs/futures/0.3/futures/io/trait.AsyncSeek.html)
 
 When deriving for enum like the following:
 

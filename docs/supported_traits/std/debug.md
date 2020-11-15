@@ -1,4 +1,4 @@
-## [`Debug`](https://doc.rust-lang.org/std/fmt/trait.Debug.html) (alias: `fmt::Debug`)
+# [`Debug`](https://doc.rust-lang.org/std/fmt/trait.Debug.html) (alias: `fmt::Debug`)
 
 When deriving for enum like the following:
 
