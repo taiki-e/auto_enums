@@ -32,27 +32,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Install Rust
-        run: ci/install-rust.sh ${{ matrix.rust }}
-      - if: matrix.rust == 'nightly'
+      - uses: taiki-e/github-actions/install-rust@main
+        with:
+          toolchain: ${{ matrix.rust }}
+      - if: startsWith(matrix.rust, 'nightly')
         run: cargo install cargo-hack
       - if: matrix.rust == '1.31.0'
         run: cargo check --all
       - if: matrix.rust != '1.31.0'
         run: cargo test --all --tests
-      - if: matrix.rust == 'nightly'
+      - if: startsWith(matrix.rust, 'nightly')
         run: cargo test --all --all-features
-      - if: matrix.rust == 'nightly'
+      - if: startsWith(matrix.rust, 'nightly')
         run: cargo check --benches
-      - if: matrix.rust == 'nightly'
+      - if: startsWith(matrix.rust, 'nightly')
         run: bash scripts/check-minimal-versions.sh
 
   features:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Install Rust
-        run: ci/install-rust.sh
+      - uses: taiki-e/github-actions/install-rust@main
       - run: cargo install cargo-hack
       - run: |
           cargo hack check --all --feature-powerset --depth 2 --no-dev-deps \
@@ -62,16 +62,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Install Rust and Clippy
-        run: ci/install-component.sh clippy
+      - uses: taiki-e/github-actions/install-rust@main
+        with:
+          component: clippy
       - run: cargo clippy --all --all-features --all-targets
 
   rustfmt:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Install Rust and Rustfmt
-        run: ci/install-component.sh rustfmt
+      - uses: taiki-e/github-actions/install-rust@main
+        with:
+          component: rustfmt
       - run: cargo fmt --all -- --check
 
   rustdoc:
@@ -80,8 +82,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Install Rust
-        run: ci/install-rust.sh
+      - uses: taiki-e/github-actions/install-rust@main
       - run: cargo doc --no-deps --all --all-features
 
   shellcheck:
