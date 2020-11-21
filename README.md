@@ -1,8 +1,8 @@
 # auto_enums
 
 [![crates.io](https://img.shields.io/crates/v/auto_enums.svg?style=flat-square&logo=rust)](https://crates.io/crates/auto_enums)
-[![docs.rs](https://img.shields.io/badge/docs.rs-auto_enums-blue?style=flat-square)][docs]
-[![license](https://img.shields.io/badge/license-Apache--2.0%20OR%20MIT-blue.svg?style=flat-square)](#license)
+[![docs.rs](https://img.shields.io/badge/docs.rs-auto__enums-blue?style=flat-square)](https://docs.rs/auto_enums)
+[![license](https://img.shields.io/badge/license-Apache--2.0_OR_MIT-blue.svg?style=flat-square)](#license)
 [![rustc](https://img.shields.io/badge/rustc-1.31+-blue.svg?style=flat-square)](https://www.rust-lang.org)
 [![build status](https://img.shields.io/github/workflow/status/taiki-e/auto_enums/CI/master?style=flat-square)](https://github.com/taiki-e/auto_enums/actions?query=workflow%3ACI+branch%3Amaster)
 
@@ -93,7 +93,7 @@ fn foo(x: i32) -> impl Iterator<Item = i32> {
 }
 ```
 
-See [documentation][docs] for more details.
+See [documentation](https://docs.rs/auto_enums) for more details.
 
 ## Supported traits
 
@@ -185,7 +185,6 @@ fn func2(x: i32) {
 Please be careful if you return another traits with the same name.
 
 [derive_utils]: https://github.com/taiki-e/derive_utils
-[docs]: https://docs.rs/auto_enums
 [futures-enum]: https://github.com/taiki-e/futures-enum
 [futures01]: https://docs.rs/futures/0.1
 [futures03]: https://docs.rs/futures/0.3
