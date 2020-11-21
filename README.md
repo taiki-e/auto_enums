@@ -1,22 +1,14 @@
 # auto_enums
 
-[![crates-badge]][crates-url]
-[![docs-badge]][docs-url]
-[![license-badge]][license]
-[![rustc-badge]][rustc-url]
-
-[crates-badge]: https://img.shields.io/crates/v/auto_enums.svg
-[crates-url]: https://crates.io/crates/auto_enums
-[docs-badge]: https://docs.rs/auto_enums/badge.svg
-[docs-url]: https://docs.rs/auto_enums
-[license-badge]: https://img.shields.io/badge/license-Apache--2.0%20OR%20MIT-blue.svg
-[license]: #license
-[rustc-badge]: https://img.shields.io/badge/rustc-1.31+-lightgray.svg
-[rustc-url]: https://blog.rust-lang.org/2018/12/06/Rust-1.31-and-rust-2018.html
+[![crates.io](https://img.shields.io/crates/v/auto_enums.svg?style=flat-square&logo=rust)](https://crates.io/crates/auto_enums)
+[![docs.rs](https://img.shields.io/badge/docs.rs-auto_enums-blue?style=flat-square)][docs]
+[![license](https://img.shields.io/badge/license-Apache--2.0%20OR%20MIT-blue.svg?style=flat-square)](#license)
+[![rustc](https://img.shields.io/badge/rustc-1.31+-blue.svg?style=flat-square)](https://www.rust-lang.org)
+[![build status](https://img.shields.io/github/workflow/status/taiki-e/auto_enums/CI/master?style=flat-square)](https://github.com/taiki-e/auto_enums/actions?query=workflow%3ACI+branch%3Amaster)
 
 A library for to allow multiple return types by automatically generated enum.
 
-This crate is a procedural macro implementation of the features discussions in <https://github.com/rust-lang/rfcs/issues/2414>.
+This crate is a procedural macro implementation of the features discussions in [rust-lang/rfcs#2414]. This idea is also known as "Anonymous sum types".
 
 This library provides the following attribute macros:
 
@@ -37,7 +29,7 @@ Add this to your `Cargo.toml`:
 auto_enums = "0.7"
 ```
 
-The current auto_enums requires Rust 1.31 or later.
+*Compiler support: requires rustc 1.31+*
 
 ## Examples
 
@@ -101,7 +93,7 @@ fn foo(x: i32) -> impl Iterator<Item = i32> {
 }
 ```
 
-See [documentation][docs-url] for more details.
+See [documentation][docs] for more details.
 
 ## Supported traits
 
@@ -193,6 +185,7 @@ fn func2(x: i32) {
 Please be careful if you return another traits with the same name.
 
 [derive_utils]: https://github.com/taiki-e/derive_utils
+[docs]: https://docs.rs/auto_enums
 [futures-enum]: https://github.com/taiki-e/futures-enum
 [futures01]: https://docs.rs/futures/0.1
 [futures03]: https://docs.rs/futures/0.3
@@ -200,6 +193,7 @@ Please be careful if you return another traits with the same name.
 [iter-enum]: https://github.com/taiki-e/iter-enum
 [proc-macro-derive]: https://doc.rust-lang.org/reference/procedural-macros.html#derive-macros
 [rayon]: https://docs.rs/rayon/1
+[rust-lang/rfcs#2414]: https://github.com/rust-lang/rfcs/issues/2414
 [serde]: https://docs.rs/serde/1
 [tokio01]: https://docs.rs/tokio/0.1
 [tokio02]: https://docs.rs/tokio/0.2
@@ -215,7 +209,5 @@ Please be careful if you return another traits with the same name.
 ## License
 
 Licensed under either of [Apache License, Version 2.0](LICENSE-APACHE) or [MIT license](LICENSE-MIT) at your option.
-
-### Contribution
 
 Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above, without any additional terms or conditions.
