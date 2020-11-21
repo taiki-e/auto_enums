@@ -8,7 +8,7 @@
 
 A library for to allow multiple return types by automatically generated enum.
 
-This crate is a procedural macro implementation of the features discussions in [rust-lang/rfcs#2414]. This idea is also known as "Anonymous sum types".
+This crate is a procedural macro implementation of the features discussions in [rust-lang/rfcs#2414]. This idea is also known as ["Anonymous sum types"][rust-lang/rfcs#294].
 
 This library provides the following attribute macros:
 
@@ -193,6 +193,7 @@ Please be careful if you return another traits with the same name.
 [iter-enum]: https://github.com/taiki-e/iter-enum
 [proc-macro-derive]: https://doc.rust-lang.org/reference/procedural-macros.html#derive-macros
 [rayon]: https://docs.rs/rayon/1
+[rust-lang/rfcs#294]: https://github.com/rust-lang/rfcs/issues/294
 [rust-lang/rfcs#2414]: https://github.com/rust-lang/rfcs/issues/2414
 [serde]: https://docs.rs/serde/1
 [tokio01]: https://docs.rs/tokio/0.1
