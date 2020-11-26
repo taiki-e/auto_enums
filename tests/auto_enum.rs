@@ -8,7 +8,12 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 #![warn(rust_2018_idioms, single_use_lifetimes)]
 #![allow(dead_code)]
-#![allow(clippy::needless_return, clippy::let_and_return, clippy::never_loop)]
+#![allow(
+    clippy::needless_return,
+    clippy::let_and_return,
+    clippy::never_loop,
+    clippy::unnecessary_wraps
+)]
 
 mod stable {
     use auto_enums::auto_enum;

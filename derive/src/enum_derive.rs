@@ -170,6 +170,8 @@ impl Parse for Args {
     }
 }
 
+// https://github.com/rust-lang/rust-clippy/issues/6384
+#[allow(clippy::unnecessary_wraps)]
 fn get_trait_deps(s: &str) -> Option<&'static [&'static str]> {
     Some(match s {
         "Copy" => &["Clone"],

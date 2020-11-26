@@ -1,3 +1,5 @@
+#![allow(clippy::unnecessary_wraps)]
+
 pub(crate) mod core;
 pub(crate) mod external;
 #[cfg(feature = "std")]
