@@ -1,4 +1,4 @@
-# [`Future`](https://doc.rust-lang.org/nightly/std/future/trait.Future.html)
+# [`Future`](https://doc.rust-lang.org/std/future/trait.Future.html)
 
 When deriving for enum like the following:
 
