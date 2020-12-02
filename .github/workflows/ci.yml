@@ -38,13 +38,11 @@ jobs:
       - if: startsWith(matrix.rust, 'nightly')
         run: cargo install cargo-hack
       - if: matrix.rust == '1.31.0'
-        run: cargo check --all
+        run: cargo build --all
       - if: matrix.rust != '1.31.0'
         run: cargo test --all --tests
       - if: startsWith(matrix.rust, 'nightly')
         run: cargo test --all --all-features
-      - if: startsWith(matrix.rust, 'nightly')
-        run: cargo check --benches
       - if: startsWith(matrix.rust, 'nightly')
         run: bash scripts/check-minimal-versions.sh
 
