@@ -23,9 +23,6 @@ jobs:
     strategy:
       matrix:
         rust:
-          # This is the minimum supported Rust version of this crate.
-          # When updating this, the reminder to update the minimum supported Rust version in README.md.
-          - 1.31
           - stable
           - beta
           - nightly
@@ -37,14 +34,25 @@ jobs:
           toolchain: ${{ matrix.rust }}
       - if: startsWith(matrix.rust, 'nightly')
         run: cargo install cargo-hack
-      - if: matrix.rust == '1.31'
-        run: cargo build --all
-      - if: matrix.rust != '1.31'
-        run: cargo test --all --tests
+      - run: cargo test --all --tests
       - if: startsWith(matrix.rust, 'nightly')
         run: cargo test --all --all-features
       - if: startsWith(matrix.rust, 'nightly')
         run: bash scripts/check-minimal-versions.sh
+
+  build:
+    strategy:
+      matrix:
+        range:
+          # This is the minimum supported Rust version of this crate.
+          # When updating this, the reminder to update the minimum supported Rust version in README.md.
+          - 1.31..1.40
+          - 1.41..
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: cargo install cargo-hack
+      - run: cargo hack build --all --ignore-private --no-dev-deps --version-range ${{ matrix.range }}
 
   features:
     runs-on: ubuntu-latest
@@ -53,7 +61,7 @@ jobs:
       - uses: taiki-e/github-actions/install-rust@main
       - run: cargo install cargo-hack
       - run: |
-          cargo hack check --all --feature-powerset --depth 2 --no-dev-deps \
+          cargo hack check --all --ignore-private --feature-powerset --depth 2 --no-dev-deps \
             --features unstable --ignore-unknown-features
 
   clippy:
