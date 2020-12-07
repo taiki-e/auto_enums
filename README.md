@@ -8,13 +8,16 @@
 
 A library for to allow multiple return types by automatically generated enum.
 
-This crate is a procedural macro implementation of the features discussions in [rust-lang/rfcs#2414]. This idea is also known as ["Anonymous sum types"][rust-lang/rfcs#294].
+This crate is a procedural macro implementation of the features discussions
+in [rust-lang/rfcs#2414]. This idea is also known as
+["Anonymous sum types"][rust-lang/rfcs#294].
 
 This library provides the following attribute macros:
 
 * `#[auto_enum]`
 
-  Parses syntax, creates the enum, inserts variants, and passes specified traits to `#[enum_derive]`.
+  Parses syntax, creates the enum, inserts variants, and passes specified
+  traits to `#[enum_derive]`.
 
 * `#[enum_derive]`
 
@@ -33,7 +36,9 @@ auto_enums = "0.7"
 
 ## Examples
 
-`#[auto_enum]`'s basic feature is to wrap the value returned by the obvious branches (`match`, `if`, `return`, etc..) by an enum that implemented the specified traits.
+`#[auto_enum]`'s basic feature is to wrap the value returned by the obvious
+branches (`match`, `if`, `return`, etc..) by an enum that implemented the
+specified traits.
 
 ```rust
 use auto_enums::auto_enum;
@@ -76,7 +81,8 @@ Next, `#[enum_derive]` implements the specified traits.
 
 [Code like this will be generated](docs/example-1.md)
 
-`#[auto_enum]` can also parse nested arms/branches by using the `#[nested]` attribute.
+`#[auto_enum]` can also parse nested arms/branches by using the `#[nested]`
+attribute.
 
 ```rust
 use auto_enums::auto_enum;
@@ -97,11 +103,16 @@ See [documentation](https://docs.rs/auto_enums) for more details.
 
 ## Supported traits
 
-`#[enum_derive]` implements the supported traits and passes unsupported traits to `#[derive]`.
+`#[enum_derive]` implements the supported traits and passes unsupported
+traits to `#[derive]`.
 
-`#[enum_derive]` supports many of the standard library traits and some popular third-party libraries traits such as [rayon], [futures][futures03], [tokio][tokio03]. **See [documentation](https://docs.rs/auto_enums/0.7/auto_enums/#supported-traits) for a complete list of supported traits.**
+`#[enum_derive]` supports many of the standard library traits and some popular
+third-party libraries traits such as [rayon], [futures][futures03],
+[tokio][tokio03]. **See [documentation](https://docs.rs/auto_enums/0.7/auto_enums/#supported-traits) for a complete list of supported traits.**
 
-If you want to use traits that are not supported by `#[enum_derive]`, you can use another crate that provides [derives macros][proc-macro-derive], or you can define derives macros yourself ([derive_utils] probably can help it).
+If you want to use traits that are not supported by `#[enum_derive]`, you
+can use another crate that provides [derives macros][proc-macro-derive], or
+you can define derives macros yourself ([derive_utils] probably can help it).
 
 Basic usage of `#[enum_derive]`
 
@@ -208,6 +219,9 @@ Please be careful if you return another traits with the same name.
 
 ## License
 
-Licensed under either of [Apache License, Version 2.0](LICENSE-APACHE) or [MIT license](LICENSE-MIT) at your option.
+Licensed under either of [Apache License, Version 2.0](LICENSE-APACHE) or
+[MIT license](LICENSE-MIT) at your option.
 
-Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above, without any additional terms or conditions.
+Unless you explicitly state otherwise, any contribution intentionally submitted
+for inclusion in the work by you, as defined in the Apache-2.0 license, shall
+be dual licensed as above, without any additional terms or conditions.

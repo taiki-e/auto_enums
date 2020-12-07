@@ -1,5 +1,9 @@
 //! A library for to allow multiple return types by automatically generated enum.
 //!
+//! This crate is a procedural macro implementation of the features discussions
+//! in [rust-lang/rfcs#2414]. This idea is also known as
+//! ["Anonymous sum types"][rust-lang/rfcs#294].
+//!
 //! This library provides the following attribute macros:
 //!
 //! * `#[auto_enum]`
@@ -554,8 +558,8 @@
 //! traits to `#[derive]`.
 //!
 //! If you want to use traits that are not supported by `#[enum_derive]`, you
-//! can use another crate that provides [derives macros][proc-macro-derive],
-//! or you can define derives macros yourself ([derive_utils] probably can help it).
+//! can use another crate that provides [derives macros][proc-macro-derive], or
+//! you can define derives macros yourself ([derive_utils] probably can help it).
 //!
 //! Basic usage of `#[enum_derive]`
 //!
