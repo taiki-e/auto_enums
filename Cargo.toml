@@ -96,4 +96,4 @@ rayon_crate = { version = "1", package = "rayon" }
 serde_crate = { version = "1", package = "serde" }
 
 # for benches
-rand = "0.7"
+rand = "0.8"
