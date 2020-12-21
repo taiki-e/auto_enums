@@ -99,7 +99,7 @@ macro_rules! bench_next {
         fn $fn(b: &mut Bencher) {
             let mut rng = rand::thread_rng();
             b.iter(|| {
-                let mut iter = $iter(rng.gen_range(0, $max));
+                let mut iter = $iter(rng.gen_range(0..$max));
                 (0..$num).for_each(|_| assert!(iter.next().is_some()))
             })
         }
@@ -112,7 +112,7 @@ macro_rules! bench_fold {
         fn $fn(b: &mut Bencher) {
             let mut rng = rand::thread_rng();
             b.iter(|| {
-                let iter = $iter(rng.gen_range(0, $max));
+                let iter = $iter(rng.gen_range(0..$max));
                 iter.take($num).fold(0, |sum, x| sum + x)
             })
         }
@@ -125,7 +125,7 @@ macro_rules! bench_fold_semi {
         fn $fn(b: &mut Bencher) {
             let mut rng = rand::thread_rng();
             b.iter(|| {
-                let iter = $iter(rng.gen_range(0, $max));
+                let iter = $iter(rng.gen_range(0..$max));
                 iter.take($num).fold(0, |sum, x| sum + x);
             })
         }
