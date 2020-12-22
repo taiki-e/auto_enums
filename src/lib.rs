@@ -848,8 +848,6 @@
 #![forbid(unsafe_code)]
 #![warn(future_incompatible, rust_2018_idioms, single_use_lifetimes, unreachable_pub)]
 #![warn(clippy::all, clippy::default_trait_access)]
-// mem::take requires Rust 1.40
-#![allow(clippy::mem_replace_with_default)]
 
 #[cfg(all(feature = "generator_trait", not(feature = "unstable")))]
 compile_error!(
