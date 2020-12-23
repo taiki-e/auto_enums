@@ -117,6 +117,15 @@ fn get_derive(s: &str) -> Option<DeriveFn> {
         // serde
         #[cfg(feature = "serde")]
         external::serde::serialize,
+        // tokio1
+        #[cfg(feature = "tokio1")]
+        external::tokio1::async_read,
+        #[cfg(feature = "tokio1")]
+        external::tokio1::async_write,
+        #[cfg(feature = "tokio1")]
+        external::tokio1::async_seek,
+        #[cfg(feature = "tokio1")]
+        external::tokio1::async_buf_read,
         // tokio03
         #[cfg(feature = "tokio03")]
         external::tokio03::async_read,
@@ -170,8 +179,6 @@ impl Parse for Args {
     }
 }
 
-// https://github.com/rust-lang/rust-clippy/issues/6384
-#[allow(clippy::unnecessary_wraps)]
 fn get_trait_deps(s: &str) -> Option<&'static [&'static str]> {
     Some(match s {
         "Copy" => &["Clone"],

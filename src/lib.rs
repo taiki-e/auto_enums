@@ -679,7 +679,7 @@
 //! }
 //! ```
 //!
-//! ### [futures 0.3][futures03] *(requires `"futures03"` or `"futures"` crate feature)*
+//! ### [futures v0.3][futures03] *(requires `"futures03"` or `"futures"` crate feature)*
 //!
 //! * [`futures03::Stream`](https://docs.rs/futures/0.3/futures/stream/trait.Stream.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/futures/stream.md)
 //! * [`futures03::Sink`](https://docs.rs/futures/0.3/futures/sink/trait.Sink.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/futures/sink.md)
@@ -690,7 +690,7 @@
 //!
 //! *See also [futures-enum] crate.*
 //!
-//! ### [futures 0.1][futures01] *(requires `"futures01"` crate feature)*
+//! ### [futures v0.1][futures01] *(requires `"futures01"` crate feature)*
 //!
 //! * [`futures01::Future`](https://docs.rs/futures/0.1/futures/future/trait.Future.html)
 //! * [`futures01::Stream`](https://docs.rs/futures/0.1/futures/stream/trait.Stream.html)
@@ -706,21 +706,28 @@
 //!
 //! * [`serde::Serialize`](https://docs.rs/serde/1/serde/trait.Serialize.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/serde/serialize.md)
 //!
-//! ### [tokio 0.3][tokio03] *(requires `"tokio03"` crate feature)*
+//! ### [tokio v1][tokio1] *(requires `"tokio1"` crate feature)*
+//!
+//! * [`tokio1::AsyncRead`](https://docs.rs/tokio/1/tokio/io/trait.AsyncRead.html)
+//! * [`tokio1::AsyncWrite`](https://docs.rs/tokio/1/tokio/io/trait.AsyncWrite.html)
+//! * [`tokio1::AsyncSeek`](https://docs.rs/tokio/1/tokio/io/trait.AsyncSeek.html)
+//! * [`tokio1::AsyncBufRead`](https://docs.rs/tokio/1/tokio/io/trait.AsyncBufRead.html)
+//!
+//! ### [tokio v0.3][tokio03] *(requires `"tokio03"` crate feature)*
 //!
 //! * [`tokio03::AsyncRead`](https://docs.rs/tokio/0.3/tokio/io/trait.AsyncRead.html)
 //! * [`tokio03::AsyncWrite`](https://docs.rs/tokio/0.3/tokio/io/trait.AsyncWrite.html)
 //! * [`tokio03::AsyncSeek`](https://docs.rs/tokio/0.3/tokio/io/trait.AsyncSeek.html)
 //! * [`tokio03::AsyncBufRead`](https://docs.rs/tokio/0.3/tokio/io/trait.AsyncBufRead.html)
 //!
-//! ### [tokio 0.2][tokio02] *(requires `"tokio02"` crate feature)*
+//! ### [tokio v0.2][tokio02] *(requires `"tokio02"` crate feature)*
 //!
 //! * [`tokio02::AsyncRead`](https://docs.rs/tokio/0.2/tokio/io/trait.AsyncRead.html)
 //! * [`tokio02::AsyncWrite`](https://docs.rs/tokio/0.2/tokio/io/trait.AsyncWrite.html)
 //! * [`tokio02::AsyncSeek`](https://docs.rs/tokio/0.2/tokio/io/trait.AsyncSeek.html)
 //! * [`tokio02::AsyncBufRead`](https://docs.rs/tokio/0.2/tokio/io/trait.AsyncBufRead.html)
 //!
-//! ### [tokio 0.1][tokio01] *(requires `"tokio01"` crate feature)*
+//! ### [tokio v0.1][tokio01] *(requires `"tokio01"` crate feature)*
 //!
 //! * [`tokio01::AsyncRead`](https://docs.rs/tokio/0.1/tokio/io/trait.AsyncRead.html)
 //! * [`tokio01::AsyncWrite`](https://docs.rs/tokio/0.1/tokio/io/trait.AsyncWrite.html)
@@ -767,19 +774,21 @@
 //! * **`transpose_methods`**
 //!   * Enable to use `transpose*` methods.
 //! * **`futures03`**
-//!   * Enable to use [futures 0.3][futures03] traits.
+//!   * Enable to use [futures v0.3][futures03] traits.
 //! * **`futures01`**
-//!   * Enable to use [futures 0.1][futures01] traits.
+//!   * Enable to use [futures v0.1][futures01] traits.
 //! * **`rayon`**
 //!   * Enable to use [rayon] traits.
 //! * **`serde`**
 //!   * Enable to use [serde] traits.
+//! * **`tokio1`**
+//!   * Enable to use [tokio v1][tokio1] traits.
 //! * **`tokio03`**
-//!   * Enable to use [tokio 0.3][tokio03] traits.
+//!   * Enable to use [tokio v0.3][tokio03] traits.
 //! * **`tokio02`**
-//!   * Enable to use [tokio 0.2][tokio02] traits.
+//!   * Enable to use [tokio v0.2][tokio02] traits.
 //! * **`tokio01`**
-//!   * Enable to use [tokio 0.1][tokio01] traits.
+//!   * Enable to use [tokio v0.1][tokio01] traits.
 //! * **`generator_trait`**
 //!   * Enable to use `[std|core]::ops::Generator` trait.
 //!   * Note that this feature is unstable and may cause incompatible changes between patch versions.
@@ -839,6 +848,7 @@
 //! [tokio01]: https://docs.rs/tokio/0.1
 //! [tokio02]: https://docs.rs/tokio/0.2
 //! [tokio03]: https://docs.rs/tokio/0.3
+//! [tokio1]: https://docs.rs/tokio/1
 
 #![no_std]
 #![doc(test(

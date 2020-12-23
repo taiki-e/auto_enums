@@ -19,3 +19,6 @@ pub(crate) mod tokio02;
 // https://docs.rs/tokio/0.3
 #[cfg(feature = "tokio03")]
 pub(crate) mod tokio03;
+// https://docs.rs/tokio/1
+#[cfg(feature = "tokio1")]
+pub(crate) mod tokio1;

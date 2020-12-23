@@ -6,6 +6,8 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+* Add support for `tokio1::{AsyncRead, AsyncWrite, AsyncSeek, AsyncBufRead}`.
+
 ## [0.7.10] - 2020-11-15
 
 * Documentation improvements.

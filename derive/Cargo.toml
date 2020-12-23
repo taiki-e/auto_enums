@@ -51,6 +51,8 @@ futures = ["futures03"]
 rayon = []
 # https://docs.rs/serde/1
 serde = []
+# https://docs.rs/tokio/1
+tokio1 = []
 # https://docs.rs/tokio/0.3
 tokio03 = []
 # https://docs.rs/tokio/0.2

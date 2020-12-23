@@ -9,6 +9,7 @@
     feature = "tokio01",
     feature = "tokio02",
     feature = "tokio03",
+    feature = "tokio1",
 ))]
 #![warn(rust_2018_idioms, single_use_lifetimes)]
 
