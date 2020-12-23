@@ -62,7 +62,7 @@ for member in "${MEMBERS[@]}"; do
   (
     cd "${member}"
     actual=$(cargo pkgid | sed 's/.*#//')
-    if [[ "${actual}" != "${version}" ]]; then
+    if [[ "${actual}" != "${version}" ]] && [[ "${actual}" != *":${version}" ]]; then
       error "expected to release version ${version}, but ${member}/Cargo.toml contained ${actual}"
       exit 1
     fi
