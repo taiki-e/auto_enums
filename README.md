@@ -108,7 +108,7 @@ traits to `#[derive]`.
 
 `#[enum_derive]` supports many of the standard library traits and some popular
 third-party libraries traits such as [rayon], [futures][futures03],
-[tokio][tokio03]. **See [documentation](https://docs.rs/auto_enums/0.7/auto_enums/#supported-traits) for a complete list of supported traits.**
+[tokio][tokio1]. **See [documentation](https://docs.rs/auto_enums/0.7/auto_enums/#supported-traits) for a complete list of supported traits.**
 
 If you want to use traits that are not supported by `#[enum_derive]`, you
 can use another crate that provides [derives macros][proc-macro-derive], or
@@ -140,19 +140,21 @@ enum Foo<A, B> {
 * **`transpose_methods`**
   * Enable to use `transpose*` methods.
 * **`futures03`**
-  * Enable to use [futures 0.3][futures03] traits.
+  * Enable to use [futures v0.3][futures03] traits.
 * **`futures01`**
-  * Enable to use [futures 0.1][futures01] traits.
+  * Enable to use [futures v0.1][futures01] traits.
 * **`rayon`**
   * Enable to use [rayon] traits.
 * **`serde`**
   * Enable to use [serde] traits.
+* **`tokio1`**
+  * Enable to use [tokio v1][tokio1] traits.
 * **`tokio03`**
-  * Enable to use [tokio 0.3][tokio03] traits.
+  * Enable to use [tokio v0.3][tokio03] traits.
 * **`tokio02`**
-  * Enable to use [tokio 0.2][tokio02] traits.
+  * Enable to use [tokio v0.2][tokio02] traits.
 * **`tokio01`**
-  * Enable to use [tokio 0.1][tokio01] traits.
+  * Enable to use [tokio v0.1][tokio01] traits.
 * **`generator_trait`**
   * Enable to use `[std|core]::ops::Generator` trait.
   * Note that this feature is unstable and may cause incompatible changes between patch versions.
@@ -209,6 +211,7 @@ Please be careful if you return another traits with the same name.
 [tokio01]: https://docs.rs/tokio/0.1
 [tokio02]: https://docs.rs/tokio/0.2
 [tokio03]: https://docs.rs/tokio/0.3
+[tokio1]: https://docs.rs/tokio/1
 
 ## Related Projects
 
