@@ -1,6 +1,6 @@
 [package]
 name = "auto_enums_derive"
-version = "0.7.10"
+version = "0.7.11"
 authors = ["Taiki Endo <te316e89@gmail.com>"]
 edition = "2018"
 license = "Apache-2.0 OR MIT"
