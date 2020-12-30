@@ -9,6 +9,7 @@ documentation = "https://docs.rs/auto_enums"
 keywords = ["enum", "macros", "derive", "attribute"]
 categories = ["rust-patterns"]
 readme = "README.md"
+exclude = ["/.github", "/ci", "/scripts"]
 description = """
 A library for to allow multiple return types by automatically generated enum.
 """
