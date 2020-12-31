@@ -14,12 +14,12 @@ in [rust-lang/rfcs#2414]. This idea is also known as
 
 This library provides the following attribute macros:
 
-* `#[auto_enum]`
+- `#[auto_enum]`
 
   Parses syntax, creates the enum, inserts variants, and passes specified
   traits to `#[enum_derive]`.
 
-* `#[enum_derive]`
+- `#[enum_derive]`
 
   Implements specified traits to the enum.
 
@@ -56,9 +56,9 @@ fn foo(x: i32) -> impl Iterator<Item = i32> {
 
 First, `#[auto_enum]` will do the following.
 
-* parses syntax
-* creates the enum
-* inserts variants
+- parses syntax
+- creates the enum
+- inserts variants
 
 Code like this will be generated:
 
@@ -129,41 +129,41 @@ enum Foo<A, B> {
 
 ## Optional features
 
-* **`std`** *(enabled by default)*
-  * Enable to use `std` library's traits.
-* **`ops`**
-  * Enable to use `[std|core]::ops`'s `Deref`, `DerefMut`, `Index`, `IndexMut`, and `RangeBounds` traits.
-* **`convert`**
-  * Enable to use `[std|core]::convert`'s `AsRef` and `AsMut` traits.
-* **`fmt`**
-  * Enable to use `[std|core]::fmt`'s traits other than `Debug`, `Display` and `Write`.
-* **`transpose_methods`**
-  * Enable to use `transpose*` methods.
-* **`futures03`**
-  * Enable to use [futures v0.3][futures03] traits.
-* **`futures01`**
-  * Enable to use [futures v0.1][futures01] traits.
-* **`rayon`**
-  * Enable to use [rayon] traits.
-* **`serde`**
-  * Enable to use [serde] traits.
-* **`tokio1`**
-  * Enable to use [tokio v1][tokio1] traits.
-* **`tokio03`**
-  * Enable to use [tokio v0.3][tokio03] traits.
-* **`tokio02`**
-  * Enable to use [tokio v0.2][tokio02] traits.
-* **`tokio01`**
-  * Enable to use [tokio v0.1][tokio01] traits.
-* **`generator_trait`**
-  * Enable to use `[std|core]::ops::Generator` trait.
-  * Note that this feature is unstable and may cause incompatible changes between patch versions.
-* **`fn_traits`**
-  * Enable to use `[std|core]::ops`'s `Fn`, `FnMut`, and `FnOnce` traits.
-  * Note that this feature is unstable and may cause incompatible changes between patch versions.
-* **`trusted_len`**
-  * Enable to use `[std|core]::iter::TrustedLen` trait.
-  * Note that this feature is unstable and may cause incompatible changes between patch versions.
+- **`std`** *(enabled by default)*
+  - Enable to use `std` library's traits.
+- **`ops`**
+  - Enable to use `[std|core]::ops`'s `Deref`, `DerefMut`, `Index`, `IndexMut`, and `RangeBounds` traits.
+- **`convert`**
+  - Enable to use `[std|core]::convert`'s `AsRef` and `AsMut` traits.
+- **`fmt`**
+  - Enable to use `[std|core]::fmt`'s traits other than `Debug`, `Display` and `Write`.
+- **`transpose_methods`**
+  - Enable to use `transpose*` methods.
+- **`futures03`**
+  - Enable to use [futures v0.3][futures03] traits.
+- **`futures01`**
+  - Enable to use [futures v0.1][futures01] traits.
+- **`rayon`**
+  - Enable to use [rayon] traits.
+- **`serde`**
+  - Enable to use [serde] traits.
+- **`tokio1`**
+  - Enable to use [tokio v1][tokio1] traits.
+- **`tokio03`**
+  - Enable to use [tokio v0.3][tokio03] traits.
+- **`tokio02`**
+  - Enable to use [tokio v0.2][tokio02] traits.
+- **`tokio01`**
+  - Enable to use [tokio v0.1][tokio01] traits.
+- **`generator_trait`**
+  - Enable to use `[std|core]::ops::Generator` trait.
+  - Note that this feature is unstable and may cause incompatible changes between patch versions.
+- **`fn_traits`**
+  - Enable to use `[std|core]::ops`'s `Fn`, `FnMut`, and `FnOnce` traits.
+  - Note that this feature is unstable and may cause incompatible changes between patch versions.
+- **`trusted_len`**
+  - Enable to use `[std|core]::iter::TrustedLen` trait.
+  - Note that this feature is unstable and may cause incompatible changes between patch versions.
 
 ### `type_analysis` feature
 
@@ -215,10 +215,10 @@ Please be careful if you return another traits with the same name.
 
 ## Related Projects
 
-* [derive_utils]: A procedural macro helper for easily writing [derives macros][proc-macro-derive] for enums.
-* [futures-enum]: \#\[derive(Future, Stream, Sink, AsyncRead, AsyncWrite, AsyncSeek, AsyncBufRead)\] for enums.
-* [io-enum]: \#\[derive(Read, Write, Seek, BufRead)\] for enums.
-* [iter-enum]: \#\[derive(Iterator, DoubleEndedIterator, ExactSizeIterator, Extend)\] for enums.
+- [derive_utils]: A procedural macro helper for easily writing [derives macros][proc-macro-derive] for enums.
+- [futures-enum]: \#\[derive(Future, Stream, Sink, AsyncRead, AsyncWrite, AsyncSeek, AsyncBufRead)\] for enums.
+- [io-enum]: \#\[derive(Read, Write, Seek, BufRead)\] for enums.
+- [iter-enum]: \#\[derive(Iterator, DoubleEndedIterator, ExactSizeIterator, Extend)\] for enums.
 
 ## License
 

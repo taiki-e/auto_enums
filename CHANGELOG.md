@@ -124,11 +124,11 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 - Added `"convert"` crate feature, and made `[std|core]::convert`'s `AsRef` and `AsMut` traits optional.
 
-- Added `"generator_trait"` crate feature, and made `[std|core]::ops::Generator` traits optional. _(nightly-only)_
+- Added `"generator_trait"` crate feature, and made `[std|core]::ops::Generator` traits optional. *(nightly-only)*
 
-- Added `"fn_traits"` crate feature, and made `Fn`, `FnMut`, and `FnOnce` traits optional. _(nightly-only)_
+- Added `"fn_traits"` crate feature, and made `Fn`, `FnMut`, and `FnOnce` traits optional. *(nightly-only)*
 
-- Added `"trusted_len"` crate feature, and made `[std|core]::iter::TrustedLen` traits optional. _(nightly-only)_
+- Added `"trusted_len"` crate feature, and made `[std|core]::iter::TrustedLen` traits optional. *(nightly-only)*
 
 - Diagnostic improvements.
 
@@ -161,11 +161,11 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 - Added `"convert"` crate feature, and made `[std|core]::convert`'s `AsRef` and `AsMut` traits optional.
 
-- Added `"generator_trait"` crate feature, and made `[std|core]::ops::Generator` traits optional. _(nightly-only)_
+- Added `"generator_trait"` crate feature, and made `[std|core]::ops::Generator` traits optional. *(nightly-only)*
 
-- Added `"fn_traits"` crate feature, and made `Fn`, `FnMut`, and `FnOnce` traits optional. _(nightly-only)_
+- Added `"fn_traits"` crate feature, and made `Fn`, `FnMut`, and `FnOnce` traits optional. *(nightly-only)*
 
-- Added `"trusted_len"` crate feature, and made `[std|core]::iter::TrustedLen` traits optional. _(nightly-only)_
+- Added `"trusted_len"` crate feature, and made `[std|core]::iter::TrustedLen` traits optional. *(nightly-only)*
 
 - Diagnostic improvements.
 
@@ -333,7 +333,7 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 Initial release
 
-[unreleased]: https://github.com/taiki-e/auto_enums/compare/v0.7.11...HEAD
+[Unreleased]: https://github.com/taiki-e/auto_enums/compare/v0.7.11...HEAD
 [0.7.11]: https://github.com/taiki-e/auto_enums/compare/v0.7.10...v0.7.11
 [0.7.10]: https://github.com/taiki-e/auto_enums/compare/v0.7.9...v0.7.10
 [0.7.9]: https://github.com/taiki-e/auto_enums/compare/v0.7.8...v0.7.9
