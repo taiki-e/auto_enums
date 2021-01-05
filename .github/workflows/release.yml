@@ -23,6 +23,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: taiki-e/github-actions/install-rust@main
+        with:
+          toolchain: stable
       - run: |
           ci/publish.sh
         env:
