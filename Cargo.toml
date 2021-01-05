@@ -1,6 +1,6 @@
 [package]
 name = "auto_enums"
-version = "0.7.12"
+version = "0.8.0-dev"
 authors = ["Taiki Endo <te316e89@gmail.com>"]
 edition = "2018"
 license = "Apache-2.0 OR MIT"
@@ -19,71 +19,79 @@ all-features = true
 targets = ["x86_64-unknown-linux-gnu"]
 
 [workspace]
-members = ["core", "derive", "tests/doc"]
+members = ["tests/doc"]
+
+[lib]
+proc-macro = true
 
 [features]
 # Default features.
 default = ["std"]
 
 # Analyze return type of function and `let` binding.
-type_analysis = ["auto_enums_core/type_analysis"]
+type_analysis = []
 
 # Enable to use `transpose*` methods.
-transpose_methods = ["auto_enums_derive/transpose_methods"]
+transpose_methods = []
 
 # ==============================================================================
 # [std|core] libraries
 
 # Enable to use `std` library's traits.
-std = ["auto_enums_derive/std"]
+std = []
 # Enable to use `[std|core]::ops`'s `Deref`, `DerefMut`, `Index`, `IndexMut`, and `RangeBounds` traits.
-ops = ["auto_enums_derive/ops"]
+ops = []
 # Enable to use `[std|core]::convert`'s `AsRef` and `AsMut` traits.
-convert = ["auto_enums_derive/convert"]
+convert = []
 # Enable to use `[std|core]::fmt`'s traits other than `Debug`, `Display` and `Write`
-fmt = ["auto_enums_derive/fmt"]
+fmt = []
 
 # ==============================================================================
 # Using external libraries
 
 # https://docs.rs/futures/0.3
-futures03 = ["auto_enums_derive/futures03"]
+futures03 = []
 # https://docs.rs/futures/0.1
-futures01 = ["auto_enums_derive/futures01"]
+futures01 = []
 # TODO: remove this in favor of futures03.
-futures = ["auto_enums_derive/futures"]
+futures = []
 # https://docs.rs/rayon/1
-rayon = ["auto_enums_derive/rayon"]
+rayon = []
 # https://docs.rs/serde/1
-serde = ["auto_enums_derive/serde"]
+serde = []
 # https://docs.rs/tokio/1
-tokio1 = ["auto_enums_derive/tokio1"]
+tokio1 = []
 # https://docs.rs/tokio/0.3
-tokio03 = ["auto_enums_derive/tokio03"]
+tokio03 = []
 # https://docs.rs/tokio/0.2
-tokio02 = ["auto_enums_derive/tokio02"]
+tokio02 = []
 # https://docs.rs/tokio/0.1
-tokio01 = ["auto_enums_derive/tokio01"]
+tokio01 = []
 
 # ==============================================================================
 # Unstable features
 # These features are outside of the normal semver guarantees and require the
 # `unstable` feature as an explicit opt-in to unstable API.
-unstable = ["auto_enums_derive/unstable"]
+unstable = []
 
 # Enable unstable features of [std|core] libraries
 
 # Enable to use `[std|core]::ops::Generator` trait.
-generator_trait = ["auto_enums_derive/generator_trait"]
+generator_trait = []
 # Enable to use `[std|core]::ops`'s `Fn`, `FnMut`, and `FnOnce` traits.
-fn_traits = ["auto_enums_derive/fn_traits"]
+fn_traits = []
 # Enable to use `[std|core]::iter::TrustedLen` trait.
-trusted_len = ["auto_enums_derive/trusted_len"]
+trusted_len = []
+
+[build-dependencies]
+autocfg = "1"
 
 # NB: futures*, tokio*, serde, and rayon are public dependencies.
 [dependencies]
-auto_enums_core = { version = "=0.7.12", path = "core", default-features = false }
-auto_enums_derive = { version = "=0.7.12", path = "derive", default-features = false }
+derive_utils = { version = "0.11" }
+proc-macro2 = "1"
+quote = "1"
+syn = { version = "1", features = ["full", "visit-mut"] }
 
 [dev-dependencies]
 rustversion = "1"
