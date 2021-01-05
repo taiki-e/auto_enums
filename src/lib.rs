@@ -822,7 +822,7 @@
 //! fn func2(x: i32) {
 //!     // Unlike `feature(impl_trait_in_bindings)`, this works on stable compilers.
 //!     #[auto_enum]
-//!     let _iter: impl Iterator<Item = i32> = match x {
+//!     let iter: impl Iterator<Item = i32> = match x {
 //!         0 => Some(0).into_iter(),
 //!         _ => 0..x,
 //!     };
@@ -853,7 +853,10 @@
 #![no_std]
 #![doc(test(
     no_crate_inject,
-    attr(deny(warnings, rust_2018_idioms, single_use_lifetimes), allow(dead_code))
+    attr(
+        deny(warnings, rust_2018_idioms, single_use_lifetimes),
+        allow(dead_code, unused_variables)
+    )
 ))]
 #![forbid(unsafe_code)]
 #![warn(future_incompatible, rust_2018_idioms, single_use_lifetimes, unreachable_pub)]
