@@ -10,6 +10,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+- [Merge `auto_enums_core` and `auto_enums_derive` crates into main `auto_enums` crate.](https://github.com/taiki-e/auto_enums/pull/123)
+
 ## [0.7.12] - 2021-01-05
 
 - Exclude unneeded files from crates.io.

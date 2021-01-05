@@ -850,7 +850,6 @@
 //! [tokio03]: https://docs.rs/tokio/0.3
 //! [tokio1]: https://docs.rs/tokio/1
 
-#![no_std]
 #![doc(test(
     no_crate_inject,
     attr(
@@ -859,7 +858,9 @@
     )
 ))]
 #![forbid(unsafe_code)]
-#![warn(future_incompatible, rust_2018_idioms, single_use_lifetimes, unreachable_pub)]
+#![warn(future_incompatible, rust_2018_idioms, unreachable_pub)]
+// It cannot be included in the published code because these lints have false positives in the minimum required version.
+#![cfg_attr(test, warn(single_use_lifetimes))]
 #![warn(clippy::all, clippy::default_trait_access)]
 
 #[cfg(all(feature = "generator_trait", not(feature = "unstable")))]
@@ -877,8 +878,32 @@ compile_error!(
     "The `trusted_len` feature requires the `unstable` feature as an explicit opt-in to unstable features"
 );
 
-#[doc(inline)]
-pub use auto_enums_core::auto_enum;
+// older compilers require explicit `extern crate`.
+#[allow(unused_extern_crates)]
+extern crate proc_macro;
 
-#[doc(inline)]
-pub use auto_enums_derive::enum_derive;
+#[macro_use]
+mod utils;
+
+mod auto_enum;
+mod derive;
+mod enum_derive;
+
+use proc_macro::TokenStream;
+
+/// An attribute macro like a wrapper of `#[derive]`, implementing
+/// the supported traits and passing unsupported traits to `#[derive]`.
+///
+/// See crate level documentation for details.
+#[proc_macro_attribute]
+pub fn enum_derive(args: TokenStream, input: TokenStream) -> TokenStream {
+    crate::enum_derive::attribute(args.into(), input.into()).into()
+}
+
+/// An attribute macro for to allow multiple return types by automatically generated enum.
+///
+/// See crate level documentation for details.
+#[proc_macro_attribute]
+pub fn auto_enum(args: TokenStream, input: TokenStream) -> TokenStream {
+    crate::auto_enum::attribute(args.into(), input.into()).into()
+}

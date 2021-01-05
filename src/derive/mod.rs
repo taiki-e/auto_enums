@@ -1,4 +1,5 @@
 #![allow(clippy::unnecessary_wraps)]
+#![allow(clippy::wildcard_imports)]
 
 pub(crate) mod core;
 pub(crate) mod external;
