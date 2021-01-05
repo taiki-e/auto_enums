@@ -53,8 +53,6 @@ fmt = []
 futures03 = []
 # https://docs.rs/futures/0.1
 futures01 = []
-# TODO: remove this in favor of futures03.
-futures = []
 # https://docs.rs/rayon/1
 rayon = []
 # https://docs.rs/serde/1

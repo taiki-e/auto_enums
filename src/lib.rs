@@ -679,7 +679,7 @@
 //! }
 //! ```
 //!
-//! ### [futures v0.3][futures03] *(requires `"futures03"` or `"futures"` crate feature)*
+//! ### [futures v0.3][futures03] *(requires `"futures03"` crate feature)*
 //!
 //! * [`futures03::Stream`](https://docs.rs/futures/0.3/futures/stream/trait.Stream.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/futures/stream.md)
 //! * [`futures03::Sink`](https://docs.rs/futures/0.3/futures/sink/trait.Sink.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/futures/sink.md)
