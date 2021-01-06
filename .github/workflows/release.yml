@@ -5,6 +5,16 @@ on:
     tags:
       - "v*"
 
+env:
+  CARGO_INCREMENTAL: 0
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: -D warnings
+  RUST_BACKTRACE: 1
+
+defaults:
+  run:
+    shell: bash
+
 jobs:
   create-release:
     if: github.repository_owner == 'taiki-e'
