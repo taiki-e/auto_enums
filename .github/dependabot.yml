@@ -6,9 +6,6 @@ updates:
       interval: daily
     commit-message:
       prefix: ""
-    ignore:
-      - dependency-name: futures
-      - dependency-name: tokio
     labels: []
   - package-ecosystem: github-actions
     directory: /

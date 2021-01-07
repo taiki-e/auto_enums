@@ -2,13 +2,9 @@
     feature = "std",
     feature = "type_analysis",
     feature = "transpose_methods",
-    feature = "futures01",
     feature = "futures03",
     feature = "rayon",
     feature = "serde",
-    feature = "tokio01",
-    feature = "tokio02",
-    feature = "tokio03",
     feature = "tokio1",
 ))]
 #![warn(rust_2018_idioms, single_use_lifetimes)]

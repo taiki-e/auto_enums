@@ -690,12 +690,6 @@
 //!
 //! *See also [futures-enum] crate.*
 //!
-//! ### [futures v0.1][futures01] *(requires `"futures01"` crate feature)*
-//!
-//! * [`futures01::Future`](https://docs.rs/futures/0.1/futures/future/trait.Future.html)
-//! * [`futures01::Stream`](https://docs.rs/futures/0.1/futures/stream/trait.Stream.html)
-//! * [`futures01::Sink`](https://docs.rs/futures/0.1/futures/sink/trait.Sink.html)
-//!
 //! ### [rayon] *(requires `"rayon"` crate feature)*
 //!
 //! * [`rayon::ParallelIterator`](https://docs.rs/rayon/1/rayon/iter/trait.ParallelIterator.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/rayon/ParallelIterator.md)
@@ -712,25 +706,6 @@
 //! * [`tokio1::AsyncWrite`](https://docs.rs/tokio/1/tokio/io/trait.AsyncWrite.html)
 //! * [`tokio1::AsyncSeek`](https://docs.rs/tokio/1/tokio/io/trait.AsyncSeek.html)
 //! * [`tokio1::AsyncBufRead`](https://docs.rs/tokio/1/tokio/io/trait.AsyncBufRead.html)
-//!
-//! ### [tokio v0.3][tokio03] *(requires `"tokio03"` crate feature)*
-//!
-//! * [`tokio03::AsyncRead`](https://docs.rs/tokio/0.3/tokio/io/trait.AsyncRead.html)
-//! * [`tokio03::AsyncWrite`](https://docs.rs/tokio/0.3/tokio/io/trait.AsyncWrite.html)
-//! * [`tokio03::AsyncSeek`](https://docs.rs/tokio/0.3/tokio/io/trait.AsyncSeek.html)
-//! * [`tokio03::AsyncBufRead`](https://docs.rs/tokio/0.3/tokio/io/trait.AsyncBufRead.html)
-//!
-//! ### [tokio v0.2][tokio02] *(requires `"tokio02"` crate feature)*
-//!
-//! * [`tokio02::AsyncRead`](https://docs.rs/tokio/0.2/tokio/io/trait.AsyncRead.html)
-//! * [`tokio02::AsyncWrite`](https://docs.rs/tokio/0.2/tokio/io/trait.AsyncWrite.html)
-//! * [`tokio02::AsyncSeek`](https://docs.rs/tokio/0.2/tokio/io/trait.AsyncSeek.html)
-//! * [`tokio02::AsyncBufRead`](https://docs.rs/tokio/0.2/tokio/io/trait.AsyncBufRead.html)
-//!
-//! ### [tokio v0.1][tokio01] *(requires `"tokio01"` crate feature)*
-//!
-//! * [`tokio01::AsyncRead`](https://docs.rs/tokio/0.1/tokio/io/trait.AsyncRead.html)
-//! * [`tokio01::AsyncWrite`](https://docs.rs/tokio/0.1/tokio/io/trait.AsyncWrite.html)
 //!
 //! ## Inherent methods
 //!
@@ -775,20 +750,12 @@
 //!   * Enable to use `transpose*` methods.
 //! * **`futures03`**
 //!   * Enable to use [futures v0.3][futures03] traits.
-//! * **`futures01`**
-//!   * Enable to use [futures v0.1][futures01] traits.
 //! * **`rayon`**
 //!   * Enable to use [rayon] traits.
 //! * **`serde`**
 //!   * Enable to use [serde] traits.
 //! * **`tokio1`**
 //!   * Enable to use [tokio v1][tokio1] traits.
-//! * **`tokio03`**
-//!   * Enable to use [tokio v0.3][tokio03] traits.
-//! * **`tokio02`**
-//!   * Enable to use [tokio v0.2][tokio02] traits.
-//! * **`tokio01`**
-//!   * Enable to use [tokio v0.1][tokio01] traits.
 //! * **`generator_trait`**
 //!   * Enable to use `[std|core]::ops::Generator` trait.
 //!   * Note that this feature is unstable and may cause incompatible changes between patch versions.
@@ -838,16 +805,12 @@
 //!
 //! [derive_utils]: https://github.com/taiki-e/derive_utils
 //! [futures-enum]: https://github.com/taiki-e/futures-enum
-//! [futures01]: https://docs.rs/futures/0.1
 //! [futures03]: https://docs.rs/futures/0.3
 //! [io-enum]: https://github.com/taiki-e/io-enum
 //! [iter-enum]: https://github.com/taiki-e/iter-enum
 //! [proc-macro-derive]: https://doc.rust-lang.org/reference/procedural-macros.html#derive-macros
 //! [rayon]: https://docs.rs/rayon/1
 //! [serde]: https://docs.rs/serde/1
-//! [tokio01]: https://docs.rs/tokio/0.1
-//! [tokio02]: https://docs.rs/tokio/0.2
-//! [tokio03]: https://docs.rs/tokio/0.3
 //! [tokio1]: https://docs.rs/tokio/1
 
 #![doc(test(
