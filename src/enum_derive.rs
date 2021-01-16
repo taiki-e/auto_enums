@@ -3,11 +3,11 @@ use proc_macro2::TokenStream;
 use quote::ToTokens;
 use syn::{
     parse::{Parse, ParseStream},
-    parse_quote, ItemEnum, Path, Result, Token,
+    parse_quote, Error, ItemEnum, Path, Result, Token,
 };
 
 pub(crate) fn attribute(args: TokenStream, input: TokenStream) -> TokenStream {
-    expand(args, input).unwrap_or_else(|e| e.to_compile_error())
+    expand(args, input).unwrap_or_else(Error::into_compile_error)
 }
 
 type DeriveFn = fn(&'_ Data) -> Result<TokenStream>;

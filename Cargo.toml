@@ -80,7 +80,7 @@ autocfg = "1"
 derive_utils = { version = "0.11" }
 proc-macro2 = "1"
 quote = "1"
-syn = { version = "1", features = ["full", "visit-mut"] }
+syn = { version = "1.0.56", features = ["full", "visit-mut"] }
 
 [dev-dependencies]
 rustversion = "1"
