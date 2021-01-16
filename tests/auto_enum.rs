@@ -753,15 +753,16 @@ mod nightly {
 
     #[test]
     fn marker() {
-        fn marker1(x: usize) -> impl Iterator<Item = i32> + Clone {
-            #[auto_enum(Iterator, Clone)]
-            (0..x as i32)
-                .map(|x| x + 1)
-                .flat_map(|x| if x > 10 { marker!(0..x) } else { marker!(-100..=0) })
-        }
-        for (i, _x) in ANS.iter().enumerate() {
-            let _ = marker1(i).clone().sum::<i32>();
-        }
+        // TODO: uncomment when https://github.com/rust-lang/rust/issues/81007 fixed.
+        // fn marker1(x: usize) -> impl Iterator<Item = i32> + Clone {
+        //     #[auto_enum(Iterator, Clone)]
+        //     (0..x as i32)
+        //         .map(|x| x + 1)
+        //         .flat_map(|x| if x > 10 { marker!(0..x) } else { marker!(-100..=0) })
+        // }
+        // for (i, _x) in ANS.iter().enumerate() {
+        //     let _ = marker1(i).clone().sum::<i32>();
+        // }
 
         fn marker2(x: usize) -> impl Iterator<Item = i32> + Clone {
             let a;
