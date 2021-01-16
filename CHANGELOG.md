@@ -65,27 +65,21 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [0.7.4] - 2020-05-07
 
-- [Fixed an issue that `#[auto_enum]` on non-statement expression does not work without unstable features.][97]
-
-[97]: https://github.com/taiki-e/auto_enums/pull/97
+- [Fixed an issue that `#[auto_enum]` on non-statement expression does not work without unstable features.](https://github.com/taiki-e/auto_enums/pull/97)
 
 ## [0.7.3] - 2020-04-19
 
-- [Added support for `tokio02::{AsyncRead, AsyncWrite, AsyncSeek, AsyncBufRead}`.][92]
+- [Added support for `tokio02::{AsyncRead, AsyncWrite, AsyncSeek, AsyncBufRead}`.](https://github.com/taiki-e/auto_enums/pull/92)
 
-- [Added support for `tokio01::{AsyncRead, AsyncWrite}`.][92]
+- [Added support for `tokio01::{AsyncRead, AsyncWrite}`.](https://github.com/taiki-e/auto_enums/pull/92)
 
-- [Added `futures03` feature. This is an alias of `futures` feature.][92]
-
-[92]: https://github.com/taiki-e/auto_enums/pull/92
+- [Added `futures03` feature. This is an alias of `futures` feature.](https://github.com/taiki-e/auto_enums/pull/92)
 
 ## [0.7.2] - 2020-04-13
 
-- [Fix unused braces warnings.][88]
+- [Fix unused braces warnings.](https://github.com/taiki-e/auto_enums/pull/88)
 
 - Update to support latest generator.
-
-[88]: https://github.com/taiki-e/auto_enums/pull/88
 
 ## [0.7.1] - 2019-11-16
 
@@ -93,14 +87,11 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [0.7.0] - 2019-10-20
 
-- [Support `#[nested]` for nested if expressions.][67]
+- [Support `#[nested]` for nested if expressions.](https://github.com/taiki-e/auto_enums/pull/67)
 
 - Fixed bugs of `"type_analysis"` feature.
 
-- [Removed unstable `"exact_size_is_empty"`, `"read_initializer"`, and `"try_trait"` crate features.][69]
-
-[67]: https://github.com/taiki-e/auto_enums/pull/67
-[69]: https://github.com/taiki-e/auto_enums/pull/69
+- [Removed unstable `"exact_size_is_empty"`, `"read_initializer"`, and `"try_trait"` crate features.](https://github.com/taiki-e/auto_enums/pull/69)
 
 ## [0.6.4] - 2019-09-28
 
@@ -108,10 +99,7 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [0.6.3] - 2019-09-20
 
-- [Removed usage of mutable global state from `#[auto_enum]` for forward compatibility.][60] See also [rust-lang/rust#63831].
-
-[60]: https://github.com/taiki-e/auto_enums/pull/60
-[rust-lang/rust#63831]: https://github.com/rust-lang/rust/pull/63831
+- [Removed usage of mutable global state from `#[auto_enum]` for forward compatibility.](https://github.com/taiki-e/auto_enums/pull/60) See also [rust-lang/rust#63831](https://github.com/rust-lang/rust/pull/63831).
 
 ## [0.6.2] - 2019-09-08
 
@@ -123,17 +111,17 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [0.6.0] - 2019-09-07
 
-- [Added `"unstable"` crate feature to separate unstable features from stable features.][56] When using features that depend on unstable APIs, the `"unstable"` feature must be explicitly enabled.
+- [Added `"unstable"` crate feature to separate unstable features from stable features.](https://github.com/taiki-e/auto_enums/pull/56) When using features that depend on unstable APIs, the `"unstable"` feature must be explicitly enabled.
 
 - Improved compile time.
 
 - Renamed `#[rec]` to `#[nested]`.
 
-- [Removed `marker(name)` option in favor of `marker = name`.][55]
+- [Removed `marker(name)` option in favor of `marker = name`.](https://github.com/taiki-e/auto_enums/pull/55)
 
-- [Removed `never` option in argument position in favor of `#[enum_derive]` attribute.][48]
+- [Removed `never` option in argument position in favor of `#[enum_derive]` attribute.](https://github.com/taiki-e/auto_enums/pull/48)
 
-- [Removed `"proc_macro"` crate feature.][54]
+- [Removed `"proc_macro"` crate feature.](https://github.com/taiki-e/auto_enums/pull/54)
 
 - Added `"ops"` crate feature, and made `[std|core]::ops`'s `Deref`, `DerefMut`, `Index`, `IndexMut`, and `RangeBounds` traits optional.
 
@@ -151,24 +139,19 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [0.6.0-alpha.3] - 2019-09-06
 
-- [Added `"unstable"` crate feature to separate unstable features from stable features.][56] When using features that depend on unstable APIs, the `"unstable"` feature must be explicitly enabled.
-
-[56]: https://github.com/taiki-e/auto_enums/pull/56
+- [Added `"unstable"` crate feature to separate unstable features from stable features.](https://github.com/taiki-e/auto_enums/pull/56) When using features that depend on unstable APIs, the `"unstable"` feature must be explicitly enabled.
 
 ## [0.6.0-alpha.2] - 2019-08-30
 
-- [Removed `marker(name)` option in favor of `marker = name`.][55]
+- [Removed `marker(name)` option in favor of `marker = name`.](https://github.com/taiki-e/auto_enums/pull/55)
 
-- [Removed `"proc_macro"` crate feature.][54]
-
-[54]: https://github.com/taiki-e/auto_enums/pull/54
-[55]: https://github.com/taiki-e/auto_enums/pull/55
+- [Removed `"proc_macro"` crate feature.](https://github.com/taiki-e/auto_enums/pull/54)
 
 ## [0.6.0-alpha.1] - 2019-08-24
 
 - Renamed `#[rec]` to `#[nested]`.
 
-- [Removed `never` option in argument position in favor of `#[enum_derive]` attribute.][48]
+- [Removed `never` option in argument position in favor of `#[enum_derive]` attribute.](https://github.com/taiki-e/auto_enums/pull/48)
 
 - Improved compile time.
 
@@ -183,8 +166,6 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 - Added `"trusted_len"` crate feature, and made `[std|core]::iter::TrustedLen` traits optional. *(nightly-only)*
 
 - Diagnostic improvements.
-
-[48]: https://github.com/taiki-e/auto_enums/pull/48
 
 ## [0.5.10] - 2019-08-15
 
