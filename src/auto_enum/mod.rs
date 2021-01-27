@@ -13,12 +13,11 @@ use syn::{
     Local, PathArguments, Result, ReturnType, Stmt, Type, TypePath,
 };
 
-use crate::utils::{block, expr_block, replace_expr};
-
 use self::{
     context::{Context, VisitLastMode, VisitMode, DEFAULT_MARKER},
     expr::child_expr,
 };
+use crate::utils::{block, expr_block, replace_expr};
 
 /// The attribute name.
 const NAME: &str = "auto_enum";

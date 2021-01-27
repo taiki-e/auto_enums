@@ -445,8 +445,9 @@ mod stable {
     #[cfg(feature = "std")]
     #[test]
     fn stable_std() {
-        use auto_enums::enum_derive;
         use std::{error::Error, fs, io, path::Path};
+
+        use auto_enums::enum_derive;
 
         #[auto_enum(Transpose, Write)]
         fn transpose_ok(file: Option<&Path>) -> io::Result<impl io::Write> {

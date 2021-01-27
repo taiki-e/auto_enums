@@ -2,8 +2,9 @@
 #![warn(rust_2018_idioms, single_use_lifetimes)]
 #![allow(dead_code)]
 
-use auto_enums::auto_enum;
 use std::fmt;
+
+use auto_enums::auto_enum;
 
 #[test]
 fn func() {

@@ -1,5 +1,6 @@
-use proc_macro2::TokenStream;
 use std::{iter, mem};
+
+use proc_macro2::TokenStream;
 use syn::{
     punctuated::Punctuated, token, visit_mut::VisitMut, Arm, Attribute, Block, Expr, ExprBlock,
     ExprCall, ExprPath, ExprTuple, ItemFn, Local, Path, PathSegment, Result, Stmt,

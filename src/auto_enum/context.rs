@@ -1,6 +1,7 @@
+use std::{collections::hash_map::DefaultHasher, hash::Hasher, iter, mem};
+
 use proc_macro2::TokenStream;
 use quote::format_ident;
-use std::{collections::hash_map::DefaultHasher, hash::Hasher, iter, mem};
 #[cfg(feature = "type_analysis")]
 use syn::Type;
 use syn::{
