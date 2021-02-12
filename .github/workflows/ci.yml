@@ -34,13 +34,13 @@ jobs:
       - uses: taiki-e/github-actions/install-rust@main
         with:
           toolchain: ${{ matrix.rust }}
-      - if: startsWith(matrix.rust, 'nightly')
-        run: cargo install cargo-hack
+      - run: cargo install cargo-hack
+        if: startsWith(matrix.rust, 'nightly')
       - run: cargo test --all --tests
-      - if: startsWith(matrix.rust, 'nightly')
-        run: cargo test --all --all-features
-      - if: startsWith(matrix.rust, 'nightly')
-        run: scripts/check-minimal-versions.sh
+      - run: cargo test --all --all-features
+        if: startsWith(matrix.rust, 'nightly')
+      - run: scripts/check-minimal-versions.sh
+        if: startsWith(matrix.rust, 'nightly')
 
   build:
     strategy:
@@ -63,9 +63,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: taiki-e/github-actions/install-rust@main
       - run: cargo install cargo-hack
-      - run: |
-          cargo hack check --all --ignore-private --feature-powerset --depth 2 --no-dev-deps \
-            --features unstable --ignore-unknown-features
+      - run: cargo hack check --all --ignore-private --feature-powerset --depth 2 --no-dev-deps --features unstable --ignore-unknown-features
 
   clippy:
     runs-on: ubuntu-latest
