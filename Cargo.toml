@@ -75,7 +75,7 @@ trusted_len = []
 [build-dependencies]
 autocfg = "1"
 
-# NB: futures*, tokio*, serde, and rayon are public dependencies.
+# Note: futures, tokio, serde, and rayon are public dependencies.
 [dependencies]
 derive_utils = { version = "0.11" }
 proc-macro2 = "1"
