@@ -601,27 +601,27 @@
 //!
 //! ### `[std|core]::iter`
 //!
-//! * [`Iterator`](https://doc.rust-lang.org/std/iter/trait.Iterator.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/iter/iterator.md)
-//! * [`DoubleEndedIterator`](https://doc.rust-lang.org/std/iter/trait.DoubleEndedIterator.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/iter/DoubleEndedIterator.md)
-//! * [`ExactSizeIterator`](https://doc.rust-lang.org/std/iter/trait.ExactSizeIterator.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/iter/ExactSizeIterator.md)
-//! * [`FusedIterator`](https://doc.rust-lang.org/std/iter/trait.FusedIterator.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/iter/FusedIterator.md)
-//! * [`Extend`](https://doc.rust-lang.org/std/iter/trait.Extend.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/iter/extend.md)
-//! * [`TrustedLen`](https://doc.rust-lang.org/std/iter/trait.TrustedLen.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/iter/TrustedLen.md) *(requires `"trusted_len"` and `"unstable"` crate features)*
+//! * [`Iterator`](https://doc.rust-lang.org/std/iter/trait.Iterator.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/HEAD/docs/supported_traits/std/iter/iterator.md)
+//! * [`DoubleEndedIterator`](https://doc.rust-lang.org/std/iter/trait.DoubleEndedIterator.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/HEAD/docs/supported_traits/std/iter/DoubleEndedIterator.md)
+//! * [`ExactSizeIterator`](https://doc.rust-lang.org/std/iter/trait.ExactSizeIterator.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/HEAD/docs/supported_traits/std/iter/ExactSizeIterator.md)
+//! * [`FusedIterator`](https://doc.rust-lang.org/std/iter/trait.FusedIterator.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/HEAD/docs/supported_traits/std/iter/FusedIterator.md)
+//! * [`Extend`](https://doc.rust-lang.org/std/iter/trait.Extend.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/HEAD/docs/supported_traits/std/iter/extend.md)
+//! * [`TrustedLen`](https://doc.rust-lang.org/std/iter/trait.TrustedLen.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/HEAD/docs/supported_traits/std/iter/TrustedLen.md) *(requires `"trusted_len"` and `"unstable"` crate features)*
 //!
 //! *See also [iter-enum] crate.*
 //!
 //! ### `[std|core]::future`
 //!
-//! * [`Future`](https://doc.rust-lang.org/std/future/trait.Future.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/future.md)
+//! * [`Future`](https://doc.rust-lang.org/std/future/trait.Future.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/HEAD/docs/supported_traits/std/future.md)
 //!
 //! *See also [futures-enum] crate.*
 //!
 //! ### `std::io` *(requires `"std"` crate feature)*
 //!
-//! * [`Read`](https://doc.rust-lang.org/std/io/trait.Read.html) (alias: `io::Read`) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/io/read.md)
-//! * [`BufRead`](https://doc.rust-lang.org/std/io/trait.BufRead.html) (alias: `io::BufRead`) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/io/BufRead.md)
-//! * [`Write`](https://doc.rust-lang.org/std/io/trait.Write.html) (alias: `io::Write`) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/io/write.md)
-//! * [`Seek`](https://doc.rust-lang.org/std/io/trait.Seek.html) (alias: `io::Seek`) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/io/seek.md)
+//! * [`Read`](https://doc.rust-lang.org/std/io/trait.Read.html) (alias: `io::Read`) - [generated code](https://github.com/taiki-e/auto_enums/blob/HEAD/docs/supported_traits/std/io/read.md)
+//! * [`BufRead`](https://doc.rust-lang.org/std/io/trait.BufRead.html) (alias: `io::BufRead`) - [generated code](https://github.com/taiki-e/auto_enums/blob/HEAD/docs/supported_traits/std/io/BufRead.md)
+//! * [`Write`](https://doc.rust-lang.org/std/io/trait.Write.html) (alias: `io::Write`) - [generated code](https://github.com/taiki-e/auto_enums/blob/HEAD/docs/supported_traits/std/io/write.md)
+//! * [`Seek`](https://doc.rust-lang.org/std/io/trait.Seek.html) (alias: `io::Seek`) - [generated code](https://github.com/taiki-e/auto_enums/blob/HEAD/docs/supported_traits/std/io/seek.md)
 //!
 //! *See also [io-enum] crate.*
 //!
@@ -644,7 +644,7 @@
 //!
 //! ### `[std|core]::fmt`
 //!
-//! * [`Debug`](https://doc.rust-lang.org/std/fmt/trait.Debug.html) (alias: `fmt::Debug`) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/debug.md)
+//! * [`Debug`](https://doc.rust-lang.org/std/fmt/trait.Debug.html) (alias: `fmt::Debug`) - [generated code](https://github.com/taiki-e/auto_enums/blob/HEAD/docs/supported_traits/std/debug.md)
 //! * [`Display`](https://doc.rust-lang.org/std/fmt/trait.Display.html) (alias: `fmt::Display`)
 //! * [`fmt::Binary`](https://doc.rust-lang.org/std/fmt/trait.Binary.html) *(requires `"fmt"` crate feature)*
 //! * [`fmt::LowerExp`](https://doc.rust-lang.org/std/fmt/trait.LowerExp.html) *(requires `"fmt"` crate feature)*
@@ -657,7 +657,7 @@
 //!
 //! ### `std::error` *(requires `"std"` crate feature)*
 //!
-//! * [`Error`](https://doc.rust-lang.org/std/error/trait.Error.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/std/error.md)
+//! * [`Error`](https://doc.rust-lang.org/std/error/trait.Error.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/HEAD/docs/supported_traits/std/error.md)
 //!
 //! ## External libraries
 //!
@@ -681,24 +681,24 @@
 //!
 //! ### [futures v0.3][futures03] *(requires `"futures03"` crate feature)*
 //!
-//! * [`futures03::Stream`](https://docs.rs/futures/0.3/futures/stream/trait.Stream.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/futures/stream.md)
-//! * [`futures03::Sink`](https://docs.rs/futures/0.3/futures/sink/trait.Sink.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/futures/sink.md)
-//! * [`futures03::AsyncRead`](https://docs.rs/futures/0.3/futures/io/trait.AsyncRead.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/futures/AsyncRead.md)
-//! * [`futures03::AsyncWrite`](https://docs.rs/futures/0.3/futures/io/trait.AsyncWrite.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/futures/AsyncWrite.md)
-//! * [`futures03::AsyncSeek`](https://docs.rs/futures/0.3/futures/io/trait.AsyncSeek.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/futures/AsyncSeek.md)
-//! * [`futures03::AsyncBufRead`](https://docs.rs/futures/0.3/futures/io/trait.AsyncBufRead.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/futures/AsyncBufRead.md)
+//! * [`futures03::Stream`](https://docs.rs/futures/0.3/futures/stream/trait.Stream.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/HEAD/docs/supported_traits/external/futures/stream.md)
+//! * [`futures03::Sink`](https://docs.rs/futures/0.3/futures/sink/trait.Sink.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/HEAD/docs/supported_traits/external/futures/sink.md)
+//! * [`futures03::AsyncRead`](https://docs.rs/futures/0.3/futures/io/trait.AsyncRead.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/HEAD/docs/supported_traits/external/futures/AsyncRead.md)
+//! * [`futures03::AsyncWrite`](https://docs.rs/futures/0.3/futures/io/trait.AsyncWrite.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/HEAD/docs/supported_traits/external/futures/AsyncWrite.md)
+//! * [`futures03::AsyncSeek`](https://docs.rs/futures/0.3/futures/io/trait.AsyncSeek.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/HEAD/docs/supported_traits/external/futures/AsyncSeek.md)
+//! * [`futures03::AsyncBufRead`](https://docs.rs/futures/0.3/futures/io/trait.AsyncBufRead.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/HEAD/docs/supported_traits/external/futures/AsyncBufRead.md)
 //!
 //! *See also [futures-enum] crate.*
 //!
 //! ### [rayon] *(requires `"rayon"` crate feature)*
 //!
-//! * [`rayon::ParallelIterator`](https://docs.rs/rayon/1/rayon/iter/trait.ParallelIterator.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/rayon/ParallelIterator.md)
-//! * [`rayon::IndexedParallelIterator`](https://docs.rs/rayon/1/rayon/iter/trait.IndexedParallelIterator.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/rayon/IndexedParallelIterator.md)
-//! * [`rayon::ParallelExtend`](https://docs.rs/rayon/1/rayon/iter/trait.ParallelExtend.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/rayon/ParallelExtend.md)
+//! * [`rayon::ParallelIterator`](https://docs.rs/rayon/1/rayon/iter/trait.ParallelIterator.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/HEAD/docs/supported_traits/external/rayon/ParallelIterator.md)
+//! * [`rayon::IndexedParallelIterator`](https://docs.rs/rayon/1/rayon/iter/trait.IndexedParallelIterator.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/HEAD/docs/supported_traits/external/rayon/IndexedParallelIterator.md)
+//! * [`rayon::ParallelExtend`](https://docs.rs/rayon/1/rayon/iter/trait.ParallelExtend.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/HEAD/docs/supported_traits/external/rayon/ParallelExtend.md)
 //!
 //! ### [serde] *(requires `"serde"` crate feature)*
 //!
-//! * [`serde::Serialize`](https://docs.rs/serde/1/serde/trait.Serialize.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/master/docs/supported_traits/external/serde/serialize.md)
+//! * [`serde::Serialize`](https://docs.rs/serde/1/serde/trait.Serialize.html) - [generated code](https://github.com/taiki-e/auto_enums/blob/HEAD/docs/supported_traits/external/serde/serialize.md)
 //!
 //! ### [tokio v1][tokio1] *(requires `"tokio1"` crate feature)*
 //!
