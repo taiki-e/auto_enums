@@ -16,6 +16,8 @@
 )]
 
 mod stable {
+    use core::iter;
+
     use auto_enums::auto_enum;
 
     const ANS: &[i32] = &[28, 3];
@@ -445,20 +447,19 @@ mod stable {
     #[cfg(feature = "std")]
     #[test]
     fn stable_std() {
-        use std::{error::Error, fs, io, path::Path};
+        use std::{error::Error, fs::File, io, path::Path};
 
         use auto_enums::enum_derive;
 
         #[auto_enum(Transpose, Write)]
         fn transpose_ok(file: Option<&Path>) -> io::Result<impl io::Write> {
-            if let Some(file) = file { fs::File::create(file) } else { Ok(io::stdout()) }
-                .transpose_ok()
+            if let Some(file) = file { File::create(file) } else { Ok(io::stdout()) }.transpose_ok()
         }
         assert!(transpose_ok(None).is_ok());
 
         #[auto_enum(Transpose, Write)]
         fn transpose_option(file: Option<&Path>) -> Option<impl io::Write> {
-            if let Some(file) = file { fs::File::create(file).ok() } else { Some(io::stdout()) }
+            if let Some(file) = file { File::create(file).ok() } else { Some(io::stdout()) }
                 .transpose()
         }
         assert!(transpose_option(None).is_some());
@@ -472,7 +473,7 @@ mod stable {
         #[auto_enum(Transpose, Write, Debug, Display, Error)]
         fn transpose_result(file: Option<&Path>) -> Result<impl io::Write, impl Error> {
             if let Some(file) = file {
-                fs::File::create(file).map_err(IoError::Io)
+                File::create(file).map_err(IoError::Io)
             } else {
                 let out: Result<io::Stdout, io::Error> = Ok(io::stdout());
                 out
@@ -508,7 +509,7 @@ mod stable {
     fn if_attr(x: bool) -> impl Iterator<Item = u8> {
         let res = {
             #[auto_enum(Iterator)]
-            if x { std::iter::once(0) } else { std::iter::repeat(1) }
+            if x { iter::once(0) } else { iter::repeat(1) }
         };
         res
     }
@@ -530,8 +531,8 @@ mod stable {
         Some(
             #[auto_enum(Iterator)]
             match x {
-                true => std::iter::once(0),
-                _ => std::iter::repeat(1),
+                true => iter::once(0),
+                _ => iter::repeat(1),
             },
         )
     }
@@ -541,8 +542,8 @@ mod stable {
         Some({
             #[auto_enum(Iterator)]
             match x {
-                true => std::iter::once(0),
-                _ => std::iter::repeat(1),
+                true => iter::once(0),
+                _ => iter::repeat(1),
             }
         })
     }
@@ -553,8 +554,8 @@ mod stable {
             let _ = {
                 #[auto_enum(Iterator)]
                 match x {
-                    true => std::iter::once(0),
-                    _ => std::iter::repeat(1),
+                    true => iter::once(0),
+                    _ => iter::repeat(1),
                 }
             };
             break;
@@ -565,7 +566,7 @@ mod stable {
     fn non_stmt_expr_if(x: bool) -> Option<impl Iterator<Item = u8>> {
         Some(
             #[auto_enum(Iterator)]
-            if x { std::iter::once(0) } else { std::iter::repeat(1) },
+            if x { iter::once(0) } else { iter::repeat(1) },
         )
     }
 }
@@ -573,6 +574,8 @@ mod stable {
 // nightly
 #[cfg(feature = "fn_traits")]
 mod nightly {
+    use std::iter;
+
     use auto_enums::auto_enum;
 
     const ANS: &[i32] = &[28, 3];
@@ -788,8 +791,8 @@ mod nightly {
             Some(
                 #[auto_enum(Iterator)]
                 match x {
-                    true => std::iter::once(0),
-                    _ => std::iter::repeat(1),
+                    true => iter::once(0),
+                    _ => iter::repeat(1),
                 },
             )
         }
@@ -797,7 +800,7 @@ mod nightly {
         fn if_(x: bool) -> Option<impl Iterator<Item = u8>> {
             Some(
                 #[auto_enum(Iterator)]
-                if x { std::iter::once(0) } else { std::iter::repeat(1) },
+                if x { iter::once(0) } else { iter::repeat(1) },
             )
         }
     }

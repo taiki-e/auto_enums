@@ -723,12 +723,12 @@
 //!
 //!     ```rust
 //!     use auto_enums::auto_enum;
-//!     use std::{fs, io, path::Path};
+//!     use std::{fs::File, io, path::Path};
 //!
 //!     #[auto_enum(Transpose, Write)]
 //!     fn output_stream(file: Option<&Path>) -> io::Result<impl io::Write> {
 //!         match file {
-//!             Some(f) => fs::File::create(f),
+//!             Some(f) => File::create(f),
 //!             None => Ok(io::stdout()),
 //!         }.transpose_ok()
 //!     }
