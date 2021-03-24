@@ -39,7 +39,7 @@ jobs:
       - run: cargo test --all --tests
       - run: cargo test --all --all-features
         if: startsWith(matrix.rust, 'nightly')
-      - run: scripts/check-minimal-versions.sh
+      - run: tools/check-minimal-versions.sh
         if: startsWith(matrix.rust, 'nightly')
 
   build:

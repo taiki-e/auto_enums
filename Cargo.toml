@@ -8,7 +8,7 @@ repository = "https://github.com/taiki-e/auto_enums"
 documentation = "https://docs.rs/auto_enums"
 keywords = ["enum", "macros", "derive", "attribute"]
 categories = ["no-std", "rust-patterns"]
-exclude = ["/.*", "/scripts"]
+exclude = ["/.*", "/tools"]
 description = """
 A library for to allow multiple return types by automatically generated enum.
 """
