@@ -141,12 +141,20 @@ enum Foo<A, B> {
   - Enable to use `transpose*` methods.
 - **`futures03`**
   - Enable to use [futures v0.3][futures03] traits.
+- **`futures01`**
+  - Enable to use [futures v0.1][futures01] traits.
 - **`rayon`**
   - Enable to use [rayon] traits.
 - **`serde`**
   - Enable to use [serde] traits.
 - **`tokio1`**
   - Enable to use [tokio v1][tokio1] traits.
+- **`tokio03`**
+  - Enable to use [tokio v0.3][tokio03] traits.
+- **`tokio02`**
+  - Enable to use [tokio v0.2][tokio02] traits.
+- **`tokio01`**
+  - Enable to use [tokio v0.1][tokio01] traits.
 - **`generator_trait`**
   - Enable to use `[std|core]::ops::Generator` trait.
   - Note that this feature is unstable and may cause incompatible changes between patch versions.
@@ -191,6 +199,7 @@ Please be careful if you return another traits with the same name.
 
 [derive_utils]: https://github.com/taiki-e/derive_utils
 [futures-enum]: https://github.com/taiki-e/futures-enum
+[futures01]: https://docs.rs/futures/0.1
 [futures03]: https://docs.rs/futures/0.3
 [io-enum]: https://github.com/taiki-e/io-enum
 [iter-enum]: https://github.com/taiki-e/iter-enum
@@ -199,6 +208,9 @@ Please be careful if you return another traits with the same name.
 [rust-lang/rfcs#294]: https://github.com/rust-lang/rfcs/issues/294
 [rust-lang/rfcs#2414]: https://github.com/rust-lang/rfcs/issues/2414
 [serde]: https://docs.rs/serde/1
+[tokio01]: https://docs.rs/tokio/0.1
+[tokio02]: https://docs.rs/tokio/0.2
+[tokio03]: https://docs.rs/tokio/0.3
 [tokio1]: https://docs.rs/tokio/1
 
 ## Related Projects

@@ -50,12 +50,20 @@ fmt = []
 
 # https://docs.rs/futures/0.3
 futures03 = []
+# https://docs.rs/futures/0.1
+futures01 = []
 # https://docs.rs/rayon/1
 rayon = []
 # https://docs.rs/serde/1
 serde = []
 # https://docs.rs/tokio/1
 tokio1 = []
+# https://docs.rs/tokio/0.3
+tokio03 = []
+# https://docs.rs/tokio/0.2
+tokio02 = []
+# https://docs.rs/tokio/0.1
+tokio01 = []
 
 # ==============================================================================
 # Unstable features
@@ -88,7 +96,11 @@ trybuild = "1"
 
 # for `#[enum_derive]`
 futures03_crate = { package = "futures", version = "0.3", default-features = false, features = ["std"] }
+futures01_crate = { package = "futures", version = "0.1" }
 tokio1_crate = { package = "tokio", version = "1" }
+tokio03_crate = { package = "tokio", version = "0.3" }
+tokio02_crate = { package = "tokio", version = "0.2" }
+tokio01_crate = { package = "tokio", version = "0.1" }
 rayon_crate = { package = "rayon", version = "1" }
 serde_crate = { package = "serde", version = "1" }
 
