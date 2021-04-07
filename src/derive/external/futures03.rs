@@ -1,7 +1,7 @@
 pub(crate) mod async_buf_read {
     use crate::derive::*;
 
-    pub(crate) const NAME: &[&str] = &["futures::AsyncBufRead"];
+    pub(crate) const NAME: &[&str] = &["futures03::AsyncBufRead"];
 
     pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
         Ok(derive_trait(data, parse_quote!(::futures::io::AsyncBufRead), None, parse_quote! {
@@ -21,7 +21,7 @@ pub(crate) mod async_buf_read {
 pub(crate) mod async_read {
     use crate::derive::*;
 
-    pub(crate) const NAME: &[&str] = &["futures::AsyncRead"];
+    pub(crate) const NAME: &[&str] = &["futures03::AsyncRead"];
 
     pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
         Ok(derive_trait(data, parse_quote!(::futures::io::AsyncRead), None, parse_quote! {
@@ -46,7 +46,7 @@ pub(crate) mod async_read {
 pub(crate) mod async_seek {
     use crate::derive::*;
 
-    pub(crate) const NAME: &[&str] = &["futures::AsyncSeek"];
+    pub(crate) const NAME: &[&str] = &["futures03::AsyncSeek"];
 
     pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
         Ok(derive_trait(data, parse_quote!(::futures::io::AsyncSeek), None, parse_quote! {
@@ -65,7 +65,7 @@ pub(crate) mod async_seek {
 pub(crate) mod async_write {
     use crate::derive::*;
 
-    pub(crate) const NAME: &[&str] = &["futures::AsyncWrite"];
+    pub(crate) const NAME: &[&str] = &["futures03::AsyncWrite"];
 
     pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
         Ok(derive_trait(data, parse_quote!(::futures::io::AsyncWrite), None, parse_quote! {
@@ -100,7 +100,7 @@ pub(crate) mod async_write {
 pub(crate) mod sink {
     use crate::derive::*;
 
-    pub(crate) const NAME: &[&str] = &["futures::Sink"];
+    pub(crate) const NAME: &[&str] = &["futures03::Sink"];
 
     pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
         Ok(derive_trait(data, parse_quote!(::futures::sink::Sink), None, parse_quote! {
@@ -134,7 +134,7 @@ pub(crate) mod sink {
 pub(crate) mod stream {
     use crate::derive::*;
 
-    pub(crate) const NAME: &[&str] = &["futures::Stream"];
+    pub(crate) const NAME: &[&str] = &["futures03::Stream"];
 
     pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
         Ok(derive_trait(data, parse_quote!(::futures::stream::Stream), None, parse_quote! {

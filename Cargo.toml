@@ -91,6 +91,7 @@ quote = "1"
 syn = { version = "1.0.56", features = ["full", "visit-mut"] }
 
 [dev-dependencies]
+macrotest = "1.0.8"
 rustversion = "1"
 trybuild = "1"
 
