@@ -100,6 +100,13 @@ fn get_derive(s: &str) -> Option<DeriveFn> {
         external::futures03::async_seek,
         #[cfg(feature = "futures03")]
         external::futures03::async_buf_read,
+        // futures01
+        #[cfg(feature = "futures01")]
+        external::futures01::future,
+        #[cfg(feature = "futures01")]
+        external::futures01::stream,
+        #[cfg(feature = "futures01")]
+        external::futures01::sink,
         // rayon
         #[cfg(feature = "rayon")]
         external::rayon::par_iter,
@@ -119,6 +126,29 @@ fn get_derive(s: &str) -> Option<DeriveFn> {
         external::tokio1::async_seek,
         #[cfg(feature = "tokio1")]
         external::tokio1::async_buf_read,
+        // tokio03
+        #[cfg(feature = "tokio03")]
+        external::tokio03::async_read,
+        #[cfg(feature = "tokio03")]
+        external::tokio03::async_write,
+        #[cfg(feature = "tokio03")]
+        external::tokio03::async_seek,
+        #[cfg(feature = "tokio03")]
+        external::tokio03::async_buf_read,
+        // tokio02
+        #[cfg(feature = "tokio02")]
+        external::tokio02::async_read,
+        #[cfg(feature = "tokio02")]
+        external::tokio02::async_write,
+        #[cfg(feature = "tokio02")]
+        external::tokio02::async_seek,
+        #[cfg(feature = "tokio02")]
+        external::tokio02::async_buf_read,
+        // tokio01
+        #[cfg(feature = "tokio01")]
+        external::tokio01::async_read,
+        #[cfg(feature = "tokio01")]
+        external::tokio01::async_write,
     }
 
     None

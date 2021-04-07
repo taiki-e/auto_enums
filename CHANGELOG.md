@@ -10,10 +10,7 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
-- [Drop support for old versions of `futures` and `tokio` (`futures01`, `tokio01`, `tokio02`, and `tokio03` features).](https://github.com/taiki-e/auto_enums/pull/125)
-  If support for these traits is needed, use `auto_enums` 0.7 or create your own drive macro ([`derive_utils`](https://github.com/taiki-e/derive_utils) crate can help it).
-
-- [Remove `futures` feature. Use `futures03` feature instead.](https://github.com/taiki-e/auto_enums/pull/124)
+- Remove `futures` feature. Use `futures03` feature instead.
 
 - [Merge `auto_enums_core` and `auto_enums_derive` crates into main `auto_enums` crate.](https://github.com/taiki-e/auto_enums/pull/123)
 
