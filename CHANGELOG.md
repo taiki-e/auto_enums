@@ -10,7 +10,7 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
-- Remove `futures` feature. Use `futures03` feature instead.
+- [Remove `futures` feature. Use `futures03` feature instead.](https://github.com/taiki-e/auto_enums/pull/124)
 
 - [Merge `auto_enums_core` and `auto_enums_derive` crates into main `auto_enums` crate.](https://github.com/taiki-e/auto_enums/pull/123)
 
