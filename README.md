@@ -79,7 +79,7 @@ fn foo(x: i32) -> impl Iterator<Item = i32> {
 
 Next, `#[enum_derive]` implements the specified traits.
 
-[Code like this will be generated](docs/example-1.md)
+[Code like this will be generated](tests/expand/enum_derive/example-1.expanded.rs)
 
 `#[auto_enum]` can also parse nested arms/branches by using the `#[nested]`
 attribute.

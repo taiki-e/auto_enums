@@ -34,6 +34,24 @@ jobs:
       - uses: taiki-e/github-actions/install-rust@main
         with:
           toolchain: ${{ matrix.rust }}
+          component: rustfmt
+      - name: Pre Cache cargo-expand
+        run: |
+          mkdir -p .github/caching
+          curl -LsSf https://api.github.com/repos/dtolnay/cargo-expand/releases/latest \
+            | jq -r '.tag_name' > .github/caching/cargo-expand.lock
+          echo "${{ runner.tool_cache }}/cargo-expand/bin" >> "${GITHUB_PATH}"
+        if: startsWith(matrix.rust, 'nightly')
+      - name: Cache cargo-expand
+        id: cache-cargo-expand
+        uses: actions/cache@v2
+        with:
+          path: ${{ runner.tool_cache }}/cargo-expand/bin
+          key: cargo-expand-bin-${{ hashFiles('.github/caching/cargo-expand.lock') }}
+        if: startsWith(matrix.rust, 'nightly')
+      - name: Install cargo-expand
+        run: cargo install -f cargo-expand --root ${{ runner.tool_cache }}/cargo-expand
+        if: startsWith(matrix.rust, 'nightly') && steps.cache-cargo-expand.outputs.cache-hit != 'true'
       - run: cargo install cargo-hack
         if: startsWith(matrix.rust, 'nightly')
       - run: cargo test --all --tests
