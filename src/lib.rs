@@ -341,12 +341,12 @@
 //!   `?` operator is expanded as follows:
 //!
 //!   ```rust
-//!   # enum Enum<A> { Veriant(A) }
+//!   # enum Enum<A> { Variant(A) }
 //!   # fn dox<T, E>(expr: Result<T, E>) -> Result<T, Enum<E>> {
 //!   # Ok(
 //!   match expr {
 //!       Ok(val) => val,
-//!       Err(err) => return Err(Enum::Veriant(err)),
+//!       Err(err) => return Err(Enum::Variant(err)),
 //!   }
 //!   # )
 //!   # }
