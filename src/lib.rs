@@ -606,7 +606,7 @@
 //! - [`ExactSizeIterator`](https://doc.rust-lang.org/std/iter/trait.ExactSizeIterator.html) - [example](https://github.com/taiki-e/auto_enums/blob/HEAD/tests/expand/std/iter/exact_size_iterator.rs) | [generated code](https://github.com/taiki-e/auto_enums/blob/HEAD/tests/expand/std/iter/exact_size_iterator.expanded.rs)
 //! - [`FusedIterator`](https://doc.rust-lang.org/std/iter/trait.FusedIterator.html) - [example](https://github.com/taiki-e/auto_enums/blob/HEAD/tests/expand/std/iter/fused_iterator.rs) | [generated code](https://github.com/taiki-e/auto_enums/blob/HEAD/tests/expand/std/iter/fused_iterator.expanded.rs)
 //! - [`Extend`](https://doc.rust-lang.org/std/iter/trait.Extend.html) - [example](https://github.com/taiki-e/auto_enums/blob/HEAD/tests/expand/std/iter/extend.rs) | [generated code](https://github.com/taiki-e/auto_enums/blob/HEAD/tests/expand/std/iter/extend.expanded.rs)
-//! - [`TrustedLen`](https://doc.rust-lang.org/std/iter/trait.TrustedLen.html) - [example](https://github.com/taiki-e/auto_enums/blob/HEAD/tests/expand/std/iter/trusted_len.rs) | [generated code](https://github.com/taiki-e/auto_enums/blob/HEAD/tests/expand/std/iter/trusted_len.expanded.rs) *(requires `"trusted_len"` and `"unstable"` crate features)*
+//! - [`TrustedLen`](https://doc.rust-lang.org/std/iter/trait.TrustedLen.html) *(requires `"trusted_len"` and `"unstable"` crate features)* - [example](https://github.com/taiki-e/auto_enums/blob/HEAD/tests/expand/std/iter/trusted_len.rs) | [generated code](https://github.com/taiki-e/auto_enums/blob/HEAD/tests/expand/std/iter/trusted_len.expanded.rs)
 //!
 //! *See also [iter-enum] crate.*
 //!
@@ -618,7 +618,7 @@
 //!
 //! ### `std::io` *(requires `"std"` crate feature)*
 //!
-//! * [`Read`](https://doc.rust-lang.org/std/io/trait.Read.html) (alias: `io::Read`) - [example](https://github.com/taiki-e/auto_enums/blob/HEAD/tests/expand/std/io/read.expanded.rs) | [generated code](https://github.com/taiki-e/auto_enums/blob/HEAD/tests/expand/std/io/read.expanded.rs)
+//! * [`Read`](https://doc.rust-lang.org/std/io/trait.Read.html) (alias: `io::Read`) - [example](https://github.com/taiki-e/auto_enums/blob/HEAD/tests/expand/std/io/read.rs) | [generated code](https://github.com/taiki-e/auto_enums/blob/HEAD/tests/expand/std/io/read.expanded.rs)
 //! * [`BufRead`](https://doc.rust-lang.org/std/io/trait.BufRead.html) (alias: `io::BufRead`) - [example](https://github.com/taiki-e/auto_enums/blob/HEAD/tests/expand/std/io/buf_read.rs) | [generated code](https://github.com/taiki-e/auto_enums/blob/HEAD/tests/expand/std/io/buf_read.expanded.rs)
 //! * [`Write`](https://doc.rust-lang.org/std/io/trait.Write.html) (alias: `io::Write`) - [example](https://github.com/taiki-e/auto_enums/blob/HEAD/tests/expand/std/io/write.rs) | [generated code](https://github.com/taiki-e/auto_enums/blob/HEAD/tests/expand/std/io/write.expanded.rs)
 //! * [`Seek`](https://doc.rust-lang.org/std/io/trait.Seek.html) (alias: `io::Seek`) - [example](https://github.com/taiki-e/auto_enums/blob/HEAD/tests/expand/std/io/seek.rs) | [generated code](https://github.com/taiki-e/auto_enums/blob/HEAD/tests/expand/std/io/seek.expanded.rs)
