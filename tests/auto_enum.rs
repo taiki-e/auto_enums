@@ -757,51 +757,51 @@ mod nightly {
 
     #[test]
     fn marker() {
-        // TODO: uncomment when https://github.com/rust-lang/rust/pull/81352 merged.
-        // fn marker1(x: usize) -> impl Iterator<Item = i32> + Clone {
-        //     #[auto_enum(Iterator, Clone)]
-        //     (0..x as i32)
-        //         .map(|x| x + 1)
-        //         .flat_map(|x| if x > 10 { marker!(0..x) } else { marker!(-100..=0) })
-        // }
-        // for (i, _x) in ANS.iter().enumerate() {
-        //     let _ = marker1(i).clone().sum::<i32>();
-        // }
+        fn marker1(x: usize) -> impl Iterator<Item = i32> + Clone {
+            #[auto_enum(Iterator, Clone)]
+            (0..x as i32)
+                .map(|x| x + 1)
+                .flat_map(|x| if x > 10 { marker!(0..x) } else { marker!(-100..=0) })
+        }
+        for (i, _x) in ANS.iter().enumerate() {
+            let _ = marker1(i).clone().sum::<i32>();
+        }
 
-        // TODO: uncomment when rustc bug fixed.
-        // fn marker2(x: usize) -> impl Iterator<Item = i32> + Clone {
-        //     let a;
-        //
-        //     #[auto_enum(Iterator, Clone)]
-        //     match x {
-        //         0 => a = marker!(2..8),
-        //         _ if x < 2 => a = marker!(vec![2, 0].into_iter()),
-        //         _ => a = marker!(2..=10),
-        //     };
-        //     a
-        // }
-        // for (i, x) in ANS.iter().enumerate() {
-        //     assert_eq!(marker2(i).clone().sum::<i32>(), *x - 1);
-        // }
+        fn marker2(x: usize) -> impl Iterator<Item = i32> + Clone {
+            let a;
+
+            #[auto_enum(Iterator, Clone)]
+            match x {
+                0 => a = marker!(2..8),
+                _ if x < 2 => a = marker!(vec![2, 0].into_iter()),
+                _ => a = marker!(2..=10),
+            };
+            a
+        }
+        for (i, x) in ANS.iter().enumerate() {
+            assert_eq!(marker2(i).clone().sum::<i32>(), *x - 1);
+        }
     }
 
     #[test]
     fn non_stmt_expr() {
-        fn match_(x: bool) -> Option<impl Iterator<Item = u8>> {
-            Some(
-                #[auto_enum(Iterator)]
-                match x {
-                    true => iter::once(0),
-                    _ => iter::repeat(1),
-                },
-            )
-        }
+        // TODO: uncomment when rustc bug fixed.
+        // fn match_(x: bool) -> Option<impl Iterator<Item = u8>> {
+        //     Some(
+        //         #[auto_enum(Iterator)]
+        //         match x {
+        //             true => iter::once(0),
+        //             _ => iter::repeat(1),
+        //         },
+        //     )
+        // }
 
-        fn if_(x: bool) -> Option<impl Iterator<Item = u8>> {
-            Some(
-                #[auto_enum(Iterator)]
-                if x { iter::once(0) } else { iter::repeat(1) },
-            )
-        }
+        // TODO: uncomment when rustc bug fixed.
+        // fn if_(x: bool) -> Option<impl Iterator<Item = u8>> {
+        //     Some(
+        //         #[auto_enum(Iterator)]
+        //         if x { iter::once(0) } else { iter::repeat(1) },
+        //     )
+        // }
     }
 }
