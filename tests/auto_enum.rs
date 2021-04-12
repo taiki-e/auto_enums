@@ -574,8 +574,6 @@ mod stable {
 // nightly
 #[cfg(feature = "fn_traits")]
 mod nightly {
-    use std::iter;
-
     use auto_enums::auto_enum;
 
     const ANS: &[i32] = &[28, 3];
@@ -785,6 +783,8 @@ mod nightly {
 
     #[test]
     fn non_stmt_expr() {
+        // use std::iter;
+
         // TODO: uncomment when rustc bug fixed.
         // fn match_(x: bool) -> Option<impl Iterator<Item = u8>> {
         //     Some(
