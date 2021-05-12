@@ -30,7 +30,7 @@ jobs:
           - nightly
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2.3.4
       - uses: taiki-e/github-actions/install-rust@main
         with:
           toolchain: ${{ matrix.rust }}
@@ -71,14 +71,14 @@ jobs:
           - 1.41..
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2.3.4
       - run: cargo install cargo-hack
       - run: cargo hack build --all --ignore-private --no-dev-deps --version-range ${{ matrix.range }}
 
   features:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2.3.4
       - uses: taiki-e/github-actions/install-rust@main
       - run: cargo install cargo-hack
       - run: cargo hack check --all --ignore-private --feature-powerset --depth 2 --no-dev-deps --features unstable --ignore-unknown-features
@@ -86,7 +86,7 @@ jobs:
   clippy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2.3.4
       - uses: taiki-e/github-actions/install-rust@main
         with:
           component: clippy
@@ -95,7 +95,7 @@ jobs:
   rustfmt:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2.3.4
       - uses: taiki-e/github-actions/install-rust@main
         with:
           component: rustfmt
@@ -104,7 +104,7 @@ jobs:
   rustdoc:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2.3.4
       - uses: taiki-e/github-actions/install-rust@main
       - run: cargo doc --no-deps --all --all-features
         env:
@@ -113,7 +113,7 @@ jobs:
   shellcheck:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2.3.4
       - run: shellcheck **/*.sh
 
   # This job doesn't actually test anything, but they're used to tell bors the
