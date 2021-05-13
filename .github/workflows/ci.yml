@@ -132,8 +132,8 @@ jobs:
       - build
       - features
       - clippy
-      - rustfmt
-      - rustdoc
+      - fmt
+      - docs
       - shellcheck
     runs-on: ubuntu-latest
     steps:
