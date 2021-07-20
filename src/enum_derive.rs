@@ -160,14 +160,14 @@ struct Args {
 
 impl Parse for Args {
     fn parse(input: ParseStream<'_>) -> Result<Self> {
-        fn to_trimed_string(p: &Path) -> String {
+        fn to_trimmed_string(p: &Path) -> String {
             p.to_token_stream().to_string().replace(" ", "")
         }
 
         let mut inner = Vec::new();
         while !input.is_empty() {
             let path = input.parse()?;
-            inner.push((to_trimed_string(&path), path));
+            inner.push((to_trimmed_string(&path), path));
 
             if input.is_empty() {
                 break;

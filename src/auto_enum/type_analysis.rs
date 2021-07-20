@@ -21,8 +21,8 @@ pub(super) fn collect_impl_trait(args: &[Path], traits: &mut Vec<Path>, ty: &mut
                 if let TypeParamBound::Trait(ty) = ty {
                     let ty = path(ty.path.segments.iter().map(|ty| ty.ident.clone().into()));
                     let ty_str = ty.to_token_stream().to_string();
-                    let ty_trimed = ty_str.replace(" ", "");
-                    if TRAITS.contains(&&*ty_trimed)
+                    let ty_trimmed = ty_str.replace(" ", "");
+                    if TRAITS.contains(&&*ty_trimmed)
                         && !self.args.iter().any(|x| x.to_token_stream().to_string() == ty_str)
                     {
                         self.has_impl_trait = true;
