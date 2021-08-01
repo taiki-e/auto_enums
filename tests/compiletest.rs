@@ -23,7 +23,6 @@ fn ui() {
     }
 
     let t = trybuild::TestCases::new();
-    t.pass("tests/ui/external/*.rs");
-    t.compile_fail("tests/ui/auto_enum/*.rs");
-    t.compile_fail("tests/ui/enum_derive/*.rs");
+    t.compile_fail("tests/ui/**/*.rs");
+    t.pass("tests/run-pass/**/*.rs");
 }
