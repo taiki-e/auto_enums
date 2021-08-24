@@ -9,3 +9,5 @@ error: cannot find macro `marker` in this scope
    |
 25 |         2 => return marker!(1..9), //~ ERROR cannot find macro `marker!` in this scope
    |                     ^^^^^^
+   |
+   = note: `marker` is in scope, but it is an attribute: `#[marker]`
