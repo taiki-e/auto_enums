@@ -3,6 +3,7 @@ name = "auto_enums"
 version = "0.8.0-dev"
 authors = ["Taiki Endo <te316e89@gmail.com>"]
 edition = "2018"
+rust-version = "1.31"
 license = "Apache-2.0 OR MIT"
 repository = "https://github.com/taiki-e/auto_enums"
 keywords = ["enum", "macros", "derive", "attribute"]
