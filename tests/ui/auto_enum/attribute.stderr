@@ -1,17 +1,17 @@
-error: unexpected token: (foo)
- --> $DIR/attribute.rs:7:16
+error: unexpected token: `(foo)`
+ --> tests/ui/auto_enum/attribute.rs:7:16
   |
 7 |         #[never(foo)] //~ ERROR unexpected token
   |                ^^^^^
 
-error: unexpected token: (foo)
-  --> $DIR/attribute.rs:17:17
+error: unexpected token: `(foo)`
+  --> tests/ui/auto_enum/attribute.rs:17:17
    |
 17 |         #[nested(foo)] //~ ERROR unexpected token
    |                 ^^^^^
 
 error: #[rec] has been removed and replaced with #[nested]
-  --> $DIR/attribute.rs:27:9
+  --> tests/ui/auto_enum/attribute.rs:27:9
    |
 27 |         #[rec] //~ ERROR #[rec] has been removed and replaced with #[nested]
    |         ^^^^^^

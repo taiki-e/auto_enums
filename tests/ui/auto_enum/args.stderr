@@ -1,47 +1,47 @@
 error: expected `,`
- --> $DIR/args.rs:3:21
+ --> tests/ui/auto_enum/args.rs:3:21
   |
 3 | #[auto_enum(Iterator;)] //~ ERROR expected `,`
   |                     ^
 
 error: expected identifier
-  --> $DIR/args.rs:11:22
+  --> tests/ui/auto_enum/args.rs:11:22
    |
 11 | #[auto_enum(Iterator,;)] //~ ERROR expected identifier
    |                      ^
 
 error: expected `,`
-  --> $DIR/args.rs:22:23
+  --> tests/ui/auto_enum/args.rs:22:23
    |
 22 |     #[auto_enum(marker{f}, Iterator)] //~ ERROR expected `,`
    |                       ^
 
 error: expected `,`
-  --> $DIR/args.rs:30:23
+  --> tests/ui/auto_enum/args.rs:30:23
    |
 30 |     #[auto_enum(marker[f], Iterator)] //~ ERROR expected `,`
    |                       ^
 
 error: expected `,`
-  --> $DIR/args.rs:38:23
+  --> tests/ui/auto_enum/args.rs:38:23
    |
 38 |     #[auto_enum(marker(f), Iterator)] //~ ERROR expected `,`
    |                       ^
 
 error: duplicate `marker` argument
-  --> $DIR/args.rs:46:29
+  --> tests/ui/auto_enum/args.rs:46:29
    |
 46 |     #[auto_enum(marker = f, marker = g, Iterator)] //~ ERROR duplicate `marker` argument
    |                             ^^^^^^
 
 error: expected identifier
-  --> $DIR/args.rs:54:25
+  --> tests/ui/auto_enum/args.rs:54:25
    |
 54 |     #[auto_enum(marker =, Iterator)] //~ ERROR expected identifier
    |                         ^
 
 error: expected `,`
-  --> $DIR/args.rs:62:28
+  --> tests/ui/auto_enum/args.rs:62:28
    |
 62 |     #[auto_enum(marker = f t, Iterator)] //~ ERROR expected `,`
    |                            ^

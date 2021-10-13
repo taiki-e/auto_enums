@@ -93,7 +93,7 @@ syn = { version = "1.0.56", features = ["full", "visit-mut"] }
 [dev-dependencies]
 macrotest = "1.0.8"
 rustversion = "1"
-trybuild = "1"
+trybuild = "1.0.49"
 
 # for `#[enum_derive]`
 futures03_crate = { package = "futures", version = "0.3", default-features = false, features = ["std"] }

@@ -1,5 +1,5 @@
 error[E0267]: `break` inside of a closure
- --> $DIR/invalid_break.rs:2:8
+ --> tests/ui/auto_enum/invalid_break.rs:2:8
   |
 2 |     || break
   |     -- ^^^^^ cannot `break` inside of a closure
@@ -7,7 +7,7 @@ error[E0267]: `break` inside of a closure
   |     enclosing closure
 
 error[E0267]: `break` inside of an `async` block
- --> $DIR/invalid_break.rs:6:13
+ --> tests/ui/auto_enum/invalid_break.rs:6:13
   |
 6 |     async { break }
   |           --^^^^^--

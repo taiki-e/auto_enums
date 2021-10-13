@@ -1,5 +1,5 @@
 error: `enum_derive(Transpose)` all fields need to be generics
-  --> $DIR/ty_impls.rs:6:1
+  --> tests/ui/enum_derive/ty_impls.rs:6:1
    |
 6  | / enum Enum1<A, B> {
 7  | |     //~^ ERROR `enum_derive(Transpose)` all fields need to be generics

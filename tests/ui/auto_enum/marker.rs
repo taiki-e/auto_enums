@@ -3,7 +3,7 @@ use auto_enums::auto_enum;
 #[auto_enum(Iterator, marker = foo)]
 fn a(x: usize) -> impl Iterator<Item = i32> {
     #[auto_enum(Iterator, marker = foo)]
-    //~ ERROR A custom marker name is specified that duplicated the name already used in the parent scope
+    //~ ERROR a custom marker name is specified that duplicated the name already used in the parent scope
     let _iter = match x {
         0 => 1..8,
         1 => return foo!(1..9),

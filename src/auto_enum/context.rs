@@ -91,7 +91,7 @@ impl Context {
             if markers.contains(&marker_string) {
                 return Err(error!(
                     marker,
-                    "A custom marker name is specified that duplicated the name already used in the parent scope",
+                    "a custom marker name is specified that duplicated the name already used in the parent scope",
                 ));
             }
             marker_string
