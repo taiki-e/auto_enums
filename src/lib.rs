@@ -548,7 +548,11 @@
 //!
 //! #[auto_enum(Fn)]
 //! fn foo(x: bool) -> impl Fn(i32) -> i32 {
-//!     if x { |y| y + 1 } else { |z| z - 1 }
+//!     if x {
+//!         |y| y + 1
+//!     } else {
+//!         |z| z - 1
+//!     }
 //! }
 //! ```
 //!
