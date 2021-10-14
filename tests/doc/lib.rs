@@ -1,4 +1,3 @@
-#![cfg(nightly)]
 #![doc(test(
     no_crate_inject,
     attr(
