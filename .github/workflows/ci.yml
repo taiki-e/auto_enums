@@ -59,12 +59,8 @@ jobs:
       - name: Install cargo-expand
         run: cargo install -f cargo-expand --debug --root ${{ runner.tool_cache }}/cargo-expand
         if: startsWith(matrix.rust, 'nightly') && steps.cache-cargo-expand.outputs.cache-hit != 'true'
-      - run: cargo install cargo-hack --debug
-        if: startsWith(matrix.rust, 'nightly')
       - run: cargo test --all --tests
       - run: cargo test --all --all-features
-        if: startsWith(matrix.rust, 'nightly')
-      - run: tools/check-minimal-versions.sh
         if: startsWith(matrix.rust, 'nightly')
 
   build:
@@ -102,8 +98,12 @@ jobs:
       - uses: taiki-e/github-actions/install-rust@main
         with:
           component: clippy,rustfmt
-      - run: cargo clippy --all --all-features --all-targets
+      - run: cargo install cargo-hack --debug
       - run: cargo fmt --all -- --check
+        if: always()
+      - run: cargo clippy --all --all-features --all-targets
+        if: always()
+      - run: tools/check-minimal-versions.sh
         if: always()
       - run: shellcheck **/*.sh
         if: always()
