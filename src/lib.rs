@@ -866,7 +866,6 @@
 // It cannot be included in the published code because these lints have false positives in the minimum required version.
 #![cfg_attr(test, warn(single_use_lifetimes))]
 #![warn(clippy::default_trait_access, clippy::wildcard_imports)]
-#![allow(clippy::if_then_panic)]
 
 #[cfg(all(feature = "generator_trait", not(feature = "unstable")))]
 compile_error!(
