@@ -494,9 +494,9 @@ fn stable_std() {
     #[auto_enum(Debug, Display, Error)]
     fn try_operator(file: Option<&Path>) -> Result<(), impl Error> {
         if let Some(_f) = file {
-            Err(io::Error::from(io::ErrorKind::NotFound)).map_err(IoError::Io2)?
+            Err(io::Error::from(io::ErrorKind::NotFound)).map_err(IoError::Io2)?;
         } else {
-            Err(io::Error::from(io::ErrorKind::NotFound))?
+            Err(io::Error::from(io::ErrorKind::NotFound))?;
         }
         Ok(())
     }
@@ -935,7 +935,7 @@ mod nightly {
                 0 => 1..8,
                 #[never]
                 5..=10 => loop {
-                    panic!()
+                    panic!();
                 },
                 _ => vec![1, 2, 0].into_iter(),
             };
@@ -959,7 +959,7 @@ mod nightly {
             let iter = if i > 3 {
                 #[never]
                 loop {
-                    panic!()
+                    panic!();
                 }
             } else if i == 0 {
                 1..8
@@ -1038,16 +1038,16 @@ mod nightly {
                 0 => 1..8,
                 #[never]
                 5..=10 => loop {
-                    panic!()
+                    panic!();
                 },
                 _ => match i {
                     #[never]
                     5..=10 => loop {
-                        panic!()
+                        panic!();
                     },
                     #[never]
                     11..=20 => loop {
-                        panic!()
+                        panic!();
                     },
                     _ => vec![1, 2, 0].into_iter(),
                 },
@@ -1061,18 +1061,18 @@ mod nightly {
                 0 => 1..8,
                 #[never]
                 5..=10 => loop {
-                    panic!()
+                    panic!();
                 },
                 1..=4 => vec![1, 2, 0].into_iter(),
                 _ => {
                     match i {
                         #[never]
                         5..=10 => loop {
-                            panic!()
+                            panic!();
                         },
                         #[never]
                         11..=20 => loop {
-                            panic!()
+                            panic!();
                         },
                         _ => panic!(),
                     }
