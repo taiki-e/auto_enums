@@ -161,7 +161,7 @@ struct Args {
 impl Parse for Args {
     fn parse(input: ParseStream<'_>) -> Result<Self> {
         fn to_trimmed_string(p: &Path) -> String {
-            p.to_token_stream().to_string().replace(" ", "")
+            p.to_token_stream().to_string().replace(' ', "")
         }
 
         let mut inner = Vec::new();
