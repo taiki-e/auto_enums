@@ -969,6 +969,7 @@ mod nightly {
             assert_eq!(iter.sum::<i32>(), *x);
         }
 
+        #[allow(clippy::needless_late_init)]
         fn assign(x: usize) -> impl Iterator<Item = i32> + Clone {
             let a;
             a = #[auto_enum(Iterator, Clone)]
