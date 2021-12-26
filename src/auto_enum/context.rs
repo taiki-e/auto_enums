@@ -89,10 +89,10 @@ impl Context {
             // https://github.com/alexcrichton/proc-macro2/blob/1.0.1/src/wrapper.rs#L706
             let marker_string = marker.to_string();
             if markers.contains(&marker_string) {
-                return Err(error!(
+                bail!(
                     marker,
                     "a custom marker name is specified that duplicated the name already used in the parent scope",
-                ));
+                );
             }
             marker_string
         } else {
@@ -254,7 +254,7 @@ impl Context {
                 VisitLastMode::Never => ("marker macros", "marker macro"),
             };
 
-            error!(
+            format_err!(
                 cx.span,
                 "`#[auto_enum]` is required two or more {}, there is {} {} in this statement",
                 msg1,
@@ -316,7 +316,7 @@ impl Parse for Args {
                 let _: Token![=] = input.parse()?;
                 let ident: Ident = input.parse()?;
                 if marker.replace(ident).is_some() {
-                    return Err(error!(i, "duplicate `marker` argument"));
+                    bail!(i, "duplicate `marker` argument");
                 }
             } else {
                 args.push(input.parse()?);

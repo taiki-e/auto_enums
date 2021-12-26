@@ -26,7 +26,7 @@ fn check_fields(data: &Data) -> Result<()> {
     if quote!(#generics).to_string() == quote!(<#(#fields),*#comma>).to_string() {
         Ok(())
     } else {
-        Err(error!(data, "all fields need to be generics"))
+        bail!(data, "all fields need to be generics")
     }
 }
 

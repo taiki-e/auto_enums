@@ -263,7 +263,8 @@ fn expand(args: TokenStream, input: TokenStream) -> Result<TokenStream> {
     for (s, arg) in args {
         match (get_derive(s), arg) {
             (Some(f), _) => {
-                items.extend(f(&data).map_err(|e| error!(data, "`enum_derive({})` {}", s, e))?);
+                items
+                    .extend(f(&data).map_err(|e| format_err!(data, "`enum_derive({})` {}", s, e))?);
             }
             (_, Some(arg)) => derive.push(arg),
             _ => {}

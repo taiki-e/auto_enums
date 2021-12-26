@@ -6,12 +6,18 @@ use syn::{
     ExprCall, ExprPath, ExprTuple, ItemFn, Local, Path, PathSegment, Result, Stmt,
 };
 
-macro_rules! error {
-    ($span:expr, $msg:expr) => {
-        syn::Error::new_spanned(&$span, $msg)
+macro_rules! format_err {
+    ($span:expr, $msg:expr $(,)*) => {
+        syn::Error::new_spanned(&$span as &dyn quote::ToTokens, &$msg as &dyn ::std::fmt::Display)
     };
     ($span:expr, $($tt:tt)*) => {
-        error!($span, format!($($tt)*))
+        format_err!($span, format!($($tt)*))
+    };
+}
+
+macro_rules! bail {
+    ($($tt:tt)*) => {
+        return Err(format_err!($($tt)*))
     };
 }
 
@@ -64,7 +70,7 @@ pub(crate) fn parse_as_empty(tokens: &TokenStream) -> Result<()> {
     if tokens.is_empty() {
         Ok(())
     } else {
-        Err(error!(tokens, "unexpected token: `{}`", tokens))
+        bail!(tokens, "unexpected token: `{}`", tokens)
     }
 }
 

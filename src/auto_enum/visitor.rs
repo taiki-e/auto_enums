@@ -54,8 +54,11 @@ impl<'a> Visitor<'a> {
 
             // The old annotation `#[rec]` is replaced with `#[nested]`.
             if let Some(old) = attrs.find_remove_attr("rec") {
-                self.cx
-                    .error(error!(old, "#[rec] has been removed and replaced with #[{}]", NESTED));
+                self.cx.error(format_err!(
+                    old,
+                    "#[rec] has been removed and replaced with #[{}]",
+                    NESTED
+                ));
             }
         }
     }

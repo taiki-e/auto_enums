@@ -37,7 +37,7 @@ pub(crate) fn attribute(args: TokenStream, input: TokenStream) -> TokenStream {
         Err(e) => syn::parse2::<Expr>(input)
             .map_err(|_e| {
                 cx.error(e);
-                error!(cx.span, "may only be used on expression, statement, or function")
+                format_err!(cx.span, "may only be used on expression, statement, or function")
             })
             .and_then(|mut expr| {
                 expand_parent_expr(&mut cx, &mut expr, false).map(|()| expr.into_token_stream())
@@ -97,7 +97,7 @@ fn expand_parent_stmt(cx: &mut Context, stmt: &mut Stmt) -> Result<()> {
         Stmt::Local(local) => expand_parent_local(cx, local),
         Stmt::Item(Item::Fn(item)) => expand_parent_item_fn(cx, item),
         Stmt::Item(item) => {
-            Err(error!(item, "may only be used on expression, statement, or function"))
+            bail!(item, "may only be used on expression, statement, or function");
         }
     }
 }
@@ -135,10 +135,7 @@ fn expand_parent_local(cx: &mut Context, local: &mut Local) -> Result<()> {
     let expr = if let Some((_, expr)) = &mut local.init {
         &mut **expr
     } else {
-        return Err(error!(
-            local,
-            "the `#[auto_enum]` attribute is not supported uninitialized let statement"
-        ));
+        bail!(local, "the `#[auto_enum]` attribute is not supported uninitialized let statement");
     };
 
     expand_expr(cx, expr)?;
@@ -199,10 +196,7 @@ fn expand_parent_item_fn(cx: &mut Context, item: &mut ItemFn) -> Result<()> {
         Some(Stmt::Expr(expr)) => child_expr(cx, expr)?,
         Some(_) => {}
         None => {
-            return Err(error!(
-                item.block,
-                "the `#[auto_enum]` attribute is not supported empty functions"
-            ));
+            bail!(item.block, "the `#[auto_enum]` attribute is not supported empty functions");
         }
     }
 
