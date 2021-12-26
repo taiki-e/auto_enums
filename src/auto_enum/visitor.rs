@@ -7,7 +7,7 @@ use syn::{
 };
 
 use super::{Context, VisitMode, DEFAULT_MARKER, NAME, NESTED, NEVER};
-use crate::utils::{parse_as_empty, replace_expr, Attrs, VisitedNode};
+use crate::utils::{parse_as_empty, replace_expr, Attrs, Node};
 
 #[derive(Clone, Copy, Default)]
 struct Scope {
@@ -382,7 +382,7 @@ trait VisitStmt: VisitMut {
 // FindNested
 
 /// Find `#[nested]` attribute.
-pub(super) fn find_nested(node: &mut impl VisitedNode) -> bool {
+pub(super) fn find_nested(node: &mut impl Node) -> bool {
     struct FindNested {
         has: bool,
     }
@@ -435,7 +435,7 @@ pub(super) struct FnCount {
     pub(super) return_: usize,
 }
 
-pub(super) fn visit_fn(cx: &Context, node: &mut impl VisitedNode) -> FnCount {
+pub(super) fn visit_fn(cx: &Context, node: &mut impl Node) -> FnCount {
     struct FnVisitor<'a> {
         cx: &'a Context,
         scope: Scope,

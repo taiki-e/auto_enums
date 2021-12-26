@@ -90,41 +90,41 @@ impl<T> VecExt<T> for Vec<T> {
 // =================================================================================================
 // visited node
 
-pub(crate) trait VisitedNode {
+pub(crate) trait Node {
     fn visited(&mut self, visitor: &mut impl VisitMut);
 }
 
-impl VisitedNode for Stmt {
+impl Node for Stmt {
     fn visited(&mut self, visitor: &mut impl VisitMut) {
         visitor.visit_stmt_mut(self);
     }
 }
 
-impl VisitedNode for Local {
+impl Node for Local {
     fn visited(&mut self, visitor: &mut impl VisitMut) {
         visitor.visit_local_mut(self);
     }
 }
 
-impl VisitedNode for Expr {
+impl Node for Expr {
     fn visited(&mut self, visitor: &mut impl VisitMut) {
         visitor.visit_expr_mut(self);
     }
 }
 
-impl VisitedNode for Arm {
+impl Node for Arm {
     fn visited(&mut self, visitor: &mut impl VisitMut) {
         visitor.visit_arm_mut(self);
     }
 }
 
-impl VisitedNode for Block {
+impl Node for Block {
     fn visited(&mut self, visitor: &mut impl VisitMut) {
         visitor.visit_block_mut(self);
     }
 }
 
-impl VisitedNode for ItemFn {
+impl Node for ItemFn {
     fn visited(&mut self, visitor: &mut impl VisitMut) {
         visitor.visit_item_fn_mut(self);
     }

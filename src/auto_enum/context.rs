@@ -10,7 +10,7 @@ use syn::{
 };
 
 use super::visitor::{Dummy, Visitor};
-use crate::utils::{expr_call, path, replace_expr, unit, VisitedNode};
+use crate::utils::{expr_call, path, replace_expr, unit, Node};
 
 // =================================================================================================
 // Context
@@ -230,11 +230,11 @@ impl Context {
 
     // visitors
 
-    pub(super) fn visitor(&mut self, node: &mut impl VisitedNode) {
+    pub(super) fn visitor(&mut self, node: &mut impl Node) {
         node.visited(&mut Visitor::new(self));
     }
 
-    pub(super) fn dummy(&mut self, node: &mut impl VisitedNode) {
+    pub(super) fn dummy(&mut self, node: &mut impl Node) {
         #[cfg(not(feature = "type_analysis"))]
         debug_assert!(self.is_dummy());
         #[cfg(feature = "type_analysis")]
