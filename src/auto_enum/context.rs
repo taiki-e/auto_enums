@@ -1,4 +1,4 @@
-use std::{collections::hash_map::DefaultHasher, hash::Hasher, iter, mem};
+use std::{cell::RefCell, collections::hash_map::DefaultHasher, hash::Hasher, iter, mem, thread};
 
 use proc_macro2::TokenStream;
 use quote::format_ident;
@@ -15,7 +15,7 @@ use crate::utils::{expr_call, path, replace_expr, unit, Node};
 // =================================================================================================
 // Context
 
-/// Config for related to `visotor::Visotor` type.
+/// Config for related to `visitor::Visitor` type.
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub(super) enum VisitMode {
     Default,
@@ -38,11 +38,6 @@ pub(super) enum VisitLastMode {
     Never,
 }
 
-#[derive(Default)]
-struct Diagnostic {
-    message: Option<Error>,
-}
-
 /// The default identifier of expression level marker.
 pub(super) const DEFAULT_MARKER: &str = "marker";
 
@@ -50,26 +45,29 @@ pub(super) struct Context {
     builder: Builder,
 
     /// The identifier of the marker macro of the current scope.
-    pub(super) marker: String,
+    pub(super) current_marker: String,
     /// All marker macro identifiers that may have effects on the current scope.
-    pub(super) markers: Vec<String>,
+    markers: Vec<String>,
 
     // TODO: we may be able to replace some fields based on depth.
     // depth: isize,
     /// Currently, this is basically the same as `self.markers.len() == 1`.
     root: bool,
     /// This is `true` if other `auto_enum` attribute exists in the current scope.
-    pub(super) other_attr: bool,
+    pub(super) has_child: bool,
 
     pub(super) visit_mode: VisitMode,
     pub(super) visit_last_mode: VisitLastMode,
 
     /// Span passed to `syn::Error::new_spanned`.
     pub(super) span: TokenStream,
-    diagnostic: Diagnostic,
+    // - `None`: during checking.
+    // - `Some(None)`: there are no errors.
+    // - `Some(Some)`: there are errors.
+    error: RefCell<Option<Option<Error>>>,
 
     pub(super) args: Vec<Path>,
-    #[cfg(feature = "type_analysis")]
+    // if "type_analysis" feature is disabled, this field is always empty.
     traits: Vec<Path>,
 }
 
@@ -79,11 +77,11 @@ impl Context {
         args: TokenStream,
         root: bool,
         mut markers: Vec<String>,
-        diagnostic: Diagnostic,
+        diagnostic: Option<Error>,
     ) -> Result<Self> {
         let Args { args, marker } = syn::parse2(args)?;
 
-        let marker = if let Some(marker) = marker {
+        let current_marker = if let Some(marker) = marker {
             // Currently, there is no reason to preserve the span, so convert `Ident` to `String`.
             // This should probably be more efficient than calling `to_string` for each comparison.
             // https://github.com/alexcrichton/proc-macro2/blob/1.0.1/src/wrapper.rs#L706
@@ -99,37 +97,37 @@ impl Context {
             DEFAULT_MARKER.to_string()
         };
 
-        markers.push(marker.clone());
+        markers.push(current_marker.clone());
 
         Ok(Self {
             builder: Builder::new(&span),
-            marker,
+            current_marker,
             markers,
             root,
-            other_attr: false,
+            has_child: false,
             visit_mode: VisitMode::Default,
             visit_last_mode: VisitLastMode::Default,
             span,
-            diagnostic,
+            error: RefCell::new(Some(diagnostic)),
             args,
-            #[cfg(feature = "type_analysis")]
             traits: Vec::new(),
         })
     }
 
     /// Make a new `Context` as a root.
     pub(super) fn root(span: TokenStream, args: TokenStream) -> Result<Self> {
-        Self::new(span, args, true, Vec::new(), Diagnostic::default())
+        Self::new(span, args, true, Vec::with_capacity(1), None)
     }
 
     /// Make a new `Context` as a child based on a parent context `self`.
     pub(super) fn make_child(&mut self, span: TokenStream, args: TokenStream) -> Result<Self> {
+        debug_assert!(self.has_child);
         Self::new(
             span,
             args,
             false,
             mem::replace(&mut self.markers, Vec::new()),
-            mem::replace(&mut self.diagnostic, Diagnostic::default()),
+            self.error.borrow_mut().as_mut().unwrap().take(),
         )
     }
 
@@ -137,27 +135,30 @@ impl Context {
     pub(super) fn join_child(&mut self, mut child: Self) {
         debug_assert!(self.markers.is_empty());
         child.markers.pop();
-        self.markers = child.markers;
+        mem::swap(&mut self.markers, &mut child.markers);
 
-        if let Some(message) = child.diagnostic.message {
+        if let Some(message) = child.error.borrow_mut().take().unwrap() {
             self.error(message);
         }
     }
 
-    pub(super) fn error(&mut self, message: Error) {
-        match &mut self.diagnostic.message {
+    pub(super) fn error(&self, message: Error) {
+        match self.error.borrow_mut().as_mut().unwrap() {
             Some(base) => base.combine(message),
-            None => self.diagnostic.message = Some(message),
+            error @ None => *error = Some(message),
         }
     }
 
-    pub(super) fn compile_error(&self) -> Option<TokenStream> {
-        self.diagnostic.message.as_ref().map(Error::to_compile_error)
+    pub(super) fn check(self) -> Result<()> {
+        match self.error.borrow_mut().take().unwrap() {
+            Some(e) => Err(e),
+            None => Ok(()),
+        }
     }
 
     /// Returns `true` if one or more errors occurred.
     pub(super) fn has_error(&self) -> bool {
-        self.diagnostic.message.is_some()
+        self.error.borrow().as_ref().unwrap().is_some()
     }
 
     pub(super) fn visit_last(&self) -> bool {
@@ -165,18 +166,12 @@ impl Context {
     }
 
     /// Even if this is `false`, there are cases where this `auto_enum` attribute is handled as a
-    /// dummy. e.g., If `self.other_attr && self.builder.variants.is_empty()` is true, this
+    /// dummy. e.g., If `self.has_child && self.builder.variants.is_empty()` is true, this
     /// `auto_enum` attribute is handled as a dummy.
     pub(super) fn is_dummy(&self) -> bool {
         // `auto_enum` attribute with no argument is handled as a dummy.
-        #[cfg(not(feature = "type_analysis"))]
-        {
-            self.args.is_empty()
-        }
-        #[cfg(feature = "type_analysis")]
-        {
-            self.args.is_empty() && self.traits.is_empty()
-        }
+        // if "type_analysis" feature is disabled, `self.traits` field is always empty.
+        self.args.is_empty() && self.traits.is_empty()
     }
 
     #[cfg(feature = "type_analysis")]
@@ -204,7 +199,7 @@ impl Context {
 
     /// Returns `true` if `mac` is the marker macro of the current scope.
     pub(super) fn is_marker_macro_exact(&self, mac: &Macro) -> bool {
-        mac.path.is_ident(&self.marker)
+        mac.path.is_ident(&self.current_marker)
     }
 
     /// from `<expr>` into `Enum::VariantN(<expr>)`
@@ -235,9 +230,6 @@ impl Context {
     }
 
     pub(super) fn dummy(&mut self, node: &mut impl Node) {
-        #[cfg(not(feature = "type_analysis"))]
-        debug_assert!(self.is_dummy());
-        #[cfg(feature = "type_analysis")]
         debug_assert!(self.args.is_empty());
 
         node.visited(&mut Dummy::new(self));
@@ -245,44 +237,34 @@ impl Context {
 
     // build
 
-    pub(super) fn build(&mut self, f: impl FnOnce(ItemEnum)) -> Result<()> {
-        fn err(cx: &Context) -> Error {
-            let (msg1, msg2) = match cx.visit_last_mode {
+    pub(super) fn build(&mut self, f: impl FnOnce(ItemEnum)) {
+        // As we know that an error will occur, it does not matter if there are not enough variants.
+        if !self.has_error() {
+            match self.builder.variants.len() {
+                1 => {}
+                0 if !self.has_child => {}
+                _ => {
+                    if !self.builder.variants.is_empty() {
+                        f(self.builder.build(&self.args, &self.traits));
+                    }
+                    return;
+                }
+            }
+
+            let (msg1, msg2) = match self.visit_last_mode {
                 VisitLastMode::Default => {
                     ("branches or marker macros in total", "branch or marker macro")
                 }
                 VisitLastMode::Never => ("marker macros", "marker macro"),
             };
-
-            format_err!(
-                cx.span,
+            self.error(format_err!(
+                self.span,
                 "`#[auto_enum]` is required two or more {}, there is {} {} in this statement",
                 msg1,
-                if cx.builder.variants.is_empty() { "no" } else { "only one" },
+                if self.builder.variants.is_empty() { "no" } else { "only one" },
                 msg2
-            )
+            ));
         }
-
-        // As we know that an error will occur, it does not matter if there are not enough variants.
-        if !self.has_error() {
-            match self.builder.variants.len() {
-                1 => return Err(err(self)),
-                0 if !self.other_attr => return Err(err(self)),
-                _ => {}
-            }
-        }
-
-        if !self.builder.variants.is_empty() {
-            #[cfg(not(feature = "type_analysis"))]
-            {
-                f(self.builder.build(&self.args, &[]));
-            }
-            #[cfg(feature = "type_analysis")]
-            {
-                f(self.builder.build(&self.args, &self.traits));
-            }
-        }
-        Ok(())
     }
 
     // type_analysis feature
@@ -290,6 +272,14 @@ impl Context {
     #[cfg(feature = "type_analysis")]
     pub(super) fn collect_impl_trait(&mut self, ty: &mut Type) -> bool {
         super::type_analysis::collect_impl_trait(&self.args, &mut self.traits, ty)
+    }
+}
+
+impl Drop for Context {
+    fn drop(&mut self) {
+        if !thread::panicking() && self.error.borrow().is_some() {
+            panic!("context need to be checked");
+        }
     }
 }
 

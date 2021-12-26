@@ -119,7 +119,7 @@ impl<'a> Visitor<'a> {
                             brace_token: token::Brace::default(),
                             arms,
                         })
-                    })
+                    });
                 }
                 _ => {}
             }
@@ -130,16 +130,16 @@ impl<'a> Visitor<'a> {
     fn visit_nested(&mut self, node: &mut Expr, attr: &Attribute) {
         debug_assert!(!self.scope.foreign);
 
-        if let Err(e) =
-            parse_as_empty(&attr.tokens).and_then(|_| super::expr::child_expr(self.cx, node))
-        {
+        if let Err(e) = parse_as_empty(&attr.tokens) {
             self.cx.error(e);
+        } else {
+            super::expr::child_expr(self.cx, node);
         }
     }
 
     /// Expression level marker (`marker!` macro)
     fn visit_marker_macro(&mut self, node: &mut Expr) {
-        debug_assert!(!self.scope.foreign || self.cx.marker != DEFAULT_MARKER);
+        debug_assert!(!self.scope.foreign || self.cx.current_marker != DEFAULT_MARKER);
 
         match node {
             // Desugar `marker!(<expr>)` into `Enum::VariantN(<expr>)`.
@@ -161,7 +161,7 @@ impl<'a> Visitor<'a> {
                     } else {
                         self.cx.next_expr_with_attrs(expr.attrs, args)
                     }
-                })
+                });
             }
             _ => {}
         }
@@ -175,7 +175,7 @@ impl<'a> Visitor<'a> {
         if node.any_attr(NAME) {
             self.scope.foreign = true;
             // Record whether other `auto_enum` attribute exists.
-            self.cx.other_attr = true;
+            self.cx.has_child = true;
         }
         self.scope.check_expr(node);
 
@@ -193,7 +193,7 @@ impl<'a> Visitor<'a> {
 
         VisitStmt::visit_expr(self, node, has_semi);
 
-        if !self.scope.foreign || self.cx.marker != DEFAULT_MARKER {
+        if !self.scope.foreign || self.cx.current_marker != DEFAULT_MARKER {
             self.visit_marker_macro(node);
             self.find_remove_attrs(node);
         }
@@ -250,7 +250,7 @@ impl VisitMut for Visitor<'_> {
                     if node.any_attr(NAME) {
                         self.scope.foreign = true;
                         // Record whether other `auto_enum` attribute exists.
-                        self.cx.other_attr = true;
+                        self.cx.has_child = true;
                     }
 
                     VisitStmt::visit_stmt(self, node);
@@ -289,7 +289,7 @@ impl VisitMut for Dummy<'_> {
     fn visit_stmt_mut(&mut self, node: &mut Stmt) {
         if !self.cx.has_error() {
             if node.any_attr(NAME) {
-                self.cx.other_attr = true;
+                self.cx.has_child = true;
             }
             VisitStmt::visit_stmt(self, node);
         }
@@ -298,7 +298,7 @@ impl VisitMut for Dummy<'_> {
     fn visit_expr_mut(&mut self, node: &mut Expr) {
         if !self.cx.has_error() {
             if node.any_attr(NAME) {
-                self.cx.other_attr = true;
+                self.cx.has_child = true;
             }
             VisitStmt::visit_expr(self, node, false);
         }
@@ -334,8 +334,8 @@ trait VisitStmt: VisitMut {
         match res {
             Some(Err(e)) => visitor.cx().error(e),
             Some(Ok(mut cx)) => {
-                super::expand_parent_expr(&mut cx, node, has_semi).unwrap_or_else(|e| cx.error(e));
-                visitor.cx().join_child(cx)
+                super::expand_parent_expr(&mut cx, node, has_semi);
+                visitor.cx().join_child(cx);
             }
             None => {}
         }
@@ -370,8 +370,8 @@ trait VisitStmt: VisitMut {
         match res {
             Some(Err(e)) => visitor.cx().error(e),
             Some(Ok(mut cx)) => {
-                super::expand_parent_stmt(&mut cx, node).unwrap_or_else(|e| cx.error(e));
-                visitor.cx().join_child(cx)
+                super::expand_parent_stmt(&mut cx, node);
+                visitor.cx().join_child(cx);
             }
             None => {}
         }
