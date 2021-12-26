@@ -15,7 +15,7 @@ use crate::utils::{expr_call, path, replace_expr, unit, Node};
 // =================================================================================================
 // Context
 
-/// Config for related to `visotor::Visotor` type.
+/// Config for related to `visitor::Visitor` type.
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub(super) enum VisitMode {
     Default,
@@ -59,7 +59,7 @@ pub(super) struct Context {
     /// Currently, this is basically the same as `self.markers.len() == 1`.
     root: bool,
     /// This is `true` if other `auto_enum` attribute exists in the current scope.
-    pub(super) other_attr: bool,
+    pub(super) has_child: bool,
 
     pub(super) visit_mode: VisitMode,
     pub(super) visit_last_mode: VisitLastMode,
@@ -106,7 +106,7 @@ impl Context {
             marker,
             markers,
             root,
-            other_attr: false,
+            has_child: false,
             visit_mode: VisitMode::Default,
             visit_last_mode: VisitLastMode::Default,
             span,
@@ -165,7 +165,7 @@ impl Context {
     }
 
     /// Even if this is `false`, there are cases where this `auto_enum` attribute is handled as a
-    /// dummy. e.g., If `self.other_attr && self.builder.variants.is_empty()` is true, this
+    /// dummy. e.g., If `self.has_child && self.builder.variants.is_empty()` is true, this
     /// `auto_enum` attribute is handled as a dummy.
     pub(super) fn is_dummy(&self) -> bool {
         // `auto_enum` attribute with no argument is handled as a dummy.
@@ -267,7 +267,7 @@ impl Context {
         if !self.has_error() {
             match self.builder.variants.len() {
                 1 => return Err(err(self)),
-                0 if !self.other_attr => return Err(err(self)),
+                0 if !self.has_child => return Err(err(self)),
                 _ => {}
             }
         }

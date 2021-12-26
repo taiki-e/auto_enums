@@ -122,7 +122,7 @@ fn expand_parent_local(cx: &mut Context, local: &mut Local) -> Result<()> {
     {
         if let Pat::Type(pat) = &mut local.pat {
             if cx.collect_impl_trait(&mut pat.ty) {
-                local.pat = (*pat.pat).clone()
+                local.pat = (*pat.pat).clone();
             }
         }
     }

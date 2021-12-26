@@ -88,7 +88,7 @@ impl<T> VecExt<T> for Vec<T> {
 }
 
 // =================================================================================================
-// visited node
+// node
 
 pub(crate) trait Node {
     fn visited(&mut self, visitor: &mut impl VisitMut);

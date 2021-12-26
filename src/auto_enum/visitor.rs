@@ -119,7 +119,7 @@ impl<'a> Visitor<'a> {
                             brace_token: token::Brace::default(),
                             arms,
                         })
-                    })
+                    });
                 }
                 _ => {}
             }
@@ -161,7 +161,7 @@ impl<'a> Visitor<'a> {
                     } else {
                         self.cx.next_expr_with_attrs(expr.attrs, args)
                     }
-                })
+                });
             }
             _ => {}
         }
@@ -175,7 +175,7 @@ impl<'a> Visitor<'a> {
         if node.any_attr(NAME) {
             self.scope.foreign = true;
             // Record whether other `auto_enum` attribute exists.
-            self.cx.other_attr = true;
+            self.cx.has_child = true;
         }
         self.scope.check_expr(node);
 
@@ -250,7 +250,7 @@ impl VisitMut for Visitor<'_> {
                     if node.any_attr(NAME) {
                         self.scope.foreign = true;
                         // Record whether other `auto_enum` attribute exists.
-                        self.cx.other_attr = true;
+                        self.cx.has_child = true;
                     }
 
                     VisitStmt::visit_stmt(self, node);
@@ -289,7 +289,7 @@ impl VisitMut for Dummy<'_> {
     fn visit_stmt_mut(&mut self, node: &mut Stmt) {
         if !self.cx.has_error() {
             if node.any_attr(NAME) {
-                self.cx.other_attr = true;
+                self.cx.has_child = true;
             }
             VisitStmt::visit_stmt(self, node);
         }
@@ -298,7 +298,7 @@ impl VisitMut for Dummy<'_> {
     fn visit_expr_mut(&mut self, node: &mut Expr) {
         if !self.cx.has_error() {
             if node.any_attr(NAME) {
-                self.cx.other_attr = true;
+                self.cx.has_child = true;
             }
             VisitStmt::visit_expr(self, node, false);
         }
@@ -335,7 +335,7 @@ trait VisitStmt: VisitMut {
             Some(Err(e)) => visitor.cx().error(e),
             Some(Ok(mut cx)) => {
                 super::expand_parent_expr(&mut cx, node, has_semi).unwrap_or_else(|e| cx.error(e));
-                visitor.cx().join_child(cx)
+                visitor.cx().join_child(cx);
             }
             None => {}
         }
@@ -371,7 +371,7 @@ trait VisitStmt: VisitMut {
             Some(Err(e)) => visitor.cx().error(e),
             Some(Ok(mut cx)) => {
                 super::expand_parent_stmt(&mut cx, node).unwrap_or_else(|e| cx.error(e));
-                visitor.cx().join_child(cx)
+                visitor.cx().join_child(cx);
             }
             None => {}
         }
