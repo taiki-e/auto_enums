@@ -17,6 +17,7 @@ on:
 env:
   CARGO_INCREMENTAL: 0
   CARGO_NET_RETRY: 10
+  CARGO_NET_GIT_FETCH_WITH_CLI: true
   CARGO_TERM_COLOR: always
   RUST_BACKTRACE: 1
   RUSTFLAGS: -D warnings
@@ -47,7 +48,7 @@ jobs:
       - name: Pre Cache cargo-expand
         run: |
           mkdir -p .github/caching
-          curl -fsSL --retry 3 https://api.github.com/repos/dtolnay/cargo-expand/releases/latest \
+          curl -fsSL --retry 10 --retry-connrefused https://api.github.com/repos/dtolnay/cargo-expand/releases/latest \
             | jq -r '.tag_name' > .github/caching/cargo-expand.lock
           echo "${{ runner.tool_cache }}/cargo-expand/bin" >> "${GITHUB_PATH}"
         if: startsWith(matrix.rust, 'nightly')
@@ -107,7 +108,7 @@ jobs:
         if: always()
       - run: tools/check-minimal-versions.sh
         if: always()
-      - run: shellcheck **/*.sh
+      - run: shellcheck $(git ls-files '*.sh')
         if: always()
 
   docs:
