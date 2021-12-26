@@ -139,7 +139,7 @@ impl<'a> Visitor<'a> {
 
     /// Expression level marker (`marker!` macro)
     fn visit_marker_macro(&mut self, node: &mut Expr) {
-        debug_assert!(!self.scope.foreign || self.cx.marker != DEFAULT_MARKER);
+        debug_assert!(!self.scope.foreign || self.cx.current_marker != DEFAULT_MARKER);
 
         match node {
             // Desugar `marker!(<expr>)` into `Enum::VariantN(<expr>)`.
@@ -193,7 +193,7 @@ impl<'a> Visitor<'a> {
 
         VisitStmt::visit_expr(self, node, has_semi);
 
-        if !self.scope.foreign || self.cx.marker != DEFAULT_MARKER {
+        if !self.scope.foreign || self.cx.current_marker != DEFAULT_MARKER {
             self.visit_marker_macro(node);
             self.find_remove_attrs(node);
         }

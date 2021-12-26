@@ -50,9 +50,9 @@ pub(super) struct Context {
     builder: Builder,
 
     /// The identifier of the marker macro of the current scope.
-    pub(super) marker: String,
+    pub(super) current_marker: String,
     /// All marker macro identifiers that may have effects on the current scope.
-    pub(super) markers: Vec<String>,
+    markers: Vec<String>,
 
     // TODO: we may be able to replace some fields based on depth.
     // depth: isize,
@@ -83,7 +83,7 @@ impl Context {
     ) -> Result<Self> {
         let Args { args, marker } = syn::parse2(args)?;
 
-        let marker = if let Some(marker) = marker {
+        let current_marker = if let Some(marker) = marker {
             // Currently, there is no reason to preserve the span, so convert `Ident` to `String`.
             // This should probably be more efficient than calling `to_string` for each comparison.
             // https://github.com/alexcrichton/proc-macro2/blob/1.0.1/src/wrapper.rs#L706
@@ -99,11 +99,11 @@ impl Context {
             DEFAULT_MARKER.to_string()
         };
 
-        markers.push(marker.clone());
+        markers.push(current_marker.clone());
 
         Ok(Self {
             builder: Builder::new(&span),
-            marker,
+            current_marker,
             markers,
             root,
             has_child: false,
@@ -204,7 +204,7 @@ impl Context {
 
     /// Returns `true` if `mac` is the marker macro of the current scope.
     pub(super) fn is_marker_macro_exact(&self, mac: &Macro) -> bool {
-        mac.path.is_ident(&self.marker)
+        mac.path.is_ident(&self.current_marker)
     }
 
     /// from `<expr>` into `Enum::VariantN(<expr>)`
