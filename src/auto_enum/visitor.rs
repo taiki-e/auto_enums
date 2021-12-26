@@ -130,10 +130,10 @@ impl<'a> Visitor<'a> {
     fn visit_nested(&mut self, node: &mut Expr, attr: &Attribute) {
         debug_assert!(!self.scope.foreign);
 
-        if let Err(e) =
-            parse_as_empty(&attr.tokens).and_then(|_| super::expr::child_expr(self.cx, node))
-        {
+        if let Err(e) = parse_as_empty(&attr.tokens) {
             self.cx.error(e);
+        } else {
+            super::expr::child_expr(self.cx, node);
         }
     }
 
@@ -334,7 +334,7 @@ trait VisitStmt: VisitMut {
         match res {
             Some(Err(e)) => visitor.cx().error(e),
             Some(Ok(mut cx)) => {
-                super::expand_parent_expr(&mut cx, node, has_semi).unwrap_or_else(|e| cx.error(e));
+                super::expand_parent_expr(&mut cx, node, has_semi);
                 visitor.cx().join_child(cx);
             }
             None => {}
@@ -370,7 +370,7 @@ trait VisitStmt: VisitMut {
         match res {
             Some(Err(e)) => visitor.cx().error(e),
             Some(Ok(mut cx)) => {
-                super::expand_parent_stmt(&mut cx, node).unwrap_or_else(|e| cx.error(e));
+                super::expand_parent_stmt(&mut cx, node);
                 visitor.cx().join_child(cx);
             }
             None => {}
