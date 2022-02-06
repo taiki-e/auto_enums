@@ -1,4 +1,4 @@
-// rustc-cfg emitted by the build script are *not* public API.
+// The rustc-cfg emitted by the build script are *not* public API.
 
 #![warn(rust_2018_idioms, single_use_lifetimes)]
 
