@@ -16,14 +16,20 @@ where
         }
     }
     #[inline]
-    fn read_to_end(&mut self, buf: &mut ::std::vec::Vec<u8>) -> ::std::io::Result<usize> {
+    fn read_to_end(
+        &mut self,
+        buf: &mut ::std::vec::Vec<u8>,
+    ) -> ::std::io::Result<usize> {
         match self {
             Enum::A(x) => ::std::io::Read::read_to_end(x, buf),
             Enum::B(x) => ::std::io::Read::read_to_end(x, buf),
         }
     }
     #[inline]
-    fn read_to_string(&mut self, buf: &mut ::std::string::String) -> ::std::io::Result<usize> {
+    fn read_to_string(
+        &mut self,
+        buf: &mut ::std::string::String,
+    ) -> ::std::io::Result<usize> {
         match self {
             Enum::A(x) => ::std::io::Read::read_to_string(x, buf),
             Enum::B(x) => ::std::io::Read::read_to_string(x, buf),

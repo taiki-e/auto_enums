@@ -80,6 +80,5 @@ unsafe impl<A, B> ::core::iter::TrustedLen for Enum<A, B>
 where
     A: ::core::iter::TrustedLen,
     B: ::core::iter::TrustedLen<Item = <A as ::core::iter::Iterator>::Item>,
-{
-}
+{}
 fn main() {}

@@ -78,6 +78,11 @@ fn foo(x: i32) -> impl Iterator<Item = i32> {
     }
     match x {
         0 => __Enum1::__T1(1..10),
-        _ => __Enum1::__T2(<[_]>::into_vec(box [5, 10]).into_iter()),
+        _ => {
+            __Enum1::__T2(
+                <[_]>::into_vec(#[rustc_box] ::alloc::boxed::Box::new([5, 10]))
+                    .into_iter(),
+            )
+        }
     }
 }

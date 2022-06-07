@@ -6,7 +6,9 @@ enum Enum<A, B> {
 impl<A, B> ::rayon::iter::ParallelIterator for Enum<A, B>
 where
     A: ::rayon::iter::ParallelIterator,
-    B: ::rayon::iter::ParallelIterator<Item = <A as ::rayon::iter::ParallelIterator>::Item>,
+    B: ::rayon::iter::ParallelIterator<
+        Item = <A as ::rayon::iter::ParallelIterator>::Item,
+    >,
 {
     type Item = <A as ::rayon::iter::ParallelIterator>::Item;
     #[inline]

@@ -9,7 +9,10 @@ where
     B: ::serde::ser::Serialize,
 {
     #[inline]
-    fn serialize<__S>(&self, serializer: __S) -> ::core::result::Result<__S::Ok, __S::Error>
+    fn serialize<__S>(
+        &self,
+        serializer: __S,
+    ) -> ::core::result::Result<__S::Ok, __S::Error>
     where
         __S: ::serde::ser::Serializer,
     {

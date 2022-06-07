@@ -37,7 +37,10 @@ where
         }
     }
     #[inline]
-    fn write_vectored(&mut self, bufs: &[::std::io::IoSlice<'_>]) -> ::std::io::Result<usize> {
+    fn write_vectored(
+        &mut self,
+        bufs: &[::std::io::IoSlice<'_>],
+    ) -> ::std::io::Result<usize> {
         match self {
             Enum::A(x) => ::std::io::Write::write_vectored(x, bufs),
             Enum::B(x) => ::std::io::Write::write_vectored(x, bufs),

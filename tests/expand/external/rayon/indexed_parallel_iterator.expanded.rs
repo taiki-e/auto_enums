@@ -6,7 +6,9 @@ enum Enum<A, B> {
 impl<A, B> ::rayon::iter::ParallelIterator for Enum<A, B>
 where
     A: ::rayon::iter::ParallelIterator,
-    B: ::rayon::iter::ParallelIterator<Item = <A as ::rayon::iter::ParallelIterator>::Item>,
+    B: ::rayon::iter::ParallelIterator<
+        Item = <A as ::rayon::iter::ParallelIterator>::Item,
+    >,
 {
     type Item = <A as ::rayon::iter::ParallelIterator>::Item;
     #[inline]
@@ -30,7 +32,9 @@ where
 impl<A, B> ::rayon::iter::IndexedParallelIterator for Enum<A, B>
 where
     A: ::rayon::iter::IndexedParallelIterator,
-    B: ::rayon::iter::IndexedParallelIterator<Item = <A as ::rayon::iter::ParallelIterator>::Item>,
+    B: ::rayon::iter::IndexedParallelIterator<
+        Item = <A as ::rayon::iter::ParallelIterator>::Item,
+    >,
 {
     #[inline]
     fn drive<__C>(self, consumer: __C) -> __C::Result
@@ -55,8 +59,12 @@ where
         __CB: ::rayon::iter::plumbing::ProducerCallback<Self::Item>,
     {
         match self {
-            Enum::A(x) => ::rayon::iter::IndexedParallelIterator::with_producer(x, callback),
-            Enum::B(x) => ::rayon::iter::IndexedParallelIterator::with_producer(x, callback),
+            Enum::A(x) => {
+                ::rayon::iter::IndexedParallelIterator::with_producer(x, callback)
+            }
+            Enum::B(x) => {
+                ::rayon::iter::IndexedParallelIterator::with_producer(x, callback)
+            }
         }
     }
 }

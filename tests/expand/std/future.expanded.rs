@@ -17,8 +17,12 @@ where
     ) -> ::core::task::Poll<Self::Output> {
         unsafe {
             match self.get_unchecked_mut() {
-                Enum::A(x) => ::core::future::Future::poll(::core::pin::Pin::new_unchecked(x), cx),
-                Enum::B(x) => ::core::future::Future::poll(::core::pin::Pin::new_unchecked(x), cx),
+                Enum::A(x) => {
+                    ::core::future::Future::poll(::core::pin::Pin::new_unchecked(x), cx)
+                }
+                Enum::B(x) => {
+                    ::core::future::Future::poll(::core::pin::Pin::new_unchecked(x), cx)
+                }
             }
         }
     }

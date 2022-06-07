@@ -18,10 +18,16 @@ where
         unsafe {
             match self.get_unchecked_mut() {
                 Enum::A(x) => {
-                    ::futures::stream::Stream::poll_next(::core::pin::Pin::new_unchecked(x), cx)
+                    ::futures::stream::Stream::poll_next(
+                        ::core::pin::Pin::new_unchecked(x),
+                        cx,
+                    )
                 }
                 Enum::B(x) => {
-                    ::futures::stream::Stream::poll_next(::core::pin::Pin::new_unchecked(x), cx)
+                    ::futures::stream::Stream::poll_next(
+                        ::core::pin::Pin::new_unchecked(x),
+                        cx,
+                    )
                 }
             }
         }
