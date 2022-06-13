@@ -55,7 +55,7 @@ echo "============== CHANGELOG =============="
 parse-changelog CHANGELOG.md "${version}"
 echo "======================================="
 
-release_date=$(date --utc '+%Y-%m-%d')
+release_date=$(date -u '+%Y-%m-%d')
 if ! grep -Eq "^## \\[${version//./\\.}\\] - ${release_date}$" CHANGELOG.md; then
     bail "not found section '[${version}] - ${release_date}' in CHANGELOG.md"
 fi
