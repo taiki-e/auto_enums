@@ -90,7 +90,7 @@ quote = "1"
 syn = { version = "1.0.56", features = ["full", "visit-mut"] }
 
 [dev-dependencies]
-macrotest = { git = "https://github.com/taiki-e/macrotest.git", rev = "4a9f0da" } # https://github.com/eupn/macrotest/pull/69 + https://github.com/eupn/macrotest/pull/78
+macrotest = "1.0.9"
 rustversion = "1"
 trybuild = "1.0.49"
 

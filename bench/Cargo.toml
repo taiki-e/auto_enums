@@ -7,7 +7,7 @@ publish = false
 [dev-dependencies]
 auto_enums = { path = ".." }
 
-criterion = { default-features = false, git = "https://github.com/taiki-e/criterion.rs.git", rev = "fbc46dfad4a089d2e70ecb1d21557b80b8488c61" } # https://github.com/bheisler/criterion.rs/pull/496 + patches to reduce deps more
+criterion = { default-features = false, git = "https://github.com/taiki-e/criterion.rs.git", branch = "dev" } # https://github.com/bheisler/criterion.rs/pull/496 + patches to reduce deps more
 rand = "0.8"
 
 [[bench]]
