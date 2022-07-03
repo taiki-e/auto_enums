@@ -71,7 +71,7 @@ impl<'a> Visitor<'a> {
             // Desugar `return <expr>` into `return Enum::VariantN(<expr>)`.
             if let Expr::Return(ExprReturn { expr, .. }) = node {
                 // Skip if `<expr>` is a marker macro.
-                if expr.as_ref().map_or(true, |expr| !self.cx.is_marker_expr(&**expr)) {
+                if expr.as_ref().map_or(true, |expr| !self.cx.is_marker_expr(expr)) {
                     self.cx.replace_boxed_expr(expr);
                 }
             }
@@ -95,7 +95,7 @@ impl<'a> Visitor<'a> {
                 // }
                 //
                 // Skip if `<expr>` is a marker macro.
-                Expr::Try(ExprTry { expr, .. }) if !self.cx.is_marker_expr(&**expr) => {
+                Expr::Try(ExprTry { expr, .. }) if !self.cx.is_marker_expr(expr) => {
                     replace_expr(node, |expr| {
                         let ExprTry { attrs, expr, .. } =
                             if let Expr::Try(expr) = expr { expr } else { unreachable!() };
@@ -213,7 +213,7 @@ impl VisitMut for Visitor<'_> {
         if !self.cx.has_error() {
             if !self.scope.foreign {
                 if let Some(attr) = node.find_remove_attr(NESTED) {
-                    self.visit_nested(&mut *node.body, &attr);
+                    self.visit_nested(&mut node.body, &attr);
                 }
             }
 
@@ -228,7 +228,7 @@ impl VisitMut for Visitor<'_> {
             if !self.scope.foreign {
                 if let Some(attr) = node.find_remove_attr(NESTED) {
                     if let Some((_, expr)) = &mut node.init {
-                        self.visit_nested(&mut **expr, &attr);
+                        self.visit_nested(expr, &attr);
                     }
                 }
             }
@@ -452,13 +452,13 @@ pub(super) fn visit_fn(cx: &Context, node: &mut impl Node) -> FnCount {
                 match node {
                     Expr::Try(ExprTry { expr, .. }) => {
                         // Skip if `<expr>` is a marker macro.
-                        if !self.cx.is_marker_expr(&**expr) {
+                        if !self.cx.is_marker_expr(expr) {
                             self.count.try_ += 1;
                         }
                     }
                     Expr::Return(ExprReturn { expr, .. }) => {
                         // Skip if `<expr>` is a marker macro.
-                        if expr.as_ref().map_or(true, |expr| !self.cx.is_marker_expr(&**expr)) {
+                        if expr.as_ref().map_or(true, |expr| !self.cx.is_marker_expr(expr)) {
                             self.count.return_ += 1;
                         }
                     }

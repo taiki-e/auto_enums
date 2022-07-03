@@ -213,7 +213,7 @@ impl Context {
     }
 
     pub(super) fn replace_boxed_expr(&mut self, expr: &mut Option<Box<Expr>>) {
-        replace_expr(&mut **expr.get_or_insert_with(|| Box::new(unit())), |expr| {
+        replace_expr(expr.get_or_insert_with(|| Box::new(unit())), |expr| {
             if self.is_marker_expr(&expr) {
                 // Skip if `<expr>` is a marker macro.
                 expr

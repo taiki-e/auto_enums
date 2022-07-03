@@ -56,7 +56,7 @@ pub(super) fn is_unreachable(cx: &Context, expr: &Expr) -> bool {
         }
 
         Expr::Match(ExprMatch { arms, .. }) => {
-            arms.iter().all(|arm| arm.any_empty_attr(NEVER) || is_unreachable(cx, &*arm.body))
+            arms.iter().all(|arm| arm.any_empty_attr(NEVER) || is_unreachable(cx, &arm.body))
         }
 
         // `Err(expr)?` or `None?`.
@@ -93,14 +93,14 @@ fn visit_last_expr_match(cx: &mut Context, expr: &mut ExprMatch) {
     fn skip(cx: &mut Context, arm: &mut Arm) -> bool {
         arm.any_empty_attr(NEVER)
             || arm.any_empty_attr(NESTED)
-            || is_unreachable(cx, &*arm.body)
+            || is_unreachable(cx, &arm.body)
             || visitor::find_nested(arm)
     }
 
     for arm in &mut expr.arms {
         if !skip(cx, arm) {
             arm.comma = Some(<Token![,]>::default());
-            replace_expr(&mut *arm.body, |x| cx.next_expr(x));
+            replace_expr(&mut arm.body, |x| cx.next_expr(x));
         }
     }
 }
