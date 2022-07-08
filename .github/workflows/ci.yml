@@ -50,7 +50,7 @@ jobs:
       - run: cargo test --workspace --all-features
         if: startsWith(matrix.rust, 'nightly')
 
-  build:
+  msrv:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -112,7 +112,7 @@ jobs:
     if: github.event_name == 'push' && success()
     needs:
       - test
-      - build
+      - msrv
       - features
       - tidy
       - docs
