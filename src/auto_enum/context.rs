@@ -64,6 +64,7 @@ pub(super) struct Context {
     // - `None`: during checking.
     // - `Some(None)`: there are no errors.
     // - `Some(Some)`: there are errors.
+    #[allow(clippy::option_option)]
     error: RefCell<Option<Option<Error>>>,
 
     pub(super) args: Vec<Path>,
