@@ -454,7 +454,7 @@ fn stable_std() {
     fn transpose_ok(file: Option<&Path>) -> io::Result<impl io::Write> {
         if let Some(file) = file { File::create(file) } else { Ok(io::stdout()) }.transpose_ok()
     }
-    transpose_ok(None).unwrap();
+    assert!(transpose_ok(None).is_ok());
 
     #[auto_enum(Transpose, Write)]
     fn transpose_option(file: Option<&Path>) -> Option<impl io::Write> {
@@ -478,7 +478,7 @@ fn stable_std() {
         }
         .transpose()
     }
-    transpose_result(None).unwrap();
+    assert!(transpose_result(None).is_ok());
 
     #[auto_enum(Transpose, Debug, Display, Error)]
     fn transpose_err(file: Option<&Path>) -> Result<(), impl Error> {
