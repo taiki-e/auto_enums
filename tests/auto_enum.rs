@@ -9,7 +9,6 @@
 #![warn(rust_2018_idioms, single_use_lifetimes)]
 #![allow(dead_code)]
 #![allow(
-    clippy::assertions_on_result_states,
     clippy::let_and_return,
     clippy::needless_return,
     clippy::never_loop,
