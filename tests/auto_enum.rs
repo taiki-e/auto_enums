@@ -37,20 +37,20 @@ fn stable() {
 
     // block + unsafe block + parentheses
     #[rustfmt::skip]
-        #[allow(unknown_lints)]
-        #[allow(unused_parens)]
-        #[allow(unused_braces)]
-        #[allow(unused_unsafe)]
-        #[auto_enum(Iterator)]
-        fn block(x: usize) -> impl Iterator<Item = i32> {
-            {{({ unsafe {{({ unsafe { unsafe {{
-                match x {
-                    0 => 1..8,
-                    n if n > 3 => 2..=10,
-                    _ => (0..2).map(|x| x + 1),
-                }
-            }}}})}}})}}
-        }
+    #[allow(unknown_lints)]
+    #[allow(unused_parens)]
+    #[allow(unused_braces)]
+    #[allow(unused_unsafe)]
+    #[auto_enum(Iterator)]
+    fn block(x: usize) -> impl Iterator<Item = i32> {
+        {{({ unsafe {{({ unsafe { unsafe {{
+            match x {
+                0 => 1..8,
+                n if n > 3 => 2..=10,
+                _ => (0..2).map(|x| x + 1),
+            }
+        }}}})}}})}}
+    }
     for (i, x) in ANS.iter().enumerate() {
         assert_eq!(block(i).sum::<i32>(), *x);
     }
