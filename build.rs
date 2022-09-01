@@ -5,6 +5,8 @@
 use std::{env, process::Command, str};
 
 fn main() {
+    println!("cargo:rerun-if-changed=build.rs");
+
     let minor = match rustc_version() {
         Some(version) => version,
         None => {
