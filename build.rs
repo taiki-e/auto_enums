@@ -15,12 +15,11 @@ fn main() {
         }
     };
 
-    // Note that this is `<` (less than), not `>=` (greater than or equal).
-    // This allows treating as the latest stable rustc is used when the build
-    // script doesn't run. This is useful for non-cargo build systems that don't
-    // run the build script.
+    // Note that this is `no_`*, not `has_*`. This allows treating as the latest
+    // stable rustc is used when the build script doesn't run. This is useful
+    // for non-cargo build systems that don't run the build script.
     if minor < 36 {
-        println!("cargo:rustc-cfg=stable_lt_1_36");
+        println!("cargo:rustc-cfg=auto_enums_no_iovec");
     }
 }
 

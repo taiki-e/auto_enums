@@ -4,9 +4,9 @@ pub(crate) mod read {
     pub(crate) const NAME: &[&str] = &["Read", "io::Read"];
 
     pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
-        #[cfg(stable_lt_1_36)]
+        #[cfg(auto_enums_no_iovec)]
         let vectored = quote!();
-        #[cfg(not(stable_lt_1_36))]
+        #[cfg(not(auto_enums_no_iovec))]
         let vectored = quote! {
             #[inline]
             fn read_vectored(
@@ -87,9 +87,9 @@ pub(crate) mod write {
     pub(crate) const NAME: &[&str] = &["Write", "io::Write"];
 
     pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
-        #[cfg(stable_lt_1_36)]
+        #[cfg(auto_enums_no_iovec)]
         let vectored = quote!();
-        #[cfg(not(stable_lt_1_36))]
+        #[cfg(not(auto_enums_no_iovec))]
         let vectored = quote! {
             #[inline]
             fn write_vectored(
