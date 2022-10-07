@@ -2,7 +2,7 @@ error: expected identifier
  --> tests/ui/enum_derive/args.rs:3:22
   |
 3 | #[enum_derive(Clone, =>)] //~ ERROR expected identifier
-  |                      ^^
+  |                      ^
 
 error: expected identifier
  --> tests/ui/enum_derive/args.rs:9:25
