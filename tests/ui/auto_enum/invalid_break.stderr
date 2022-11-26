@@ -10,7 +10,7 @@ error[E0267]: `break` inside of an `async` block
  --> tests/ui/auto_enum/invalid_break.rs:6:13
   |
 6 |     async { break }
-  |           --^^^^^--
-  |           | |
-  |           | cannot `break` inside of an `async` block
-  |           enclosing `async` block
+  |     --------^^^^^--
+  |     |       |
+  |     |       cannot `break` inside of an `async` block
+  |     enclosing `async` block
