@@ -8,7 +8,7 @@
 use auto_enums::enum_derive;
 
 #[test]
-fn unfmt() {
+fn not_formatted() {
     #[rustfmt::skip]
     #[enum_derive(Debug, Iterator)]
     enum Enum1<A, B,> {
