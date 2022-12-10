@@ -198,7 +198,6 @@ fn func2(x: i32) {
 Please be careful if you return another traits with the same name.
 
 [derive_utils]: https://github.com/taiki-e/derive_utils
-[futures-enum]: https://github.com/taiki-e/futures-enum
 [futures01]: https://docs.rs/futures/0.1
 [futures03]: https://docs.rs/futures/0.3
 [io-enum]: https://github.com/taiki-e/io-enum
@@ -216,7 +215,6 @@ Please be careful if you return another traits with the same name.
 ## Related Projects
 
 - [derive_utils]: A procedural macro helper for easily writing [derives macros][proc-macro-derive] for enums.
-- [futures-enum]: \#\[derive(Future, Stream, Sink, AsyncRead, AsyncWrite, AsyncSeek, AsyncBufRead)\] for enums.
 - [io-enum]: \#\[derive(Read, Write, Seek, BufRead)\] for enums.
 - [iter-enum]: \#\[derive(Iterator, DoubleEndedIterator, ExactSizeIterator, Extend)\] for enums.
 

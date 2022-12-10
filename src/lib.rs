@@ -618,8 +618,6 @@
 //!
 //! - [`Future`](https://doc.rust-lang.org/std/future/trait.Future.html) - [example](https://github.com/taiki-e/auto_enums/blob/HEAD/tests/expand/std/future.rs) | [generated code](https://github.com/taiki-e/auto_enums/blob/HEAD/tests/expand/std/future.expanded.rs)
 //!
-//! *See also [futures-enum] crate.*
-//!
 //! ### `std::io` *(requires `"std"` crate feature)*
 //!
 //! - [`Read`](https://doc.rust-lang.org/std/io/trait.Read.html) (alias: `io::Read`) - [example](https://github.com/taiki-e/auto_enums/blob/HEAD/tests/expand/std/io/read.rs) | [generated code](https://github.com/taiki-e/auto_enums/blob/HEAD/tests/expand/std/io/read.expanded.rs)
@@ -691,8 +689,6 @@
 //! - [`futures03::AsyncWrite`](https://docs.rs/futures/0.3/futures/io/trait.AsyncWrite.html) - [example](https://github.com/taiki-e/auto_enums/blob/HEAD/tests/expand/external/futures/async_write.rs) | [generated code](https://github.com/taiki-e/auto_enums/blob/HEAD/tests/expand/external/futures/async_write.expanded.rs)
 //! - [`futures03::AsyncSeek`](https://docs.rs/futures/0.3/futures/io/trait.AsyncSeek.html) - [example](https://github.com/taiki-e/auto_enums/blob/HEAD/tests/expand/external/futures/async_seek.rs) | [generated code](https://github.com/taiki-e/auto_enums/blob/HEAD/tests/expand/external/futures/async_seek.expanded.rs)
 //! - [`futures03::AsyncBufRead`](https://docs.rs/futures/0.3/futures/io/trait.AsyncBufRead.html) - [example](https://github.com/taiki-e/auto_enums/blob/HEAD/tests/expand/external/futures/async_buf_read.rs) | [generated code](https://github.com/taiki-e/auto_enums/blob/HEAD/tests/expand/external/futures/async_buf_read.expanded.rs)
-//!
-//! *See also [futures-enum] crate.*
 //!
 //! ### [futures v0.1][futures01] *(requires `"futures01"` crate feature)*
 //!
@@ -841,7 +837,6 @@
 //! - There needs to be marker macros for unsupported expressions.
 //!
 //! [derive_utils]: https://github.com/taiki-e/derive_utils
-//! [futures-enum]: https://github.com/taiki-e/futures-enum
 //! [futures01]: https://docs.rs/futures/0.1
 //! [futures03]: https://docs.rs/futures/0.3
 //! [io-enum]: https://github.com/taiki-e/io-enum
