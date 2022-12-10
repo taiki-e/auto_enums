@@ -3,7 +3,7 @@ pub(crate) mod read {
 
     pub(crate) const NAME: &[&str] = &["Read", "io::Read"];
 
-    pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+    pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
         #[cfg(auto_enums_no_iovec)]
         let vectored = quote!();
         #[cfg(not(auto_enums_no_iovec))]
@@ -44,7 +44,7 @@ pub(crate) mod buf_read {
 
     pub(crate) const NAME: &[&str] = &["BufRead", "io::BufRead"];
 
-    pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+    pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
         Ok(derive_trait(data, parse_quote!(::std::io::BufRead), None, parse_quote! {
             trait BufRead {
                 #[inline]
@@ -71,7 +71,7 @@ pub(crate) mod seek {
 
     pub(crate) const NAME: &[&str] = &["Seek", "io::Seek"];
 
-    pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+    pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
         Ok(derive_trait(data, parse_quote!(::std::io::Seek), None, parse_quote! {
             trait Seek {
                 #[inline]
@@ -86,7 +86,7 @@ pub(crate) mod write {
 
     pub(crate) const NAME: &[&str] = &["Write", "io::Write"];
 
-    pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+    pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
         #[cfg(auto_enums_no_iovec)]
         let vectored = quote!();
         #[cfg(not(auto_enums_no_iovec))]

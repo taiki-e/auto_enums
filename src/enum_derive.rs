@@ -1,6 +1,8 @@
+use std::cell::Cell;
+
 use derive_utils::EnumData as Data;
 use proc_macro2::TokenStream;
-use quote::ToTokens;
+use quote::{quote, ToTokens};
 use syn::{
     parse::{Parse, ParseStream},
     parse_quote, Error, ItemEnum, Path, Result, Token,
@@ -10,7 +12,18 @@ pub(crate) fn attribute(args: TokenStream, input: TokenStream) -> TokenStream {
     expand(args, input).unwrap_or_else(Error::into_compile_error)
 }
 
-type DeriveFn = fn(&'_ Data) -> Result<TokenStream>;
+#[derive(Default)]
+pub(crate) struct DeriveContext {
+    needs_pin_projection: Cell<bool>,
+}
+
+impl DeriveContext {
+    pub(crate) fn needs_pin_projection(&self) {
+        self.needs_pin_projection.set(true);
+    }
+}
+
+type DeriveFn = fn(&'_ DeriveContext, &'_ Data) -> Result<TokenStream>;
 
 fn get_derive(s: &str) -> Option<DeriveFn> {
     macro_rules! match_derive {
@@ -260,18 +273,60 @@ fn expand(args: TokenStream, input: TokenStream) -> Result<TokenStream> {
 
     let mut derive = Vec::new();
     let mut items = TokenStream::new();
+    let cx = DeriveContext::default();
     for (s, arg) in args {
         match (get_derive(s), arg) {
             (Some(f), _) => {
-                items
-                    .extend(f(&data).map_err(|e| format_err!(data, "`enum_derive({})` {}", s, e))?);
+                items.extend(
+                    f(&cx, &data).map_err(|e| format_err!(data, "`enum_derive({})` {}", s, e))?,
+                );
             }
             (_, Some(arg)) => derive.push(arg),
             _ => {}
         }
     }
 
-    let mut item: ItemEnum = data.into();
+    let mut item = if cx.needs_pin_projection.get() {
+        // If a user creates their own Unpin or Drop implementation, trait implementations with
+        // `Pin<&mut self>` receiver can cause unsoundness.
+        //
+        // This was not a problem in #[auto_enum] attribute where enums are anonymized,
+        // but it becomes a problem when users have access to enums (i.e., when using #[enum_derive]).
+        //
+        // So, we ensure safety here by an Unpin implementation that implements Unpin
+        // only if all fields are Unpin (this also forbids custom Unpin implementation),
+        // and a hack that forbids custom Drop implementation. (Both are what pin-project does by default.)
+        // The repr(packed) check is not needed since repr(packed) is not available on enum.
+
+        // Automatically create the appropriate conditional `Unpin` implementation.
+        // https://github.com/taiki-e/pin-project/blob/v1.0.10/examples/struct-default-expanded.rs#L89
+        items.extend(derive_utils::derive_trait(
+            &data,
+            parse_quote!(::core::marker::Unpin),
+            None,
+            parse_quote! {
+                trait Unpin {}
+            },
+        ));
+
+        let item: ItemEnum = data.into();
+        let name = &item.ident;
+        let (impl_generics, ty_generics, where_clause) = item.generics.split_for_impl();
+        // Ensure that enum does not implement `Drop`.
+        // https://github.com/taiki-e/pin-project/blob/v1.0.10/examples/struct-default-expanded.rs#L138
+        items.extend(quote! {
+            const _: () = {
+                trait MustNotImplDrop {}
+                #[allow(clippy::drop_bounds, drop_bounds)]
+                impl<T: ::core::ops::Drop> MustNotImplDrop for T {}
+                impl #impl_generics MustNotImplDrop for #name #ty_generics #where_clause {}
+            };
+        });
+        item
+    } else {
+        data.into()
+    };
+
     if !derive.is_empty() {
         item.attrs.push(parse_quote!(#[derive(#(#derive),*)]));
     }

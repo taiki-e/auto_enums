@@ -3,17 +3,16 @@ enum Enum<A, B> {
     A(A),
     B(B),
 }
-#[allow(unsafe_code)]
 impl<A, B> ::futures::io::AsyncBufRead for Enum<A, B>
 where
     A: ::futures::io::AsyncBufRead,
     B: ::futures::io::AsyncBufRead,
 {
     #[inline]
-    fn poll_fill_buf<'__a>(
-        self: ::core::pin::Pin<&'__a mut Self>,
+    fn poll_fill_buf(
+        self: ::core::pin::Pin<&mut Self>,
         cx: &mut ::core::task::Context<'_>,
-    ) -> ::core::task::Poll<::std::io::Result<&'__a [u8]>> {
+    ) -> ::core::task::Poll<::std::io::Result<&[u8]>> {
         unsafe {
             match self.get_unchecked_mut() {
                 Enum::A(x) => {
@@ -51,4 +50,15 @@ where
         }
     }
 }
+impl<A, B> ::core::marker::Unpin for Enum<A, B>
+where
+    A: ::core::marker::Unpin,
+    B: ::core::marker::Unpin,
+{}
+const _: () = {
+    trait MustNotImplDrop {}
+    #[allow(clippy::drop_bounds, drop_bounds)]
+    impl<T: ::core::ops::Drop> MustNotImplDrop for T {}
+    impl<A, B> MustNotImplDrop for Enum<A, B> {}
+};
 fn main() {}

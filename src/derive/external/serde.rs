@@ -3,7 +3,7 @@ pub(crate) mod serialize {
 
     pub(crate) const NAME: &[&str] = &["serde::Serialize"];
 
-    pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+    pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
         Ok(derive_trait(data, parse_quote!(::serde::ser::Serialize), None, parse_quote! {
             trait Serialize {
                 #[inline]

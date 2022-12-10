@@ -4,12 +4,17 @@ enum Enum<A, B> {
     A(A),
     B(B),
 }
-#[allow(unsafe_code)]
 impl<A, B> ::tokio::io::AsyncWrite for Enum<A, B>
 where
     A: ::tokio::io::AsyncWrite,
     B: ::tokio::io::AsyncWrite,
 {
+    fn is_write_vectored(&self) -> bool {
+        match self {
+            Enum::A(x) => ::tokio::io::AsyncWrite::is_write_vectored(x),
+            Enum::B(x) => ::tokio::io::AsyncWrite::is_write_vectored(x),
+        }
+    }
     fn poll_write(
         self: ::core::pin::Pin<&mut Self>,
         cx: &mut ::core::task::Context<'_>,
@@ -100,11 +105,16 @@ where
             }
         }
     }
-    fn is_write_vectored(&self) -> bool {
-        match self {
-            Enum::A(x) => ::tokio::io::AsyncWrite::is_write_vectored(x),
-            Enum::B(x) => ::tokio::io::AsyncWrite::is_write_vectored(x),
-        }
-    }
 }
+impl<A, B> ::core::marker::Unpin for Enum<A, B>
+where
+    A: ::core::marker::Unpin,
+    B: ::core::marker::Unpin,
+{}
+const _: () = {
+    trait MustNotImplDrop {}
+    #[allow(clippy::drop_bounds, drop_bounds)]
+    impl<T: ::core::ops::Drop> MustNotImplDrop for T {}
+    impl<A, B> MustNotImplDrop for Enum<A, B> {}
+};
 fn main() {}

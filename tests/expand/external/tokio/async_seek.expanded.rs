@@ -4,7 +4,6 @@ enum Enum<A, B> {
     A(A),
     B(B),
 }
-#[allow(unsafe_code)]
 impl<A, B> ::tokio::io::AsyncSeek for Enum<A, B>
 where
     A: ::tokio::io::AsyncSeek,
@@ -53,4 +52,15 @@ where
         }
     }
 }
+impl<A, B> ::core::marker::Unpin for Enum<A, B>
+where
+    A: ::core::marker::Unpin,
+    B: ::core::marker::Unpin,
+{}
+const _: () = {
+    trait MustNotImplDrop {}
+    #[allow(clippy::drop_bounds, drop_bounds)]
+    impl<T: ::core::ops::Drop> MustNotImplDrop for T {}
+    impl<A, B> MustNotImplDrop for Enum<A, B> {}
+};
 fn main() {}
