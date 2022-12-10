@@ -4,6 +4,8 @@
 #![warn(rust_2018_idioms, single_use_lifetimes)]
 #![allow(dead_code)]
 
+// See tests/run-pass for external crates.
+
 use auto_enums::enum_derive;
 
 #[test]

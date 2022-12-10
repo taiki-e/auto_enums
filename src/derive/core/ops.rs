@@ -94,23 +94,42 @@ pub(crate) mod range_bounds {
 
 #[cfg(feature = "generator_trait")]
 pub(crate) mod generator {
+    use quote::ToTokens;
+
     use crate::derive::*;
 
     pub(crate) const NAME: &[&str] = &["Generator"];
 
     pub(crate) fn derive(cx: &Context, data: &Data) -> Result<TokenStream> {
         cx.needs_pin_projection();
-        Ok(derive_trait(data, parse_quote!(::core::ops::Generator), None, parse_quote! {
+
+        let ident = &data.ident;
+        let pin = quote!(::core::pin::Pin);
+        let trait_: syn::Path = parse_quote!(::core::ops::Generator);
+        let mut impl_ = EnumImpl::from_trait(data, trait_.clone(), None, parse_quote! {
             trait Generator<R> {
                 type Yield;
                 type Return;
-                #[inline]
-                fn resume(
-                    self: ::core::pin::Pin<&mut Self>,
-                    arg: R,
-                ) -> ::core::ops::GeneratorState<Self::Yield, Self::Return>;
             }
-        }))
+        })
+        .build_impl();
+
+        let resume = data
+            .variant_idents()
+            .map(|v| quote!(#ident::#v(x) => #trait_::resume(#pin::new_unchecked(x), arg)));
+        impl_.items.push(parse_quote! {
+            #[inline]
+            fn resume(
+                self: #pin<&mut Self>,
+                arg: R,
+            ) -> ::core::ops::GeneratorState<Self::Yield, Self::Return> {
+                unsafe {
+                    match self.get_unchecked_mut() { #(#resume,)* }
+                }
+            }
+        });
+
+        Ok(impl_.into_token_stream())
     }
 }
 

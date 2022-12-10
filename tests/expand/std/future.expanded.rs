@@ -3,7 +3,6 @@ enum Enum<A, B> {
     A(A),
     B(B),
 }
-#[allow(unsafe_code)]
 impl<A, B> ::core::future::Future for Enum<A, B>
 where
     A: ::core::future::Future,

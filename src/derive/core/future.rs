@@ -1,17 +1,36 @@
+use quote::ToTokens;
+
 use crate::derive::*;
 
 pub(crate) const NAME: &[&str] = &["Future"];
 
 pub(crate) fn derive(cx: &Context, data: &Data) -> Result<TokenStream> {
     cx.needs_pin_projection();
-    Ok(derive_trait(data, parse_quote!(::core::future::Future), None, parse_quote! {
+
+    let ident = &data.ident;
+    let pin = quote!(::core::pin::Pin);
+    let trait_: syn::Path = parse_quote!(::core::future::Future);
+    let mut impl_ = EnumImpl::from_trait(data, trait_.clone(), None, parse_quote! {
         trait Future {
             type Output;
-            #[inline]
-            fn poll(
-                self: ::core::pin::Pin<&mut Self>,
-                cx: &mut ::core::task::Context<'_>,
-            ) -> ::core::task::Poll<Self::Output>;
         }
-    }))
+    })
+    .build_impl();
+
+    let poll = data
+        .variant_idents()
+        .map(|v| quote!(#ident::#v(x) => #trait_::poll(#pin::new_unchecked(x), cx)));
+    impl_.items.push(parse_quote! {
+        #[inline]
+        fn poll(
+            self: #pin<&mut Self>,
+            cx: &mut ::core::task::Context<'_>,
+        ) -> ::core::task::Poll<Self::Output> {
+            unsafe {
+                match self.get_unchecked_mut() { #(#poll,)* }
+            }
+        }
+    });
+
+    Ok(impl_.into_token_stream())
 }

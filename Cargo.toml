@@ -84,7 +84,7 @@ trusted_len = []
 
 # Note: futures, tokio, serde, and rayon are public dependencies.
 [dependencies]
-derive_utils = { version = "0.11" }
+derive_utils = { version = "0.12" }
 proc-macro2 = "1"
 quote = "1"
 syn = { version = "1.0.56", features = ["full", "visit-mut"] }

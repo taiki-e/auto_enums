@@ -3,13 +3,19 @@ enum Enum<A, B> {
     A(A),
     B(B),
 }
-#[allow(unsafe_code)]
 impl<A, B> ::futures::stream::Stream for Enum<A, B>
 where
     A: ::futures::stream::Stream,
     B: ::futures::stream::Stream<Item = <A as ::futures::stream::Stream>::Item>,
 {
     type Item = <A as ::futures::stream::Stream>::Item;
+    #[inline]
+    fn size_hint(&self) -> (usize, ::core::option::Option<usize>) {
+        match self {
+            Enum::A(x) => ::futures::stream::Stream::size_hint(x),
+            Enum::B(x) => ::futures::stream::Stream::size_hint(x),
+        }
+    }
     #[inline]
     fn poll_next(
         self: ::core::pin::Pin<&mut Self>,
@@ -30,13 +36,6 @@ where
                     )
                 }
             }
-        }
-    }
-    #[inline]
-    fn size_hint(&self) -> (usize, ::core::option::Option<usize>) {
-        match self {
-            Enum::A(x) => ::futures::stream::Stream::size_hint(x),
-            Enum::B(x) => ::futures::stream::Stream::size_hint(x),
         }
     }
 }

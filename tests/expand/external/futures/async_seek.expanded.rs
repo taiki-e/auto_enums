@@ -3,7 +3,6 @@ enum Enum<A, B> {
     A(A),
     B(B),
 }
-#[allow(unsafe_code)]
 impl<A, B> ::futures::io::AsyncSeek for Enum<A, B>
 where
     A: ::futures::io::AsyncSeek,

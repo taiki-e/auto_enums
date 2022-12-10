@@ -4,7 +4,6 @@ enum Enum<A, B> {
     A(A),
     B(B),
 }
-#[allow(unsafe_code)]
 impl<A, B> ::tokio::io::AsyncSeek for Enum<A, B>
 where
     A: ::tokio::io::AsyncSeek,

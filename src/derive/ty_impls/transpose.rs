@@ -67,7 +67,6 @@ fn transpose_result(data: &Data) -> TokenStream {
     let transpose = data
         .variant_idents()
         .map(|v| quote!(#ident::#v(x) => x.map(#ident::#v).map_err(#ident::#v)));
-
     impl_.push_item(parse_quote! {
         #[inline]
         fn transpose(

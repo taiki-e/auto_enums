@@ -3,7 +3,6 @@ enum Enum<A, B> {
     A(A),
     B(B),
 }
-#[allow(unsafe_code)]
 impl<A, B, Item> ::futures::sink::Sink<Item> for Enum<A, B>
 where
     A: ::futures::sink::Sink<Item>,
