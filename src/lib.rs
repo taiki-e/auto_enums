@@ -712,10 +712,10 @@
 //!
 //! ### [tokio v1][tokio1] *(requires `"tokio1"` crate feature)*
 //!
-//! - [`tokio1::AsyncRead`](https://docs.rs/tokio/1/tokio/io/trait.AsyncRead.html)
-//! - [`tokio1::AsyncWrite`](https://docs.rs/tokio/1/tokio/io/trait.AsyncWrite.html)
-//! - [`tokio1::AsyncSeek`](https://docs.rs/tokio/1/tokio/io/trait.AsyncSeek.html)
-//! - [`tokio1::AsyncBufRead`](https://docs.rs/tokio/1/tokio/io/trait.AsyncBufRead.html)
+//! - [`tokio1::AsyncRead`](https://docs.rs/tokio/1/tokio/io/trait.AsyncRead.html) - [example](https://github.com/taiki-e/auto_enums/blob/HEAD/tests/expand/external/tokio/async_read.rs) | [generated code](https://github.com/taiki-e/auto_enums/blob/HEAD/tests/expand/external/tokio/async_read.expanded.rs)
+//! - [`tokio1::AsyncWrite`](https://docs.rs/tokio/1/tokio/io/trait.AsyncWrite.html) - [example](https://github.com/taiki-e/auto_enums/blob/HEAD/tests/expand/external/tokio/async_write.rs) | [generated code](https://github.com/taiki-e/auto_enums/blob/HEAD/tests/expand/external/tokio/async_write.expanded.rs)
+//! - [`tokio1::AsyncSeek`](https://docs.rs/tokio/1/tokio/io/trait.AsyncSeek.html) - [example](https://github.com/taiki-e/auto_enums/blob/HEAD/tests/expand/external/tokio/async_seek.rs) | [generated code](https://github.com/taiki-e/auto_enums/blob/HEAD/tests/expand/external/tokio/async_seek.expanded.rs)
+//! - [`tokio1::AsyncBufRead`](https://docs.rs/tokio/1/tokio/io/trait.AsyncBufRead.html) - [example](https://github.com/taiki-e/auto_enums/blob/HEAD/tests/expand/external/tokio/async_buf_read.rs) | [generated code](https://github.com/taiki-e/auto_enums/blob/HEAD/tests/expand/external/tokio/async_buf_read.expanded.rs)
 //!
 //! ### [tokio v0.3][tokio03] *(requires `"tokio03"` crate feature)*
 //!
