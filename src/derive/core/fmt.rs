@@ -5,7 +5,7 @@ macro_rules! derive_fmt {
 
             pub(crate) const NAME: &[&str] = &[$($name),*];
 
-            pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+            pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
                 Ok(derive_trait(data, parse_quote!(::core::fmt::$Trait), None, parse_quote! {
                     trait $Trait {
                         #[inline]
@@ -40,7 +40,7 @@ pub(crate) mod write {
 
     pub(crate) const NAME: &[&str] = &["fmt::Write"];
 
-    pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+    pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
         Ok(derive_trait(data, parse_quote!(::core::fmt::Write), None, parse_quote! {
             trait Write {
                 #[inline]

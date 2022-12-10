@@ -4,7 +4,7 @@ pub(crate) mod deref {
 
     pub(crate) const NAME: &[&str] = &["Deref"];
 
-    pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+    pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
         Ok(derive_trait(data, parse_quote!(::core::ops::Deref), None, parse_quote! {
             trait Deref {
                 type Target;
@@ -21,7 +21,7 @@ pub(crate) mod deref_mut {
 
     pub(crate) const NAME: &[&str] = &["DerefMut"];
 
-    pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+    pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
         Ok(derive_trait(
             data,
             parse_quote!(::core::ops::DerefMut),
@@ -42,7 +42,7 @@ pub(crate) mod index {
 
     pub(crate) const NAME: &[&str] = &["Index"];
 
-    pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+    pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
         Ok(derive_trait(data, parse_quote!(::core::ops::Index), None, parse_quote! {
             trait Index<__Idx> {
                 type Output;
@@ -59,7 +59,7 @@ pub(crate) mod index_mut {
 
     pub(crate) const NAME: &[&str] = &["IndexMut"];
 
-    pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+    pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
         Ok(derive_trait(
             data,
             parse_quote!(::core::ops::IndexMut),
@@ -80,7 +80,7 @@ pub(crate) mod range_bounds {
 
     pub(crate) const NAME: &[&str] = &["RangeBounds"];
 
-    pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+    pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
         Ok(derive_trait(data, parse_quote!(::core::ops::RangeBounds), None, parse_quote! {
             trait RangeBounds<__T: ?Sized> {
                 #[inline]
@@ -98,7 +98,8 @@ pub(crate) mod generator {
 
     pub(crate) const NAME: &[&str] = &["Generator"];
 
-    pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+    pub(crate) fn derive(cx: &Context, data: &Data) -> Result<TokenStream> {
+        cx.needs_pin_projection();
         Ok(derive_trait(data, parse_quote!(::core::ops::Generator), None, parse_quote! {
             trait Generator<R> {
                 type Yield;
@@ -122,7 +123,7 @@ pub(crate) mod fn_ {
 
     pub(crate) const NAME: &[&str] = &["Fn"];
 
-    pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+    pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
         let trait_path = quote!(::core::ops::Fn);
         let trait_ = quote!(#trait_path(__T) -> __U);
         let fst = data.field_types().next();
@@ -155,7 +156,7 @@ pub(crate) mod fn_mut {
 
     pub(crate) const NAME: &[&str] = &["FnMut"];
 
-    pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+    pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
         let trait_path = quote!(::core::ops::FnMut);
         let trait_ = quote!(#trait_path(__T) -> __U);
         let fst = data.field_types().next();
@@ -188,7 +189,7 @@ pub(crate) mod fn_once {
 
     pub(crate) const NAME: &[&str] = &["FnOnce"];
 
-    pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+    pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
         let trait_path = quote!(::core::ops::FnOnce);
         let trait_ = quote!(#trait_path(__T) -> __U);
         let fst = data.field_types().next();

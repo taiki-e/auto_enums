@@ -3,7 +3,8 @@ pub(crate) mod async_buf_read {
 
     pub(crate) const NAME: &[&str] = &["futures03::AsyncBufRead"];
 
-    pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+    pub(crate) fn derive(cx: &Context, data: &Data) -> Result<TokenStream> {
+        cx.needs_pin_projection();
         Ok(derive_trait(data, parse_quote!(::futures::io::AsyncBufRead), None, parse_quote! {
             trait AsyncBufRead {
                 #[inline]
@@ -23,7 +24,8 @@ pub(crate) mod async_read {
 
     pub(crate) const NAME: &[&str] = &["futures03::AsyncRead"];
 
-    pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+    pub(crate) fn derive(cx: &Context, data: &Data) -> Result<TokenStream> {
+        cx.needs_pin_projection();
         Ok(derive_trait(data, parse_quote!(::futures::io::AsyncRead), None, parse_quote! {
             trait AsyncRead {
                 #[inline]
@@ -48,7 +50,8 @@ pub(crate) mod async_seek {
 
     pub(crate) const NAME: &[&str] = &["futures03::AsyncSeek"];
 
-    pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+    pub(crate) fn derive(cx: &Context, data: &Data) -> Result<TokenStream> {
+        cx.needs_pin_projection();
         Ok(derive_trait(data, parse_quote!(::futures::io::AsyncSeek), None, parse_quote! {
             trait AsyncSeek {
                 #[inline]
@@ -67,7 +70,8 @@ pub(crate) mod async_write {
 
     pub(crate) const NAME: &[&str] = &["futures03::AsyncWrite"];
 
-    pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+    pub(crate) fn derive(cx: &Context, data: &Data) -> Result<TokenStream> {
+        cx.needs_pin_projection();
         Ok(derive_trait(data, parse_quote!(::futures::io::AsyncWrite), None, parse_quote! {
             trait AsyncWrite {
                 #[inline]
@@ -102,7 +106,8 @@ pub(crate) mod sink {
 
     pub(crate) const NAME: &[&str] = &["futures03::Sink"];
 
-    pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+    pub(crate) fn derive(cx: &Context, data: &Data) -> Result<TokenStream> {
+        cx.needs_pin_projection();
         Ok(derive_trait(data, parse_quote!(::futures::sink::Sink), None, parse_quote! {
             trait Sink<Item> {
                 type Error;
@@ -136,7 +141,8 @@ pub(crate) mod stream {
 
     pub(crate) const NAME: &[&str] = &["futures03::Stream"];
 
-    pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+    pub(crate) fn derive(cx: &Context, data: &Data) -> Result<TokenStream> {
+        cx.needs_pin_projection();
         Ok(derive_trait(data, parse_quote!(::futures::stream::Stream), None, parse_quote! {
             trait Stream {
                 type Item;

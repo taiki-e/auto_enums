@@ -3,7 +3,7 @@ pub(crate) mod iterator {
 
     pub(crate) const NAME: &[&str] = &["Iterator"];
 
-    pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+    pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
         // TODO: When `try_trait` stabilized, add `try_fold` and remove `fold`, `find` etc. conditionally.
 
         // It is equally efficient if `try_fold` can be used.
@@ -47,7 +47,7 @@ pub(crate) mod double_ended_iterator {
 
     pub(crate) const NAME: &[&str] = &["DoubleEndedIterator"];
 
-    pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+    pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
         // TODO: When `try_trait` stabilized, add `try_rfold` and remove `rfold` and `rfind` conditionally.
 
         // It is equally efficient if `try_rfold` can be used.
@@ -82,7 +82,7 @@ pub(crate) mod exact_size_iterator {
 
     pub(crate) const NAME: &[&str] = &["ExactSizeIterator"];
 
-    pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+    pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
         // TODO: When `exact_size_is_empty` stabilized, add `is_empty` conditionally.
 
         Ok(derive_trait(
@@ -104,7 +104,7 @@ pub(crate) mod fused_iterator {
 
     pub(crate) const NAME: &[&str] = &["FusedIterator"];
 
-    pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+    pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
         Ok(derive_trait(
             data,
             parse_quote!(::core::iter::FusedIterator),
@@ -122,7 +122,7 @@ pub(crate) mod trusted_len {
 
     pub(crate) const NAME: &[&str] = &["TrustedLen"];
 
-    pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+    pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
         Ok(derive_trait(
             data,
             parse_quote!(::core::iter::TrustedLen),
@@ -139,7 +139,7 @@ pub(crate) mod extend {
 
     pub(crate) const NAME: &[&str] = &["Extend"];
 
-    pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+    pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
         Ok(derive_trait(data, parse_quote!(::core::iter::Extend), None, parse_quote! {
             trait Extend<__A> {
                 #[inline]

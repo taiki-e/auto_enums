@@ -8,7 +8,7 @@ use crate::derive::*;
 pub(crate) const NAME: &[&str] = &["Transpose"];
 
 // Implementing this with `Into` requires many type annotations.
-pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
     check_fields(data)?;
     let mut items = TokenStream::new();
     items.extend(transpose_option(data));

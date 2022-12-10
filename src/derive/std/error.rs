@@ -4,7 +4,7 @@ use crate::derive::*;
 
 pub(crate) const NAME: &[&str] = &["Error"];
 
-pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
     let ident = &data.ident;
     let source =
         data.variant_idents().map(|v| quote!(#ident::#v(x) => ::std::option::Option::Some(x)));

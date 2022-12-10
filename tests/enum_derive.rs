@@ -1,7 +1,6 @@
 #![cfg_attr(feature = "generator_trait", feature(generator_trait))]
 #![cfg_attr(feature = "fn_traits", feature(fn_traits, unboxed_closures))]
 #![cfg_attr(feature = "trusted_len", feature(trusted_len))]
-#![cfg_attr(not(feature = "std"), no_std)]
 #![warn(rust_2018_idioms, single_use_lifetimes)]
 #![allow(dead_code)]
 

@@ -13,7 +13,8 @@
     clippy::let_and_return,
     clippy::needless_return,
     clippy::never_loop,
-    clippy::unnecessary_wraps
+    clippy::unnecessary_wraps,
+    clippy::pedantic
 )]
 
 use core::iter;

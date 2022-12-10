@@ -3,7 +3,8 @@ pub(crate) mod async_buf_read {
 
     pub(crate) const NAME: &[&str] = &["tokio1::AsyncBufRead"];
 
-    pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+    pub(crate) fn derive(cx: &Context, data: &Data) -> Result<TokenStream> {
+        cx.needs_pin_projection();
         Ok(derive_trait(data, parse_quote!(::tokio::io::AsyncBufRead), None, parse_quote! {
             trait AsyncBufRead {
                 fn poll_fill_buf<'__a>(
@@ -21,7 +22,8 @@ pub(crate) mod async_read {
 
     pub(crate) const NAME: &[&str] = &["tokio1::AsyncRead"];
 
-    pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+    pub(crate) fn derive(cx: &Context, data: &Data) -> Result<TokenStream> {
+        cx.needs_pin_projection();
         Ok(derive_trait(data, parse_quote!(::tokio::io::AsyncRead), None, parse_quote! {
             trait AsyncRead {
                 fn poll_read(
@@ -39,7 +41,8 @@ pub(crate) mod async_seek {
 
     pub(crate) const NAME: &[&str] = &["tokio1::AsyncSeek"];
 
-    pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+    pub(crate) fn derive(cx: &Context, data: &Data) -> Result<TokenStream> {
+        cx.needs_pin_projection();
         Ok(derive_trait(data, parse_quote!(::tokio::io::AsyncSeek), None, parse_quote! {
             trait AsyncSeek {
                 fn start_seek(
@@ -60,7 +63,8 @@ pub(crate) mod async_write {
 
     pub(crate) const NAME: &[&str] = &["tokio1::AsyncWrite"];
 
-    pub(crate) fn derive(data: &Data) -> Result<TokenStream> {
+    pub(crate) fn derive(cx: &Context, data: &Data) -> Result<TokenStream> {
+        cx.needs_pin_projection();
         Ok(derive_trait(data, parse_quote!(::tokio::io::AsyncWrite), None, parse_quote! {
             trait AsyncWrite {
                 fn poll_write(
