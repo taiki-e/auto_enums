@@ -1011,13 +1011,6 @@ mod nightly {
         }
         assert_eq!(fn_traits1(true)(1), 2);
 
-        // parentheses and type ascription
-        #[auto_enum(Fn)]
-        fn fn_traits2(option: bool) -> impl Fn(i32) -> i32 {
-            (if option { |x| x + 1 } else { |y| y - 1 }): _
-        }
-        assert_eq!(fn_traits2(true)(1), 2);
-
         #[auto_enum(Iterator, Clone)]
         let _y = match 0 {
             0 => 2..8,
