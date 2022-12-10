@@ -29,7 +29,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-auto_enums = "0.7"
+auto_enums = "0.8"
 ```
 
 *Compiler support: requires rustc 1.31+*
@@ -108,7 +108,7 @@ traits to `#[derive]`.
 
 `#[enum_derive]` supports many of the standard library traits and some popular
 third-party libraries traits such as [rayon], [futures][futures03],
-[tokio][tokio1]. **See [documentation](https://docs.rs/auto_enums/0.7/auto_enums/#supported-traits) for a complete list of supported traits.**
+[tokio][tokio1]. **See [documentation](https://docs.rs/auto_enums/latest/auto_enums/#supported-traits) for a complete list of supported traits.**
 
 If you want to use traits that are not supported by `#[enum_derive]`, you
 can use another crate that provides [derives macros][proc-macro-derive], or
