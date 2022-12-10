@@ -1,6 +1,6 @@
 [package]
 name = "auto_enums"
-version = "0.8.0-dev"
+version = "0.8.0"
 edition = "2018"
 rust-version = "1.31"
 license = "Apache-2.0 OR MIT"

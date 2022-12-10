@@ -10,6 +10,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+## [0.8.0] - 2022-12-10
+
 - Remove `futures` feature. Use `futures03` feature instead. ([#124](https://github.com/taiki-e/auto_enums/pull/124))
 
 - Merge `auto_enums_core` and `auto_enums_derive` crates into main `auto_enums` crate. ([#123](https://github.com/taiki-e/auto_enums/pull/123))
@@ -330,7 +332,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 Initial release
 
-[Unreleased]: https://github.com/taiki-e/auto_enums/compare/v0.7.12...HEAD
+[Unreleased]: https://github.com/taiki-e/auto_enums/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/taiki-e/auto_enums/compare/v0.7.12...v0.8.0
 [0.7.12]: https://github.com/taiki-e/auto_enums/compare/v0.7.11...v0.7.12
 [0.7.11]: https://github.com/taiki-e/auto_enums/compare/v0.7.10...v0.7.11
 [0.7.10]: https://github.com/taiki-e/auto_enums/compare/v0.7.9...v0.7.10
