@@ -224,8 +224,10 @@ Found 5 outliers among 100 measurements (5.00%)
 
 #![warn(rust_2018_idioms, single_use_lifetimes)]
 
+use std::hint::black_box;
+
 use auto_enums::auto_enum;
-use criterion::{black_box, criterion_group, criterion_main, Criterion};
+use criterion::{criterion_group, criterion_main, Criterion};
 use rand::Rng;
 
 fn iter_no_branch(_x: u32) -> impl Iterator<Item = i64> {
