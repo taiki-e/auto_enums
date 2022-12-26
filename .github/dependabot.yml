@@ -11,10 +11,3 @@ updates:
       - dependency-name: futures
       - dependency-name: tokio
     labels: []
-  - package-ecosystem: github-actions
-    directory: /
-    schedule:
-      interval: daily
-    commit-message:
-      prefix: ''
-    labels: []
