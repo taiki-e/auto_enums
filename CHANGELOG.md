@@ -16,9 +16,9 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 - Merge `auto_enums_core` and `auto_enums_derive` crates into main `auto_enums` crate. ([#123](https://github.com/taiki-e/auto_enums/pull/123))
 
-- Forbid custom `Unpin`/`Drop` impl if trait has `Pin<&mut self>` receiver. See [#135](https://github.com/taiki-e/auto_enums/pull/123) for more.
+- Forbid custom `Unpin`/`Drop` impl if trait has `Pin<&mut self>` receiver. See [#135](https://github.com/taiki-e/auto_enums/pull/135) for more.
 
-- Update `derive_utils` to 0.12. ([#135](https://github.com/taiki-e/auto_enums/pull/123))
+- Update `derive_utils` to 0.12. ([#135](https://github.com/taiki-e/auto_enums/pull/135))
 
 ## [0.7.12] - 2021-01-05
 
