@@ -16,7 +16,7 @@ This library provides the following attribute macros:
 
   Implements specified traits to the enum.
 
-- `#[auto_enum]`
+# `#[auto_enum]`
 
 `#[auto_enum]`'s basic feature is to wrap the value returned by the obvious
 branches (`match`, `if`, `return`, etc..) by an enum that implemented the
@@ -837,6 +837,12 @@ Please be careful if you return another traits with the same name.
 - There needs to explicitly specify the trait to be implemented (`type_analysis` crate feature reduces this limitation).
 - There needs to be marker macros for unsupported expressions.
 
+## Related Projects
+
+- [derive_utils]: A procedural macro helper for easily writing [derives macros][proc-macro-derive] for enums.
+- [io-enum]: \#\[derive(Read, Write, Seek, BufRead)\] for enums.
+- [iter-enum]: \#\[derive(Iterator, DoubleEndedIterator, ExactSizeIterator, Extend)\] for enums.
+
 [derive_utils]: https://github.com/taiki-e/derive_utils
 [futures01]: https://docs.rs/futures/0.1
 [futures03]: https://docs.rs/futures/0.3
@@ -844,6 +850,8 @@ Please be careful if you return another traits with the same name.
 [iter-enum]: https://github.com/taiki-e/iter-enum
 [proc-macro-derive]: https://doc.rust-lang.org/reference/procedural-macros.html#derive-macros
 [rayon]: https://docs.rs/rayon/1
+[rust-lang/rfcs#294]: https://github.com/rust-lang/rfcs/issues/294
+[rust-lang/rfcs#2414]: https://github.com/rust-lang/rfcs/issues/2414
 [serde]: https://docs.rs/serde/1
 [tokio01]: https://docs.rs/tokio/0.1
 [tokio02]: https://docs.rs/tokio/0.2

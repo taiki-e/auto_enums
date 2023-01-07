@@ -86,6 +86,7 @@ attribute.
 
 ```rust
 use auto_enums::auto_enum;
+
 #[auto_enum(Iterator)]
 fn foo(x: i32) -> impl Iterator<Item = i32> {
     match x {
@@ -188,7 +189,7 @@ fn func1(x: i32) -> impl Iterator<Item = i32> {
 fn func2(x: i32) {
     // Unlike `feature(impl_trait_in_bindings)`, this works on stable compilers.
     #[auto_enum]
-    let _iter: impl Iterator<Item = i32> = match x {
+    let iter: impl Iterator<Item = i32> = match x {
         0 => Some(0).into_iter(),
         _ => 0..x,
     };
@@ -196,6 +197,12 @@ fn func2(x: i32) {
 ```
 
 Please be careful if you return another traits with the same name.
+
+## Related Projects
+
+- [derive_utils]: A procedural macro helper for easily writing [derives macros][proc-macro-derive] for enums.
+- [io-enum]: \#\[derive(Read, Write, Seek, BufRead)\] for enums.
+- [iter-enum]: \#\[derive(Iterator, DoubleEndedIterator, ExactSizeIterator, Extend)\] for enums.
 
 [derive_utils]: https://github.com/taiki-e/derive_utils
 [futures01]: https://docs.rs/futures/0.1
@@ -211,12 +218,6 @@ Please be careful if you return another traits with the same name.
 [tokio02]: https://docs.rs/tokio/0.2
 [tokio03]: https://docs.rs/tokio/0.3
 [tokio1]: https://docs.rs/tokio/1
-
-## Related Projects
-
-- [derive_utils]: A procedural macro helper for easily writing [derives macros][proc-macro-derive] for enums.
-- [io-enum]: \#\[derive(Read, Write, Seek, BufRead)\] for enums.
-- [iter-enum]: \#\[derive(Iterator, DoubleEndedIterator, ExactSizeIterator, Extend)\] for enums.
 
 ## License
 
