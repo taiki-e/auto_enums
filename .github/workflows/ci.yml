@@ -61,7 +61,9 @@ jobs:
       - run: rustup toolchain add nightly --no-self-update
       - uses: taiki-e/install-action@cargo-hack
       - uses: taiki-e/install-action@cargo-minimal-versions
-      - uses: dtolnay/install@cargo-expand
+      - uses: taiki-e/cache-cargo-install-action@v1
+        with:
+          tool: cargo-expand
         if: startsWith(matrix.rust, 'nightly')
       - run: cargo test --workspace --tests
       - run: cargo test --workspace --all-features
