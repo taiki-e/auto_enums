@@ -4,7 +4,6 @@ compiletest
 elems
 expandtest
 idents
-impls
 iovec
 qself
 smallvec
