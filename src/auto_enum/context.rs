@@ -16,7 +16,7 @@ use crate::utils::{expr_call, path, replace_expr, unit, Node};
 // Context
 
 /// Config for related to `visitor::Visitor` type.
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, PartialEq)]
 pub(super) enum VisitMode {
     Default,
     Return(/* count */ usize),
@@ -24,7 +24,7 @@ pub(super) enum VisitMode {
 }
 
 /// Config for related to `expr::child_expr`.
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, PartialEq)]
 pub(super) enum VisitLastMode {
     Default,
     /*
