@@ -871,7 +871,7 @@ Please be careful if you return another traits with the same name.
 // It cannot be included in the published code because these lints have false positives in the minimum required version.
 #![cfg_attr(test, warn(single_use_lifetimes))]
 #![warn(clippy::pedantic)]
-#![allow(clippy::too_many_lines)]
+#![allow(clippy::too_many_lines, clippy::manual_assert)]
 
 #[cfg(all(feature = "generator_trait", not(feature = "unstable")))]
 compile_error!(
