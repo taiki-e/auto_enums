@@ -291,7 +291,6 @@ mod kw {
     syn::custom_keyword!(marker);
 }
 
-#[allow(dead_code)] // false positive that fixed in Rust 1.39
 struct Args {
     args: Vec<Path>,
     marker: Option<Ident>,

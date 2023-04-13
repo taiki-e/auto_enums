@@ -4,18 +4,7 @@ pub(crate) mod read {
     pub(crate) const NAME: &[&str] = &["Read", "io::Read"];
 
     pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
-        #[cfg(auto_enums_no_iovec)]
-        let vectored = quote!();
-        #[cfg(not(auto_enums_no_iovec))]
-        let vectored = quote! {
-            #[inline]
-            fn read_vectored(
-                &mut self,
-                bufs: &mut [::std::io::IoSliceMut<'_>],
-            ) -> ::std::io::Result<usize>;
-        };
-
-        // TODO: When `read_initializer` or alternative stabilized, add that conditionally.
+        // TODO: When `read_buf` stabilized, add `read_buf` conditionally.
 
         Ok(derive_trait(data, parse_quote!(::std::io::Read), None, parse_quote! {
             trait Read {
@@ -33,7 +22,11 @@ pub(crate) mod read {
                 ) -> ::std::io::Result<usize>;
                 #[inline]
                 fn read_exact(&mut self, buf: &mut [u8]) -> ::std::io::Result<()>;
-                #vectored
+                #[inline]
+                fn read_vectored(
+                    &mut self,
+                    bufs: &mut [::std::io::IoSliceMut<'_>],
+                ) -> ::std::io::Result<usize>;
             }
         }))
     }
@@ -87,17 +80,6 @@ pub(crate) mod write {
     pub(crate) const NAME: &[&str] = &["Write", "io::Write"];
 
     pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
-        #[cfg(auto_enums_no_iovec)]
-        let vectored = quote!();
-        #[cfg(not(auto_enums_no_iovec))]
-        let vectored = quote! {
-            #[inline]
-            fn write_vectored(
-                &mut self,
-                bufs: &[::std::io::IoSlice<'_>],
-            ) -> ::std::io::Result<usize>;
-        };
-
         Ok(derive_trait(data, parse_quote!(::std::io::Write), None, parse_quote! {
             trait Write {
                 #[inline]
@@ -111,7 +93,11 @@ pub(crate) mod write {
                     &mut self,
                     fmt: ::std::fmt::Arguments<'_>,
                 ) -> ::std::io::Result<()>;
-                #vectored
+                #[inline]
+                fn write_vectored(
+                    &mut self,
+                    bufs: &[::std::io::IoSlice<'_>],
+                ) -> ::std::io::Result<usize>;
             }
         }))
     }

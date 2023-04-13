@@ -892,6 +892,10 @@ compile_error!(
 #[allow(unused_extern_crates)]
 extern crate proc_macro;
 
+#[cfg(doctest)]
+#[doc = include_str!("../README.md")]
+const _README: () = ();
+
 #[macro_use]
 mod utils;
 
