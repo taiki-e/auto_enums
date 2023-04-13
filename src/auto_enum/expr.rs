@@ -80,7 +80,7 @@ pub(super) fn is_unreachable(cx: &Context, expr: &Expr) -> bool {
 
 fn is_unreachable_stmt(cx: &Context, stmt: Option<&Stmt>) -> bool {
     match stmt {
-        Some(Stmt::Expr(expr)) | Some(Stmt::Semi(expr, _)) => is_unreachable(cx, expr),
+        Some(Stmt::Expr(expr) | Stmt::Semi(expr, _)) => is_unreachable(cx, expr),
         Some(Stmt::Local(local)) => {
             local.init.as_ref().map_or(false, |(_, expr)| is_unreachable(cx, expr))
         }
