@@ -127,7 +127,7 @@ impl Context {
             span,
             args,
             false,
-            mem::replace(&mut self.markers, Vec::new()),
+            mem::take(&mut self.markers),
             self.error.borrow_mut().as_mut().unwrap().take(),
         )
     }
