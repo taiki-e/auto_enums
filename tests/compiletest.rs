@@ -1,3 +1,4 @@
+#![cfg(not(miri))]
 #![cfg(all(
     feature = "std",
     feature = "type_analysis",
