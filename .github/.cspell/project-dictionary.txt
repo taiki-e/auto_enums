@@ -3,7 +3,6 @@ bufs
 compiletest
 elems
 expandtest
-idents
 iovec
 qself
 smallvec
