@@ -10,6 +10,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+- Increase the minimum supported Rust version from Rust 1.31 to Rust 1.56.
+
 - Update minimal version of `proc-macro2` to 1.0.60.
 
 ## [0.8.0] - 2022-12-10
