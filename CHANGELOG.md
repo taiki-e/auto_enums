@@ -10,6 +10,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+## [0.8.1] - 2023-06-29
+
 - Increase the minimum supported Rust version from Rust 1.31 to Rust 1.56.
 
 - Update minimal version of `proc-macro2` to 1.0.60.
@@ -336,7 +338,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 Initial release
 
-[Unreleased]: https://github.com/taiki-e/auto_enums/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/taiki-e/auto_enums/compare/v0.8.1...HEAD
+[0.8.1]: https://github.com/taiki-e/auto_enums/compare/v0.8.0...v0.8.1
 [0.8.0]: https://github.com/taiki-e/auto_enums/compare/v0.7.12...v0.8.0
 [0.7.12]: https://github.com/taiki-e/auto_enums/compare/v0.7.11...v0.7.12
 [0.7.11]: https://github.com/taiki-e/auto_enums/compare/v0.7.10...v0.7.11
