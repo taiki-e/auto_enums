@@ -10,6 +10,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+- Update minimal version of `proc-macro2` to 1.0.60.
+
 ## [0.8.0] - 2022-12-10
 
 - Remove `futures` feature. Use `futures03` feature instead. ([#124](https://github.com/taiki-e/auto_enums/pull/124))
