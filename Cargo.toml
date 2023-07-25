@@ -6,7 +6,7 @@ rust-version = "1.56"
 license = "Apache-2.0 OR MIT"
 repository = "https://github.com/taiki-e/auto_enums"
 keywords = ["enum", "macros", "derive", "attribute"]
-categories = ["no-std", "rust-patterns"]
+categories = ["no-std", "no-std::no-alloc", "rust-patterns"]
 exclude = ["/.*", "/tools", "/DEVELOPMENT.md"]
 description = """
 A library for to allow multiple return types by automatically generated enum.
