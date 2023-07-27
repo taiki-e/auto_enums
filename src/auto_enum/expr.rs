@@ -90,7 +90,7 @@ fn is_unreachable_stmt(cx: &Context, stmt: Option<&Stmt>) -> bool {
 }
 
 fn visit_last_expr_match(cx: &mut Context, expr: &mut ExprMatch) {
-    fn skip(cx: &mut Context, arm: &mut Arm) -> bool {
+    fn skip(cx: &Context, arm: &mut Arm) -> bool {
         arm.any_empty_attr(NEVER)
             || arm.any_empty_attr(NESTED)
             || is_unreachable(cx, &arm.body)
@@ -106,7 +106,7 @@ fn visit_last_expr_match(cx: &mut Context, expr: &mut ExprMatch) {
 }
 
 fn visit_last_expr_if(cx: &mut Context, expr: &mut ExprIf) {
-    fn skip(cx: &mut Context, block: &mut Block) -> bool {
+    fn skip(cx: &Context, block: &mut Block) -> bool {
         match block.stmts.last_mut() {
             Some(Stmt::Expr(expr)) => {
                 expr.any_empty_attr(NESTED)
