@@ -53,7 +53,7 @@ pub(crate) mod double_ended_iterator {
         // It is equally efficient if `try_rfold` can be used.
         let try_trait = quote! {
             #[inline]
-            fn rfold<__U, __F>(self, accum: __U, f: __F) -> __U
+            fn rfold<__U, __F>(self, init: __U, f: __F) -> __U
             where
                 __F: ::core::ops::FnMut(__U, Self::Item) -> __U;
             #[inline]
