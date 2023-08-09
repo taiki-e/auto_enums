@@ -1,13 +1,14 @@
-use proc_macro2::{Group, TokenStream};
+use proc_macro2::TokenStream;
 use quote::ToTokens;
 use syn::{
     parse_quote, token,
     visit_mut::{self, VisitMut},
-    Arm, Attribute, Expr, ExprMacro, ExprMatch, ExprReturn, ExprTry, Item, Local, Stmt, Token,
+    Arm, Attribute, Expr, ExprMacro, ExprMatch, ExprReturn, ExprTry, Item, Local, LocalInit,
+    MetaList, Stmt, Token,
 };
 
 use super::{Context, VisitMode, DEFAULT_MARKER, NAME, NESTED, NEVER};
-use crate::utils::{parse_as_empty, replace_expr, Attrs, Node};
+use crate::utils::{replace_expr, Attrs, Node};
 
 #[derive(Clone, Copy, Default)]
 struct Scope {
@@ -47,7 +48,7 @@ impl<'a> Visitor<'a> {
     fn find_remove_attrs(&mut self, attrs: &mut impl Attrs) {
         if !self.scope.foreign {
             if let Some(attr) = attrs.find_remove_attr(NEVER) {
-                if let Err(e) = parse_as_empty(&attr.tokens) {
+                if let Err(e) = attr.meta.require_path_only() {
                     self.cx.error(e);
                 }
             }
@@ -130,7 +131,7 @@ impl<'a> Visitor<'a> {
     fn visit_nested(&mut self, node: &mut Expr, attr: &Attribute) {
         debug_assert!(!self.scope.foreign);
 
-        if let Err(e) = parse_as_empty(&attr.tokens) {
+        if let Err(e) = attr.meta.require_path_only() {
             self.cx.error(e);
         } else {
             super::expr::child_expr(self.cx, node);
@@ -227,7 +228,7 @@ impl VisitMut for Visitor<'_> {
         if !self.cx.has_error() {
             if !self.scope.foreign {
                 if let Some(attr) = node.find_remove_attr(NESTED) {
-                    if let Some((_, expr)) = &mut node.init {
+                    if let Some(LocalInit { expr, .. }) = &mut node.init {
                         self.visit_nested(expr, &attr);
                     }
                 }
@@ -242,8 +243,7 @@ impl VisitMut for Visitor<'_> {
     fn visit_stmt_mut(&mut self, node: &mut Stmt) {
         if !self.cx.has_error() {
             match node {
-                Stmt::Expr(expr) => self.visit_expr(expr, false),
-                Stmt::Semi(expr, _) => self.visit_expr(expr, true),
+                Stmt::Expr(expr, semi) => self.visit_expr(expr, semi.is_some()),
                 _ => {
                     let tmp = self.scope;
 
@@ -325,8 +325,9 @@ trait VisitStmt: VisitMut {
         let attr = node.find_remove_attr(NAME);
 
         let res = attr.map(|attr| {
-            syn::parse2::<Group>(attr.tokens)
-                .and_then(|group| visitor.cx().make_child(node.to_token_stream(), group.stream()))
+            attr.meta.require_list().and_then(|MetaList { tokens, .. }| {
+                visitor.cx().make_child(node.to_token_stream(), tokens.clone())
+            })
         });
 
         visit_mut::visit_expr_mut(visitor, node);
@@ -343,24 +344,21 @@ trait VisitStmt: VisitMut {
 
     fn visit_stmt(visitor: &mut Self, node: &mut Stmt) {
         let attr = match node {
-            Stmt::Expr(expr) => {
-                Self::visit_expr(visitor, expr, false);
-                return;
-            }
-            Stmt::Semi(expr, _) => {
-                Self::visit_expr(visitor, expr, true);
+            Stmt::Expr(expr, semi) => {
+                Self::visit_expr(visitor, expr, semi.is_some());
                 return;
             }
             Stmt::Local(local) => local.find_remove_attr(NAME),
+            Stmt::Macro(_) => None,
             // Do not recurse into nested items.
             Stmt::Item(_) => return,
         };
 
         let res = attr.map(|attr| {
-            let args = if attr.tokens.is_empty() {
-                TokenStream::new()
-            } else {
-                syn::parse2::<Group>(attr.tokens)?.stream()
+            let args = match attr.meta {
+                syn::Meta::Path(_) => TokenStream::new(),
+                syn::Meta::List(list) => list.tokens,
+                syn::Meta::NameValue(nv) => bail!(nv.eq_token, "expected list"),
             };
             visitor.cx().make_child(node.to_token_stream(), args)
         });
