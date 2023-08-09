@@ -242,21 +242,20 @@ impl VisitMut for Visitor<'_> {
 
     fn visit_stmt_mut(&mut self, node: &mut Stmt) {
         if !self.cx.has_error() {
-            match node {
-                Stmt::Expr(expr, semi) => self.visit_expr(expr, semi.is_some()),
-                _ => {
-                    let tmp = self.scope;
+            if let Stmt::Expr(expr, semi) = node {
+                self.visit_expr(expr, semi.is_some());
+            } else {
+                let tmp = self.scope;
 
-                    if node.any_attr(NAME) {
-                        self.scope.foreign = true;
-                        // Record whether other `auto_enum` attribute exists.
-                        self.cx.has_child = true;
-                    }
-
-                    VisitStmt::visit_stmt(self, node);
-
-                    self.scope = tmp;
+                if node.any_attr(NAME) {
+                    self.scope.foreign = true;
+                    // Record whether other `auto_enum` attribute exists.
+                    self.cx.has_child = true;
                 }
+
+                VisitStmt::visit_stmt(self, node);
+
+                self.scope = tmp;
             }
         }
     }
