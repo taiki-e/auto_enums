@@ -10,6 +10,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+- Update `syn` to 2. ([#158](https://github.com/taiki-e/auto_enums/pull/158), thanks @cuviper)
+
 ## [0.8.1] - 2023-06-29
 
 - Increase the minimum supported Rust version from Rust 1.31 to Rust 1.56.
