@@ -1,8 +1,8 @@
 use syn::{
     visit_mut::{self, VisitMut},
     Arm, Block, Expr, ExprBlock, ExprBreak, ExprCall, ExprIf, ExprLoop, ExprMacro, ExprMatch,
-    ExprMethodCall, ExprParen, ExprPath, ExprTry, ExprType, ExprUnsafe, Item, Label, Lifetime,
-    Stmt, Token,
+    ExprMethodCall, ExprParen, ExprPath, ExprTry, ExprUnsafe, Item, Label, Lifetime, LocalInit,
+    Macro, Stmt, StmtMacro, Token,
 };
 
 use super::{visitor, Context, NAME, NESTED, NEVER};
@@ -18,7 +18,7 @@ pub(super) fn child_expr(cx: &mut Context, expr: &mut Expr) {
 
     match expr {
         Expr::Block(ExprBlock { block, .. }) | Expr::Unsafe(ExprUnsafe { block, .. }) => {
-            if let Some(Stmt::Expr(expr)) = block.stmts.last_mut() {
+            if let Some(Stmt::Expr(expr, None)) = block.stmts.last_mut() {
                 child_expr(cx, expr);
             }
         }
@@ -29,16 +29,13 @@ pub(super) fn child_expr(cx: &mut Context, expr: &mut Expr) {
 
         // Search recursively
         Expr::MethodCall(ExprMethodCall { receiver: expr, .. })
-        | Expr::Paren(ExprParen { expr, .. })
-        | Expr::Type(ExprType { expr, .. }) => child_expr(cx, expr),
+        | Expr::Paren(ExprParen { expr, .. }) => child_expr(cx, expr),
 
         _ => {}
     }
 }
 
 pub(super) fn is_unreachable(cx: &Context, expr: &Expr) -> bool {
-    const UNREACHABLE_MACROS: &[&str] = &["unreachable", "panic"];
-
     if expr.any_empty_attr(NEVER) || expr.any_attr(NAME) {
         return true;
     }
@@ -50,10 +47,7 @@ pub(super) fn is_unreachable(cx: &Context, expr: &Expr) -> bool {
 
         Expr::Break(_) | Expr::Continue(_) | Expr::Return(_) => true,
 
-        // `unreachable!`, `panic!` or an expression level marker (`marker!` macro).
-        Expr::Macro(ExprMacro { mac, .. }) => {
-            UNREACHABLE_MACROS.iter().any(|i| mac.path.is_ident(i)) || cx.is_marker_macro(mac)
-        }
+        Expr::Macro(ExprMacro { mac, .. }) => is_unreachable_macro(cx, mac),
 
         Expr::Match(ExprMatch { arms, .. }) => {
             arms.iter().all(|arm| arm.any_empty_attr(NEVER) || is_unreachable(cx, &arm.body))
@@ -71,20 +65,27 @@ pub(super) fn is_unreachable(cx: &Context, expr: &Expr) -> bool {
 
         // Search recursively
         Expr::MethodCall(ExprMethodCall { receiver: expr, .. })
-        | Expr::Paren(ExprParen { expr, .. })
-        | Expr::Type(ExprType { expr, .. }) => is_unreachable(cx, expr),
+        | Expr::Paren(ExprParen { expr, .. }) => is_unreachable(cx, expr),
 
         _ => false,
     }
 }
 
+fn is_unreachable_macro(cx: &Context, mac: &Macro) -> bool {
+    const UNREACHABLE_MACROS: &[&str] = &["unreachable", "panic"];
+
+    // `unreachable!`, `panic!` or an expression level marker (`marker!` macro).
+    UNREACHABLE_MACROS.iter().any(|i| mac.path.is_ident(i)) || cx.is_marker_macro(mac)
+}
+
 fn is_unreachable_stmt(cx: &Context, stmt: Option<&Stmt>) -> bool {
     match stmt {
-        Some(Stmt::Expr(expr) | Stmt::Semi(expr, _)) => is_unreachable(cx, expr),
+        Some(Stmt::Expr(expr, _)) => is_unreachable(cx, expr),
         Some(Stmt::Local(local)) => {
-            local.init.as_ref().map_or(false, |(_, expr)| is_unreachable(cx, expr))
+            local.init.as_ref().map_or(false, |LocalInit { expr, .. }| is_unreachable(cx, expr))
         }
         Some(Stmt::Item(_)) => true,
+        Some(Stmt::Macro(StmtMacro { mac, .. })) => is_unreachable_macro(cx, mac),
         None => false,
     }
 }
@@ -108,7 +109,7 @@ fn visit_last_expr_match(cx: &mut Context, expr: &mut ExprMatch) {
 fn visit_last_expr_if(cx: &mut Context, expr: &mut ExprIf) {
     fn skip(cx: &Context, block: &mut Block) -> bool {
         match block.stmts.last_mut() {
-            Some(Stmt::Expr(expr)) => {
+            Some(Stmt::Expr(expr, None)) => {
                 expr.any_empty_attr(NESTED)
                     || is_unreachable(cx, expr)
                     || visitor::find_nested(block)

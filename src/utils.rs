@@ -3,7 +3,7 @@ use std::{iter, mem};
 use proc_macro2::TokenStream;
 use syn::{
     punctuated::Punctuated, token, visit_mut::VisitMut, Arm, Attribute, Block, Expr, ExprBlock,
-    ExprCall, ExprPath, ExprTuple, ItemFn, Local, Path, PathSegment, Result, Stmt,
+    ExprCall, ExprPath, ExprTuple, ItemFn, Local, Meta, Path, PathSegment, Stmt, StmtMacro,
 };
 
 macro_rules! format_err {
@@ -59,19 +59,7 @@ pub(crate) fn replace_block(this: &mut Block, f: impl FnOnce(Block) -> Expr) {
     // If `f` generates unused braces containing the span of `this.brace_token`,
     // this will cause confusing warnings: https://github.com/rust-lang/rust/issues/71080
     let stmts = mem::take(&mut this.stmts);
-    this.stmts = vec![Stmt::Expr(f(block(stmts)))];
-}
-
-/// Checks if `tokens` is an empty `TokenStream`.
-///
-/// This is almost equivalent to `syn::parse2::<Nothing>()`, but produces
-/// a better error message and does not require ownership of `tokens`.
-pub(crate) fn parse_as_empty(tokens: &TokenStream) -> Result<()> {
-    if tokens.is_empty() {
-        Ok(())
-    } else {
-        bail!(tokens, "unexpected token: `{}`", tokens)
-    }
+    this.stmts = vec![Stmt::Expr(f(block(stmts)), None)];
 }
 
 // =================================================================================================
@@ -137,17 +125,17 @@ pub(crate) trait Attrs {
     fn attrs(&self) -> &[Attribute];
 
     fn any_attr(&self, ident: &str) -> bool {
-        self.attrs().iter().any(|attr| attr.path.is_ident(ident))
+        self.attrs().iter().any(|attr| attr.path().is_ident(ident))
     }
 
     fn any_empty_attr(&self, ident: &str) -> bool {
-        self.attrs().iter().any(|attr| attr.path.is_ident(ident) && attr.tokens.is_empty())
+        self.attrs().iter().any(|attr| matches!(&attr.meta, Meta::Path(p) if p.is_ident(ident)))
     }
 
     fn attrs_mut(&mut self) -> Option<&mut Vec<Attribute>>;
 
     fn find_remove_attr(&mut self, ident: &str) -> Option<Attribute> {
-        self.attrs_mut()?.find_remove(|attr| attr.path.is_ident(ident))
+        self.attrs_mut()?.find_remove(|attr| attr.path().is_ident(ident))
     }
 }
 
@@ -171,11 +159,22 @@ impl Attrs for Local {
     }
 }
 
+impl Attrs for StmtMacro {
+    fn attrs(&self) -> &[Attribute] {
+        &self.attrs
+    }
+
+    fn attrs_mut(&mut self) -> Option<&mut Vec<Attribute>> {
+        Some(&mut self.attrs)
+    }
+}
+
 impl Attrs for Stmt {
     fn attrs(&self) -> &[Attribute] {
         match self {
-            Stmt::Expr(expr) | Stmt::Semi(expr, _) => expr.attrs(),
+            Stmt::Expr(expr, _) => expr.attrs(),
             Stmt::Local(local) => local.attrs(),
+            Stmt::Macro(mac) => mac.attrs(),
             // Ignore nested items.
             Stmt::Item(_) => &[],
         }
@@ -183,8 +182,9 @@ impl Attrs for Stmt {
 
     fn attrs_mut(&mut self) -> Option<&mut Vec<Attribute>> {
         match self {
-            Stmt::Expr(expr) | Stmt::Semi(expr, _) => expr.attrs_mut(),
+            Stmt::Expr(expr, _) => expr.attrs_mut(),
             Stmt::Local(local) => local.attrs_mut(),
+            Stmt::Macro(mac) => mac.attrs_mut(),
             // Ignore nested items.
             Stmt::Item(_) => None,
         }
@@ -214,12 +214,10 @@ macro_rules! attrs_impl {
 attrs_impl! {
     Array(ExprArray),
     Assign(ExprAssign),
-    AssignOp(ExprAssignOp),
     Async(ExprAsync),
     Await(ExprAwait),
     Binary(ExprBinary),
     Block(ExprBlock),
-    Box(ExprBox),
     Break(ExprBreak),
     Call(ExprCall),
     Cast(ExprCast),
@@ -246,7 +244,6 @@ attrs_impl! {
     Try(ExprTry),
     TryBlock(ExprTryBlock),
     Tuple(ExprTuple),
-    Type(ExprType),
     Unary(ExprUnary),
     Unsafe(ExprUnsafe),
     While(ExprWhile),

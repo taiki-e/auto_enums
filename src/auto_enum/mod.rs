@@ -10,7 +10,7 @@ use quote::ToTokens;
 use syn::Pat;
 use syn::{
     AngleBracketedGenericArguments, Error, Expr, ExprClosure, GenericArgument, Item, ItemEnum,
-    ItemFn, Local, PathArguments, ReturnType, Stmt, Type, TypePath,
+    ItemFn, Local, LocalInit, PathArguments, ReturnType, Stmt, Type, TypePath,
 };
 
 use self::{
@@ -85,7 +85,9 @@ fn expand_expr(cx: &mut Context, expr: &mut Expr) {
 }
 
 fn build_expr(expr: &mut Expr, item: ItemEnum) {
-    replace_expr(expr, |expr| expr_block(block(vec![Stmt::Item(item.into()), Stmt::Expr(expr)])));
+    replace_expr(expr, |expr| {
+        expr_block(block(vec![Stmt::Item(item.into()), Stmt::Expr(expr, None)]))
+    });
 }
 
 // =================================================================================================
@@ -93,13 +95,13 @@ fn build_expr(expr: &mut Expr, item: ItemEnum) {
 
 fn expand_parent_stmt(cx: &mut Context, stmt: &mut Stmt) {
     match stmt {
-        Stmt::Expr(expr) => expand_parent_expr(cx, expr, false),
-        Stmt::Semi(expr, _) => expand_parent_expr(cx, expr, true),
+        Stmt::Expr(expr, semi) => expand_parent_expr(cx, expr, semi.is_some()),
         Stmt::Local(local) => expand_parent_local(cx, local),
         Stmt::Item(Item::Fn(item)) => expand_parent_item_fn(cx, item),
         Stmt::Item(item) => {
             cx.error(format_err!(item, "may only be used on expression, statement, or function"));
         }
+        Stmt::Macro(_) => {}
     }
 }
 
@@ -133,7 +135,7 @@ fn expand_parent_local(cx: &mut Context, local: &mut Local) {
         return;
     }
 
-    let expr = if let Some((_, expr)) = &mut local.init {
+    let expr = if let Some(LocalInit { expr, .. }) = &mut local.init {
         &mut **expr
     } else {
         cx.error(format_err!(
@@ -198,7 +200,7 @@ fn expand_parent_item_fn(cx: &mut Context, item: &mut ItemFn) {
     }
 
     match item.block.stmts.last_mut() {
-        Some(Stmt::Expr(expr)) => child_expr(cx, expr),
+        Some(Stmt::Expr(expr, None)) => child_expr(cx, expr),
         Some(_) => {}
         None => cx.error(format_err!(
             item.block,
