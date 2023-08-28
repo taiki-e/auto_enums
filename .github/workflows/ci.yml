@@ -72,7 +72,7 @@ jobs:
       - run: cargo test --workspace --tests
       - run: cargo test --workspace --all-features
         if: startsWith(matrix.rust, 'nightly')
-      - run: cargo minimal-versions build --workspace --all-features --ignore-private
+      - run: cargo minimal-versions build --workspace --no-private --all-features
 
   features:
     runs-on: ubuntu-latest
@@ -84,7 +84,7 @@ jobs:
       - name: Install Rust
         run: rustup toolchain add nightly --no-self-update && rustup default nightly
       - uses: taiki-e/install-action@cargo-hack
-      - run: cargo hack build --workspace --ignore-private --feature-powerset --depth 2 --no-dev-deps --features unstable --ignore-unknown-features
+      - run: cargo hack build --workspace --no-private --feature-powerset --depth 2 --no-dev-deps --features unstable --ignore-unknown-features
 
   miri:
     runs-on: ubuntu-latest
