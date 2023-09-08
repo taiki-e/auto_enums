@@ -259,11 +259,11 @@ fn expand(args: TokenStream, input: TokenStream) -> Result<TokenStream> {
     let args = syn::parse2::<Args>(args)?.inner;
     let args = args.iter().fold(Vec::new(), |mut v, (s, arg)| {
         if let Some(traits) = get_trait_deps(s) {
-            traits.iter().filter(|&x| !args.iter().any(|(s, _)| s == x)).for_each(|s| {
+            for s in traits.iter().filter(|&x| !args.iter().any(|(s, _)| s == x)) {
                 if !exists_alias(s, &v) {
                     v.push((s, None));
                 }
-            });
+            }
         }
         if !exists_alias(s, &v) {
             v.push((s, Some(arg)));

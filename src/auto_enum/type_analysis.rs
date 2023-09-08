@@ -17,7 +17,7 @@ pub(super) fn collect_impl_trait(args: &[Path], traits: &mut Vec<Path>, ty: &mut
         fn visit_type_impl_trait_mut(&mut self, node: &mut TypeImplTrait) {
             visit_mut::visit_type_impl_trait_mut(self, node);
 
-            node.bounds.iter().for_each(|ty| {
+            for ty in &node.bounds {
                 if let TypeParamBound::Trait(ty) = ty {
                     let ty = path(ty.path.segments.iter().map(|ty| ty.ident.clone().into()));
                     let ty_str = ty.to_token_stream().to_string();
@@ -29,7 +29,7 @@ pub(super) fn collect_impl_trait(args: &[Path], traits: &mut Vec<Path>, ty: &mut
                         self.traits.push(ty);
                     }
                 }
-            });
+            }
         }
     }
 
