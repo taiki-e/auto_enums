@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0 OR MIT
+
 // https://docs.rs/futures/0.1
 #[cfg(feature = "futures01")]
 pub(crate) mod futures01;

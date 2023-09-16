@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0 OR MIT
+
 macro_rules! derive_fmt {
     ($trait:ident, $Trait:ident, [$($name:expr),*]) => {
         pub(crate) mod $trait {

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0 OR MIT
+
 /*
 Note that this benchmark currently only measures a fairly narrow area.
 

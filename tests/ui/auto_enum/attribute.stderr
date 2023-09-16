@@ -1,17 +1,17 @@
 error: unexpected token in attribute
- --> tests/ui/auto_enum/attribute.rs:7:16
+ --> tests/ui/auto_enum/attribute.rs:9:16
   |
-7 |         #[never(foo)] //~ ERROR unexpected token
+9 |         #[never(foo)] //~ ERROR unexpected token
   |                ^
 
 error: unexpected token in attribute
-  --> tests/ui/auto_enum/attribute.rs:17:17
+  --> tests/ui/auto_enum/attribute.rs:19:17
    |
-17 |         #[nested(foo)] //~ ERROR unexpected token
+19 |         #[nested(foo)] //~ ERROR unexpected token
    |                 ^
 
 error: #[rec] has been removed and replaced with #[nested]
-  --> tests/ui/auto_enum/attribute.rs:27:9
+  --> tests/ui/auto_enum/attribute.rs:29:9
    |
-27 |         #[rec] //~ ERROR #[rec] has been removed and replaced with #[nested]
+29 |         #[rec] //~ ERROR #[rec] has been removed and replaced with #[nested]
    |         ^^^^^^

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0 OR MIT
+
 extern crate tokio01_crate as tokio;
 
 use auto_enums::enum_derive;

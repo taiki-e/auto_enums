@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0 OR MIT
+
 #[cfg(feature = "ops")]
 pub(crate) mod deref {
     use crate::derive::*;

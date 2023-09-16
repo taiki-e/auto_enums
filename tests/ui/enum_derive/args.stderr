@@ -1,23 +1,23 @@
 error: expected identifier
- --> tests/ui/enum_derive/args.rs:3:22
+ --> tests/ui/enum_derive/args.rs:5:22
   |
-3 | #[enum_derive(Clone, =>)] //~ ERROR expected identifier
+5 | #[enum_derive(Clone, =>)] //~ ERROR expected identifier
   |                      ^
 
 error: expected identifier
- --> tests/ui/enum_derive/args.rs:9:25
-  |
-9 | #[enum_derive(foo::bar::!)] //~ ERROR expected identifier
-  |                         ^
-
-error: expected `,`
-  --> tests/ui/enum_derive/args.rs:15:25
+  --> tests/ui/enum_derive/args.rs:11:25
    |
-15 | #[enum_derive(Clone, Foo:)] //~ ERROR expected `,`
+11 | #[enum_derive(foo::bar::!)] //~ ERROR expected identifier
    |                         ^
 
 error: expected `,`
-  --> tests/ui/enum_derive/args.rs:21:21
+  --> tests/ui/enum_derive/args.rs:17:25
    |
-21 | #[enum_derive(Clone Foo)] //~ ERROR expected `,`
+17 | #[enum_derive(Clone, Foo:)] //~ ERROR expected `,`
+   |                         ^
+
+error: expected `,`
+  --> tests/ui/enum_derive/args.rs:23:21
+   |
+23 | #[enum_derive(Clone Foo)] //~ ERROR expected `,`
    |                     ^^^

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0 OR MIT
+
 /// `core::convert`
 #[cfg(feature = "convert")]
 pub(crate) mod convert;

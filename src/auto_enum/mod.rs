@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0 OR MIT
+
 mod context;
 mod expr;
 #[cfg(feature = "type_analysis")]

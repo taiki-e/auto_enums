@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0 OR MIT
+
 use std::{iter, mem};
 
 use proc_macro2::TokenStream;

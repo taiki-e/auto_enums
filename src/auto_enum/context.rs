@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0 OR MIT
+
 use std::{cell::RefCell, collections::hash_map::DefaultHasher, hash::Hasher, iter, mem, thread};
 
 use proc_macro2::TokenStream;

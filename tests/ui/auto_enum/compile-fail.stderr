@@ -1,47 +1,47 @@
 error: `if` expression missing an else clause
- --> tests/ui/auto_enum/compile-fail.rs:7:12
+ --> tests/ui/auto_enum/compile-fail.rs:9:12
   |
-7 |     } else if x > 3 {
+9 |     } else if x > 3 {
   |            ^^
 
 error: `#[auto_enum]` is required two or more branches or marker macros in total, there is only one branch or marker macro in this statement
-  --> tests/ui/auto_enum/compile-fail.rs:16:5
+  --> tests/ui/auto_enum/compile-fail.rs:18:5
    |
-16 | /     let iter = match x {
-17 | |         //~^ ERROR `#[auto_enum]` is required two or more branches or marker macros in total, there is only one branch or marker macro in...
-18 | |         _ if y < 0 => return y..=0,
-19 | |         _ => 2..=10,
-20 | |     };
+18 | /     let iter = match x {
+19 | |         //~^ ERROR `#[auto_enum]` is required two or more branches or marker macros in total, there is only one branch or marker macro in...
+20 | |         _ if y < 0 => return y..=0,
+21 | |         _ => 2..=10,
+22 | |     };
    | |______^
 
 error: `#[auto_enum]` is required two or more branches or marker macros in total, there is no branch or marker macro in this statement
-  --> tests/ui/auto_enum/compile-fail.rs:31:5
+  --> tests/ui/auto_enum/compile-fail.rs:33:5
    |
-31 | /     let iter = match x {
-32 | |         //~^ ERROR `#[auto_enum]` is required two or more branches or marker macros in total, there is no branch or marker macro in this ...
-33 | |         _ if y < 0 => return y..=0,
-34 | |         _ => return 2..=10,
-35 | |     };
+33 | /     let iter = match x {
+34 | |         //~^ ERROR `#[auto_enum]` is required two or more branches or marker macros in total, there is no branch or marker macro in this ...
+35 | |         _ if y < 0 => return y..=0,
+36 | |         _ => return 2..=10,
+37 | |     };
    | |______^
 
 error: `#[auto_enum]` is required two or more branches or marker macros in total, there is only one branch or marker macro in this statement
-  --> tests/ui/auto_enum/compile-fail.rs:51:13
+  --> tests/ui/auto_enum/compile-fail.rs:53:13
    |
-51 | / ...   let _iter = match x {
-52 | | ...       //~^ ERROR `#[auto_enum]` is required two or more branches or marker macros in total, there is only one branch or marker macro ...
-53 | | ...       _ if y < 0 => return y..=0,
-54 | | ...       _ => 2..=10,
-55 | | ...   };
+53 | / ...   let _iter = match x {
+54 | | ...       //~^ ERROR `#[auto_enum]` is required two or more branches or marker macros in total, there is only one branch or marker macro ...
+55 | | ...       _ if y < 0 => return y..=0,
+56 | | ...       _ => 2..=10,
+57 | | ...   };
    | |________^
 
 error: `#[auto_enum]` is required two or more branches or marker macros in total, there is only one branch or marker macro in this statement
-  --> tests/ui/auto_enum/compile-fail.rs:46:5
+  --> tests/ui/auto_enum/compile-fail.rs:48:5
    |
-46 | /     let iter = match x {
-47 | |         //~^ ERROR `#[auto_enum]` is required two or more branches or marker macros in total, there is only one branch or marker macro in...
-48 | |         _ if y < 0 => return y..=0,
-49 | |         _ => {
+48 | /     let iter = match x {
+49 | |         //~^ ERROR `#[auto_enum]` is required two or more branches or marker macros in total, there is only one branch or marker macro in...
+50 | |         _ if y < 0 => return y..=0,
+51 | |         _ => {
 ...  |
-57 | |         }
-58 | |     };
+59 | |         }
+60 | |     };
    | |______^

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0 OR MIT
+
 use auto_enums::auto_enum;
 
 #[auto_enum(Iterator, marker = foo)]

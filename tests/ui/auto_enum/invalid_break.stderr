@@ -1,15 +1,15 @@
 error[E0267]: `break` inside of a closure
- --> tests/ui/auto_enum/invalid_break.rs:2:8
+ --> tests/ui/auto_enum/invalid_break.rs:4:8
   |
-2 |     || break
+4 |     || break
   |     -- ^^^^^ cannot `break` inside of a closure
   |     |
   |     enclosing closure
 
 error[E0267]: `break` inside of an `async` block
- --> tests/ui/auto_enum/invalid_break.rs:6:13
+ --> tests/ui/auto_enum/invalid_break.rs:8:13
   |
-6 |     async { break }
+8 |     async { break }
   |     --------^^^^^--
   |     |       |
   |     |       cannot `break` inside of an `async` block

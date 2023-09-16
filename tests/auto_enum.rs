@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0 OR MIT
+
 #![cfg_attr(
     feature = "fn_traits",
     feature(proc_macro_hygiene, stmt_expr_attributes, type_ascription)
