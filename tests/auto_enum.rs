@@ -487,7 +487,7 @@ fn stable_std() {
     #[auto_enum(Transpose, Debug, Display, Error)]
     fn transpose_err(file: Option<&Path>) -> Result<(), impl Error> {
         if let Some(_f) = file {
-            Err(io::Error::from(io::ErrorKind::NotFound)).map_err(IoError::Io2)
+            Err(IoError::Io2(io::Error::from(io::ErrorKind::NotFound)))
         } else {
             Err(io::Error::from(io::ErrorKind::NotFound))
         }
@@ -498,7 +498,7 @@ fn stable_std() {
     #[auto_enum(Debug, Display, Error)]
     fn try_operator(file: Option<&Path>) -> Result<(), impl Error> {
         if let Some(_f) = file {
-            Err(io::Error::from(io::ErrorKind::NotFound)).map_err(IoError::Io2)?;
+            Err(IoError::Io2(io::Error::from(io::ErrorKind::NotFound)))?;
         } else {
             Err(io::Error::from(io::ErrorKind::NotFound))?;
         }
