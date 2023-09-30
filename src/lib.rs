@@ -869,10 +869,7 @@ Please be careful if you return another traits with the same name.
     )
 ))]
 #![forbid(unsafe_code)]
-#![warn(rust_2018_idioms, unreachable_pub)]
-// It cannot be included in the published code because these lints have false positives in the minimum required version.
-#![cfg_attr(test, warn(single_use_lifetimes))]
-#![warn(clippy::pedantic)]
+#![warn(rust_2018_idioms, single_use_lifetimes, unreachable_pub, clippy::pedantic)]
 #![allow(clippy::doc_markdown, clippy::too_many_lines, clippy::manual_assert)]
 
 #[cfg(all(feature = "generator_trait", not(feature = "unstable")))]
