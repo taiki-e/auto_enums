@@ -887,10 +887,6 @@ compile_error!(
     "The `trusted_len` feature requires the `unstable` feature as an explicit opt-in to unstable features"
 );
 
-// older compilers require explicit `extern crate`.
-#[allow(unused_extern_crates)]
-extern crate proc_macro;
-
 #[cfg(doctest)]
 #[doc = include_str!("../README.md")]
 const _README: () = ();
