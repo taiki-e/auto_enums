@@ -896,11 +896,12 @@ extern crate proc_macro;
 const _README: () = ();
 
 #[macro_use]
-mod utils;
+mod error;
 
 mod auto_enum;
 mod derive;
 mod enum_derive;
+mod utils;
 
 use proc_macro::TokenStream;
 

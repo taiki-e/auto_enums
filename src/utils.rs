@@ -8,21 +8,6 @@ use syn::{
     ExprCall, ExprPath, ExprTuple, ItemFn, Local, Meta, Path, PathSegment, Stmt, StmtMacro,
 };
 
-macro_rules! format_err {
-    ($span:expr, $msg:expr $(,)*) => {
-        syn::Error::new_spanned(&$span as &dyn quote::ToTokens, &$msg as &dyn ::std::fmt::Display)
-    };
-    ($span:expr, $($tt:tt)*) => {
-        format_err!($span, format!($($tt)*))
-    };
-}
-
-macro_rules! bail {
-    ($($tt:tt)*) => {
-        return Err(format_err!($($tt)*))
-    };
-}
-
 pub(crate) fn path(segments: impl IntoIterator<Item = PathSegment>) -> Path {
     Path { leading_colon: None, segments: segments.into_iter().collect() }
 }
