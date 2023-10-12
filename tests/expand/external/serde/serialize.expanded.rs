@@ -1,3 +1,4 @@
+extern crate serde_crate as serde;
 use auto_enums::enum_derive;
 enum Enum<A, B> {
     A(A),

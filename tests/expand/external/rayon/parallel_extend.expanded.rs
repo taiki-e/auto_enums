@@ -1,3 +1,4 @@
+extern crate rayon_crate as rayon;
 use auto_enums::enum_derive;
 enum Enum<A, B> {
     A(A),
