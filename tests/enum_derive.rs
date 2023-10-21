@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
-#![cfg_attr(feature = "generator_trait", feature(generator_trait))]
+#![cfg_attr(feature = "coroutine_trait", feature(coroutine_trait))]
 #![cfg_attr(feature = "fn_traits", feature(fn_traits, unboxed_closures))]
 #![cfg_attr(feature = "trusted_len", feature(trusted_len))]
 #![warn(rust_2018_idioms, single_use_lifetimes)]
@@ -111,10 +111,10 @@ fn stable_std() {
 
 // nightly
 
-#[cfg(feature = "generator_trait")]
+#[cfg(feature = "coroutine_trait")]
 #[test]
-fn generator_trait() {
-    #[enum_derive(Generator)]
+fn coroutine_trait() {
+    #[enum_derive(Coroutine)]
     enum Enum1<A, B> {
         A(A),
         B(B),

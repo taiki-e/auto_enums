@@ -85,8 +85,8 @@ fn get_derive(s: &str) -> Option<DeriveFn> {
         core::ops::fn_mut,
         #[cfg(feature = "fn_traits")]
         core::ops::fn_once,
-        #[cfg(feature = "generator_trait")]
-        core::ops::generator,
+        #[cfg(feature = "coroutine_trait")]
+        core::ops::coroutine,
         core::future,
         // std
         #[cfg(feature = "std")]

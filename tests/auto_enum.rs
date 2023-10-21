@@ -4,7 +4,7 @@
     feature = "fn_traits",
     feature(proc_macro_hygiene, stmt_expr_attributes, type_ascription)
 )]
-#![cfg_attr(feature = "generator_trait", feature(generator_trait))]
+#![cfg_attr(feature = "coroutine_trait", feature(coroutine_trait))]
 #![cfg_attr(feature = "fn_traits", feature(fn_traits, unboxed_closures))]
 #![cfg_attr(feature = "trusted_len", feature(trusted_len))]
 #![cfg_attr(not(feature = "std"), no_std)]

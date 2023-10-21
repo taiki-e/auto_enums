@@ -94,22 +94,22 @@ pub(crate) mod range_bounds {
     }
 }
 
-#[cfg(feature = "generator_trait")]
-pub(crate) mod generator {
+#[cfg(feature = "coroutine_trait")]
+pub(crate) mod coroutine {
     use quote::ToTokens;
 
     use crate::derive::*;
 
-    pub(crate) const NAME: &[&str] = &["Generator"];
+    pub(crate) const NAME: &[&str] = &["Coroutine"];
 
     pub(crate) fn derive(cx: &Context, data: &Data) -> Result<TokenStream> {
         cx.needs_pin_projection();
 
         let ident = &data.ident;
         let pin = quote!(::core::pin::Pin);
-        let trait_: syn::Path = parse_quote!(::core::ops::Generator);
+        let trait_: syn::Path = parse_quote!(::core::ops::Coroutine);
         let mut impl_ = EnumImpl::from_trait(data, trait_.clone(), None, parse_quote! {
-            trait Generator<R> {
+            trait Coroutine<R> {
                 type Yield;
                 type Return;
             }
@@ -124,7 +124,7 @@ pub(crate) mod generator {
             fn resume(
                 self: #pin<&mut Self>,
                 arg: R,
-            ) -> ::core::ops::GeneratorState<Self::Yield, Self::Return> {
+            ) -> ::core::ops::CoroutineState<Self::Yield, Self::Return> {
                 unsafe {
                     match self.get_unchecked_mut() { #(#resume,)* }
                 }

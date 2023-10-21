@@ -77,7 +77,7 @@ const TRAITS: &[&str] = &[
     "Fn",
     "FnMut",
     "FnOnce",
-    "Generator",
+    "Coroutine",
     "Future",
     // std
     "Read",

@@ -156,8 +156,8 @@ enum Foo<A, B> {
   - Enable to use [tokio v0.2][tokio02] traits.
 - **`tokio01`**
   - Enable to use [tokio v0.1][tokio01] traits.
-- **`generator_trait`**
-  - Enable to use `[std|core]::ops::Generator` trait.
+- **`coroutine_trait`**
+  - Enable to use `[std|core]::ops::Coroutine` trait.
   - Note that this feature is unstable and may cause incompatible changes between patch versions.
 - **`fn_traits`**
   - Enable to use `[std|core]::ops`'s `Fn`, `FnMut`, and `FnOnce` traits.

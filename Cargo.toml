@@ -73,8 +73,9 @@ unstable = []
 
 # Enable unstable features of [std|core] libraries
 
-# Enable to use `[std|core]::ops::Generator` trait.
-generator_trait = []
+# Enable to use `[std|core]::ops::Coroutine` trait.
+coroutine_trait = []
+generator_trait = ["coroutine_trait"] # alias for coroutine_trait; TODO: remove in the next breaking release
 # Enable to use `[std|core]::ops`'s `Fn`, `FnMut`, and `FnOnce` traits.
 fn_traits = []
 # Enable to use `[std|core]::iter::TrustedLen` trait.

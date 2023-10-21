@@ -640,7 +640,7 @@ Note that some traits have aliases.
 - [`Fn`](https://doc.rust-lang.org/std/ops/trait.Fn.html) *(requires `"fn_traits"` and `"unstable"` crate features)*
 - [`FnMut`](https://doc.rust-lang.org/std/ops/trait.FnMut.html) *(requires `"fn_traits"` and `"unstable"` crate features)*
 - [`FnOnce`](https://doc.rust-lang.org/std/ops/trait.FnOnce.html) *(requires `"fn_traits"` and `"unstable"` crate features)*
-- [`Generator`](https://doc.rust-lang.org/nightly/std/ops/trait.Generator.html) *(requires `"generator_trait"` and `"unstable"` crate features)*
+- [`Coroutine`](https://doc.rust-lang.org/nightly/std/ops/trait.Coroutine.html) *(requires `"coroutine_trait"` and `"unstable"` crate features)*
 
 ### `[std|core]::convert`
 
@@ -792,8 +792,8 @@ These don't derive traits, but derive inherent methods instead.
   - Enable to use [tokio v0.2][tokio02] traits.
 - **`tokio01`**
   - Enable to use [tokio v0.1][tokio01] traits.
-- **`generator_trait`**
-  - Enable to use `[std|core]::ops::Generator` trait.
+- **`coroutine_trait`**
+  - Enable to use `[std|core]::ops::Coroutine` trait.
   - Note that this feature is unstable and may cause incompatible changes between patch versions.
 - **`fn_traits`**
   - Enable to use `[std|core]::ops`'s `Fn`, `FnMut`, and `FnOnce` traits.
@@ -872,9 +872,9 @@ Please be careful if you return another traits with the same name.
 #![warn(rust_2018_idioms, single_use_lifetimes, unreachable_pub, clippy::pedantic)]
 #![allow(clippy::doc_markdown, clippy::too_many_lines, clippy::manual_assert)]
 
-#[cfg(all(feature = "generator_trait", not(feature = "unstable")))]
+#[cfg(all(feature = "coroutine_trait", not(feature = "unstable")))]
 compile_error!(
-    "The `generator_trait` feature requires the `unstable` feature as an explicit opt-in to unstable features"
+    "The `coroutine_trait` feature requires the `unstable` feature as an explicit opt-in to unstable features"
 );
 
 #[cfg(all(feature = "fn_traits", not(feature = "unstable")))]
