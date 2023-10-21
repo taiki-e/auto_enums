@@ -10,7 +10,7 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
-- Update to [new coroutine API since nightly-2023-10-21](https://github.com/rust-lang/rust/pull/116958). This renames unstable `generator_trait` feature to `coroutine_trait`. The old cargo feature name is kept as a deprecated alias and will be removed in the next breaking release.
+- Update to [new coroutine API since nightly-2023-10-21](https://github.com/rust-lang/rust/pull/116958). This renames unstable `generator_trait` feature to `coroutine_trait`. The old cargo feature name is kept as a deprecated alias and will be removed in the next breaking release. ([daf9165](https://github.com/taiki-e/auto_enums/commit/daf91653b925d53cde57b598f0d884fe35a53c60))
 
 ## [0.8.2] - 2023-08-10
 
