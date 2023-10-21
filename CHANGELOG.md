@@ -10,6 +10,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+## [0.8.3] - 2023-10-21
+
 - Update to [new coroutine API since nightly-2023-10-21](https://github.com/rust-lang/rust/pull/116958). This renames unstable `generator_trait` feature to `coroutine_trait`. The old cargo feature name is kept as a deprecated alias and will be removed in the next breaking release. ([daf9165](https://github.com/taiki-e/auto_enums/commit/daf91653b925d53cde57b598f0d884fe35a53c60))
 
 ## [0.8.2] - 2023-08-10
@@ -344,7 +346,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 Initial release
 
-[Unreleased]: https://github.com/taiki-e/auto_enums/compare/v0.8.2...HEAD
+[Unreleased]: https://github.com/taiki-e/auto_enums/compare/v0.8.3...HEAD
+[0.8.3]: https://github.com/taiki-e/auto_enums/compare/v0.8.2...v0.8.3
 [0.8.2]: https://github.com/taiki-e/auto_enums/compare/v0.8.1...v0.8.2
 [0.8.1]: https://github.com/taiki-e/auto_enums/compare/v0.8.0...v0.8.1
 [0.8.0]: https://github.com/taiki-e/auto_enums/compare/v0.7.12...v0.8.0
