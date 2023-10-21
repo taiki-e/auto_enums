@@ -8,7 +8,7 @@ use syn::{
 };
 
 use super::{visitor, Context, NAME, NESTED, NEVER};
-use crate::utils::{expr_block, replace_block, replace_expr, Attrs};
+use crate::utils::{expr_block, path_eq, replace_block, replace_expr, Attrs};
 
 /// Visits last expression.
 ///
@@ -57,9 +57,13 @@ pub(super) fn is_unreachable(cx: &Context, expr: &Expr) -> bool {
 
         // `Err(expr)?` or `None?`.
         Expr::Try(ExprTry { expr, .. }) => match &**expr {
-            Expr::Path(ExprPath { path, qself: None, .. }) => path.is_ident("None"),
+            Expr::Path(ExprPath { path, qself: None, .. }) => {
+                path_eq(path, &["std", "core"], &["option", "Option", "None"])
+            }
             Expr::Call(ExprCall { args, func, .. }) if args.len() == 1 => match &**func {
-                Expr::Path(ExprPath { path, qself: None, .. }) => path.is_ident("Err"),
+                Expr::Path(ExprPath { path, qself: None, .. }) => {
+                    path_eq(path, &["std", "core"], &["result", "Result", "Err"])
+                }
                 _ => false,
             },
             _ => false,
@@ -77,7 +81,8 @@ fn is_unreachable_macro(cx: &Context, mac: &Macro) -> bool {
     const UNREACHABLE_MACROS: &[&str] = &["unreachable", "panic"];
 
     // `unreachable!`, `panic!` or an expression level marker (`marker!` macro).
-    UNREACHABLE_MACROS.iter().any(|i| mac.path.is_ident(i)) || cx.is_marker_macro(mac)
+    UNREACHABLE_MACROS.iter().any(|i| path_eq(&mac.path, &["std", "core"], &[i]))
+        || cx.is_marker_macro(mac)
 }
 
 fn is_unreachable_stmt(cx: &Context, stmt: Option<&Stmt>) -> bool {

@@ -19,7 +19,7 @@ use self::{
     context::{Context, VisitLastMode, VisitMode, DEFAULT_MARKER},
     expr::child_expr,
 };
-use crate::utils::{block, expr_block, replace_expr};
+use crate::utils::{block, expr_block, path_eq, replace_expr};
 
 /// The attribute name.
 const NAME: &str = "auto_enum";
@@ -173,7 +173,9 @@ fn expand_parent_item_fn(cx: &mut Context, item: &mut ItemFn) {
                         colon2_token: None,
                         args,
                         ..
-                    }) if args.len() == 2 && ty.ident == "Result" => {
+                    }) if args.len() == 2
+                        && path_eq(path, &["std", "core"], &["result", "Result"]) =>
+                    {
                         if let (
                             GenericArgument::Type(_),
                             GenericArgument::Type(Type::ImplTrait(_)),

@@ -133,11 +133,21 @@ fn stable() {
         assert_eq!(no_return3(i).sum::<i32>(), *x);
     }
     #[auto_enum(Iterator)]
-    fn no_return4(x: usize) -> impl Iterator<Item = i32> {
-        if x == 0 {
+    fn no_return4(i: usize) -> impl Iterator<Item = i32> {
+        if i == 0 {
             1..8
-        } else if x > 3 {
+        } else if i > 6 {
             panic!();
+        } else if i > 5 {
+            std::panic!("5");
+        } else if i > 4 {
+            core::panic!("4");
+        } else if i > 3 {
+            unreachable!("3");
+        } else if i > 2 {
+            std::unreachable!("2");
+        } else if i > 1 {
+            core::unreachable!();
         } else {
             (0..2).map(|x| x + 1)
         }
@@ -257,12 +267,34 @@ fn stable() {
         #[auto_enum(Iterator)]
         let iter = match x {
             0 => 2..8,
+            1 => None?,
+            2 => std::option::Option::None?,
+            3 => core::option::Option::None?,
             _ => 2..=10,
         };
 
         Some(iter)
     }
     assert_eq!(return3(10).unwrap().sum::<i32>(), 54);
+
+    #[auto_enum]
+    fn return4(x: i32) -> Result<impl Iterator<Item = i32>, ()> {
+        if x < 0 {
+            return Err(());
+        }
+
+        #[auto_enum(Iterator)]
+        let iter = match x {
+            0 => 2..8,
+            1 => Err(())?,
+            2 => std::result::Result::Err(())?,
+            3 => core::result::Result::Err(())?,
+            _ => 2..=10,
+        };
+
+        Ok(iter)
+    }
+    assert_eq!(return4(10).unwrap().sum::<i32>(), 54);
 
     #[auto_enum(Debug, Display)]
     fn try_operator1(x: i32) -> Result<impl Iterator<Item = i32>, impl core::fmt::Debug> {
@@ -280,7 +312,9 @@ fn stable() {
     assert_eq!(try_operator1(10).unwrap().sum::<i32>(), 54);
 
     #[auto_enum(Debug)]
-    fn try_operator2(x: i32) -> Result<impl Iterator<Item = i32>, impl core::fmt::Debug> {
+    fn try_operator2(
+        x: i32,
+    ) -> std::result::Result<impl Iterator<Item = i32>, impl core::fmt::Debug> {
         if x < 0 {
             Err(1_i32)?;
         }
@@ -291,6 +325,21 @@ fn stable() {
         }
     }
     assert_eq!(try_operator2(10).unwrap().sum::<i32>(), 54);
+
+    #[auto_enum(Debug)]
+    fn try_operator3(
+        x: i32,
+    ) -> core::result::Result<impl Iterator<Item = i32>, impl core::fmt::Debug> {
+        if x < 0 {
+            Err(1_i32)?;
+        }
+
+        match x {
+            0 => Err(())?,
+            _ => Ok(2..=10),
+        }
+    }
+    assert_eq!(try_operator3(10).unwrap().sum::<i32>(), 54);
 
     #[auto_enum]
     fn closure() {

@@ -49,6 +49,24 @@ pub(crate) fn replace_block(this: &mut Block, f: impl FnOnce(Block) -> Expr) {
     this.stmts = vec![Stmt::Expr(f(block(stmts)), None)];
 }
 
+pub(crate) fn path_eq(path: &syn::Path, expected_crates: &[&str], expected_path: &[&str]) -> bool {
+    if path.segments.len() == 1 && path.segments[0].ident == expected_path.last().unwrap() {
+        return true;
+    }
+    if path.segments.len() == expected_path.len() + 1 {
+        if !expected_crates.iter().any(|&c| path.segments[0].ident == c) {
+            return false;
+        }
+        for i in 1..path.segments.len() {
+            if path.segments[i].ident != expected_path[i - 1] {
+                return false;
+            }
+        }
+        return true;
+    }
+    false
+}
+
 // =================================================================================================
 // extension traits
 
