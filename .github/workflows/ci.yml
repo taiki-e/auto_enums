@@ -68,7 +68,7 @@ jobs:
       - run: cargo test --workspace --tests
       - run: cargo test --workspace --all-features
         if: startsWith(matrix.rust, 'nightly')
-      - run: cargo minimal-versions build --workspace --no-private --all-features
+      - run: cargo minimal-versions build --workspace --no-private --detach-path-deps=skip-exact --all-features
 
   features:
     runs-on: ubuntu-latest
