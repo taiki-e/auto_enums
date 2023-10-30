@@ -869,8 +869,6 @@ Please be careful if you return another traits with the same name.
     )
 ))]
 #![forbid(unsafe_code)]
-#![warn(rust_2018_idioms, single_use_lifetimes, unreachable_pub, clippy::pedantic)]
-#![allow(clippy::doc_markdown, clippy::too_many_lines, clippy::manual_assert)]
 
 #[cfg(all(feature = "coroutine_trait", not(feature = "unstable")))]
 compile_error!(

@@ -14,3 +14,6 @@ rand = "0.8"
 name = "vs_boxed"
 path = "vs_boxed.rs"
 harness = false
+
+[lints]
+workspace = true

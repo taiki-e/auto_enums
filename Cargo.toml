@@ -16,10 +16,6 @@ A library for to allow multiple return types by automatically generated enum.
 all-features = true
 targets = ["x86_64-unknown-linux-gnu"]
 
-[workspace]
-resolver = "2"
-members = ["bench"]
-
 [lib]
 proc-macro = true
 
@@ -89,9 +85,9 @@ quote = "1"
 syn = { version = "2.0.6", features = ["full", "visit-mut"] }
 
 [dev-dependencies]
-macrotest = { git = "https://github.com/taiki-e/macrotest.git", branch = "dev" } # 2021 edition support + syn 2.0 + no cargo-expand
+macrotest = { git = "https://github.com/taiki-e/macrotest.git", branch = "dev" } # 2021 edition support + syn 2.0 + no cargo-expand + adjust overwrite behavior
 rustversion = "1"
-trybuild = "1.0.49"
+trybuild = { git = "https://github.com/taiki-e/trybuild.git", branch = "dev" } # adjust overwrite behavior
 
 # for `#[enum_derive]`
 futures03_crate = { package = "futures", version = "0.3", default-features = false, features = ["std"] }
@@ -102,3 +98,45 @@ tokio02_crate = { package = "tokio", version = "0.2", default-features = false }
 tokio01_crate = { package = "tokio", version = "0.1", default-features = false, features = ["io"] }
 rayon_crate = { package = "rayon", version = "1" }
 serde_crate = { package = "serde", version = "1" }
+
+[lints]
+workspace = true
+
+[workspace]
+resolver = "2"
+members = ["bench"]
+
+# This table is shared by projects under https://github.com/taiki-e.
+# It is not intended for manual editing.
+[workspace.lints.rust]
+improper_ctypes = "warn"
+improper_ctypes_definitions = "warn"
+non_ascii_idents = "warn"
+rust_2018_idioms = "warn"
+single_use_lifetimes = "warn"
+unreachable_pub = "warn"
+# unsafe_op_in_unsafe_fn = "warn" # Set at crate-level instead since https://github.com/rust-lang/rust/pull/100081 is not available on MSRV
+[workspace.lints.clippy]
+all = "warn" # Downgrade deny-by-default lints
+pedantic = "warn"
+as_ptr_cast_mut = "warn"
+default_union_representation = "warn"
+inline_asm_x86_att_syntax = "warn"
+trailing_empty_array = "warn"
+transmute_undefined_repr = "warn"
+undocumented_unsafe_blocks = "warn"
+# Suppress buggy or noisy clippy lints
+borrow_as_ptr = { level = "allow", priority = 1 } # https://github.com/rust-lang/rust-clippy/issues/8286
+doc_markdown = { level = "allow", priority = 1 }
+float_cmp = { level = "allow", priority = 1 } # https://github.com/rust-lang/rust-clippy/issues/7725
+manual_assert = { level = "allow", priority = 1 }
+manual_range_contains = { level = "allow", priority = 1 } # https://github.com/rust-lang/rust-clippy/issues/6455#issuecomment-1225966395
+missing_errors_doc = { level = "allow", priority = 1 }
+module_name_repetitions = { level = "allow", priority = 1 }
+similar_names = { level = "allow", priority = 1 }
+single_match = { level = "allow", priority = 1 }
+single_match_else = { level = "allow", priority = 1 }
+struct_excessive_bools = { level = "allow", priority = 1 }
+too_many_arguments = { level = "allow", priority = 1 }
+too_many_lines = { level = "allow", priority = 1 }
+type_complexity = { level = "allow", priority = 1 }

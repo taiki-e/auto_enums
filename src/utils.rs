@@ -200,6 +200,7 @@ macro_rules! attrs_impl {
     ($($Expr:ident($Struct:ident),)*) => {
         impl Attrs for Expr {
             fn attrs(&self) -> &[Attribute] {
+                // #[cfg_attr(test, deny(non_exhaustive_omitted_patterns))]
                 match self {
                     $(Expr::$Expr(syn::$Struct { attrs, .. }))|* => &attrs,
                     _ => &[],
@@ -207,6 +208,7 @@ macro_rules! attrs_impl {
             }
 
             fn attrs_mut(&mut self) -> Option<&mut Vec<Attribute>> {
+                // #[cfg_attr(test, deny(non_exhaustive_omitted_patterns))]
                 match self {
                     $(Expr::$Expr(syn::$Struct { attrs, .. }))|* => Some(attrs),
                     _ => None,

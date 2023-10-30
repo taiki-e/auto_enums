@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
-#![allow(clippy::unnecessary_wraps)]
-#![allow(clippy::wildcard_imports)]
+#![allow(clippy::unnecessary_wraps, clippy::wildcard_imports)]
 
 pub(crate) mod core;
 pub(crate) mod external;

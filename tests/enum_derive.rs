@@ -3,7 +3,6 @@
 #![cfg_attr(feature = "coroutine_trait", feature(coroutine_trait))]
 #![cfg_attr(feature = "fn_traits", feature(fn_traits, unboxed_closures))]
 #![cfg_attr(feature = "trusted_len", feature(trusted_len))]
-#![warn(rust_2018_idioms, single_use_lifetimes)]
 #![allow(dead_code)]
 
 // See tests/run-pass for external crates.

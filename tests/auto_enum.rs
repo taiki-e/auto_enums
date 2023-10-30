@@ -8,15 +8,17 @@
 #![cfg_attr(feature = "fn_traits", feature(fn_traits, unboxed_closures))]
 #![cfg_attr(feature = "trusted_len", feature(trusted_len))]
 #![cfg_attr(not(feature = "std"), no_std)]
-#![warn(rust_2018_idioms, single_use_lifetimes)]
-#![allow(dead_code)]
 #![allow(
+    dead_code,
+    clippy::cast_possible_truncation,
     clippy::cast_possible_wrap,
+    clippy::items_after_statements,
     clippy::let_and_return,
     clippy::needless_return,
     clippy::never_loop,
-    clippy::unnecessary_wraps,
-    clippy::pedantic
+    clippy::no_effect_underscore_binding,
+    clippy::undocumented_unsafe_blocks,
+    clippy::unnecessary_wraps
 )]
 
 use core::iter;
@@ -41,10 +43,7 @@ fn stable() {
 
     // block + unsafe block + parentheses
     #[rustfmt::skip]
-    #[allow(unknown_lints)]
-    #[allow(unused_parens)]
-    #[allow(unused_braces)]
-    #[allow(unused_unsafe)]
+    #[allow(unused_parens, unused_braces, unused_unsafe)]
     #[auto_enum(Iterator)]
     fn block(x: usize) -> impl Iterator<Item = i32> {
         {{({ unsafe {{({ unsafe { unsafe {{
@@ -668,9 +667,7 @@ fn nested() {
     }
 
     #[rustfmt::skip]
-    #[allow(unknown_lints)]
-    #[allow(unused_unsafe)]
-    #[allow(unused_braces)]
+    #[allow(unused_braces, unused_unsafe)]
     #[auto_enum(Iterator)]
     fn in_block(x: usize) -> impl Iterator<Item = i32> {
         {{{ unsafe {{{ unsafe { unsafe {{

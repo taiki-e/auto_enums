@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 #![cfg(feature = "type_analysis")]
-#![warn(rust_2018_idioms, single_use_lifetimes)]
 #![allow(dead_code)]
 
 use std::fmt;
