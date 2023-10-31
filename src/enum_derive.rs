@@ -33,7 +33,7 @@ fn get_derive(s: &str) -> Option<DeriveFn> {
             $(#[$meta])*
             {
                 if crate::derive::$($arm)::*::NAME.iter().any(|name| *name == s) {
-                    return Some(crate::derive::$($arm)::*::derive as DeriveFn)
+                    return Some(crate::derive::$($arm)::*::derive)
                 }
             }
         )*};
