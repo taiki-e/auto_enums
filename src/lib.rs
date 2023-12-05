@@ -869,6 +869,7 @@ Please be careful if you return another traits with the same name.
     )
 ))]
 #![forbid(unsafe_code)]
+#![allow(clippy::doc_link_with_quotes)]
 
 #[cfg(all(feature = "coroutine_trait", not(feature = "unstable")))]
 compile_error!(
