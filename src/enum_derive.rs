@@ -179,7 +179,7 @@ impl Parse for Args {
             p.to_token_stream().to_string().replace(' ', "")
         }
 
-        let mut inner = Vec::new();
+        let mut inner = vec![];
         while !input.is_empty() {
             let path = input.parse()?;
             inner.push((to_trimmed_string(&path), path));
@@ -259,7 +259,7 @@ fn exists_alias(s: &str, v: &[(&str, Option<&Path>)]) -> bool {
 fn expand(args: TokenStream, input: TokenStream) -> Result<TokenStream> {
     let data = syn::parse2::<Data>(input)?;
     let args = syn::parse2::<Args>(args)?.inner;
-    let args = args.iter().fold(Vec::new(), |mut v, (s, arg)| {
+    let args = args.iter().fold(vec![], |mut v, (s, arg)| {
         if let Some(traits) = get_trait_deps(s) {
             for s in traits.iter().filter(|&x| !args.iter().any(|(s, _)| s == x)) {
                 if !exists_alias(s, &v) {
@@ -273,7 +273,7 @@ fn expand(args: TokenStream, input: TokenStream) -> Result<TokenStream> {
         v
     });
 
-    let mut derive = Vec::new();
+    let mut derive = vec![];
     let mut items = TokenStream::new();
     let cx = DeriveContext::default();
     for (s, arg) in args {

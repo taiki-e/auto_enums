@@ -17,13 +17,13 @@ pub(crate) fn block(stmts: Vec<Stmt>) -> Block {
 }
 
 pub(crate) fn expr_block(block: Block) -> Expr {
-    Expr::Block(ExprBlock { attrs: Vec::new(), label: None, block })
+    Expr::Block(ExprBlock { attrs: vec![], label: None, block })
 }
 
 pub(crate) fn expr_call(attrs: Vec<Attribute>, path: Path, arg: Expr) -> Expr {
     Expr::Call(ExprCall {
         attrs,
-        func: Box::new(Expr::Path(ExprPath { attrs: Vec::new(), qself: None, path })),
+        func: Box::new(Expr::Path(ExprPath { attrs: vec![], qself: None, path })),
         paren_token: token::Paren::default(),
         args: iter::once(arg).collect(),
     })
@@ -31,7 +31,7 @@ pub(crate) fn expr_call(attrs: Vec<Attribute>, path: Path, arg: Expr) -> Expr {
 
 pub(crate) fn unit() -> Expr {
     Expr::Tuple(ExprTuple {
-        attrs: Vec::new(),
+        attrs: vec![],
         paren_token: token::Paren::default(),
         elems: Punctuated::new(),
     })

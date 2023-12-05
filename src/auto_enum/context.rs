@@ -113,7 +113,7 @@ impl Context {
             span,
             error: RefCell::new(Some(diagnostic)),
             args,
-            traits: Vec::new(),
+            traits: vec![],
         })
     }
 
@@ -207,7 +207,7 @@ impl Context {
 
     /// from `<expr>` into `Enum::VariantN(<expr>)`
     pub(super) fn next_expr(&mut self, expr: Expr) -> Expr {
-        self.next_expr_with_attrs(Vec::new(), expr)
+        self.next_expr_with_attrs(vec![], expr)
     }
 
     /// from `<expr>` into `<attrs> Enum::VariantN(<expr>)`
@@ -300,7 +300,7 @@ struct Args {
 
 impl Parse for Args {
     fn parse(input: ParseStream<'_>) -> Result<Self> {
-        let mut args = Vec::new();
+        let mut args = Vec::with_capacity(usize::from(!input.is_empty()));
         let mut marker = None;
         while !input.is_empty() {
             if input.peek(kw::marker) && input.peek2(Token![=]) {
@@ -334,7 +334,7 @@ struct Builder {
 
 impl Builder {
     fn new(input: &TokenStream) -> Self {
-        Self { ident: format_ident!("__Enum{}", hash(input)), variants: Vec::new() }
+        Self { ident: format_ident!("__Enum{}", hash(input)), variants: Vec::with_capacity(2) }
     }
 
     fn next_expr(&mut self, attrs: Vec<Attribute>, expr: Expr) -> Expr {

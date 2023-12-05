@@ -103,17 +103,17 @@ impl<'a> Visitor<'a> {
                         let ExprTry { attrs, expr, .. } =
                             if let Expr::Try(expr) = expr { expr } else { unreachable!() };
 
-                        let mut arms = Vec::with_capacity(2);
-                        arms.push(parse_quote! {
-                            ::core::result::Result::Ok(val) => val,
-                        });
-
                         let err = self.cx.next_expr(parse_quote!(err));
-                        arms.push(parse_quote! {
-                            ::core::result::Result::Err(err) => {
-                                return ::core::result::Result::Err(#err);
-                            }
-                        });
+                        let arms = vec![
+                            parse_quote! {
+                                ::core::result::Result::Ok(val) => val,
+                            },
+                            parse_quote! {
+                                ::core::result::Result::Err(err) => {
+                                    return ::core::result::Result::Err(#err);
+                                }
+                            },
+                        ];
 
                         Expr::Match(ExprMatch {
                             attrs,
