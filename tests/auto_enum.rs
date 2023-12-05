@@ -269,6 +269,7 @@ fn stable() {
             1 => None?,
             2 => std::option::Option::None?,
             3 => core::option::Option::None?,
+            4 => None::<_>?,
             _ => 2..=10,
         };
 
@@ -288,6 +289,7 @@ fn stable() {
             1 => Err(())?,
             2 => std::result::Result::Err(())?,
             3 => core::result::Result::Err(())?,
+            4 => Err::<_, ()>(())?,
             _ => 2..=10,
         };
 
