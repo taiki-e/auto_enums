@@ -1,4 +1,3 @@
-bufs
 compiletest
 elems
 expandtest
