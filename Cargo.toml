@@ -81,7 +81,7 @@ trusted_len = []
 [dependencies]
 derive_utils = { version = "0.13" }
 proc-macro2 = "1.0.60"
-quote = "1"
+quote = "1.0.25"
 syn = { version = "2.0.6", features = ["full", "visit-mut"] }
 
 [dev-dependencies]
