@@ -24,3 +24,6 @@ pub(crate) mod tokio03;
 // https://docs.rs/tokio/1
 #[cfg(feature = "tokio1")]
 pub(crate) mod tokio1;
+// https://docs.rs/http-body/1
+#[cfg(feature = "http_body1")]
+pub(crate) mod http_body1;

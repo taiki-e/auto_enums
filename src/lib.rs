@@ -735,6 +735,10 @@ fn func(x: i32) -> impl ParallelIterator {
 - [`tokio01::AsyncRead`](https://docs.rs/tokio/0.1/tokio/io/trait.AsyncRead.html)
 - [`tokio01::AsyncWrite`](https://docs.rs/tokio/0.1/tokio/io/trait.AsyncWrite.html)
 
+### [http_body v1][http_body1] *(requires `"http_body1"` crate feature)*
+
+- [`http_body1::Body`](https://docs.rs/http-body/1/http_body/trait.Body.html) - [example](https://github.com/taiki-e/auto_enums/blob/HEAD/tests/expand/external/http_body/body.rs) | [generated code](https://github.com/taiki-e/auto_enums/blob/HEAD/tests/expand/external/http_body/body.expanded.rs)
+
 ## Inherent methods
 
 These don't derive traits, but derive inherent methods instead.
@@ -859,6 +863,7 @@ Please be careful if you return another traits with the same name.
 [tokio02]: https://docs.rs/tokio/0.2
 [tokio03]: https://docs.rs/tokio/0.3
 [tokio1]: https://docs.rs/tokio/1
+[http_body1]: https://docs.rs/http-body/1
 */
 
 #![doc(test(
