@@ -796,6 +796,8 @@ These don't derive traits, but derive inherent methods instead.
   - Enable to use [tokio v0.2][tokio02] traits.
 - **`tokio01`**
   - Enable to use [tokio v0.1][tokio01] traits.
+- **`http_body1`**
+  - Enable to use [http_body v1][http_body1] traits.
 - **`coroutine_trait`**
   - Enable to use `[std|core]::ops::Coroutine` trait.
   - Note that this feature is unstable and may cause incompatible changes between patch versions.

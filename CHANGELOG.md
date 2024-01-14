@@ -10,7 +10,7 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
-- Add support for `http_body1::Body`.
+- Add support for `http_body1::Body`. ([#161](https://github.com/taiki-e/auto_enums/pull/161), thanks @nwtgck)
 
 ## [0.8.3] - 2023-10-21
 
