@@ -60,6 +60,8 @@ tokio03 = []
 tokio02 = []
 # https://docs.rs/tokio/0.1
 tokio01 = []
+# https://docs.rs/http-body/1
+http_body1 = []
 
 # ==============================================================================
 # Unstable features
@@ -98,6 +100,7 @@ tokio02_crate = { package = "tokio", version = "0.2", default-features = false }
 tokio01_crate = { package = "tokio", version = "0.1", default-features = false, features = ["io"] }
 rayon_crate = { package = "rayon", version = "1" }
 serde_crate = { package = "serde", version = "1" }
+http_body1_crate = { package = "http-body", version = "1", default-features = false }
 
 [lints]
 workspace = true

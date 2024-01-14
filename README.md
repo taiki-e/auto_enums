@@ -109,7 +109,7 @@ traits to `#[derive]`.
 
 `#[enum_derive]` supports many of the standard library traits and some popular
 third-party libraries traits such as [rayon], [futures][futures03],
-[tokio][tokio1]. **See [documentation](https://docs.rs/auto_enums/latest/auto_enums/#supported-traits) for a complete list of supported traits.**
+[tokio][tokio1], [http_body][http_body1]. **See [documentation](https://docs.rs/auto_enums/latest/auto_enums/#supported-traits) for a complete list of supported traits.**
 
 If you want to use traits that are not supported by `#[enum_derive]`, you
 can use another crate that provides [derives macros][proc-macro-derive], or
@@ -165,6 +165,8 @@ enum Foo<A, B> {
 - **`trusted_len`**
   - Enable to use `[std|core]::iter::TrustedLen` trait.
   - Note that this feature is unstable and may cause incompatible changes between patch versions.
+- **`http_body1`**
+  - Enable to use [http_body v1][http_body1] traits.
 
 ### `type_analysis` feature
 
@@ -218,6 +220,7 @@ Please be careful if you return another traits with the same name.
 [tokio02]: https://docs.rs/tokio/0.2
 [tokio03]: https://docs.rs/tokio/0.3
 [tokio1]: https://docs.rs/tokio/1
+[http_body1]: https://docs.rs/http_body/1
 
 ## License
 

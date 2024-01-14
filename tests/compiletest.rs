@@ -14,6 +14,7 @@
     feature = "tokio02",
     feature = "tokio03",
     feature = "tokio1",
+    feature = "http_body1",
 ))]
 
 #[rustversion::attr(not(nightly), ignore)]

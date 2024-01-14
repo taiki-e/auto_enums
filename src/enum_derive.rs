@@ -164,6 +164,9 @@ fn get_derive(s: &str) -> Option<DeriveFn> {
         external::tokio01::async_read,
         #[cfg(feature = "tokio01")]
         external::tokio01::async_write,
+        // http_body1
+        #[cfg(feature = "http_body1")]
+        external::http_body1::body,
     }
 
     None
