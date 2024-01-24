@@ -1,8 +1,6 @@
 [package]
 name = "bench"
-version = "0.0.0"
 edition = "2021"
-publish = false
 
 [dev-dependencies]
 auto_enums = { path = ".." }
