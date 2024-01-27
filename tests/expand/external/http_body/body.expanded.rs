@@ -17,15 +17,15 @@ where
     #[inline]
     fn is_end_stream(&self) -> bool {
         match self {
-            Enum::A(x) => ::http_body::Body::is_end_stream(x),
-            Enum::B(x) => ::http_body::Body::is_end_stream(x),
+            Enum::A(x) => <A as ::http_body::Body>::is_end_stream(x),
+            Enum::B(x) => <B as ::http_body::Body>::is_end_stream(x),
         }
     }
     #[inline]
     fn size_hint(&self) -> ::http_body::SizeHint {
         match self {
-            Enum::A(x) => ::http_body::Body::size_hint(x),
-            Enum::B(x) => ::http_body::Body::size_hint(x),
+            Enum::A(x) => <A as ::http_body::Body>::size_hint(x),
+            Enum::B(x) => <B as ::http_body::Body>::size_hint(x),
         }
     }
     fn poll_frame(

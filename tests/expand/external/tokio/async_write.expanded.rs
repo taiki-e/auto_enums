@@ -11,8 +11,8 @@ where
 {
     fn is_write_vectored(&self) -> bool {
         match self {
-            Enum::A(x) => ::tokio::io::AsyncWrite::is_write_vectored(x),
-            Enum::B(x) => ::tokio::io::AsyncWrite::is_write_vectored(x),
+            Enum::A(x) => <A as ::tokio::io::AsyncWrite>::is_write_vectored(x),
+            Enum::B(x) => <B as ::tokio::io::AsyncWrite>::is_write_vectored(x),
         }
     }
     fn poll_write(

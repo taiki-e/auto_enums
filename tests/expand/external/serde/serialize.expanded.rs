@@ -18,8 +18,8 @@ where
         __S: ::serde::ser::Serializer,
     {
         match self {
-            Enum::A(x) => ::serde::ser::Serialize::serialize(x, serializer),
-            Enum::B(x) => ::serde::ser::Serialize::serialize(x, serializer),
+            Enum::A(x) => <A as ::serde::ser::Serialize>::serialize(x, serializer),
+            Enum::B(x) => <B as ::serde::ser::Serialize>::serialize(x, serializer),
         }
     }
 }

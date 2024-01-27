@@ -24,7 +24,7 @@ pub(crate) mod iterator {
                 __F: ::core::ops::FnMut(Self::Item) -> ::core::option::Option<__U>;
         };
 
-        Ok(derive_trait(data, parse_quote!(::core::iter::Iterator), None, parse_quote! {
+        Ok(derive_trait(data, &parse_quote!(::core::iter::Iterator), None, parse_quote! {
             trait Iterator {
                 type Item;
                 #[inline]
@@ -66,7 +66,7 @@ pub(crate) mod double_ended_iterator {
 
         Ok(derive_trait(
             data,
-            parse_quote!(::core::iter::DoubleEndedIterator),
+            &parse_quote!(::core::iter::DoubleEndedIterator),
             Some(format_ident!("Item")),
             parse_quote! {
                 trait DoubleEndedIterator: ::core::iter::Iterator {
@@ -89,7 +89,7 @@ pub(crate) mod exact_size_iterator {
 
         Ok(derive_trait(
             data,
-            parse_quote!(::core::iter::ExactSizeIterator),
+            &parse_quote!(::core::iter::ExactSizeIterator),
             Some(format_ident!("Item")),
             parse_quote! {
                 trait ExactSizeIterator: ::core::iter::Iterator {
@@ -109,7 +109,7 @@ pub(crate) mod fused_iterator {
     pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
         Ok(derive_trait(
             data,
-            parse_quote!(::core::iter::FusedIterator),
+            &parse_quote!(::core::iter::FusedIterator),
             Some(format_ident!("Item")),
             parse_quote! {
                 trait FusedIterator: ::core::iter::Iterator {}
@@ -127,7 +127,7 @@ pub(crate) mod trusted_len {
     pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
         Ok(derive_trait(
             data,
-            parse_quote!(::core::iter::TrustedLen),
+            &parse_quote!(::core::iter::TrustedLen),
             Some(format_ident!("Item")),
             parse_quote! {
                 unsafe trait TrustedLen: ::core::iter::Iterator {}
@@ -142,7 +142,7 @@ pub(crate) mod extend {
     pub(crate) const NAME: &[&str] = &["Extend"];
 
     pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
-        Ok(derive_trait(data, parse_quote!(::core::iter::Extend), None, parse_quote! {
+        Ok(derive_trait(data, &parse_quote!(::core::iter::Extend), None, parse_quote! {
             trait Extend<__A> {
                 #[inline]
                 fn extend<__T: ::core::iter::IntoIterator<Item = __A>>(&mut self, iter: __T);

@@ -6,7 +6,7 @@ pub(crate) mod par_iter {
     pub(crate) const NAME: &[&str] = &["rayon::ParallelIterator"];
 
     pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
-        Ok(derive_trait(data, parse_quote!(::rayon::iter::ParallelIterator), None, parse_quote! {
+        Ok(derive_trait(data, &parse_quote!(::rayon::iter::ParallelIterator), None, parse_quote! {
             trait ParallelIterator {
                 type Item;
                 #[inline]
@@ -28,7 +28,7 @@ pub(crate) mod indexed_par_iter {
     pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
         Ok(derive_trait(
             data,
-            parse_quote!(::rayon::iter::IndexedParallelIterator),
+            &parse_quote!(::rayon::iter::IndexedParallelIterator),
             Some(format_ident!("Item")),
             parse_quote! {
                 trait IndexedParallelIterator: ::rayon::iter::ParallelIterator {
@@ -54,7 +54,7 @@ pub(crate) mod par_extend {
     pub(crate) const NAME: &[&str] = &["rayon::ParallelExtend"];
 
     pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
-        Ok(derive_trait(data, parse_quote!(::rayon::iter::ParallelExtend), None, parse_quote! {
+        Ok(derive_trait(data, &parse_quote!(::rayon::iter::ParallelExtend), None, parse_quote! {
             trait ParallelExtend<__T: Send> {
                 #[inline]
                 fn par_extend<__I>(&mut self, par_iter: __I)

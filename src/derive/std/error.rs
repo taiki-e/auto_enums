@@ -18,7 +18,7 @@ pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
     };
 
     let mut impl_ =
-        EnumImpl::from_trait(data, parse_quote!(::std::error::Error), None, parse_quote! {
+        EnumImpl::from_trait(data, &parse_quote!(::std::error::Error), None, parse_quote! {
             trait Error {
                 #[allow(deprecated)]
                 fn description(&self) -> &str;

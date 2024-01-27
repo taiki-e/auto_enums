@@ -7,7 +7,7 @@ pub(crate) mod deref {
     pub(crate) const NAME: &[&str] = &["Deref"];
 
     pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
-        Ok(derive_trait(data, parse_quote!(::core::ops::Deref), None, parse_quote! {
+        Ok(derive_trait(data, &parse_quote!(::core::ops::Deref), None, parse_quote! {
             trait Deref {
                 type Target;
                 #[inline]
@@ -26,7 +26,7 @@ pub(crate) mod deref_mut {
     pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
         Ok(derive_trait(
             data,
-            parse_quote!(::core::ops::DerefMut),
+            &parse_quote!(::core::ops::DerefMut),
             Some(format_ident!("Target")),
             parse_quote! {
                 trait DerefMut: ::core::ops::Deref {
@@ -45,7 +45,7 @@ pub(crate) mod index {
     pub(crate) const NAME: &[&str] = &["Index"];
 
     pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
-        Ok(derive_trait(data, parse_quote!(::core::ops::Index), None, parse_quote! {
+        Ok(derive_trait(data, &parse_quote!(::core::ops::Index), None, parse_quote! {
             trait Index<__Idx> {
                 type Output;
                 #[inline]
@@ -64,7 +64,7 @@ pub(crate) mod index_mut {
     pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
         Ok(derive_trait(
             data,
-            parse_quote!(::core::ops::IndexMut),
+            &parse_quote!(::core::ops::IndexMut),
             Some(format_ident!("Output")),
             parse_quote! {
                 trait IndexMut<__Idx>: ::core::ops::Index<__Idx> {
@@ -83,7 +83,7 @@ pub(crate) mod range_bounds {
     pub(crate) const NAME: &[&str] = &["RangeBounds"];
 
     pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
-        Ok(derive_trait(data, parse_quote!(::core::ops::RangeBounds), None, parse_quote! {
+        Ok(derive_trait(data, &parse_quote!(::core::ops::RangeBounds), None, parse_quote! {
             trait RangeBounds<__T: ?Sized> {
                 #[inline]
                 fn start_bound(&self) -> ::core::ops::Bound<&__T>;
@@ -107,8 +107,8 @@ pub(crate) mod coroutine {
 
         let ident = &data.ident;
         let pin = quote!(::core::pin::Pin);
-        let trait_: syn::Path = parse_quote!(::core::ops::Coroutine);
-        let mut impl_ = EnumImpl::from_trait(data, trait_.clone(), None, parse_quote! {
+        let trait_ = parse_quote!(::core::ops::Coroutine);
+        let mut impl_ = EnumImpl::from_trait(data, &trait_, None, parse_quote! {
             trait Coroutine<R> {
                 type Yield;
                 type Return;

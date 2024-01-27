@@ -15,8 +15,12 @@ where
         __I: ::rayon::iter::IntoParallelIterator<Item = __T>,
     {
         match self {
-            Enum::A(x) => ::rayon::iter::ParallelExtend::par_extend(x, par_iter),
-            Enum::B(x) => ::rayon::iter::ParallelExtend::par_extend(x, par_iter),
+            Enum::A(x) => {
+                <A as ::rayon::iter::ParallelExtend<__T>>::par_extend(x, par_iter)
+            }
+            Enum::B(x) => {
+                <B as ::rayon::iter::ParallelExtend<__T>>::par_extend(x, par_iter)
+            }
         }
     }
 }

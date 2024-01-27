@@ -18,15 +18,19 @@ where
         __C: ::rayon::iter::plumbing::UnindexedConsumer<Self::Item>,
     {
         match self {
-            Enum::A(x) => ::rayon::iter::ParallelIterator::drive_unindexed(x, consumer),
-            Enum::B(x) => ::rayon::iter::ParallelIterator::drive_unindexed(x, consumer),
+            Enum::A(x) => {
+                <A as ::rayon::iter::ParallelIterator>::drive_unindexed(x, consumer)
+            }
+            Enum::B(x) => {
+                <B as ::rayon::iter::ParallelIterator>::drive_unindexed(x, consumer)
+            }
         }
     }
     #[inline]
     fn opt_len(&self) -> ::core::option::Option<usize> {
         match self {
-            Enum::A(x) => ::rayon::iter::ParallelIterator::opt_len(x),
-            Enum::B(x) => ::rayon::iter::ParallelIterator::opt_len(x),
+            Enum::A(x) => <A as ::rayon::iter::ParallelIterator>::opt_len(x),
+            Enum::B(x) => <B as ::rayon::iter::ParallelIterator>::opt_len(x),
         }
     }
 }

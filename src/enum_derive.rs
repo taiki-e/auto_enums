@@ -307,7 +307,7 @@ fn expand(args: TokenStream, input: TokenStream) -> Result<TokenStream> {
         // https://github.com/taiki-e/pin-project/blob/v1.0.10/examples/struct-default-expanded.rs#L89
         items.extend(derive_utils::derive_trait(
             &data,
-            parse_quote!(::core::marker::Unpin),
+            &parse_quote!(::core::marker::Unpin),
             None,
             parse_quote! {
                 trait Unpin {}

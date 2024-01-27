@@ -12,8 +12,8 @@ pub(crate) mod body {
 
         let ident = &data.ident;
         let pin = quote!(::core::pin::Pin);
-        let trait_: syn::Path = parse_quote!(::http_body::Body);
-        let mut impl_ = EnumImpl::from_trait(data, trait_.clone(), None, parse_quote! {
+        let trait_ = parse_quote!(::http_body::Body);
+        let mut impl_ = EnumImpl::from_trait(data, &trait_, None, parse_quote! {
             trait Body {
                 type Data;
                 type Error;

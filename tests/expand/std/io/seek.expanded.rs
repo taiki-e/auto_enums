@@ -11,8 +11,8 @@ where
     #[inline]
     fn seek(&mut self, pos: ::std::io::SeekFrom) -> ::std::io::Result<u64> {
         match self {
-            Enum::A(x) => ::std::io::Seek::seek(x, pos),
-            Enum::B(x) => ::std::io::Seek::seek(x, pos),
+            Enum::A(x) => <A as ::std::io::Seek>::seek(x, pos),
+            Enum::B(x) => <B as ::std::io::Seek>::seek(x, pos),
         }
     }
 }

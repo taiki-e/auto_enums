@@ -11,8 +11,8 @@ pub(crate) fn derive(cx: &Context, data: &Data) -> Result<TokenStream> {
 
     let ident = &data.ident;
     let pin = quote!(::core::pin::Pin);
-    let trait_: syn::Path = parse_quote!(::core::future::Future);
-    let mut impl_ = EnumImpl::from_trait(data, trait_.clone(), None, parse_quote! {
+    let trait_ = parse_quote!(::core::future::Future);
+    let mut impl_ = EnumImpl::from_trait(data, &trait_, None, parse_quote! {
         trait Future {
             type Output;
         }

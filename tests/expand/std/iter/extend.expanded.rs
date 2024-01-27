@@ -11,8 +11,8 @@ where
     #[inline]
     fn extend<__T: ::core::iter::IntoIterator<Item = __A>>(&mut self, iter: __T) {
         match self {
-            Enum::A(x) => ::core::iter::Extend::extend(x, iter),
-            Enum::B(x) => ::core::iter::Extend::extend(x, iter),
+            Enum::A(x) => <A as ::core::iter::Extend<__A>>::extend(x, iter),
+            Enum::B(x) => <B as ::core::iter::Extend<__A>>::extend(x, iter),
         }
     }
 }

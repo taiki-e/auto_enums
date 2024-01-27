@@ -11,8 +11,8 @@ where
     #[inline]
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         match self {
-            Enum::A(x) => ::core::fmt::Debug::fmt(x, f),
-            Enum::B(x) => ::core::fmt::Debug::fmt(x, f),
+            Enum::A(x) => <A as ::core::fmt::Debug>::fmt(x, f),
+            Enum::B(x) => <B as ::core::fmt::Debug>::fmt(x, f),
         }
     }
 }

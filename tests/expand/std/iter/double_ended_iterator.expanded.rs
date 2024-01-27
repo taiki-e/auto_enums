@@ -12,37 +12,37 @@ where
     #[inline]
     fn next(&mut self) -> ::core::option::Option<Self::Item> {
         match self {
-            Enum::A(x) => ::core::iter::Iterator::next(x),
-            Enum::B(x) => ::core::iter::Iterator::next(x),
+            Enum::A(x) => <A as ::core::iter::Iterator>::next(x),
+            Enum::B(x) => <B as ::core::iter::Iterator>::next(x),
         }
     }
     #[inline]
     fn size_hint(&self) -> (usize, ::core::option::Option<usize>) {
         match self {
-            Enum::A(x) => ::core::iter::Iterator::size_hint(x),
-            Enum::B(x) => ::core::iter::Iterator::size_hint(x),
+            Enum::A(x) => <A as ::core::iter::Iterator>::size_hint(x),
+            Enum::B(x) => <B as ::core::iter::Iterator>::size_hint(x),
         }
     }
     #[inline]
     fn count(self) -> usize {
         match self {
-            Enum::A(x) => ::core::iter::Iterator::count(x),
-            Enum::B(x) => ::core::iter::Iterator::count(x),
+            Enum::A(x) => <A as ::core::iter::Iterator>::count(x),
+            Enum::B(x) => <B as ::core::iter::Iterator>::count(x),
         }
     }
     #[inline]
     fn last(self) -> ::core::option::Option<Self::Item> {
         match self {
-            Enum::A(x) => ::core::iter::Iterator::last(x),
-            Enum::B(x) => ::core::iter::Iterator::last(x),
+            Enum::A(x) => <A as ::core::iter::Iterator>::last(x),
+            Enum::B(x) => <B as ::core::iter::Iterator>::last(x),
         }
     }
     #[inline]
     #[must_use = "if you really need to exhaust the iterator, consider `.for_each(drop)` instead"]
     fn collect<__U: ::core::iter::FromIterator<Self::Item>>(self) -> __U {
         match self {
-            Enum::A(x) => ::core::iter::Iterator::collect(x),
-            Enum::B(x) => ::core::iter::Iterator::collect(x),
+            Enum::A(x) => <A as ::core::iter::Iterator>::collect(x),
+            Enum::B(x) => <B as ::core::iter::Iterator>::collect(x),
         }
     }
     #[inline]
@@ -51,8 +51,8 @@ where
         __F: ::core::ops::FnMut(__U, Self::Item) -> __U,
     {
         match self {
-            Enum::A(x) => ::core::iter::Iterator::fold(x, init, f),
-            Enum::B(x) => ::core::iter::Iterator::fold(x, init, f),
+            Enum::A(x) => <A as ::core::iter::Iterator>::fold(x, init, f),
+            Enum::B(x) => <B as ::core::iter::Iterator>::fold(x, init, f),
         }
     }
     #[inline]
@@ -61,8 +61,8 @@ where
         __P: ::core::ops::FnMut(&Self::Item) -> bool,
     {
         match self {
-            Enum::A(x) => ::core::iter::Iterator::find(x, predicate),
-            Enum::B(x) => ::core::iter::Iterator::find(x, predicate),
+            Enum::A(x) => <A as ::core::iter::Iterator>::find(x, predicate),
+            Enum::B(x) => <B as ::core::iter::Iterator>::find(x, predicate),
         }
     }
     #[inline]
@@ -71,8 +71,8 @@ where
         __F: ::core::ops::FnMut(Self::Item) -> ::core::option::Option<__U>,
     {
         match self {
-            Enum::A(x) => ::core::iter::Iterator::find_map(x, f),
-            Enum::B(x) => ::core::iter::Iterator::find_map(x, f),
+            Enum::A(x) => <A as ::core::iter::Iterator>::find_map(x, f),
+            Enum::B(x) => <B as ::core::iter::Iterator>::find_map(x, f),
         }
     }
 }
@@ -84,8 +84,8 @@ where
     #[inline]
     fn next_back(&mut self) -> ::core::option::Option<Self::Item> {
         match self {
-            Enum::A(x) => ::core::iter::DoubleEndedIterator::next_back(x),
-            Enum::B(x) => ::core::iter::DoubleEndedIterator::next_back(x),
+            Enum::A(x) => <A as ::core::iter::DoubleEndedIterator>::next_back(x),
+            Enum::B(x) => <B as ::core::iter::DoubleEndedIterator>::next_back(x),
         }
     }
     #[inline]
@@ -94,8 +94,8 @@ where
         __F: ::core::ops::FnMut(__U, Self::Item) -> __U,
     {
         match self {
-            Enum::A(x) => ::core::iter::DoubleEndedIterator::rfold(x, init, f),
-            Enum::B(x) => ::core::iter::DoubleEndedIterator::rfold(x, init, f),
+            Enum::A(x) => <A as ::core::iter::DoubleEndedIterator>::rfold(x, init, f),
+            Enum::B(x) => <B as ::core::iter::DoubleEndedIterator>::rfold(x, init, f),
         }
     }
     #[inline]
@@ -104,8 +104,8 @@ where
         __P: ::core::ops::FnMut(&Self::Item) -> bool,
     {
         match self {
-            Enum::A(x) => ::core::iter::DoubleEndedIterator::rfind(x, predicate),
-            Enum::B(x) => ::core::iter::DoubleEndedIterator::rfind(x, predicate),
+            Enum::A(x) => <A as ::core::iter::DoubleEndedIterator>::rfind(x, predicate),
+            Enum::B(x) => <B as ::core::iter::DoubleEndedIterator>::rfind(x, predicate),
         }
     }
 }

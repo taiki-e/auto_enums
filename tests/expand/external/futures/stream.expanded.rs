@@ -13,8 +13,8 @@ where
     #[inline]
     fn size_hint(&self) -> (usize, ::core::option::Option<usize>) {
         match self {
-            Enum::A(x) => ::futures::stream::Stream::size_hint(x),
-            Enum::B(x) => ::futures::stream::Stream::size_hint(x),
+            Enum::A(x) => <A as ::futures::stream::Stream>::size_hint(x),
+            Enum::B(x) => <B as ::futures::stream::Stream>::size_hint(x),
         }
     }
     #[inline]

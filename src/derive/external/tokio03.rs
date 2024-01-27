@@ -12,8 +12,8 @@ pub(crate) mod async_buf_read {
 
         let ident = &data.ident;
         let pin = quote!(::core::pin::Pin);
-        let trait_: syn::Path = parse_quote!(::tokio::io::AsyncBufRead);
-        let mut impl_ = EnumImpl::from_trait(data, trait_.clone(), None, parse_quote! {
+        let trait_ = parse_quote!(::tokio::io::AsyncBufRead);
+        let mut impl_ = EnumImpl::from_trait(data, &trait_, None, parse_quote! {
             trait AsyncBufRead {}
         })
         .build_impl();
@@ -59,8 +59,8 @@ pub(crate) mod async_read {
 
         let ident = &data.ident;
         let pin = quote!(::core::pin::Pin);
-        let trait_: syn::Path = parse_quote!(::tokio::io::AsyncRead);
-        let mut impl_ = EnumImpl::from_trait(data, trait_.clone(), None, parse_quote! {
+        let trait_ = parse_quote!(::tokio::io::AsyncRead);
+        let mut impl_ = EnumImpl::from_trait(data, &trait_, None, parse_quote! {
             trait AsyncRead {}
         })
         .build_impl();
@@ -96,8 +96,8 @@ pub(crate) mod async_seek {
 
         let ident = &data.ident;
         let pin = quote!(::core::pin::Pin);
-        let trait_: syn::Path = parse_quote!(::tokio::io::AsyncSeek);
-        let mut impl_ = EnumImpl::from_trait(data, trait_.clone(), None, parse_quote! {
+        let trait_ = parse_quote!(::tokio::io::AsyncSeek);
+        let mut impl_ = EnumImpl::from_trait(data, &trait_, None, parse_quote! {
             trait AsyncSeek {}
         })
         .build_impl();
@@ -146,8 +146,8 @@ pub(crate) mod async_write {
 
         let ident = &data.ident;
         let pin = quote!(::core::pin::Pin);
-        let trait_: syn::Path = parse_quote!(::tokio::io::AsyncWrite);
-        let mut impl_ = EnumImpl::from_trait(data, trait_.clone(), None, parse_quote! {
+        let trait_ = parse_quote!(::tokio::io::AsyncWrite);
+        let mut impl_ = EnumImpl::from_trait(data, &trait_, None, parse_quote! {
             trait AsyncWrite {}
         })
         .build_impl();

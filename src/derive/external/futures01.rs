@@ -6,7 +6,7 @@ pub(crate) mod future {
     pub(crate) const NAME: &[&str] = &["futures01::Future"];
 
     pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
-        Ok(derive_trait(data, parse_quote!(::futures::future::Future), None, parse_quote! {
+        Ok(derive_trait(data, &parse_quote!(::futures::future::Future), None, parse_quote! {
             trait Future {
                 type Item;
                 type Error;
@@ -23,7 +23,7 @@ pub(crate) mod stream {
     pub(crate) const NAME: &[&str] = &["futures01::Stream"];
 
     pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
-        Ok(derive_trait(data, parse_quote!(::futures::stream::Stream), None, parse_quote! {
+        Ok(derive_trait(data, &parse_quote!(::futures::stream::Stream), None, parse_quote! {
             trait Stream {
                 type Item;
                 type Error;
@@ -42,7 +42,7 @@ pub(crate) mod sink {
     pub(crate) const NAME: &[&str] = &["futures01::Sink"];
 
     pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
-        Ok(derive_trait(data, parse_quote!(::futures::sink::Sink), None, parse_quote! {
+        Ok(derive_trait(data, &parse_quote!(::futures::sink::Sink), None, parse_quote! {
             trait Sink {
                 type SinkItem;
                 type SinkError;

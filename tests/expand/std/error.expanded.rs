@@ -11,8 +11,8 @@ where
     #[inline]
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         match self {
-            Enum::A(x) => ::core::fmt::Display::fmt(x, f),
-            Enum::B(x) => ::core::fmt::Display::fmt(x, f),
+            Enum::A(x) => <A as ::core::fmt::Display>::fmt(x, f),
+            Enum::B(x) => <B as ::core::fmt::Display>::fmt(x, f),
         }
     }
 }
@@ -24,8 +24,8 @@ where
     #[inline]
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         match self {
-            Enum::A(x) => ::core::fmt::Debug::fmt(x, f),
-            Enum::B(x) => ::core::fmt::Debug::fmt(x, f),
+            Enum::A(x) => <A as ::core::fmt::Debug>::fmt(x, f),
+            Enum::B(x) => <B as ::core::fmt::Debug>::fmt(x, f),
         }
     }
 }
@@ -39,8 +39,8 @@ where
     #[allow(deprecated)]
     fn description(&self) -> &str {
         match self {
-            Enum::A(x) => ::std::error::Error::description(x),
-            Enum::B(x) => ::std::error::Error::description(x),
+            Enum::A(x) => <A as ::std::error::Error>::description(x),
+            Enum::B(x) => <B as ::std::error::Error>::description(x),
         }
     }
     fn source(&self) -> ::std::option::Option<&(dyn ::std::error::Error + 'static)> {

@@ -12,8 +12,8 @@ pub(crate) mod async_buf_read {
 
         let ident = &data.ident;
         let pin = quote!(::core::pin::Pin);
-        let trait_: syn::Path = parse_quote!(::futures::io::AsyncBufRead);
-        let mut impl_ = EnumImpl::from_trait(data, trait_.clone(), None, parse_quote! {
+        let trait_ = parse_quote!(::futures::io::AsyncBufRead);
+        let mut impl_ = EnumImpl::from_trait(data, &trait_, None, parse_quote! {
             trait AsyncBufRead {}
         })
         .build_impl();
@@ -61,8 +61,8 @@ pub(crate) mod async_read {
 
         let ident = &data.ident;
         let pin = quote!(::core::pin::Pin);
-        let trait_: syn::Path = parse_quote!(::futures::io::AsyncRead);
-        let mut impl_ = EnumImpl::from_trait(data, trait_.clone(), None, parse_quote! {
+        let trait_ = parse_quote!(::futures::io::AsyncRead);
+        let mut impl_ = EnumImpl::from_trait(data, &trait_, None, parse_quote! {
             trait AsyncRead {}
         })
         .build_impl();
@@ -115,8 +115,8 @@ pub(crate) mod async_seek {
 
         let ident = &data.ident;
         let pin = quote!(::core::pin::Pin);
-        let trait_: syn::Path = parse_quote!(::futures::io::AsyncSeek);
-        let mut impl_ = EnumImpl::from_trait(data, trait_.clone(), None, parse_quote! {
+        let trait_ = parse_quote!(::futures::io::AsyncSeek);
+        let mut impl_ = EnumImpl::from_trait(data, &trait_, None, parse_quote! {
             trait AsyncSeek {}
         })
         .build_impl();
@@ -153,15 +153,10 @@ pub(crate) mod async_write {
 
         let ident = &data.ident;
         let pin = quote!(::core::pin::Pin);
-        let trait_: syn::Path = parse_quote!(::futures::io::AsyncWrite);
-        let mut impl_ = EnumImpl::from_trait(
-            data,
-            parse_quote!(::futures::io::AsyncWrite),
-            None,
-            parse_quote! {
-                trait AsyncWrite {}
-            },
-        )
+        let trait_ = parse_quote!(::futures::io::AsyncWrite);
+        let mut impl_ = EnumImpl::from_trait(data, &trait_, None, parse_quote! {
+            trait AsyncWrite {}
+        })
         .build_impl();
 
         let poll_write = data
@@ -242,8 +237,8 @@ pub(crate) mod sink {
 
         let ident = &data.ident;
         let pin = quote!(::core::pin::Pin);
-        let trait_: syn::Path = parse_quote!(::futures::sink::Sink);
-        let mut impl_ = EnumImpl::from_trait(data, trait_.clone(), None, parse_quote! {
+        let trait_ = parse_quote!(::futures::sink::Sink);
+        let mut impl_ = EnumImpl::from_trait(data, &trait_, None, parse_quote! {
             trait Sink<Item> {
                 type Error;
             }
@@ -326,8 +321,8 @@ pub(crate) mod stream {
 
         let ident = &data.ident;
         let pin = quote!(::core::pin::Pin);
-        let trait_: syn::Path = parse_quote!(::futures::stream::Stream);
-        let mut impl_ = EnumImpl::from_trait(data, trait_.clone(), None, parse_quote! {
+        let trait_ = parse_quote!(::futures::stream::Stream);
+        let mut impl_ = EnumImpl::from_trait(data, &trait_, None, parse_quote! {
             trait Stream {
                 type Item;
                 #[inline]
