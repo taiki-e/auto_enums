@@ -16,6 +16,16 @@ where
         }
     }
     #[inline]
+    fn read_vectored(
+        &mut self,
+        bufs: &mut [::std::io::IoSliceMut<'_>],
+    ) -> ::std::io::Result<usize> {
+        match self {
+            Enum::A(x) => <A as ::std::io::Read>::read_vectored(x, bufs),
+            Enum::B(x) => <B as ::std::io::Read>::read_vectored(x, bufs),
+        }
+    }
+    #[inline]
     fn read_to_end(
         &mut self,
         buf: &mut ::std::vec::Vec<u8>,
@@ -40,16 +50,6 @@ where
         match self {
             Enum::A(x) => <A as ::std::io::Read>::read_exact(x, buf),
             Enum::B(x) => <B as ::std::io::Read>::read_exact(x, buf),
-        }
-    }
-    #[inline]
-    fn read_vectored(
-        &mut self,
-        bufs: &mut [::std::io::IoSliceMut<'_>],
-    ) -> ::std::io::Result<usize> {
-        match self {
-            Enum::A(x) => <A as ::std::io::Read>::read_vectored(x, bufs),
-            Enum::B(x) => <B as ::std::io::Read>::read_vectored(x, bufs),
         }
     }
 }

@@ -6,24 +6,7 @@ pub(crate) mod iterator {
     pub(crate) const NAME: &[&str] = &["Iterator"];
 
     pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
-        // TODO: When `try_trait` stabilized, add `try_fold` and remove `fold`, `find` etc. conditionally.
-
-        // It is equally efficient if `try_fold` can be used.
-        let try_trait = quote! {
-            #[inline]
-            fn fold<__U, __F>(self, init: __U, f: __F) -> __U
-            where
-                __F: ::core::ops::FnMut(__U, Self::Item) -> __U;
-            #[inline]
-            fn find<__P>(&mut self, predicate: __P) -> ::core::option::Option<Self::Item>
-            where
-                __P: ::core::ops::FnMut(&Self::Item) -> bool;
-            #[inline]
-            fn find_map<__U, __F>(&mut self, f: __F) -> ::core::option::Option<__U>
-            where
-                __F: ::core::ops::FnMut(Self::Item) -> ::core::option::Option<__U>;
-        };
-
+        // TODO: Add try_fold once try_trait_v2 is stabilized https://github.com/rust-lang/rust/issues/84277
         Ok(derive_trait(data, &parse_quote!(::core::iter::Iterator), None, parse_quote! {
             trait Iterator {
                 type Item;
@@ -36,9 +19,41 @@ pub(crate) mod iterator {
                 #[inline]
                 fn last(self) -> ::core::option::Option<Self::Item>;
                 #[inline]
+                fn nth(&mut self, n: usize) -> ::core::option::Option<Self::Item>;
+                #[inline]
                 #[must_use = "if you really need to exhaust the iterator, consider `.for_each(drop)` instead"]
                 fn collect<__U: ::core::iter::FromIterator<Self::Item>>(self) -> __U;
-                #try_trait
+                #[inline]
+                fn partition<__U, __F>(self, f: __F) -> (__U, __U)
+                where
+                    __U: ::core::default::Default + ::core::iter::Extend<Self::Item>,
+                    __F: ::core::ops::FnMut(&Self::Item) -> bool;
+
+                // Once try_trait_v2 is stabilized, we can replace these by implementing try_rfold.
+                #[inline]
+                fn fold<__U, __F>(self, init: __U, f: __F) -> __U
+                where
+                    __F: ::core::ops::FnMut(__U, Self::Item) -> __U;
+                #[inline]
+                fn all<__F>(&mut self, f: __F) -> bool
+                where
+                    __F: ::core::ops::FnMut(Self::Item) -> bool;
+                #[inline]
+                fn any<__F>(&mut self, f: __F) -> bool
+                where
+                    __F: ::core::ops::FnMut(Self::Item) -> bool;
+                #[inline]
+                fn find<__P>(&mut self, predicate: __P) -> ::core::option::Option<Self::Item>
+                where
+                    __P: ::core::ops::FnMut(&Self::Item) -> bool;
+                #[inline]
+                fn find_map<__U, __F>(&mut self, f: __F) -> ::core::option::Option<__U>
+                where
+                    __F: ::core::ops::FnMut(Self::Item) -> ::core::option::Option<__U>;
+                #[inline]
+                fn position<__P>(&mut self, predicate: __P) -> ::core::option::Option<usize>
+                where
+                    __P: ::core::ops::FnMut(Self::Item) -> bool;
             }
         }))
     }
@@ -50,20 +65,8 @@ pub(crate) mod double_ended_iterator {
     pub(crate) const NAME: &[&str] = &["DoubleEndedIterator"];
 
     pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
-        // TODO: When `try_trait` stabilized, add `try_rfold` and remove `rfold` and `rfind` conditionally.
-
-        // It is equally efficient if `try_rfold` can be used.
-        let try_trait = quote! {
-            #[inline]
-            fn rfold<__U, __F>(self, init: __U, f: __F) -> __U
-            where
-                __F: ::core::ops::FnMut(__U, Self::Item) -> __U;
-            #[inline]
-            fn rfind<__P>(&mut self, predicate: __P) -> ::core::option::Option<Self::Item>
-            where
-                __P: ::core::ops::FnMut(&Self::Item) -> bool;
-        };
-
+        // TODO: Add try_rfold once try_trait_v2 is stabilized https://github.com/rust-lang/rust/issues/84277
+        // TODO: Add advance_back_by once stabilized https://github.com/rust-lang/rust/issues/77404
         Ok(derive_trait(
             data,
             &parse_quote!(::core::iter::DoubleEndedIterator),
@@ -72,7 +75,18 @@ pub(crate) mod double_ended_iterator {
                 trait DoubleEndedIterator: ::core::iter::Iterator {
                     #[inline]
                     fn next_back(&mut self) -> ::core::option::Option<Self::Item>;
-                    #try_trait
+                    #[inline]
+                    fn nth_back(&mut self, n: usize) -> ::core::option::Option<Self::Item>;
+
+                    // Once try_trait_v2 is stabilized, we can replace these by implementing try_rfold.
+                    #[inline]
+                    fn rfold<__U, __F>(self, init: __U, f: __F) -> __U
+                    where
+                        __F: ::core::ops::FnMut(__U, Self::Item) -> __U;
+                    #[inline]
+                    fn rfind<__P>(&mut self, predicate: __P) -> ::core::option::Option<Self::Item>
+                    where
+                        __P: ::core::ops::FnMut(&Self::Item) -> bool;
                 }
             },
         ))
@@ -85,8 +99,7 @@ pub(crate) mod exact_size_iterator {
     pub(crate) const NAME: &[&str] = &["ExactSizeIterator"];
 
     pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
-        // TODO: When `exact_size_is_empty` stabilized, add `is_empty` conditionally.
-
+        // TODO: Add is_empty once stabilized https://github.com/rust-lang/rust/issues/35428
         Ok(derive_trait(
             data,
             &parse_quote!(::core::iter::ExactSizeIterator),
@@ -142,6 +155,7 @@ pub(crate) mod extend {
     pub(crate) const NAME: &[&str] = &["Extend"];
 
     pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
+        // TODO: Add extend_one,extend_reserve once stabilized https://github.com/rust-lang/rust/issues/72631
         Ok(derive_trait(data, &parse_quote!(::core::iter::Extend), None, parse_quote! {
             trait Extend<__A> {
                 #[inline]

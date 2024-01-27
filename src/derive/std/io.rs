@@ -6,12 +6,17 @@ pub(crate) mod read {
     pub(crate) const NAME: &[&str] = &["Read", "io::Read"];
 
     pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
-        // TODO: When `read_buf` stabilized, add `read_buf` conditionally.
-
+        // TODO: Add is_read_vectored once stabilized https://github.com/rust-lang/rust/issues/69941
+        // TODO: Add read_buf,read_buf_exact once stabilized https://github.com/rust-lang/rust/issues/78485
         Ok(derive_trait(data, &parse_quote!(::std::io::Read), None, parse_quote! {
             trait Read {
                 #[inline]
                 fn read(&mut self, buf: &mut [u8]) -> ::std::io::Result<usize>;
+                #[inline]
+                fn read_vectored(
+                    &mut self,
+                    bufs: &mut [::std::io::IoSliceMut<'_>],
+                ) -> ::std::io::Result<usize>;
                 #[inline]
                 fn read_to_end(
                     &mut self,
@@ -24,11 +29,52 @@ pub(crate) mod read {
                 ) -> ::std::io::Result<usize>;
                 #[inline]
                 fn read_exact(&mut self, buf: &mut [u8]) -> ::std::io::Result<()>;
+            }
+        }))
+    }
+}
+
+pub(crate) mod write {
+    use crate::derive::*;
+
+    pub(crate) const NAME: &[&str] = &["Write", "io::Write"];
+
+    pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
+        // TODO: Add is_write_vectored once stabilized https://github.com/rust-lang/rust/issues/69941
+        // TODO: Add write_all_vectored once stabilized https://github.com/rust-lang/rust/issues/70436
+        Ok(derive_trait(data, &parse_quote!(::std::io::Write), None, parse_quote! {
+            trait Write {
                 #[inline]
-                fn read_vectored(
+                fn write(&mut self, buf: &[u8]) -> ::std::io::Result<usize>;
+                #[inline]
+                fn write_vectored(
                     &mut self,
-                    bufs: &mut [::std::io::IoSliceMut<'_>],
+                    bufs: &[::std::io::IoSlice<'_>],
                 ) -> ::std::io::Result<usize>;
+                #[inline]
+                fn flush(&mut self) -> ::std::io::Result<()>;
+                #[inline]
+                fn write_all(&mut self, buf: &[u8]) -> ::std::io::Result<()>;
+                #[inline]
+                fn write_fmt(
+                    &mut self,
+                    fmt: ::std::fmt::Arguments<'_>,
+                ) -> ::std::io::Result<()>;
+            }
+        }))
+    }
+}
+
+pub(crate) mod seek {
+    use crate::derive::*;
+
+    pub(crate) const NAME: &[&str] = &["Seek", "io::Seek"];
+
+    pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
+        Ok(derive_trait(data, &parse_quote!(::std::io::Seek), None, parse_quote! {
+            trait Seek {
+                #[inline]
+                fn seek(&mut self, pos: ::std::io::SeekFrom) -> ::std::io::Result<u64>;
             }
         }))
     }
@@ -55,50 +101,6 @@ pub(crate) mod buf_read {
                 fn read_line(
                     &mut self,
                     buf: &mut ::std::string::String,
-                ) -> ::std::io::Result<usize>;
-            }
-        }))
-    }
-}
-
-pub(crate) mod seek {
-    use crate::derive::*;
-
-    pub(crate) const NAME: &[&str] = &["Seek", "io::Seek"];
-
-    pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
-        Ok(derive_trait(data, &parse_quote!(::std::io::Seek), None, parse_quote! {
-            trait Seek {
-                #[inline]
-                fn seek(&mut self, pos: ::std::io::SeekFrom) -> ::std::io::Result<u64>;
-            }
-        }))
-    }
-}
-
-pub(crate) mod write {
-    use crate::derive::*;
-
-    pub(crate) const NAME: &[&str] = &["Write", "io::Write"];
-
-    pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
-        Ok(derive_trait(data, &parse_quote!(::std::io::Write), None, parse_quote! {
-            trait Write {
-                #[inline]
-                fn write(&mut self, buf: &[u8]) -> ::std::io::Result<usize>;
-                #[inline]
-                fn flush(&mut self) -> ::std::io::Result<()>;
-                #[inline]
-                fn write_all(&mut self, buf: &[u8]) -> ::std::io::Result<()>;
-                #[inline]
-                fn write_fmt(
-                    &mut self,
-                    fmt: ::std::fmt::Arguments<'_>,
-                ) -> ::std::io::Result<()>;
-                #[inline]
-                fn write_vectored(
-                    &mut self,
-                    bufs: &[::std::io::IoSlice<'_>],
                 ) -> ::std::io::Result<usize>;
             }
         }))

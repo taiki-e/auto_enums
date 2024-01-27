@@ -38,11 +38,29 @@ where
         }
     }
     #[inline]
+    fn nth(&mut self, n: usize) -> ::core::option::Option<Self::Item> {
+        match self {
+            Enum::A(x) => <A as ::core::iter::Iterator>::nth(x, n),
+            Enum::B(x) => <B as ::core::iter::Iterator>::nth(x, n),
+        }
+    }
+    #[inline]
     #[must_use = "if you really need to exhaust the iterator, consider `.for_each(drop)` instead"]
     fn collect<__U: ::core::iter::FromIterator<Self::Item>>(self) -> __U {
         match self {
             Enum::A(x) => <A as ::core::iter::Iterator>::collect(x),
             Enum::B(x) => <B as ::core::iter::Iterator>::collect(x),
+        }
+    }
+    #[inline]
+    fn partition<__U, __F>(self, f: __F) -> (__U, __U)
+    where
+        __U: ::core::default::Default + ::core::iter::Extend<Self::Item>,
+        __F: ::core::ops::FnMut(&Self::Item) -> bool,
+    {
+        match self {
+            Enum::A(x) => <A as ::core::iter::Iterator>::partition(x, f),
+            Enum::B(x) => <B as ::core::iter::Iterator>::partition(x, f),
         }
     }
     #[inline]
@@ -53,6 +71,26 @@ where
         match self {
             Enum::A(x) => <A as ::core::iter::Iterator>::fold(x, init, f),
             Enum::B(x) => <B as ::core::iter::Iterator>::fold(x, init, f),
+        }
+    }
+    #[inline]
+    fn all<__F>(&mut self, f: __F) -> bool
+    where
+        __F: ::core::ops::FnMut(Self::Item) -> bool,
+    {
+        match self {
+            Enum::A(x) => <A as ::core::iter::Iterator>::all(x, f),
+            Enum::B(x) => <B as ::core::iter::Iterator>::all(x, f),
+        }
+    }
+    #[inline]
+    fn any<__F>(&mut self, f: __F) -> bool
+    where
+        __F: ::core::ops::FnMut(Self::Item) -> bool,
+    {
+        match self {
+            Enum::A(x) => <A as ::core::iter::Iterator>::any(x, f),
+            Enum::B(x) => <B as ::core::iter::Iterator>::any(x, f),
         }
     }
     #[inline]
@@ -75,6 +113,16 @@ where
             Enum::B(x) => <B as ::core::iter::Iterator>::find_map(x, f),
         }
     }
+    #[inline]
+    fn position<__P>(&mut self, predicate: __P) -> ::core::option::Option<usize>
+    where
+        __P: ::core::ops::FnMut(Self::Item) -> bool,
+    {
+        match self {
+            Enum::A(x) => <A as ::core::iter::Iterator>::position(x, predicate),
+            Enum::B(x) => <B as ::core::iter::Iterator>::position(x, predicate),
+        }
+    }
 }
 impl<A, B> ::core::iter::DoubleEndedIterator for Enum<A, B>
 where
@@ -86,6 +134,13 @@ where
         match self {
             Enum::A(x) => <A as ::core::iter::DoubleEndedIterator>::next_back(x),
             Enum::B(x) => <B as ::core::iter::DoubleEndedIterator>::next_back(x),
+        }
+    }
+    #[inline]
+    fn nth_back(&mut self, n: usize) -> ::core::option::Option<Self::Item> {
+        match self {
+            Enum::A(x) => <A as ::core::iter::DoubleEndedIterator>::nth_back(x, n),
+            Enum::B(x) => <B as ::core::iter::DoubleEndedIterator>::nth_back(x, n),
         }
     }
     #[inline]
