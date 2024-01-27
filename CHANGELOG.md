@@ -10,6 +10,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+## [0.8.5] - 2024-01-27
+
 - Update `derive_utils` to 0.14. This fixes "overflow evaluating the requirement" error with `#[enum_derive]` in two situations.
 
 ## [0.8.4] - 2024-01-14
@@ -354,7 +356,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 Initial release
 
-[Unreleased]: https://github.com/taiki-e/auto_enums/compare/v0.8.4...HEAD
+[Unreleased]: https://github.com/taiki-e/auto_enums/compare/v0.8.5...HEAD
+[0.8.5]: https://github.com/taiki-e/auto_enums/compare/v0.8.4...v0.8.5
 [0.8.4]: https://github.com/taiki-e/auto_enums/compare/v0.8.3...v0.8.4
 [0.8.3]: https://github.com/taiki-e/auto_enums/compare/v0.8.2...v0.8.3
 [0.8.2]: https://github.com/taiki-e/auto_enums/compare/v0.8.1...v0.8.2
