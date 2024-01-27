@@ -25,9 +25,11 @@ pub(crate) mod body {
         })
         .build_impl();
 
-        let poll_frame = data
-            .variant_idents()
-            .map(|v| quote!(#ident::#v(x) => #trait_::poll_frame(#pin::new_unchecked(x), cx)));
+        let poll_frame = data.variant_idents().zip(data.field_types()).map(|(v, ty)| {
+            quote! {
+                #ident::#v(x) => <#ty as #trait_>::poll_frame(#pin::new_unchecked(x), cx),
+            }
+        });
         impl_.items.push(parse_quote! {
             fn poll_frame(
                 self: #pin<&mut Self>,
@@ -38,7 +40,7 @@ pub(crate) mod body {
                 >,
             > {
                 unsafe {
-                    match self.get_unchecked_mut() { #(#poll_frame,)* }
+                    match self.get_unchecked_mut() { #(#poll_frame)* }
                 }
             }
         });

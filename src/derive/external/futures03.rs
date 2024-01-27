@@ -18,9 +18,11 @@ pub(crate) mod async_buf_read {
         })
         .build_impl();
 
-        let poll_fill_buf = data
-            .variant_idents()
-            .map(|v| quote!(#ident::#v(x) => #trait_::poll_fill_buf(#pin::new_unchecked(x), cx)));
+        let poll_fill_buf = data.variant_idents().zip(data.field_types()).map(|(v, ty)| {
+            quote! {
+                #ident::#v(x) => <#ty as #trait_>::poll_fill_buf(#pin::new_unchecked(x), cx),
+            }
+        });
         impl_.items.push(parse_quote! {
             #[inline]
             fn poll_fill_buf(
@@ -28,19 +30,21 @@ pub(crate) mod async_buf_read {
                 cx: &mut ::core::task::Context<'_>,
             ) -> ::core::task::Poll<::std::io::Result<&[u8]>> {
                 unsafe {
-                    match self.get_unchecked_mut() { #(#poll_fill_buf,)* }
+                    match self.get_unchecked_mut() { #(#poll_fill_buf)* }
                 }
             }
         });
 
-        let consume = data
-            .variant_idents()
-            .map(|v| quote!(#ident::#v(x) => #trait_::consume(#pin::new_unchecked(x), amt)));
+        let consume = data.variant_idents().zip(data.field_types()).map(|(v, ty)| {
+            quote! {
+                #ident::#v(x) => <#ty as #trait_>::consume(#pin::new_unchecked(x), amt),
+            }
+        });
         impl_.items.push(parse_quote! {
             #[inline]
             fn consume(self: #pin<&mut Self>, amt: usize) {
                 unsafe {
-                    match self.get_unchecked_mut() { #(#consume,)* }
+                    match self.get_unchecked_mut() { #(#consume)* }
                 }
             }
         });
@@ -67,9 +71,11 @@ pub(crate) mod async_read {
         })
         .build_impl();
 
-        let poll_read = data
-            .variant_idents()
-            .map(|v| quote!(#ident::#v(x) => #trait_::poll_read(#pin::new_unchecked(x), cx, buf)));
+        let poll_read = data.variant_idents().zip(data.field_types()).map(|(v, ty)| {
+            quote! {
+                #ident::#v(x) => <#ty as #trait_>::poll_read(#pin::new_unchecked(x), cx, buf),
+            }
+        });
         impl_.items.push(parse_quote! {
             #[inline]
             fn poll_read(
@@ -78,14 +84,17 @@ pub(crate) mod async_read {
                 buf: &mut [u8],
             ) -> ::core::task::Poll<::std::io::Result<usize>> {
                 unsafe {
-                    match self.get_unchecked_mut() { #(#poll_read,)* }
+                    match self.get_unchecked_mut() { #(#poll_read)* }
                 }
             }
         });
 
-        let poll_read_vectored = data
-            .variant_idents()
-            .map(|v| quote!(#ident::#v(x) => #trait_::poll_read_vectored(#pin::new_unchecked(x), cx, bufs)));
+        let poll_read_vectored = data.variant_idents().zip(data.field_types()).map(|(v, ty)| {
+            quote! {
+                #ident::#v(x)
+                    => <#ty as #trait_>::poll_read_vectored(#pin::new_unchecked(x), cx, bufs),
+            }
+        });
         impl_.items.push(parse_quote! {
             #[inline]
             fn poll_read_vectored(
@@ -94,7 +103,7 @@ pub(crate) mod async_read {
                 bufs: &mut [::std::io::IoSliceMut<'_>],
             ) -> ::core::task::Poll<::std::io::Result<usize>> {
                 unsafe {
-                    match self.get_unchecked_mut() { #(#poll_read_vectored,)* }
+                    match self.get_unchecked_mut() { #(#poll_read_vectored)* }
                 }
             }
         });
@@ -121,9 +130,11 @@ pub(crate) mod async_seek {
         })
         .build_impl();
 
-        let poll_seek = data
-            .variant_idents()
-            .map(|v| quote!(#ident::#v(x) => #trait_::poll_seek(#pin::new_unchecked(x), cx, pos)));
+        let poll_seek = data.variant_idents().zip(data.field_types()).map(|(v, ty)| {
+            quote! {
+                #ident::#v(x) => <#ty as #trait_>::poll_seek(#pin::new_unchecked(x), cx, pos),
+            }
+        });
         impl_.items.push(parse_quote! {
             #[inline]
             fn poll_seek(
@@ -132,7 +143,7 @@ pub(crate) mod async_seek {
                 pos: ::std::io::SeekFrom,
             ) -> ::core::task::Poll<::std::io::Result<u64>> {
                 unsafe {
-                    match self.get_unchecked_mut() { #(#poll_seek,)* }
+                    match self.get_unchecked_mut() { #(#poll_seek)* }
                 }
             }
         });
@@ -159,9 +170,11 @@ pub(crate) mod async_write {
         })
         .build_impl();
 
-        let poll_write = data
-            .variant_idents()
-            .map(|v| quote!(#ident::#v(x) => #trait_::poll_write(#pin::new_unchecked(x), cx, buf)));
+        let poll_write = data.variant_idents().zip(data.field_types()).map(|(v, ty)| {
+            quote! {
+                #ident::#v(x) => <#ty as #trait_>::poll_write(#pin::new_unchecked(x), cx, buf),
+            }
+        });
         impl_.items.push(parse_quote! {
             #[inline]
             fn poll_write(
@@ -170,14 +183,17 @@ pub(crate) mod async_write {
                 buf: &[u8],
             ) -> ::core::task::Poll<::std::io::Result<usize>> {
                 unsafe {
-                    match self.get_unchecked_mut() { #(#poll_write,)* }
+                    match self.get_unchecked_mut() { #(#poll_write)* }
                 }
             }
         });
 
-        let poll_write_vectored = data
-            .variant_idents()
-            .map(|v| quote!(#ident::#v(x) => #trait_::poll_write_vectored(#pin::new_unchecked(x), cx, bufs)));
+        let poll_write_vectored = data.variant_idents().zip(data.field_types()).map(|(v, ty)| {
+            quote! {
+                #ident::#v(x)
+                    => <#ty as #trait_>::poll_write_vectored(#pin::new_unchecked(x), cx, bufs),
+            }
+        });
         impl_.items.push(parse_quote! {
             #[inline]
             fn poll_write_vectored(
@@ -186,14 +202,16 @@ pub(crate) mod async_write {
                 bufs: &[::std::io::IoSlice<'_>],
             ) -> ::core::task::Poll<::std::io::Result<usize>> {
                 unsafe {
-                    match self.get_unchecked_mut() { #(#poll_write_vectored,)* }
+                    match self.get_unchecked_mut() { #(#poll_write_vectored)* }
                 }
             }
         });
 
-        let poll_flush = data
-            .variant_idents()
-            .map(|v| quote!(#ident::#v(x) => #trait_::poll_flush(#pin::new_unchecked(x), cx)));
+        let poll_flush = data.variant_idents().zip(data.field_types()).map(|(v, ty)| {
+            quote! {
+                #ident::#v(x) => <#ty as #trait_>::poll_flush(#pin::new_unchecked(x), cx),
+            }
+        });
         impl_.items.push(parse_quote! {
             #[inline]
             fn poll_flush(
@@ -201,14 +219,16 @@ pub(crate) mod async_write {
                 cx: &mut ::core::task::Context<'_>,
             ) -> ::core::task::Poll<::std::io::Result<()>> {
                 unsafe {
-                    match self.get_unchecked_mut() { #(#poll_flush,)* }
+                    match self.get_unchecked_mut() { #(#poll_flush)* }
                 }
             }
         });
 
-        let poll_close = data
-            .variant_idents()
-            .map(|v| quote!(#ident::#v(x) => #trait_::poll_close(#pin::new_unchecked(x), cx)));
+        let poll_close = data.variant_idents().zip(data.field_types()).map(|(v, ty)| {
+            quote! {
+                #ident::#v(x) => <#ty as #trait_>::poll_close(#pin::new_unchecked(x), cx),
+            }
+        });
         impl_.items.push(parse_quote! {
             #[inline]
             fn poll_close(
@@ -216,7 +236,7 @@ pub(crate) mod async_write {
                 cx: &mut ::core::task::Context<'_>,
             ) -> ::core::task::Poll<::std::io::Result<()>> {
                 unsafe {
-                    match self.get_unchecked_mut() { #(#poll_close,)* }
+                    match self.get_unchecked_mut() { #(#poll_close)* }
                 }
             }
         });
@@ -239,15 +259,17 @@ pub(crate) mod sink {
         let pin = quote!(::core::pin::Pin);
         let trait_ = parse_quote!(::futures::sink::Sink);
         let mut impl_ = EnumImpl::from_trait(data, &trait_, None, parse_quote! {
-            trait Sink<Item> {
+            trait Sink<__Item> {
                 type Error;
             }
         })
         .build_impl();
 
-        let poll_ready = data
-            .variant_idents()
-            .map(|v| quote!(#ident::#v(x) => #trait_::poll_ready(#pin::new_unchecked(x), cx)));
+        let poll_ready = data.variant_idents().zip(data.field_types()).map(|(v, ty)| {
+            quote! {
+                #ident::#v(x) => <#ty as #trait_<__Item>>::poll_ready(#pin::new_unchecked(x), cx),
+            }
+        });
         impl_.items.push(parse_quote! {
             #[inline]
             fn poll_ready(
@@ -255,29 +277,33 @@ pub(crate) mod sink {
                 cx: &mut ::core::task::Context<'_>,
             ) -> ::core::task::Poll<::core::result::Result<(), Self::Error>> {
                 unsafe {
-                    match self.get_unchecked_mut() { #(#poll_ready,)* }
+                    match self.get_unchecked_mut() { #(#poll_ready)* }
                 }
             }
         });
 
-        let start_send = data
-            .variant_idents()
-            .map(|v| quote!(#ident::#v(x) => #trait_::start_send(#pin::new_unchecked(x), item)));
+        let start_send = data.variant_idents().zip(data.field_types()).map(|(v, ty)| {
+            quote! {
+                #ident::#v(x) => <#ty as #trait_<__Item>>::start_send(#pin::new_unchecked(x), item),
+            }
+        });
         impl_.items.push(parse_quote! {
             #[inline]
             fn start_send(
                 self: #pin<&mut Self>,
-                item: Item,
+                item: __Item,
             ) -> ::core::result::Result<(), Self::Error> {
                 unsafe {
-                    match self.get_unchecked_mut() { #(#start_send,)* }
+                    match self.get_unchecked_mut() { #(#start_send)* }
                 }
             }
         });
 
-        let poll_flush = data
-            .variant_idents()
-            .map(|v| quote!(#ident::#v(x) => #trait_::poll_flush(#pin::new_unchecked(x), cx)));
+        let poll_flush = data.variant_idents().zip(data.field_types()).map(|(v, ty)| {
+            quote! {
+                #ident::#v(x) => <#ty as #trait_<__Item>>::poll_flush(#pin::new_unchecked(x), cx),
+            }
+        });
         impl_.items.push(parse_quote! {
             #[inline]
             fn poll_flush(
@@ -285,14 +311,16 @@ pub(crate) mod sink {
                 cx: &mut ::core::task::Context<'_>,
             ) -> ::core::task::Poll<::core::result::Result<(), Self::Error>> {
                 unsafe {
-                    match self.get_unchecked_mut() { #(#poll_flush,)* }
+                    match self.get_unchecked_mut() { #(#poll_flush)* }
                 }
             }
         });
 
-        let poll_close = data
-            .variant_idents()
-            .map(|v| quote!(#ident::#v(x) => #trait_::poll_close(#pin::new_unchecked(x), cx)));
+        let poll_close = data.variant_idents().zip(data.field_types()).map(|(v, ty)| {
+            quote! {
+                #ident::#v(x) => <#ty as #trait_<__Item>>::poll_close(#pin::new_unchecked(x), cx),
+            }
+        });
         impl_.items.push(parse_quote! {
             #[inline]
             fn poll_close(
@@ -300,7 +328,7 @@ pub(crate) mod sink {
                 cx: &mut ::core::task::Context<'_>,
             ) -> ::core::task::Poll<::core::result::Result<(), Self::Error>> {
                 unsafe {
-                    match self.get_unchecked_mut() { #(#poll_close,)* }
+                    match self.get_unchecked_mut() { #(#poll_close)* }
                 }
             }
         });
@@ -331,9 +359,11 @@ pub(crate) mod stream {
         })
         .build_impl();
 
-        let poll_next = data
-            .variant_idents()
-            .map(|v| quote!(#ident::#v(x) => #trait_::poll_next(#pin::new_unchecked(x), cx)));
+        let poll_next = data.variant_idents().zip(data.field_types()).map(|(v, ty)| {
+            quote! {
+                #ident::#v(x) => <#ty as #trait_>::poll_next(#pin::new_unchecked(x), cx),
+            }
+        });
         impl_.items.push(parse_quote! {
             #[inline]
             fn poll_next(
@@ -341,7 +371,7 @@ pub(crate) mod stream {
                 cx: &mut ::core::task::Context<'_>,
             ) -> ::core::task::Poll<::core::option::Option<Self::Item>> {
                 unsafe {
-                    match self.get_unchecked_mut() { #(#poll_next,)* }
+                    match self.get_unchecked_mut() { #(#poll_next)* }
                 }
             }
         });

@@ -18,14 +18,14 @@ where
         unsafe {
             match self.get_unchecked_mut() {
                 Enum::A(x) => {
-                    ::futures::io::AsyncSeek::poll_seek(
+                    <A as ::futures::io::AsyncSeek>::poll_seek(
                         ::core::pin::Pin::new_unchecked(x),
                         cx,
                         pos,
                     )
                 }
                 Enum::B(x) => {
-                    ::futures::io::AsyncSeek::poll_seek(
+                    <B as ::futures::io::AsyncSeek>::poll_seek(
                         ::core::pin::Pin::new_unchecked(x),
                         cx,
                         pos,

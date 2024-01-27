@@ -17,14 +17,14 @@ where
         unsafe {
             match self.get_unchecked_mut() {
                 Enum::A(x) => {
-                    ::tokio::io::AsyncRead::poll_read(
+                    <A as ::tokio::io::AsyncRead>::poll_read(
                         ::core::pin::Pin::new_unchecked(x),
                         cx,
                         buf,
                     )
                 }
                 Enum::B(x) => {
-                    ::tokio::io::AsyncRead::poll_read(
+                    <B as ::tokio::io::AsyncRead>::poll_read(
                         ::core::pin::Pin::new_unchecked(x),
                         cx,
                         buf,

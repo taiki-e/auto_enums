@@ -116,9 +116,11 @@ pub(crate) mod coroutine {
         })
         .build_impl();
 
-        let resume = data
-            .variant_idents()
-            .map(|v| quote!(#ident::#v(x) => #trait_::resume(#pin::new_unchecked(x), arg)));
+        let resume = data.variant_idents().zip(data.field_types()).map(|(v, ty)| {
+            quote! {
+                #ident::#v(x) => <#ty as #trait_<R>>::resume(#pin::new_unchecked(x), arg),
+            }
+        });
         impl_.items.push(parse_quote! {
             #[inline]
             fn resume(
@@ -126,7 +128,7 @@ pub(crate) mod coroutine {
                 arg: R,
             ) -> ::core::ops::CoroutineState<Self::Yield, Self::Return> {
                 unsafe {
-                    match self.get_unchecked_mut() { #(#resume,)* }
+                    match self.get_unchecked_mut() { #(#resume)* }
                 }
             }
         });
@@ -147,17 +149,13 @@ pub(crate) mod fn_ {
     pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
         let trait_path = quote!(::core::ops::Fn);
         let trait_ = quote!(#trait_path(__T) -> __U);
-        let fst = data.field_types().next();
         let mut impl_ = EnumImpl::new(data);
 
         impl_.set_trait(parse_quote!(#trait_path<(__T,)>));
         impl_.push_generic_param(TypeParam::from(format_ident!("__T")).into());
         impl_.push_generic_param(TypeParam::from(format_ident!("__U")).into());
 
-        impl_.push_where_predicate(parse_quote!(#fst: #trait_));
-        data.field_types()
-            .skip(1)
-            .for_each(|f| impl_.push_where_predicate(parse_quote!(#f: #trait_)));
+        data.field_types().for_each(|f| impl_.push_where_predicate(parse_quote!(#f: #trait_)));
 
         impl_.push_method(parse_quote! {
             #[inline]
@@ -180,17 +178,13 @@ pub(crate) mod fn_mut {
     pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
         let trait_path = quote!(::core::ops::FnMut);
         let trait_ = quote!(#trait_path(__T) -> __U);
-        let fst = data.field_types().next();
         let mut impl_ = EnumImpl::new(data);
 
         impl_.set_trait(parse_quote!(#trait_path<(__T,)>));
         impl_.push_generic_param(TypeParam::from(format_ident!("__T")).into());
         impl_.push_generic_param(TypeParam::from(format_ident!("__U")).into());
 
-        impl_.push_where_predicate(parse_quote!(#fst: #trait_));
-        data.field_types()
-            .skip(1)
-            .for_each(|f| impl_.push_where_predicate(parse_quote!(#f: #trait_)));
+        data.field_types().for_each(|f| impl_.push_where_predicate(parse_quote!(#f: #trait_)));
 
         impl_.push_method(parse_quote! {
             #[inline]
@@ -213,17 +207,13 @@ pub(crate) mod fn_once {
     pub(crate) fn derive(_cx: &Context, data: &Data) -> Result<TokenStream> {
         let trait_path = quote!(::core::ops::FnOnce);
         let trait_ = quote!(#trait_path(__T) -> __U);
-        let fst = data.field_types().next();
         let mut impl_ = EnumImpl::new(data);
 
         impl_.set_trait(parse_quote!(#trait_path<(__T,)>));
         impl_.push_generic_param(TypeParam::from(format_ident!("__T")).into());
         impl_.push_generic_param(TypeParam::from(format_ident!("__U")).into());
 
-        impl_.push_where_predicate(parse_quote!(#fst: #trait_));
-        data.field_types()
-            .skip(1)
-            .for_each(|f| impl_.push_where_predicate(parse_quote!(#f: #trait_)));
+        data.field_types().for_each(|f| impl_.push_where_predicate(parse_quote!(#f: #trait_)));
 
         impl_.append_items_from_trait(parse_quote! {
             trait FnOnce {

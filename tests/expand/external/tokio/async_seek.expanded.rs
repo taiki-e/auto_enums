@@ -16,13 +16,13 @@ where
         unsafe {
             match self.get_unchecked_mut() {
                 Enum::A(x) => {
-                    ::tokio::io::AsyncSeek::start_seek(
+                    <A as ::tokio::io::AsyncSeek>::start_seek(
                         ::core::pin::Pin::new_unchecked(x),
                         pos,
                     )
                 }
                 Enum::B(x) => {
-                    ::tokio::io::AsyncSeek::start_seek(
+                    <B as ::tokio::io::AsyncSeek>::start_seek(
                         ::core::pin::Pin::new_unchecked(x),
                         pos,
                     )
@@ -37,13 +37,13 @@ where
         unsafe {
             match self.get_unchecked_mut() {
                 Enum::A(x) => {
-                    ::tokio::io::AsyncSeek::poll_complete(
+                    <A as ::tokio::io::AsyncSeek>::poll_complete(
                         ::core::pin::Pin::new_unchecked(x),
                         cx,
                     )
                 }
                 Enum::B(x) => {
-                    ::tokio::io::AsyncSeek::poll_complete(
+                    <B as ::tokio::io::AsyncSeek>::poll_complete(
                         ::core::pin::Pin::new_unchecked(x),
                         cx,
                     )

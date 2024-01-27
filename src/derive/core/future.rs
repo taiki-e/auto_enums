@@ -19,9 +19,11 @@ pub(crate) fn derive(cx: &Context, data: &Data) -> Result<TokenStream> {
     })
     .build_impl();
 
-    let poll = data
-        .variant_idents()
-        .map(|v| quote!(#ident::#v(x) => #trait_::poll(#pin::new_unchecked(x), cx)));
+    let poll = data.variant_idents().zip(data.field_types()).map(|(v, ty)| {
+        quote! {
+            #ident::#v(x) => <#ty as #trait_>::poll(#pin::new_unchecked(x), cx),
+        }
+    });
     impl_.items.push(parse_quote! {
         #[inline]
         fn poll(
@@ -29,7 +31,7 @@ pub(crate) fn derive(cx: &Context, data: &Data) -> Result<TokenStream> {
             cx: &mut ::core::task::Context<'_>,
         ) -> ::core::task::Poll<Self::Output> {
             unsafe {
-                match self.get_unchecked_mut() { #(#poll,)* }
+                match self.get_unchecked_mut() { #(#poll)* }
             }
         }
     });

@@ -23,14 +23,14 @@ where
         unsafe {
             match self.get_unchecked_mut() {
                 Enum::A(x) => {
-                    ::tokio::io::AsyncWrite::poll_write(
+                    <A as ::tokio::io::AsyncWrite>::poll_write(
                         ::core::pin::Pin::new_unchecked(x),
                         cx,
                         buf,
                     )
                 }
                 Enum::B(x) => {
-                    ::tokio::io::AsyncWrite::poll_write(
+                    <B as ::tokio::io::AsyncWrite>::poll_write(
                         ::core::pin::Pin::new_unchecked(x),
                         cx,
                         buf,
@@ -46,13 +46,13 @@ where
         unsafe {
             match self.get_unchecked_mut() {
                 Enum::A(x) => {
-                    ::tokio::io::AsyncWrite::poll_flush(
+                    <A as ::tokio::io::AsyncWrite>::poll_flush(
                         ::core::pin::Pin::new_unchecked(x),
                         cx,
                     )
                 }
                 Enum::B(x) => {
-                    ::tokio::io::AsyncWrite::poll_flush(
+                    <B as ::tokio::io::AsyncWrite>::poll_flush(
                         ::core::pin::Pin::new_unchecked(x),
                         cx,
                     )
@@ -67,13 +67,13 @@ where
         unsafe {
             match self.get_unchecked_mut() {
                 Enum::A(x) => {
-                    ::tokio::io::AsyncWrite::poll_shutdown(
+                    <A as ::tokio::io::AsyncWrite>::poll_shutdown(
                         ::core::pin::Pin::new_unchecked(x),
                         cx,
                     )
                 }
                 Enum::B(x) => {
-                    ::tokio::io::AsyncWrite::poll_shutdown(
+                    <B as ::tokio::io::AsyncWrite>::poll_shutdown(
                         ::core::pin::Pin::new_unchecked(x),
                         cx,
                     )
@@ -89,14 +89,14 @@ where
         unsafe {
             match self.get_unchecked_mut() {
                 Enum::A(x) => {
-                    ::tokio::io::AsyncWrite::poll_write_vectored(
+                    <A as ::tokio::io::AsyncWrite>::poll_write_vectored(
                         ::core::pin::Pin::new_unchecked(x),
                         cx,
                         bufs,
                     )
                 }
                 Enum::B(x) => {
-                    ::tokio::io::AsyncWrite::poll_write_vectored(
+                    <B as ::tokio::io::AsyncWrite>::poll_write_vectored(
                         ::core::pin::Pin::new_unchecked(x),
                         cx,
                         bufs,

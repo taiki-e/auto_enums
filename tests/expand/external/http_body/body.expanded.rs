@@ -39,10 +39,16 @@ where
         unsafe {
             match self.get_unchecked_mut() {
                 Enum::A(x) => {
-                    ::http_body::Body::poll_frame(::core::pin::Pin::new_unchecked(x), cx)
+                    <A as ::http_body::Body>::poll_frame(
+                        ::core::pin::Pin::new_unchecked(x),
+                        cx,
+                    )
                 }
                 Enum::B(x) => {
-                    ::http_body::Body::poll_frame(::core::pin::Pin::new_unchecked(x), cx)
+                    <B as ::http_body::Body>::poll_frame(
+                        ::core::pin::Pin::new_unchecked(x),
+                        cx,
+                    )
                 }
             }
         }

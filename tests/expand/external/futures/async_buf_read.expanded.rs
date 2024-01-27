@@ -17,13 +17,13 @@ where
         unsafe {
             match self.get_unchecked_mut() {
                 Enum::A(x) => {
-                    ::futures::io::AsyncBufRead::poll_fill_buf(
+                    <A as ::futures::io::AsyncBufRead>::poll_fill_buf(
                         ::core::pin::Pin::new_unchecked(x),
                         cx,
                     )
                 }
                 Enum::B(x) => {
-                    ::futures::io::AsyncBufRead::poll_fill_buf(
+                    <B as ::futures::io::AsyncBufRead>::poll_fill_buf(
                         ::core::pin::Pin::new_unchecked(x),
                         cx,
                     )
@@ -36,13 +36,13 @@ where
         unsafe {
             match self.get_unchecked_mut() {
                 Enum::A(x) => {
-                    ::futures::io::AsyncBufRead::consume(
+                    <A as ::futures::io::AsyncBufRead>::consume(
                         ::core::pin::Pin::new_unchecked(x),
                         amt,
                     )
                 }
                 Enum::B(x) => {
-                    ::futures::io::AsyncBufRead::consume(
+                    <B as ::futures::io::AsyncBufRead>::consume(
                         ::core::pin::Pin::new_unchecked(x),
                         amt,
                     )

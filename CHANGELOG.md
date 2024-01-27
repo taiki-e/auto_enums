@@ -10,7 +10,7 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
-- Update `derive_utils` to 0.14. This fixes "overflow evaluating the requirement" error with `#[enum_derive]` on recursive structures without type parameters.
+- Update `derive_utils` to 0.14. This fixes "overflow evaluating the requirement" error with `#[enum_derive]` in two situations.
 
 ## [0.8.4] - 2024-01-14
 

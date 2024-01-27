@@ -305,6 +305,7 @@ fn expand(args: TokenStream, input: TokenStream) -> Result<TokenStream> {
 
         // Automatically create the appropriate conditional `Unpin` implementation.
         // https://github.com/taiki-e/pin-project/blob/v1.0.10/examples/struct-default-expanded.rs#L89
+        // TODO: use https://github.com/taiki-e/pin-project/issues/102#issuecomment-540472282's trick.
         items.extend(derive_utils::derive_trait(
             &data,
             &parse_quote!(::core::marker::Unpin),

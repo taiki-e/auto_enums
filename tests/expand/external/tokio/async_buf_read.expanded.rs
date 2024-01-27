@@ -16,13 +16,13 @@ where
         unsafe {
             match self.get_unchecked_mut() {
                 Enum::A(x) => {
-                    ::tokio::io::AsyncBufRead::poll_fill_buf(
+                    <A as ::tokio::io::AsyncBufRead>::poll_fill_buf(
                         ::core::pin::Pin::new_unchecked(x),
                         cx,
                     )
                 }
                 Enum::B(x) => {
-                    ::tokio::io::AsyncBufRead::poll_fill_buf(
+                    <B as ::tokio::io::AsyncBufRead>::poll_fill_buf(
                         ::core::pin::Pin::new_unchecked(x),
                         cx,
                     )
@@ -34,13 +34,13 @@ where
         unsafe {
             match self.get_unchecked_mut() {
                 Enum::A(x) => {
-                    ::tokio::io::AsyncBufRead::consume(
+                    <A as ::tokio::io::AsyncBufRead>::consume(
                         ::core::pin::Pin::new_unchecked(x),
                         amt,
                     )
                 }
                 Enum::B(x) => {
-                    ::tokio::io::AsyncBufRead::consume(
+                    <B as ::tokio::io::AsyncBufRead>::consume(
                         ::core::pin::Pin::new_unchecked(x),
                         amt,
                     )

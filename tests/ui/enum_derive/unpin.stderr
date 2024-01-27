@@ -1,0 +1,16 @@
+error[E0277]: `PhantomPinned` cannot be unpinned
+  --> tests/ui/enum_derive/unpin.rs:12:1
+   |
+12 | #[enum_derive(Future)] //~ ERROR cannot be unpinned
+   | ^^^^^^^^^^^^^^^^^^^^^^ within `PinnedFuture`, the trait `Unpin` is not implemented for `PhantomPinned`
+   |
+   = note: consider using the `pin!` macro
+           consider using `Box::pin` if you need to access the pinned value outside of the current scope
+note: required because it appears within the type `PinnedFuture`
+  --> tests/ui/enum_derive/unpin.rs:17:8
+   |
+17 | struct PinnedFuture(PhantomPinned);
+   |        ^^^^^^^^^^^^
+   = help: see issue #48214
+   = help: add `#![feature(trivial_bounds)]` to the crate attributes to enable
+   = note: this error originates in the attribute macro `enum_derive` (in Nightly builds, run with -Z macro-backtrace for more info)
