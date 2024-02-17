@@ -14,3 +14,30 @@ note: required because it appears within the type `PinnedFuture`
    = help: see issue #48214
    = help: add `#![feature(trivial_bounds)]` to the crate attributes to enable
    = note: this error originates in the attribute macro `enum_derive` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0277]: `PhantomPinned` cannot be unpinned
+  --> tests/ui/enum_derive/unpin.rs:28:16
+   |
+28 |     is_unpin::<Enum1>();
+   |                ^^^^^ within `PinnedFuture`, the trait `Unpin` is not implemented for `PhantomPinned`, which is required by `Enum1: Unpin`
+   |
+   = note: consider using the `pin!` macro
+           consider using `Box::pin` if you need to access the pinned value outside of the current scope
+note: required because it appears within the type `PinnedFuture`
+  --> tests/ui/enum_derive/unpin.rs:17:8
+   |
+17 | struct PinnedFuture(PhantomPinned);
+   |        ^^^^^^^^^^^^
+note: required for `Enum1` to implement `Unpin`
+  --> tests/ui/enum_derive/unpin.rs:12:1
+   |
+12 | #[enum_derive(Future)] //~ ERROR cannot be unpinned
+   | ^^^^^^^^^^^^^^^^^^^^^^ unsatisfied trait bound introduced here
+13 | enum Enum1 {
+   |      ^^^^^
+note: required by a bound in `is_unpin`
+  --> tests/ui/enum_derive/unpin.rs:27:20
+   |
+27 |     fn is_unpin<T: Unpin>() {}
+   |                    ^^^^^ required by this bound in `is_unpin`
+   = note: this error originates in the attribute macro `enum_derive` (in Nightly builds, run with -Z macro-backtrace for more info)
