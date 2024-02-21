@@ -139,7 +139,6 @@ pub(crate) mod coroutine {
 
 #[cfg(feature = "fn_traits")]
 pub(crate) mod fn_ {
-    use derive_utils::EnumImpl;
     use syn::TypeParam;
 
     use crate::derive::*;
@@ -168,7 +167,6 @@ pub(crate) mod fn_ {
 
 #[cfg(feature = "fn_traits")]
 pub(crate) mod fn_mut {
-    use derive_utils::EnumImpl;
     use syn::TypeParam;
 
     use crate::derive::*;
@@ -197,7 +195,6 @@ pub(crate) mod fn_mut {
 
 #[cfg(feature = "fn_traits")]
 pub(crate) mod fn_once {
-    use derive_utils::EnumImpl;
     use syn::TypeParam;
 
     use crate::derive::*;

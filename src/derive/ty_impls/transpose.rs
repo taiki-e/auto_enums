@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
-use derive_utils::EnumImpl;
-use proc_macro2::TokenStream;
 use quote::ToTokens;
 use syn::TypeParam;
 

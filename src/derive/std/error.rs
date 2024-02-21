@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
-use derive_utils::EnumImpl;
-
 use crate::derive::*;
 
 pub(crate) const NAME: &[&str] = &["Error"];
