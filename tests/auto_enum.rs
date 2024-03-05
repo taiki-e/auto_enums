@@ -1162,9 +1162,9 @@ mod nightly {
 
     #[test]
     fn non_stmt_expr() {
+        // TODO: workaround rustc bug in the same way as https://github.com/taiki-e/futures-async-stream/pull/94.
         // use std::iter;
-
-        // TODO: uncomment when rustc bug fixed.
+        //
         // fn match_(x: bool) -> Option<impl Iterator<Item = u8>> {
         //     Some(
         //         #[auto_enum(Iterator)]
@@ -1174,8 +1174,7 @@ mod nightly {
         //         },
         //     )
         // }
-
-        // TODO: uncomment when rustc bug fixed.
+        //
         // fn if_(x: bool) -> Option<impl Iterator<Item = u8>> {
         //     Some(
         //         #[auto_enum(Iterator)]
