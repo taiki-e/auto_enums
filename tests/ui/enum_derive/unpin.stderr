@@ -12,8 +12,11 @@ note: required because it appears within the type `PinnedFuture`
 17 | struct PinnedFuture(PhantomPinned);
    |        ^^^^^^^^^^^^
    = help: see issue #48214
-   = help: add `#![feature(trivial_bounds)]` to the crate attributes to enable
    = note: this error originates in the attribute macro `enum_derive` (in Nightly builds, run with -Z macro-backtrace for more info)
+help: add `#![feature(trivial_bounds)]` to the crate attributes to enable
+   |
+3  + #![feature(trivial_bounds)]
+   |
 
 error[E0277]: `PhantomPinned` cannot be unpinned
   --> tests/ui/enum_derive/unpin.rs:28:16
