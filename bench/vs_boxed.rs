@@ -228,7 +228,6 @@ use std::hint::black_box;
 
 use auto_enums::auto_enum;
 use criterion::{criterion_group, criterion_main, Criterion};
-use rand::Rng;
 
 fn iter_no_branch(_x: u32) -> impl Iterator<Item = i64> {
     (0..).map(|x| black_box(x + 2 - 1))
@@ -320,10 +319,10 @@ macro_rules! bench_next {
     ($($fn:ident, $iter:ident, $max:expr, $num:expr,)*) => {
         $(
             fn $fn(c: &mut Criterion) {
-                let mut rng = rand::thread_rng();
+                let mut rng = fastrand::Rng::new();
                 c.bench_function(stringify!($fn), |b| {
                     b.iter(|| {
-                        let mut iter = $iter(rng.gen_range(0..$max));
+                        let mut iter = $iter(rng.u32(0..$max));
                         (0..$num).for_each(|_| assert!(iter.next().is_some()))
                     })
                 });
@@ -337,10 +336,10 @@ macro_rules! bench_fold {
     ($($fn:ident, $iter:ident, $max:expr, $num:expr,)*) => {
         $(
             fn $fn(c: &mut Criterion) {
-                let mut rng = rand::thread_rng();
+                let mut rng = fastrand::Rng::new();
                 c.bench_function(stringify!($fn), |b| {
                     b.iter(|| {
-                        let iter = $iter(rng.gen_range(0..$max));
+                        let iter = $iter(rng.u32(0..$max));
                         iter.take($num).fold(0, |sum, x| sum + x)
                     })
                 });
