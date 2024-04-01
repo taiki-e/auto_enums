@@ -87,7 +87,7 @@ quote = "1.0.25"
 syn = { version = "2.0.6", features = ["full", "visit-mut"] }
 
 [dev-dependencies]
-macrotest = { git = "https://github.com/taiki-e/macrotest.git", branch = "dev" } # 2021 edition support + syn 2.0 + no cargo-expand + adjust overwrite behavior
+macrotest = { git = "https://github.com/taiki-e/macrotest.git", branch = "dev" } # adjust overwrite behavior + no cargo-expand
 rustversion = "1"
 trybuild = { git = "https://github.com/taiki-e/trybuild.git", branch = "dev" } # adjust overwrite behavior
 
