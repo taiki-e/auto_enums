@@ -79,7 +79,7 @@ fn_traits = []
 # Enable to use `[std|core]::iter::TrustedLen` trait.
 trusted_len = []
 
-# Note: futures, tokio, serde, and rayon are public dependencies.
+# Note: futures, tokio, rayon, serde, and http-body are public dependencies.
 [dependencies]
 derive_utils = "0.14.1"
 proc-macro2 = "1.0.60"
@@ -92,7 +92,7 @@ rustversion = "1"
 trybuild = { git = "https://github.com/taiki-e/trybuild.git", branch = "dev" } # adjust overwrite behavior
 
 # for `#[enum_derive]`
-futures03_crate = { package = "futures", version = "0.3", default-features = false, features = ["std"] }
+futures03_crate = { package = "futures-util", version = "0.3", default-features = false, features = ["std", "io", "sink"] }
 futures01_crate = { package = "futures", version = "0.1" }
 tokio1_crate = { package = "tokio", version = "1", default-features = false }
 tokio03_crate = { package = "tokio", version = "0.3", default-features = false }
