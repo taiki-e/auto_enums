@@ -167,7 +167,7 @@ fn stable() {
     #[auto_enum(Iterator)]
     fn return1(x: usize) -> impl Iterator<Item = i32> {
         if x > 10 {
-            return (0..x as _).map(|x| x - 1);
+            return (0..x as i32).map(|x| x - 1);
         }
         if x == 0 {
             1..8
@@ -347,7 +347,7 @@ fn stable() {
         #[auto_enum(Iterator)]
         let f = |x| {
             if x > 10 {
-                return (0..x as _).map(|x| x - 1);
+                return (0..x as i32).map(|x| x - 1);
             }
             if x == 0 {
                 1..8
@@ -366,7 +366,7 @@ fn stable() {
             #[auto_enum(Iterator)]
             |x| {
                 if x > 10 {
-                    return (0..x as _).map(|x| x - 1);
+                    return (0..x as i32).map(|x| x - 1);
                 }
                 if x == 0 {
                     1..8
@@ -638,7 +638,7 @@ fn nested() {
             0 => 1..8,
             #[nested]
             n if n > 3 => match x {
-                2..=10 => (1..x as _).map(|x| x - 1),
+                2..=10 => (1..x as i32).map(|x| x - 1),
                 _ => 2..=10,
             },
             _ => (0..2).map(|x| x + 1),
@@ -658,8 +658,8 @@ fn nested() {
                 {
                     #[nested]
                     match n {
-                        4 => (1..x as _).map(|x| x - 1),
-                        _ => (1..x as _).map(|x| x + 1),
+                        4 => (1..x as i32).map(|x| x - 1),
+                        _ => (1..x as i32).map(|x| x + 1),
                     }
                 }
                 _ => 2..=10,
@@ -678,7 +678,7 @@ fn nested() {
                 #[nested]
                 n if n > 3 => {{{ unsafe {{
                     if x > 10 {
-                        (-10..=x as _).map(|x| x - 4)
+                        (-10..=x as i32).map(|x| x - 4)
                     } else {
                         (1..=4).map(|x| x - 4)
                     }
