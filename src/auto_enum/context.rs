@@ -97,7 +97,7 @@ impl Context {
             }
             marker_string
         } else {
-            DEFAULT_MARKER.to_string()
+            DEFAULT_MARKER.to_owned()
         };
 
         markers.push(current_marker.clone());
