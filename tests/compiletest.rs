@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 #![cfg(not(miri))]
-#![cfg(not(careful))]
 #![cfg(all(
     feature = "std",
     feature = "type_analysis",
