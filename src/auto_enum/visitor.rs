@@ -47,7 +47,7 @@ impl<'a> Visitor<'a> {
         Self { cx, scope: Scope::default() }
     }
 
-    fn find_remove_attrs(&mut self, attrs: &mut impl Attrs) {
+    fn find_remove_attrs(&self, attrs: &mut impl Attrs) {
         if !self.scope.foreign {
             if let Some(attr) = attrs.find_remove_attr(NEVER) {
                 if let Err(e) = attr.meta.require_path_only() {

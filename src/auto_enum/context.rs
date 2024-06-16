@@ -240,7 +240,7 @@ impl Context {
 
     // build
 
-    pub(super) fn build(&mut self, f: impl FnOnce(ItemEnum)) {
+    pub(super) fn build(&self, f: impl FnOnce(ItemEnum)) {
         // As we know that an error will occur, it does not matter if there are not enough variants.
         if !self.has_error() {
             match self.builder.variants.len() {
