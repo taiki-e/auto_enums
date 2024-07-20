@@ -29,7 +29,7 @@ type_analysis = []
 # Enable to use `transpose*` methods.
 transpose_methods = []
 
-# ==============================================================================
+# ------------------------------------------------------------------------------
 # [std|core] libraries
 
 # Enable to use `std` library's traits.
@@ -41,7 +41,7 @@ convert = []
 # Enable to use `[std|core]::fmt`'s traits other than `Debug`, `Display` and `Write`
 fmt = []
 
-# ==============================================================================
+# ------------------------------------------------------------------------------
 # Using external libraries
 
 # https://docs.rs/futures/0.3
@@ -63,7 +63,7 @@ tokio01 = []
 # https://docs.rs/http-body/1
 http_body1 = []
 
-# ==============================================================================
+# ------------------------------------------------------------------------------
 # Unstable features
 # These features are outside of the normal semver guarantees and require the
 # `unstable` feature as an explicit opt-in to unstable API.

@@ -92,7 +92,7 @@ fn build_expr(expr: &mut Expr, item: ItemEnum) {
     });
 }
 
-// =================================================================================================
+// -----------------------------------------------------------------------------
 // Expand statement or expression in which `#[auto_enum]` was directly used.
 
 fn expand_parent_stmt(cx: &mut Context, stmt: &mut Stmt) {
