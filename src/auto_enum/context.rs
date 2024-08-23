@@ -300,7 +300,7 @@ struct Args {
 
 impl Parse for Args {
     fn parse(input: ParseStream<'_>) -> Result<Self> {
-        let mut args = Vec::with_capacity(usize::from(!input.is_empty()));
+        let mut args = Vec::with_capacity((!input.is_empty()) as usize);
         let mut marker = None;
         while !input.is_empty() {
             if input.peek(kw::marker) && input.peek2(Token![=]) {
