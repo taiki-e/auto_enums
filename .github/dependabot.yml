@@ -11,6 +11,10 @@ updates:
       - dependency-name: futures
       - dependency-name: tokio
     labels: []
+    groups:
+      cargo:
+        patterns:
+          - '*'
   - package-ecosystem: github-actions
     directory: /
     schedule:
@@ -18,3 +22,7 @@ updates:
     commit-message:
       prefix: ''
     labels: []
+    groups:
+      github-actions:
+        patterns:
+          - '*'
