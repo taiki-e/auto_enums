@@ -304,7 +304,7 @@ fn expand(args: TokenStream, input: TokenStream) -> Result<TokenStream> {
         // The repr(packed) check is not needed since repr(packed) is not available on enum.
 
         // Automatically create the appropriate conditional `Unpin` implementation.
-        // https://github.com/taiki-e/pin-project/blob/v1.0.10/examples/struct-default-expanded.rs#L89
+        // https://github.com/taiki-e/pin-project/blob/v1.1.5/examples/struct-default-expanded.rs#L98
         // TODO: use https://github.com/taiki-e/pin-project/issues/102#issuecomment-540472282's trick.
         items.extend(derive_utils::derive_trait(
             &data,
@@ -319,7 +319,7 @@ fn expand(args: TokenStream, input: TokenStream) -> Result<TokenStream> {
         let name = &item.ident;
         let (impl_generics, ty_generics, where_clause) = item.generics.split_for_impl();
         // Ensure that enum does not implement `Drop`.
-        // https://github.com/taiki-e/pin-project/blob/v1.0.10/examples/struct-default-expanded.rs#L138
+        // https://github.com/taiki-e/pin-project/blob/v1.1.5/examples/struct-default-expanded.rs#L147
         items.extend(quote! {
             const _: () = {
                 trait MustNotImplDrop {}

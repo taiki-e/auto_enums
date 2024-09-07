@@ -87,7 +87,7 @@ impl Context {
         let current_marker = if let Some(marker) = marker {
             // Currently, there is no reason to preserve the span, so convert `Ident` to `String`.
             // This should probably be more efficient than calling `to_string` for each comparison.
-            // https://github.com/alexcrichton/proc-macro2/blob/1.0.1/src/wrapper.rs#L706
+            // https://github.com/dtolnay/proc-macro2/blob/1.0.86/src/wrapper.rs#L723
             let marker_string = marker.to_string();
             if markers.contains(&marker_string) {
                 bail!(
