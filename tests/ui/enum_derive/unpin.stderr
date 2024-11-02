@@ -2,7 +2,7 @@ error[E0277]: `PhantomPinned` cannot be unpinned
   --> tests/ui/enum_derive/unpin.rs:12:1
    |
 12 | #[enum_derive(Future)] //~ ERROR cannot be unpinned
-   | ^^^^^^^^^^^^^^^^^^^^^^ within `PinnedFuture`, the trait `Unpin` is not implemented for `PhantomPinned`, which is required by `PinnedFuture: Unpin`
+   | ^^^^^^^^^^^^^^^^^^^^^^ within `PinnedFuture`, the trait `Unpin` is not implemented for `PhantomPinned`
    |
    = note: consider using the `pin!` macro
            consider using `Box::pin` if you need to access the pinned value outside of the current scope
@@ -22,7 +22,7 @@ error[E0277]: `PhantomPinned` cannot be unpinned
   --> tests/ui/enum_derive/unpin.rs:28:16
    |
 28 |     is_unpin::<Enum1>();
-   |                ^^^^^ within `PinnedFuture`, the trait `Unpin` is not implemented for `PhantomPinned`, which is required by `Enum1: Unpin`
+   |                ^^^^^ within `PinnedFuture`, the trait `Unpin` is not implemented for `PhantomPinned`
    |
    = note: consider using the `pin!` macro
            consider using `Box::pin` if you need to access the pinned value outside of the current scope
