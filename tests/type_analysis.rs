@@ -68,6 +68,18 @@ fn func() {
             x -= 1;
         }
     }
+
+    enum A<'a>{
+        First(&'a i32),
+        Second(i32),
+    }
+    #[auto_enum]
+    fn use_bound(x: &i32) -> impl Iterator<Item = A<'_>> + use<'_> {
+        match x {
+            0 => vec![x].into_iter().map(A::First),
+            _ => vec![5, 10].into_iter().map(A::Second),
+        }
+    }
 }
 
 #[test]
