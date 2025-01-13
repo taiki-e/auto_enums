@@ -96,7 +96,7 @@ pub(crate) mod range_bounds {
 
 #[cfg(feature = "coroutine_trait")]
 pub(crate) mod coroutine {
-    use quote::ToTokens;
+    use quote::ToTokens as _;
 
     use crate::derive::*;
 

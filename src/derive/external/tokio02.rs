@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 pub(crate) mod async_buf_read {
-    use quote::ToTokens;
+    use quote::ToTokens as _;
 
     use crate::derive::*;
 
@@ -52,7 +52,7 @@ pub(crate) mod async_buf_read {
 }
 
 pub(crate) mod async_read {
-    use quote::ToTokens;
+    use quote::ToTokens as _;
 
     use crate::derive::*;
 
@@ -105,7 +105,7 @@ pub(crate) mod async_read {
 }
 
 pub(crate) mod async_seek {
-    use quote::ToTokens;
+    use quote::ToTokens as _;
 
     use crate::derive::*;
 
@@ -160,7 +160,7 @@ pub(crate) mod async_seek {
 }
 
 pub(crate) mod async_write {
-    use quote::ToTokens;
+    use quote::ToTokens as _;
 
     use crate::derive::*;
 

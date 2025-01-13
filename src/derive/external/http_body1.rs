@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 pub(crate) mod body {
-    use quote::ToTokens;
+    use quote::ToTokens as _;
 
     use crate::derive::*;
 

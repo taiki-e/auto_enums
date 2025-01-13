@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 use proc_macro2::TokenStream;
-use quote::ToTokens;
+use quote::ToTokens as _;
 use syn::{
     parse_quote, token,
     visit_mut::{self, VisitMut},

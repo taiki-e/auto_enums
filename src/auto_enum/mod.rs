@@ -7,7 +7,7 @@ mod type_analysis;
 mod visitor;
 
 use proc_macro2::TokenStream;
-use quote::ToTokens;
+use quote::ToTokens as _;
 #[cfg(feature = "type_analysis")]
 use syn::Pat;
 use syn::{

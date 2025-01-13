@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
-use quote::ToTokens;
+use quote::ToTokens as _;
 use syn::{
     visit_mut::{self, VisitMut},
     Path, Type, TypeImplTrait, TypeParamBound,

@@ -8,7 +8,7 @@ use syn::{
 };
 
 use super::{visitor, Context, NAME, NESTED, NEVER};
-use crate::utils::{expr_block, path_eq, replace_block, replace_expr, Attrs};
+use crate::utils::{expr_block, path_eq, replace_block, replace_expr, Attrs as _};
 
 /// Visits last expression.
 ///

@@ -4,7 +4,7 @@ use std::cell::Cell;
 
 use derive_utils::EnumData as Data;
 use proc_macro2::TokenStream;
-use quote::{quote, ToTokens};
+use quote::{quote, ToTokens as _};
 use syn::{
     parse::{Parse, ParseStream},
     parse_quote, Error, ItemEnum, Path, Result, Token,
