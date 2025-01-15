@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
-use quote::ToTokens as _;
-
 use crate::derive::prelude::*;
 
 pub(crate) const NAME: &[&str] = &["Future"];

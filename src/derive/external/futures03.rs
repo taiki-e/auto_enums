@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 pub(crate) mod async_buf_read {
-    use quote::ToTokens as _;
-
     use crate::derive::prelude::*;
 
     pub(crate) const NAME: &[&str] = &["futures03::AsyncBufRead"];
@@ -54,8 +52,6 @@ pub(crate) mod async_buf_read {
 }
 
 pub(crate) mod async_read {
-    use quote::ToTokens as _;
-
     use crate::derive::prelude::*;
 
     pub(crate) const NAME: &[&str] = &["futures03::AsyncRead"];
@@ -113,8 +109,6 @@ pub(crate) mod async_read {
 }
 
 pub(crate) mod async_seek {
-    use quote::ToTokens as _;
-
     use crate::derive::prelude::*;
 
     pub(crate) const NAME: &[&str] = &["futures03::AsyncSeek"];
@@ -153,8 +147,6 @@ pub(crate) mod async_seek {
 }
 
 pub(crate) mod async_write {
-    use quote::ToTokens as _;
-
     use crate::derive::prelude::*;
 
     pub(crate) const NAME: &[&str] = &["futures03::AsyncWrite"];
@@ -246,8 +238,6 @@ pub(crate) mod async_write {
 }
 
 pub(crate) mod sink {
-    use quote::ToTokens as _;
-
     use crate::derive::prelude::*;
 
     pub(crate) const NAME: &[&str] = &["futures03::Sink"];
@@ -338,8 +328,6 @@ pub(crate) mod sink {
 }
 
 pub(crate) mod stream {
-    use quote::ToTokens as _;
-
     use crate::derive::prelude::*;
 
     pub(crate) const NAME: &[&str] = &["futures03::Stream"];

@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
-use quote::ToTokens as _;
 use syn::TypeParam;
 
 use crate::derive::prelude::*;

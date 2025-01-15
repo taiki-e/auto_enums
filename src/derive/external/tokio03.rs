@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 pub(crate) mod async_buf_read {
-    use quote::ToTokens as _;
-
     use crate::derive::prelude::*;
 
     pub(crate) const NAME: &[&str] = &["tokio03::AsyncBufRead"];
@@ -52,8 +50,6 @@ pub(crate) mod async_buf_read {
 }
 
 pub(crate) mod async_read {
-    use quote::ToTokens as _;
-
     use crate::derive::prelude::*;
 
     pub(crate) const NAME: &[&str] = &["tokio03::AsyncRead"];
@@ -91,8 +87,6 @@ pub(crate) mod async_read {
 }
 
 pub(crate) mod async_seek {
-    use quote::ToTokens as _;
-
     use crate::derive::prelude::*;
 
     pub(crate) const NAME: &[&str] = &["tokio03::AsyncSeek"];
@@ -145,8 +139,6 @@ pub(crate) mod async_seek {
 }
 
 pub(crate) mod async_write {
-    use quote::ToTokens as _;
-
     use crate::derive::prelude::*;
 
     pub(crate) const NAME: &[&str] = &["tokio03::AsyncWrite"];
