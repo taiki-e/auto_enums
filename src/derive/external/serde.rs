@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 pub(crate) mod serialize {
-    use crate::derive::*;
+    use crate::derive::prelude::*;
 
     pub(crate) const NAME: &[&str] = &["serde::Serialize"];
 

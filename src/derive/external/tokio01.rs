@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 pub(crate) mod async_read {
-    use crate::derive::*;
+    use crate::derive::prelude::*;
 
     pub(crate) const NAME: &[&str] = &["tokio01::AsyncRead"];
 
@@ -27,7 +27,7 @@ pub(crate) mod async_read {
 }
 
 pub(crate) mod async_write {
-    use crate::derive::*;
+    use crate::derive::prelude::*;
 
     pub(crate) const NAME: &[&str] = &["tokio01::AsyncWrite"];
 

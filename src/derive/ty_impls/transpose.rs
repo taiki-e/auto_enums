@@ -3,7 +3,7 @@
 use quote::ToTokens as _;
 use syn::TypeParam;
 
-use crate::derive::*;
+use crate::derive::prelude::*;
 
 pub(crate) const NAME: &[&str] = &["Transpose"];
 

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 pub(crate) mod par_iter {
-    use crate::derive::*;
+    use crate::derive::prelude::*;
 
     pub(crate) const NAME: &[&str] = &["rayon::ParallelIterator"];
 
@@ -21,7 +21,7 @@ pub(crate) mod par_iter {
 }
 
 pub(crate) mod indexed_par_iter {
-    use crate::derive::*;
+    use crate::derive::prelude::*;
 
     pub(crate) const NAME: &[&str] = &["rayon::IndexedParallelIterator"];
 
@@ -49,7 +49,7 @@ pub(crate) mod indexed_par_iter {
 }
 
 pub(crate) mod par_extend {
-    use crate::derive::*;
+    use crate::derive::prelude::*;
 
     pub(crate) const NAME: &[&str] = &["rayon::ParallelExtend"];
 

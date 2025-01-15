@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 pub(crate) mod future {
-    use crate::derive::*;
+    use crate::derive::prelude::*;
 
     pub(crate) const NAME: &[&str] = &["futures01::Future"];
 
@@ -18,7 +18,7 @@ pub(crate) mod future {
 }
 
 pub(crate) mod stream {
-    use crate::derive::*;
+    use crate::derive::prelude::*;
 
     pub(crate) const NAME: &[&str] = &["futures01::Stream"];
 
@@ -37,7 +37,7 @@ pub(crate) mod stream {
 }
 
 pub(crate) mod sink {
-    use crate::derive::*;
+    use crate::derive::prelude::*;
 
     pub(crate) const NAME: &[&str] = &["futures01::Sink"];
 

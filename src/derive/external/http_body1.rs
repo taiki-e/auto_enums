@@ -3,7 +3,7 @@
 pub(crate) mod body {
     use quote::ToTokens as _;
 
-    use crate::derive::*;
+    use crate::derive::prelude::*;
 
     pub(crate) const NAME: &[&str] = &["http_body1::Body"];
 

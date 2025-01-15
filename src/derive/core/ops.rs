@@ -2,7 +2,7 @@
 
 #[cfg(feature = "ops")]
 pub(crate) mod deref {
-    use crate::derive::*;
+    use crate::derive::prelude::*;
 
     pub(crate) const NAME: &[&str] = &["Deref"];
 
@@ -19,7 +19,7 @@ pub(crate) mod deref {
 
 #[cfg(feature = "ops")]
 pub(crate) mod deref_mut {
-    use crate::derive::*;
+    use crate::derive::prelude::*;
 
     pub(crate) const NAME: &[&str] = &["DerefMut"];
 
@@ -40,7 +40,7 @@ pub(crate) mod deref_mut {
 
 #[cfg(feature = "ops")]
 pub(crate) mod index {
-    use crate::derive::*;
+    use crate::derive::prelude::*;
 
     pub(crate) const NAME: &[&str] = &["Index"];
 
@@ -57,7 +57,7 @@ pub(crate) mod index {
 
 #[cfg(feature = "ops")]
 pub(crate) mod index_mut {
-    use crate::derive::*;
+    use crate::derive::prelude::*;
 
     pub(crate) const NAME: &[&str] = &["IndexMut"];
 
@@ -78,7 +78,7 @@ pub(crate) mod index_mut {
 
 #[cfg(feature = "ops")]
 pub(crate) mod range_bounds {
-    use crate::derive::*;
+    use crate::derive::prelude::*;
 
     pub(crate) const NAME: &[&str] = &["RangeBounds"];
 
@@ -98,7 +98,7 @@ pub(crate) mod range_bounds {
 pub(crate) mod coroutine {
     use quote::ToTokens as _;
 
-    use crate::derive::*;
+    use crate::derive::prelude::*;
 
     pub(crate) const NAME: &[&str] = &["Coroutine"];
 
@@ -141,7 +141,7 @@ pub(crate) mod coroutine {
 pub(crate) mod fn_ {
     use syn::TypeParam;
 
-    use crate::derive::*;
+    use crate::derive::prelude::*;
 
     pub(crate) const NAME: &[&str] = &["Fn"];
 
@@ -169,7 +169,7 @@ pub(crate) mod fn_ {
 pub(crate) mod fn_mut {
     use syn::TypeParam;
 
-    use crate::derive::*;
+    use crate::derive::prelude::*;
 
     pub(crate) const NAME: &[&str] = &["FnMut"];
 
@@ -197,7 +197,7 @@ pub(crate) mod fn_mut {
 pub(crate) mod fn_once {
     use syn::TypeParam;
 
-    use crate::derive::*;
+    use crate::derive::prelude::*;
 
     pub(crate) const NAME: &[&str] = &["FnOnce"];
 

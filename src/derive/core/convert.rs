@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 pub(crate) mod as_ref {
-    use crate::derive::*;
+    use crate::derive::prelude::*;
 
     pub(crate) const NAME: &[&str] = &["AsRef"];
 
@@ -16,7 +16,7 @@ pub(crate) mod as_ref {
 }
 
 pub(crate) mod as_mut {
-    use crate::derive::*;
+    use crate::derive::prelude::*;
 
     pub(crate) const NAME: &[&str] = &["AsMut"];
 

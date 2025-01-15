@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 pub(crate) mod read {
-    use crate::derive::*;
+    use crate::derive::prelude::*;
 
     pub(crate) const NAME: &[&str] = &["Read", "io::Read"];
 
@@ -35,7 +35,7 @@ pub(crate) mod read {
 }
 
 pub(crate) mod write {
-    use crate::derive::*;
+    use crate::derive::prelude::*;
 
     pub(crate) const NAME: &[&str] = &["Write", "io::Write"];
 
@@ -66,7 +66,7 @@ pub(crate) mod write {
 }
 
 pub(crate) mod seek {
-    use crate::derive::*;
+    use crate::derive::prelude::*;
 
     pub(crate) const NAME: &[&str] = &["Seek", "io::Seek"];
 
@@ -81,7 +81,7 @@ pub(crate) mod seek {
 }
 
 pub(crate) mod buf_read {
-    use crate::derive::*;
+    use crate::derive::prelude::*;
 
     pub(crate) const NAME: &[&str] = &["BufRead", "io::BufRead"];
 

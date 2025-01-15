@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
-#![allow(clippy::unnecessary_wraps, clippy::wildcard_imports)]
+#![allow(clippy::unnecessary_wraps)]
 
 pub(crate) mod core;
 pub(crate) mod external;
@@ -8,9 +8,11 @@ pub(crate) mod external;
 pub(crate) mod std;
 pub(crate) mod ty_impls;
 
-use derive_utils::{derive_trait, EnumData as Data, EnumImpl};
-use proc_macro2::TokenStream;
-use quote::{format_ident, quote};
-use syn::{parse_quote, Result};
+mod prelude {
+    pub(super) use derive_utils::{derive_trait, EnumData as Data, EnumImpl};
+    pub(super) use proc_macro2::TokenStream;
+    pub(super) use quote::{format_ident, quote};
+    pub(super) use syn::{parse_quote, Result};
 
-use crate::enum_derive::DeriveContext as Context;
+    pub(super) use crate::enum_derive::DeriveContext as Context;
+}

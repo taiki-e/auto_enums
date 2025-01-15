@@ -2,7 +2,7 @@
 
 use quote::ToTokens as _;
 
-use crate::derive::*;
+use crate::derive::prelude::*;
 
 pub(crate) const NAME: &[&str] = &["Future"];
 
