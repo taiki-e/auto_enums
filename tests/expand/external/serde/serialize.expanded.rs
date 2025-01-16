@@ -4,6 +4,7 @@ enum Enum<A, B> {
     A(A),
     B(B),
 }
+#[automatically_derived]
 impl<A, B> ::serde::ser::Serialize for Enum<A, B>
 where
     A: ::serde::ser::Serialize,

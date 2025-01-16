@@ -3,6 +3,7 @@ enum Enum<A, B> {
     A(A),
     B(B),
 }
+#[automatically_derived]
 impl<A, B> ::core::fmt::Display for Enum<A, B>
 where
     A: ::core::fmt::Display,
@@ -16,6 +17,7 @@ where
         }
     }
 }
+#[automatically_derived]
 impl<A, B> ::core::fmt::Debug for Enum<A, B>
 where
     A: ::core::fmt::Debug,
@@ -29,6 +31,7 @@ where
         }
     }
 }
+#[automatically_derived]
 impl<A, B> ::std::error::Error for Enum<A, B>
 where
     A: ::std::error::Error,

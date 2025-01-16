@@ -4,6 +4,7 @@ enum Enum<A, B> {
     A(A),
     B(B),
 }
+#[automatically_derived]
 impl<A, B, __T: Send> ::rayon::iter::ParallelExtend<__T> for Enum<A, B>
 where
     A: ::rayon::iter::ParallelExtend<__T>,

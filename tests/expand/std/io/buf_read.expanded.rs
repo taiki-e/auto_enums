@@ -3,6 +3,7 @@ enum Enum<A, B> {
     A(A),
     B(B),
 }
+#[automatically_derived]
 impl<A, B> ::std::io::Read for Enum<A, B>
 where
     A: ::std::io::Read,
@@ -53,6 +54,7 @@ where
         }
     }
 }
+#[automatically_derived]
 impl<A, B> ::std::io::BufRead for Enum<A, B>
 where
     A: ::std::io::BufRead,

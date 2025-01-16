@@ -3,6 +3,7 @@ fn foo(x: i32) -> impl Iterator<Item = i32> {
         __T1(__T1),
         __T2(__T2),
     }
+    #[automatically_derived]
     impl<__T1, __T2> ::core::iter::Iterator for __Enum1<__T1, __T2>
     where
         __T1: ::core::iter::Iterator,

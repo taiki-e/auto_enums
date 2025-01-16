@@ -4,6 +4,7 @@ enum Enum<A, B> {
     A(A),
     B(B),
 }
+#[automatically_derived]
 impl<A, B> ::rayon::iter::ParallelIterator for Enum<A, B>
 where
     A: ::rayon::iter::ParallelIterator,
@@ -34,6 +35,7 @@ where
         }
     }
 }
+#[automatically_derived]
 impl<A, B> ::rayon::iter::IndexedParallelIterator for Enum<A, B>
 where
     A: ::rayon::iter::IndexedParallelIterator,

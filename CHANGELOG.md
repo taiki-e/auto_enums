@@ -12,6 +12,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+- Update `derive_utils` to 0.15. This uses `#[automatically_derived]` on generated impls to improve coverage support.
+
 ## [0.8.6] - 2024-08-23
 
 - Disable `derive` feature of `syn` dependency.

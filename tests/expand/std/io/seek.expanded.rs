@@ -3,6 +3,7 @@ enum Enum<A, B> {
     A(A),
     B(B),
 }
+#[automatically_derived]
 impl<A, B> ::std::io::Seek for Enum<A, B>
 where
     A: ::std::io::Seek,

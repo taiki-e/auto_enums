@@ -3,6 +3,7 @@ enum Enum<A, B> {
     A(A),
     B(B),
 }
+#[automatically_derived]
 impl<A, B, __A> ::core::iter::Extend<__A> for Enum<A, B>
 where
     A: ::core::iter::Extend<__A>,
