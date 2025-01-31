@@ -3,6 +3,9 @@
 #![cfg(not(miri))]
 #![cfg(all(
     feature = "std",
+    feature = "coroutine_trait",
+    feature = "fn_traits",
+    feature = "trusted_len",
     feature = "type_analysis",
     feature = "transpose_methods",
     feature = "futures01",

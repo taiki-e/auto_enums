@@ -1,8 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
-#![cfg_attr(feature = "coroutine_trait", feature(coroutine_trait))]
-#![cfg_attr(feature = "fn_traits", feature(fn_traits, unboxed_closures))]
-#![cfg_attr(feature = "trusted_len", feature(trusted_len))]
 #![allow(dead_code)]
 
 // See tests/run-pass for external crates.
@@ -103,38 +100,6 @@ fn stable_std() {
         Ord, Hash
     )]
     enum Stable<A, B> {
-        A(A),
-        B(B),
-    }
-}
-
-// nightly
-
-#[cfg(feature = "coroutine_trait")]
-#[test]
-fn coroutine_trait() {
-    #[enum_derive(Coroutine)]
-    enum Enum1<A, B> {
-        A(A),
-        B(B),
-    }
-}
-
-#[cfg(feature = "fn_traits")]
-#[test]
-fn fn_traits() {
-    #[enum_derive(Fn, FnMut, FnOnce)]
-    enum Enum1<A, B> {
-        A(A),
-        B(B),
-    }
-}
-
-#[cfg(feature = "trusted_len")]
-#[test]
-fn trusted_len() {
-    #[enum_derive(TrustedLen)]
-    enum Enum1<A, B> {
         A(A),
         B(B),
     }
