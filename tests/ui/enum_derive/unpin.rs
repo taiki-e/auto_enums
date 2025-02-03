@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
-use core::{
+use std::{
     future::Future,
     marker::PhantomPinned,
     pin::Pin,
