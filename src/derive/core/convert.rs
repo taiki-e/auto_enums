@@ -51,7 +51,10 @@ pub(crate) mod into {
         };
 
         if into_type_generics.args.len() != 1 {
-            return Err(Error::new(into_type_generics.span(), "Into trait must take one argument."));
+            return Err(Error::new(
+                into_type_generics.span(),
+                "Into trait must take one argument.",
+            ));
         }
 
         let target = into_type_generics.args.first().unwrap().clone();
