@@ -292,6 +292,14 @@ fn expand(args: TokenStream, input: TokenStream) -> Result<TokenStream> {
     let mut items = TokenStream::new();
     let mut cx = DeriveContext::default();
     for (s, arg) in args {
+        #[cfg(not(feature = "convert"))]
+        if s == "Into" {
+            return Err(Error::new(
+                proc_macro2::Span::call_site(),
+                "`Into` derive is only supported via `convert` feature.",
+            ));
+        }
+
         match (get_derive(s), arg) {
             (Some(f), _) => {
                 cx.set_trait_path(arg.cloned());
