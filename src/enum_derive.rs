@@ -18,11 +18,19 @@ pub(crate) fn attribute(args: TokenStream, input: TokenStream) -> TokenStream {
 #[derive(Default)]
 pub(crate) struct DeriveContext {
     needs_pin_projection: Cell<bool>,
+    trait_path: Option<Path>,
 }
 
 impl DeriveContext {
     pub(crate) fn needs_pin_projection(&self) {
         self.needs_pin_projection.set(true);
+    }
+    pub(crate) fn set_trait_path(&mut self, trait_path: Option<Path>) {
+        self.trait_path = trait_path;
+    }
+
+    pub(crate) fn trait_path(&self) -> Option<&Path> {
+        self.trait_path.as_ref()
     }
 }
 
@@ -46,6 +54,8 @@ fn get_derive(s: &str) -> Option<DeriveFn> {
         core::convert::as_mut,
         #[cfg(feature = "convert")]
         core::convert::as_ref,
+        #[cfg(feature = "convert")]
+        core::convert::into,
         core::fmt::debug,
         core::fmt::display,
         #[cfg(feature = "fmt")]
@@ -279,10 +289,11 @@ fn expand(args: TokenStream, input: TokenStream) -> Result<TokenStream> {
 
     let mut derive = vec![];
     let mut items = TokenStream::new();
-    let cx = DeriveContext::default();
+    let mut cx = DeriveContext::default();
     for (s, arg) in args {
         match (get_derive(s), arg) {
             (Some(f), _) => {
+                cx.set_trait_path(arg.cloned());
                 items.extend(
                     f(&cx, &data).map_err(|e| format_err!(data, "`enum_derive({})` {}", s, e))?,
                 );
