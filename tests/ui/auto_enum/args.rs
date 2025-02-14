@@ -18,6 +18,30 @@ fn unexpected_token_2(x: usize) -> impl Iterator<Item = i32> {
     }
 }
 
+#[auto_enum(Into)] //~ ERROR missing Into generic argument
+fn missing_into_arg(x: usize) -> impl Into<i32> {
+    match x {
+        0 => 8,
+        _ => 2,
+    }
+}
+
+#[auto_enum(Into<i32, f64>)] //~ ERROR too many Into generic arguments
+fn too_many_into_arg(x: usize) -> impl Into<i32> {
+    match x {
+        0 => 8,
+        _ => 2,
+    }
+}
+
+#[auto_enum(Into<i32,>)] //~ ERROR Into generic arg unexpected token
+fn into_arg_unexpected_token(x: usize) -> impl Into<i32> {
+    match x {
+        0 => 8,
+        _ => 2,
+    }
+}
+
 mod marker {
     use auto_enums::auto_enum;
 
