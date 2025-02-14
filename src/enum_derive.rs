@@ -29,6 +29,7 @@ impl DeriveContext {
         self.trait_path = trait_path;
     }
 
+    #[allow(dead_code)] // only used for `Into` derive
     pub(crate) fn trait_path(&self) -> Option<&Path> {
         self.trait_path.as_ref()
     }
