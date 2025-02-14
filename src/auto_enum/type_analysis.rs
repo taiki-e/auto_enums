@@ -51,6 +51,7 @@ const TRAITS: &[&str] = &[
     // core
     "AsRef",
     "AsMut",
+    "Into",
     "Debug",
     "fmt::Debug",
     "Display",
