@@ -38,19 +38,23 @@ pub(crate) mod into {
     pub(crate) const NAME: &[&str] = &["Into"];
 
     pub(crate) fn derive(cx: &Context, data: &Data) -> Result<TokenStream> {
-        let Some(path) = cx.trait_path() else { unreachable!() };
-        let Some(trait_name) = path.segments.last() else { unreachable!() };
-
-        let PathArguments::AngleBracketed(ref into_type) = trait_name.arguments else {
-            return Err(Error::new(
-                path.span(),
-                "Into trait requires a generic argument, eg: Into<TargetType>.",
-            ));
+        let path = cx.trait_path().unwrap_or_else(|| unreachable!());
+        let trait_name = path.segments.last().unwrap_or_else(|| unreachable!());
+        let into_type_generics = match trait_name.arguments {
+            PathArguments::AngleBracketed(ref generics) => generics,
+            _ => {
+                return Err(Error::new(
+                    path.span(),
+                    "Into trait requires a generic argument, eg: Into<TargetType>.",
+                ))
+            }
         };
-        if into_type.args.len() != 1 {
-            return Err(Error::new(into_type.span(), "Into trait must take one argument."));
+
+        if into_type_generics.args.len() != 1 {
+            return Err(Error::new(into_type_generics.span(), "Into trait must take one argument."));
         }
-        let target = into_type.args.first().unwrap().clone();
+
+        let target = into_type_generics.args.first().unwrap().clone();
         let path = path.clone();
 
         let mut enum_impl = derive_utils::EnumImpl::new(data);
