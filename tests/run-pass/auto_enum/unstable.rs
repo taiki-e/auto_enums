@@ -107,11 +107,7 @@ fn main() {
 
     #[auto_enum(Fn)]
     fn fn_traits1(option: bool) -> impl Fn(i32) -> i32 {
-        if option {
-            |x| x + 1
-        } else {
-            |y| y - 1
-        }
+        if option { |x| x + 1 } else { |y| y - 1 }
     }
     assert_eq!(fn_traits1(true)(1), 2);
 
@@ -180,13 +176,9 @@ fn main() {
     // marker
     fn marker1(x: usize) -> impl Iterator<Item = i32> + Clone {
         #[auto_enum(Iterator, Clone)]
-        (0..x as i32).map(|x| x + 1).flat_map(|x| {
-            if x > 10 {
-                marker!(0..x)
-            } else {
-                marker!(-100..=0)
-            }
-        })
+        (0..x as i32)
+            .map(|x| x + 1)
+            .flat_map(|x| if x > 10 { marker!(0..x) } else { marker!(-100..=0) })
     }
     for (i, _x) in ANS.iter().enumerate() {
         let _ = marker1(i).clone().sum::<i32>();

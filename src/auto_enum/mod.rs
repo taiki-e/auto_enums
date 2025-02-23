@@ -16,7 +16,7 @@ use syn::{
 };
 
 use self::{
-    context::{Context, VisitLastMode, VisitMode, DEFAULT_MARKER},
+    context::{Context, DEFAULT_MARKER, VisitLastMode, VisitMode},
     expr::child_expr,
 };
 use crate::utils::{block, expr_block, path_eq, replace_expr};

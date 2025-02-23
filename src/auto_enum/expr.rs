@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 use syn::{
-    visit_mut::{self, VisitMut},
     Arm, Block, Expr, ExprBlock, ExprBreak, ExprCall, ExprIf, ExprLoop, ExprMacro, ExprMatch,
     ExprMethodCall, ExprParen, ExprPath, ExprTry, ExprUnsafe, Item, Label, Lifetime, LocalInit,
     Macro, Stmt, StmtMacro, Token,
+    visit_mut::{self, VisitMut},
 };
 
-use super::{visitor, Context, NAME, NESTED, NEVER};
-use crate::utils::{expr_block, path_eq, replace_block, replace_expr, Attrs as _};
+use super::{Context, NAME, NESTED, NEVER, visitor};
+use crate::utils::{Attrs as _, expr_block, path_eq, replace_block, replace_expr};
 
 /// Visits last expression.
 ///

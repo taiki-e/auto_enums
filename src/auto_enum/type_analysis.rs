@@ -2,8 +2,8 @@
 
 use quote::ToTokens as _;
 use syn::{
-    visit_mut::{self, VisitMut},
     Path, Type, TypeImplTrait, TypeParamBound,
+    visit_mut::{self, VisitMut},
 };
 
 use crate::utils::path;

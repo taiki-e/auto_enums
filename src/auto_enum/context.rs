@@ -9,12 +9,13 @@ use quote::format_ident;
 #[cfg(feature = "type_analysis")]
 use syn::Type;
 use syn::{
+    Attribute, Error, Expr, Ident, ItemEnum, Macro, Path, Result, Token,
     parse::{Parse, ParseStream},
-    parse_quote, Attribute, Error, Expr, Ident, ItemEnum, Macro, Path, Result, Token,
+    parse_quote,
 };
 
 use super::visitor::{Dummy, Visitor};
-use crate::utils::{expr_call, path, replace_expr, unit, Node};
+use crate::utils::{Node, expr_call, path, replace_expr, unit};
 
 // -----------------------------------------------------------------------------
 // Context

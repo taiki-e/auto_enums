@@ -4,8 +4,8 @@ use std::{iter, mem};
 
 use proc_macro2::TokenStream;
 use syn::{
-    punctuated::Punctuated, token, visit_mut::VisitMut, Arm, Attribute, Block, Expr, ExprBlock,
-    ExprCall, ExprPath, ExprTuple, ItemFn, Local, Meta, Path, PathSegment, Stmt, StmtMacro,
+    Arm, Attribute, Block, Expr, ExprBlock, ExprCall, ExprPath, ExprTuple, ItemFn, Local, Meta,
+    Path, PathSegment, Stmt, StmtMacro, punctuated::Punctuated, token, visit_mut::VisitMut,
 };
 
 pub(crate) fn path(segments: impl IntoIterator<Item = PathSegment>) -> Path {

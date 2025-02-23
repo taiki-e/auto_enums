@@ -554,11 +554,7 @@ fn stable_std() {
 fn if_attr(x: bool) -> impl Iterator<Item = u8> {
     let res = {
         #[auto_enum(Iterator)]
-        if x {
-            iter::once(0)
-        } else {
-            iter::repeat(1)
-        }
+        if x { iter::once(0) } else { iter::repeat(1) }
     };
     res
 }
@@ -569,11 +565,7 @@ fn if_attr_in_if(x: usize) -> impl Iterator<Item = i32> {
         1..8
     } else if x > 3 {
         #[nested]
-        if x > 4 {
-            2..=10
-        } else {
-            (11..20).map(|x| x - 1)
-        }
+        if x > 4 { 2..=10 } else { (11..20).map(|x| x - 1) }
     } else {
         (0..2).map(|x| x + 1)
     }
@@ -709,11 +701,7 @@ fn nested() {
         } else if x > 3 {
             #[nested]
             {
-                if x > 4 {
-                    2..=10
-                } else {
-                    (11..20).map(|x| x - 1)
-                }
+                if x > 4 { 2..=10 } else { (11..20).map(|x| x - 1) }
             }
         } else {
             (0..2).map(|x| x + 1)
@@ -871,11 +859,7 @@ fn nested() {
             #[nested]
             let z = if x < 4 { 2..10 } else { (11..20).map(|x| x - 1) };
 
-            if x > 5 {
-                y
-            } else {
-                z
-            }
+            if x > 5 { y } else { z }
         } else {
             (0..2).map(|x| x + 1)
         }

@@ -4,10 +4,11 @@ use std::cell::Cell;
 
 use derive_utils::EnumData as Data;
 use proc_macro2::TokenStream;
-use quote::{quote, ToTokens as _};
+use quote::{ToTokens as _, quote};
 use syn::{
+    Error, ItemEnum, Path, Result, Token,
     parse::{Parse, ParseStream},
-    parse_quote, Error, ItemEnum, Path, Result, Token,
+    parse_quote,
 };
 
 pub(crate) fn attribute(args: TokenStream, input: TokenStream) -> TokenStream {

@@ -3,14 +3,13 @@
 use proc_macro2::TokenStream;
 use quote::ToTokens as _;
 use syn::{
-    parse_quote, token,
-    visit_mut::{self, VisitMut},
     Arm, Attribute, Expr, ExprMacro, ExprMatch, ExprReturn, ExprTry, Item, Local, LocalInit,
-    MetaList, Stmt, Token,
+    MetaList, Stmt, Token, parse_quote, token,
+    visit_mut::{self, VisitMut},
 };
 
-use super::{Context, VisitMode, DEFAULT_MARKER, NAME, NESTED, NEVER};
-use crate::utils::{replace_expr, Attrs, Node};
+use super::{Context, DEFAULT_MARKER, NAME, NESTED, NEVER, VisitMode};
+use crate::utils::{Attrs, Node, replace_expr};
 
 #[derive(Clone, Copy, Default)]
 struct Scope {
