@@ -224,6 +224,8 @@ Found 5 outliers among 100 measurements (5.00%)
 
 */
 
+#![allow(clippy::manual_midpoint)]
+
 use std::hint::black_box;
 
 use auto_enums::auto_enum;
