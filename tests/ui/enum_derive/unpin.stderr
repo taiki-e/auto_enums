@@ -15,7 +15,7 @@ note: required because it appears within the type `PinnedFuture`
    = note: this error originates in the attribute macro `enum_derive` (in Nightly builds, run with -Z macro-backtrace for more info)
 help: add `#![feature(trivial_bounds)]` to the crate attributes to enable
    |
-3  + #![feature(trivial_bounds)]
+ 3 + #![feature(trivial_bounds)]
    |
 
 error[E0277]: `PhantomPinned` cannot be unpinned
