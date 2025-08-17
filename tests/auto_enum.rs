@@ -7,6 +7,7 @@
     clippy::cast_possible_wrap,
     clippy::items_after_statements,
     clippy::let_and_return,
+    clippy::match_same_arms,
     clippy::needless_return,
     clippy::never_loop,
     clippy::no_effect_underscore_binding,
