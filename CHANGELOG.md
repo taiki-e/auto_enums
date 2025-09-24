@@ -12,6 +12,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+- Add `Into<T>` derive implementation ([#164](https://github.com/taiki-e/auto_enums/pull/164)).
+
 ## [0.8.8] - 2026-02-27
 
 - Enable [release immutability](https://docs.github.com/en/code-security/supply-chain-security/understanding-your-software-supply-chain/immutable-releases).
