@@ -31,7 +31,7 @@ pub(crate) mod as_mut {
 }
 
 pub(crate) mod into {
-    use syn::{spanned::Spanned as _, Error, PathArguments};
+    use syn::{Error, PathArguments, spanned::Spanned as _};
 
     use crate::derive::prelude::*;
 
@@ -46,7 +46,7 @@ pub(crate) mod into {
                 return Err(Error::new(
                     path.span(),
                     "Into trait requires a generic argument, eg: Into<TargetType>.",
-                ))
+                ));
             }
         };
 
