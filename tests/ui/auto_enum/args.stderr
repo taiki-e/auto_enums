@@ -10,89 +10,38 @@ error: expected identifier
 13 | #[auto_enum(Iterator,;)] //~ ERROR expected identifier
    |                      ^
 
-error: `enum_derive(Into)` Into trait requires a generic argument, eg: Into<TargetType>.
-  --> tests/ui/auto_enum/args.rs:21:1
-   |
-21 | #[auto_enum(Into)] //~ ERROR missing Into generic argument
-   | ^^^^^^^^^^^^^^^^^^
-   |
-   = note: this error originates in the attribute macro `auto_enum` (in Nightly builds, run with -Z macro-backtrace for more info)
-
-error: `enum_derive(Into)` Into trait must take one argument.
-  --> tests/ui/auto_enum/args.rs:29:1
-   |
-29 | #[auto_enum(Into<i32, f64>)] //~ ERROR too many Into generic arguments
-   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   |
-   = note: this error originates in the attribute macro `auto_enum` (in Nightly builds, run with -Z macro-backtrace for more info)
-
-error: `enum_derive(Into)` Into trait requires a generic argument, eg: Into<TargetType>.
-  --> tests/ui/auto_enum/args.rs:37:1
-   |
-37 | #[auto_enum(Into<i32,>)] //~ ERROR Into generic arg unexpected token
-   | ^^^^^^^^^^^^^^^^^^^^^^^^
-   |
-   = note: this error originates in the attribute macro `auto_enum` (in Nightly builds, run with -Z macro-backtrace for more info)
-
 error: expected `,`
-  --> tests/ui/auto_enum/args.rs:48:23
+  --> tests/ui/auto_enum/args.rs:24:23
    |
-48 |     #[auto_enum(marker{f}, Iterator)] //~ ERROR expected `,`
+24 |     #[auto_enum(marker{f}, Iterator)] //~ ERROR expected `,`
    |                       ^
 
 error: expected `,`
-  --> tests/ui/auto_enum/args.rs:56:23
+  --> tests/ui/auto_enum/args.rs:32:23
    |
-56 |     #[auto_enum(marker[f], Iterator)] //~ ERROR expected `,`
+32 |     #[auto_enum(marker[f], Iterator)] //~ ERROR expected `,`
    |                       ^
 
 error: expected `,`
-  --> tests/ui/auto_enum/args.rs:64:23
+  --> tests/ui/auto_enum/args.rs:40:23
    |
-64 |     #[auto_enum(marker(f), Iterator)] //~ ERROR expected `,`
+40 |     #[auto_enum(marker(f), Iterator)] //~ ERROR expected `,`
    |                       ^
 
 error: duplicate `marker` argument
-  --> tests/ui/auto_enum/args.rs:72:29
+  --> tests/ui/auto_enum/args.rs:48:29
    |
-72 |     #[auto_enum(marker = f, marker = g, Iterator)] //~ ERROR duplicate `marker` argument
+48 |     #[auto_enum(marker = f, marker = g, Iterator)] //~ ERROR duplicate `marker` argument
    |                             ^^^^^^
 
 error: expected identifier
-  --> tests/ui/auto_enum/args.rs:80:25
+  --> tests/ui/auto_enum/args.rs:56:25
    |
-80 |     #[auto_enum(marker =, Iterator)] //~ ERROR expected identifier
+56 |     #[auto_enum(marker =, Iterator)] //~ ERROR expected identifier
    |                         ^
 
 error: expected `,`
-  --> tests/ui/auto_enum/args.rs:88:28
+  --> tests/ui/auto_enum/args.rs:64:28
    |
-88 |     #[auto_enum(marker = f t, Iterator)] //~ ERROR expected `,`
+64 |     #[auto_enum(marker = f t, Iterator)] //~ ERROR expected `,`
    |                            ^
-
-error[E0433]: failed to resolve: use of unresolved module or unlinked crate `__Enum2568906583121684409`
-  --> tests/ui/auto_enum/args.rs:21:1
-   |
-21 | #[auto_enum(Into)] //~ ERROR missing Into generic argument
-   | ^^^^^^^^^^^^^^^^^^ use of unresolved module or unlinked crate `__Enum2568906583121684409`
-   |
-   = help: if you wanted to use a crate named `__Enum2568906583121684409`, use `cargo add __Enum2568906583121684409` to add it to your `Cargo.toml`
-   = note: this error originates in the attribute macro `auto_enum` (in Nightly builds, run with -Z macro-backtrace for more info)
-
-error[E0433]: failed to resolve: use of unresolved module or unlinked crate `__Enum15377793773749478612`
-  --> tests/ui/auto_enum/args.rs:29:1
-   |
-29 | #[auto_enum(Into<i32, f64>)] //~ ERROR too many Into generic arguments
-   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ use of unresolved module or unlinked crate `__Enum15377793773749478612`
-   |
-   = help: if you wanted to use a crate named `__Enum15377793773749478612`, use `cargo add __Enum15377793773749478612` to add it to your `Cargo.toml`
-   = note: this error originates in the attribute macro `auto_enum` (in Nightly builds, run with -Z macro-backtrace for more info)
-
-error[E0433]: failed to resolve: use of unresolved module or unlinked crate `__Enum12908244860424601373`
-  --> tests/ui/auto_enum/args.rs:37:1
-   |
-37 | #[auto_enum(Into<i32,>)] //~ ERROR Into generic arg unexpected token
-   | ^^^^^^^^^^^^^^^^^^^^^^^^ use of unresolved module or unlinked crate `__Enum12908244860424601373`
-   |
-   = help: if you wanted to use a crate named `__Enum12908244860424601373`, use `cargo add __Enum12908244860424601373` to add it to your `Cargo.toml`
-   = note: this error originates in the attribute macro `auto_enum` (in Nightly builds, run with -Z macro-backtrace for more info)

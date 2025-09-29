@@ -21,3 +21,21 @@ error: expected `,`
    |
 23 | #[enum_derive(Clone Foo)] //~ ERROR expected `,`
    |                     ^^^
+
+error: `enum_derive(Into)` Into trait requires a generic argument, eg: Into<TargetType>.
+  --> tests/ui/enum_derive/args.rs:30:1
+   |
+30 | / enum Enum5<A, B> {
+31 | |     A(A),
+32 | |     B(B),
+33 | | }
+   | |_^
+
+error: `enum_derive(Into)` Into trait must take one argument.
+  --> tests/ui/enum_derive/args.rs:35:1
+   |
+35 | / enum Enum6<A, B> {
+36 | |     A(A),
+37 | |     B(B),
+38 | | }
+   | |_^
