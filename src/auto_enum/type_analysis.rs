@@ -20,12 +20,16 @@ pub(super) fn collect_impl_trait(args: &[Path], traits: &mut Vec<Path>, ty: &mut
             visit_mut::visit_type_impl_trait_mut(self, node);
 
             for ty in &node.bounds {
-                if let TypeParamBound::Trait(ty) = ty {
-                    let ty = path(ty.path.segments.iter().map(|ty| ty.ident.clone().into()));
+                if let TypeParamBound::Trait(orig_ty) = ty {
+                    let ty = path(orig_ty.path.segments.iter().map(|ty| ty.ident.clone().into()));
                     let ty_str = ty.to_token_stream().to_string();
-                    let ty_trimmed = ty_str.replace(' ', "");
-                    if TRAITS.contains(&&*ty_trimmed)
-                        && !self.args.iter().any(|x| x.to_token_stream().to_string() == ty_str)
+                    let orig_ty_str = orig_ty.to_token_stream().to_string();
+                    if TRAITS.contains(&&*ty_str)
+                        && !self.args.iter().any(|x| {
+                            let arg_str = x.to_token_stream().to_string();
+                            // Some derives (ie: Into) need to check against the derive argument itself
+                            arg_str == ty_str || arg_str == orig_ty_str
+                        })
                     {
                         self.has_impl_trait = true;
                         self.traits.push(ty);
