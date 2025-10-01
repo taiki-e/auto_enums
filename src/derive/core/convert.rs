@@ -40,14 +40,11 @@ pub(crate) mod into {
     pub(crate) fn derive(cx: &Context, data: &Data) -> Result<TokenStream> {
         let path = cx.trait_path().unwrap_or_else(|| unreachable!());
         let trait_name = path.segments.last().unwrap_or_else(|| unreachable!());
-        let into_type_generics = match trait_name.arguments {
-            PathArguments::AngleBracketed(ref generics) => generics,
-            _ => {
-                return Err(Error::new(
-                    path.span(),
-                    "Into trait requires a generic argument, eg: Into<TargetType>.",
-                ));
-            }
+        let PathArguments::AngleBracketed(ref into_type_generics) = trait_name.arguments else {
+            return Err(Error::new(
+                path.span(),
+                "Into trait requires a generic argument, eg: Into<TargetType>.",
+            ));
         };
 
         if into_type_generics.args.len() != 1 {
