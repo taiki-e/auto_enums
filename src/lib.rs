@@ -877,6 +877,7 @@ Please be careful if you return another traits with the same name.
 ))]
 #![forbid(unsafe_code)]
 #![allow(clippy::doc_link_with_quotes)]
+#![allow(clippy::expl_impl_clone_on_copy)] // https://github.com/rust-lang/rust-clippy/issues/15842
 
 #[cfg(all(feature = "coroutine_trait", not(feature = "unstable")))]
 compile_error!(
