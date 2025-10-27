@@ -99,8 +99,7 @@ impl<'a> Visitor<'a> {
                 // Skip if `<expr>` is a marker macro.
                 Expr::Try(ExprTry { expr, .. }) if !self.cx.is_marker_expr(expr) => {
                     replace_expr(node, |expr| {
-                        let ExprTry { attrs, expr, .. } =
-                            if let Expr::Try(expr) = expr { expr } else { unreachable!() };
+                        let Expr::Try(ExprTry { attrs, expr, .. }) = expr else { unreachable!() };
 
                         let err = self.cx.next_expr(parse_quote!(err));
                         let arms = vec![
@@ -148,7 +147,7 @@ impl<'a> Visitor<'a> {
             // Skip if `marker!` is not a marker macro.
             Expr::Macro(ExprMacro { mac, .. }) if self.cx.is_marker_macro_exact(mac) => {
                 replace_expr(node, |expr| {
-                    let expr = if let Expr::Macro(expr) = expr { expr } else { unreachable!() };
+                    let Expr::Macro(expr) = expr else { unreachable!() };
                     let args = syn::parse2(expr.mac.tokens).unwrap_or_else(|e| {
                         self.cx.error(e);
                         // Generate an expression to fill in where the error occurred during the visit.
