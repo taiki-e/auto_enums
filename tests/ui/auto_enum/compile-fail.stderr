@@ -8,7 +8,7 @@ error: `#[auto_enum]` is required two or more branches or marker macros in total
   --> tests/ui/auto_enum/compile-fail.rs:18:5
    |
 18 | /     let iter = match x {
-19 | |         //~^ ERROR `#[auto_enum]` is required two or more branches or marker macros in total, there is only one branch or marker macro in...
+19 | |         //~^ ERROR `#[auto_enum]` is required two or more branches or marker macros in total, there is only one branch or marker m...
 20 | |         _ if y < 0 => return y..=0,
 21 | |         _ => 2..=10,
 22 | |     };
@@ -18,7 +18,7 @@ error: `#[auto_enum]` is required two or more branches or marker macros in total
   --> tests/ui/auto_enum/compile-fail.rs:33:5
    |
 33 | /     let iter = match x {
-34 | |         //~^ ERROR `#[auto_enum]` is required two or more branches or marker macros in total, there is no branch or marker macro in this ...
+34 | |         //~^ ERROR `#[auto_enum]` is required two or more branches or marker macros in total, there is no branch or marker macro i...
 35 | |         _ if y < 0 => return y..=0,
 36 | |         _ => return 2..=10,
 37 | |     };
@@ -28,7 +28,7 @@ error: `#[auto_enum]` is required two or more branches or marker macros in total
   --> tests/ui/auto_enum/compile-fail.rs:53:13
    |
 53 | / ...   let _iter = match x {
-54 | | ...       //~^ ERROR `#[auto_enum]` is required two or more branches or marker macros in total, there is only one branch or marker macro ...
+54 | | ...       //~^ ERROR `#[auto_enum]` is required two or more branches or marker macros in total, there is only one branch or marker...
 55 | | ...       _ if y < 0 => return y..=0,
 56 | | ...       _ => 2..=10,
 57 | | ...   };
@@ -38,7 +38,7 @@ error: `#[auto_enum]` is required two or more branches or marker macros in total
   --> tests/ui/auto_enum/compile-fail.rs:48:5
    |
 48 | /     let iter = match x {
-49 | |         //~^ ERROR `#[auto_enum]` is required two or more branches or marker macros in total, there is only one branch or marker macro in...
+49 | |         //~^ ERROR `#[auto_enum]` is required two or more branches or marker macros in total, there is only one branch or marker m...
 50 | |         _ if y < 0 => return y..=0,
 51 | |         _ => {
 ...  |
