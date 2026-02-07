@@ -142,6 +142,7 @@ struct Type {
 
 impl Type {
     #[auto_enum(Iterator)]
+#   #[allow(clippy::redundant_closure_for_method_calls)]
     fn method(&self) -> impl Iterator<Item = ()> + '_ {
         if self.child.is_empty() {
             Some(()).into_iter()
@@ -468,6 +469,7 @@ You can also skip that branch explicitly by `#[never]` attribute.
 use auto_enums::auto_enum;
 
 #[auto_enum(Iterator)]
+# #[allow(clippy::never_loop)]
 fn foo(x: i32) -> impl Iterator<Item = i32> {
     match x {
         0 => 1..10,
@@ -527,6 +529,7 @@ function is unnecessary.
 # #![feature(proc_macro_hygiene, stmt_expr_attributes)]
 use auto_enums::auto_enum;
 
+# #[allow(clippy::unnecessary_fold)]
 fn foo(x: i32) -> i32 {
     #[auto_enum(Iterator)]
     let iter = match x {
@@ -870,10 +873,12 @@ Please be careful if you return another traits with the same name.
 
 #![doc(test(
     no_crate_inject,
-    attr(
-        deny(warnings, rust_2018_idioms, single_use_lifetimes),
-        allow(dead_code, unused_variables)
-    )
+    attr(allow(
+        dead_code,
+        unused_variables,
+        clippy::undocumented_unsafe_blocks,
+        clippy::unused_trait_names,
+    ))
 ))]
 #![forbid(unsafe_code)]
 #![allow(clippy::doc_link_with_quotes)]
