@@ -26,4 +26,15 @@ enum Enum4<A, B> {
     B(B),
 }
 
+#[enum_derive(Into)] //~ ERROR missing Into generic argument
+enum Enum5<A, B> {
+    A(A),
+    B(B),
+}
+#[enum_derive(Into<i32, f64>)] //~ ERROR too many Into generic arguments
+enum Enum6<A, B> {
+    A(A),
+    B(B),
+}
+
 fn main() {}

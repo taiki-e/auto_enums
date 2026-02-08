@@ -12,6 +12,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+- Add `Into<T>` derive implementation ([#164](https://github.com/taiki-e/auto_enums/pull/164)).
+
 ## [0.8.7] - 2025-01-16
 
 - Update `derive_utils` to 0.15. This uses `#[automatically_derived]` on generated impls to improve coverage support.

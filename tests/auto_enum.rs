@@ -490,6 +490,25 @@ fn marker() {
     assert_eq!(marker6(10).sum::<i32>(), 3);
 }
 
+#[cfg(feature = "convert")]
+#[test]
+fn into() {
+    #[auto_enum(Into<i64>)]
+    fn number(x: u8) -> impl Into<i64> {
+        match x {
+            0 => 1_u8,
+            1 => 1_u16,
+            2 => 1_u32,
+            3 => 1_i8,
+            4 => 1_i16,
+            5 => 1_i32,
+            6 => 1_i64,
+            _ => true,
+        }
+    }
+    assert_eq!(number(2).into(), 1_i64);
+}
+
 #[cfg(feature = "transpose_methods")]
 #[cfg(feature = "std")]
 #[test]

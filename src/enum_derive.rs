@@ -18,11 +18,20 @@ pub(crate) fn attribute(args: TokenStream, input: TokenStream) -> TokenStream {
 #[derive(Default)]
 pub(crate) struct DeriveContext {
     needs_pin_projection: Cell<bool>,
+    trait_path: Option<Path>,
 }
 
 impl DeriveContext {
     pub(crate) fn needs_pin_projection(&self) {
         self.needs_pin_projection.set(true);
+    }
+    pub(crate) fn set_trait_path(&mut self, trait_path: Option<Path>) {
+        self.trait_path = trait_path;
+    }
+
+    #[allow(dead_code)] // only used for `Into` derive
+    pub(crate) fn trait_path(&self) -> Option<&Path> {
+        self.trait_path.as_ref()
     }
 }
 
@@ -46,6 +55,8 @@ fn get_derive(s: &str) -> Option<DeriveFn> {
         core::convert::as_mut,
         #[cfg(feature = "convert")]
         core::convert::as_ref,
+        #[cfg(feature = "convert")]
+        core::convert::into,
         core::fmt::debug,
         core::fmt::display,
         #[cfg(feature = "fmt")]
@@ -180,7 +191,7 @@ struct Args {
 impl Parse for Args {
     fn parse(input: ParseStream<'_>) -> Result<Self> {
         fn to_trimmed_string(p: &Path) -> String {
-            p.to_token_stream().to_string().replace(' ', "")
+            p.to_token_stream().to_string().replace(' ', "").split('<').next().unwrap().to_owned()
         }
 
         let mut inner = vec![];
@@ -279,10 +290,12 @@ fn expand(args: TokenStream, input: TokenStream) -> Result<TokenStream> {
 
     let mut derive = vec![];
     let mut items = TokenStream::new();
-    let cx = DeriveContext::default();
+    let mut cx = DeriveContext::default();
     for (s, arg) in args {
+        // TODO: add error message "`...` derive is only supported via `...` feature."
         match (get_derive(s), arg) {
             (Some(f), _) => {
+                cx.set_trait_path(arg.cloned());
                 items.extend(
                     f(&cx, &data).map_err(|e| format_err!(data, "`enum_derive({})` {}", s, e))?,
                 );
