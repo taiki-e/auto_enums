@@ -3,7 +3,7 @@ name = "auto_enums"
 version = "0.8.7" #publish:version
 edition = "2021"
 # NB: Sync with msrv badge in README.md
-rust-version = "1.68" # For syn
+rust-version = "1.71" # For syn
 license = "Apache-2.0 OR MIT"
 repository = "https://github.com/taiki-e/auto_enums"
 keywords = ["enum", "macros", "derive", "attribute"]
