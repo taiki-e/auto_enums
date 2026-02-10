@@ -40,7 +40,7 @@ jobs:
   test:
     uses: taiki-e/github-actions/.github/workflows/test.yml@main
     with:
-      doc-nightly-only: true
+      doctest-nightly-only: true
       build-args: --depth 2 --features unstable
   tidy:
     uses: taiki-e/github-actions/.github/workflows/tidy.yml@main
