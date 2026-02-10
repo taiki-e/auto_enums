@@ -89,7 +89,7 @@ fn is_unreachable_stmt(cx: &Context, stmt: Option<&Stmt>) -> bool {
     match stmt {
         Some(Stmt::Expr(expr, _)) => is_unreachable(cx, expr),
         Some(Stmt::Local(local)) => {
-            local.init.as_ref().map_or(false, |LocalInit { expr, .. }| is_unreachable(cx, expr))
+            local.init.as_ref().is_some_and(|LocalInit { expr, .. }| is_unreachable(cx, expr))
         }
         Some(Stmt::Item(_)) => true,
         Some(Stmt::Macro(StmtMacro { mac, .. })) => is_unreachable_macro(cx, mac),

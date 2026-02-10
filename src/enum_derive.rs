@@ -257,7 +257,7 @@ fn exists_alias(s: &str, v: &[(&str, Option<&Path>)]) -> bool {
         None
     }
 
-    get_alias(s).map_or(false, |x| v.iter().any(|(s, _)| *s == x))
+    get_alias(s).is_some_and(|x| v.iter().any(|(s, _)| *s == x))
 }
 
 fn expand(args: TokenStream, input: TokenStream) -> Result<TokenStream> {
