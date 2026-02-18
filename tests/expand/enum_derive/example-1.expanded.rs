@@ -131,6 +131,16 @@ fn foo(x: i32) -> impl Iterator<Item = i32> {
     }
     match x {
         0 => __Enum1::__T1(1..10),
-        _ => __Enum1::__T2(<[_]>::into_vec(::alloc::boxed::box_new([5, 10])).into_iter()),
+        _ => {
+            __Enum1::__T2(
+                ::alloc::boxed::box_assume_init_into_vec_unsafe(
+                        ::alloc::intrinsics::write_box_via_move(
+                            ::alloc::boxed::Box::new_uninit(),
+                            [5, 10],
+                        ),
+                    )
+                    .into_iter(),
+            )
+        }
     }
 }
