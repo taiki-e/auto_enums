@@ -1,6 +1,6 @@
 [package]
 name = "auto_enums"
-version = "0.8.7" #publish:version
+version = "0.8.8" #publish:version
 edition = "2021"
 # NB: Sync with msrv badge in README.md
 rust-version = "1.71" # For syn
