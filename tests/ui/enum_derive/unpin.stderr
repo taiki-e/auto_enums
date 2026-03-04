@@ -11,7 +11,6 @@ note: required because it appears within the type `PinnedFuture`
    |
 17 | struct PinnedFuture(PhantomPinned);
    |        ^^^^^^^^^^^^
-   = help: see issue #48214
    = note: this error originates in the attribute macro `enum_derive` (in Nightly builds, run with -Z macro-backtrace for more info)
 help: add `#![feature(trivial_bounds)]` to the crate attributes to enable
    |
