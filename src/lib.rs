@@ -522,6 +522,7 @@ function is unnecessary.
 
 ```
 // Add this to your crate root:
+# #![allow(unused_features)]
 #![feature(proc_macro_hygiene, stmt_expr_attributes)]
 ```
 
@@ -545,6 +546,7 @@ You can also return closures.
 
 ```
 // Add this to your crate root:
+# #![allow(unused_features)]
 #![feature(fn_traits, unboxed_closures)]
 ```
 

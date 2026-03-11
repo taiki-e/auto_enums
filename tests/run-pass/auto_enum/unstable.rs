@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
+#![allow(unused_features)]
 #![feature(proc_macro_hygiene, stmt_expr_attributes, type_ascription)]
 #![feature(coroutine_trait)]
 #![feature(fn_traits, unboxed_closures)]
