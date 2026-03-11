@@ -46,7 +46,7 @@ where
             Enum::B(x) => <B as ::std::error::Error>::description(x),
         }
     }
-    fn source(&self) -> ::std::option::Option<&(dyn ::std::error::Error + 'static)> {
+    fn source(&self) -> ::std::option::Option<&(dyn (::std::error::Error) + 'static)> {
         match self {
             Enum::A(x) => ::std::option::Option::Some(x),
             Enum::B(x) => ::std::option::Option::Some(x),
