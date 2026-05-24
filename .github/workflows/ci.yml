@@ -8,44 +8,28 @@ on:
     branches:
       - main
       - dev
-      - v[0-9]+.[0-9]+
   schedule:
     - cron: '0 2 * * *'
   workflow_dispatch:
-
-env:
-  CARGO_INCREMENTAL: 0
-  CARGO_NET_GIT_FETCH_WITH_CLI: true
-  CARGO_NET_RETRY: 10
-  CARGO_TERM_COLOR: always
-  RUST_BACKTRACE: 1
-  RUSTDOCFLAGS: -D warnings
-  RUSTFLAGS: -D warnings
-  RUSTUP_MAX_RETRIES: 10
-
-defaults:
-  run:
-    shell: bash --noprofile --norc -CeEuxo pipefail {0}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
   cancel-in-progress: true
 
 jobs:
+  tidy:
+    uses: taiki-e/github-actions/.github/workflows/tidy.yml@3637cc7cf76d2ce698edc313bcd39bad8a92caa8 # main
+    permissions:
+      security-events: write # for github/codeql-action/*
   miri:
-    uses: taiki-e/github-actions/.github/workflows/miri.yml@5f549ff6b21e9a853f5f613784d5db27746fd2bc # main
+    needs: tidy
+    uses: taiki-e/github-actions/.github/workflows/rust-miri.yml@3637cc7cf76d2ce698edc313bcd39bad8a92caa8 # main
   msrv:
-    uses: taiki-e/github-actions/.github/workflows/msrv.yml@5f549ff6b21e9a853f5f613784d5db27746fd2bc # main
+    needs: tidy
+    uses: taiki-e/github-actions/.github/workflows/rust-msrv.yml@3637cc7cf76d2ce698edc313bcd39bad8a92caa8 # main
   test:
-    uses: taiki-e/github-actions/.github/workflows/test.yml@5f549ff6b21e9a853f5f613784d5db27746fd2bc # main
+    needs: tidy
+    uses: taiki-e/github-actions/.github/workflows/rust-test.yml@3637cc7cf76d2ce698edc313bcd39bad8a92caa8 # main
     with:
       doctest-nightly-only: true
       build-args: --depth 2 --features unstable
-  tidy:
-    uses: taiki-e/github-actions/.github/workflows/tidy.yml@5f549ff6b21e9a853f5f613784d5db27746fd2bc # main
-    permissions:
-      contents: write # for creating branch for pr
-      pull-requests: write # unused (used in `codegen-automerge: true` case)
-      security-events: write # for github/codeql-action/*
-    secrets:
-      PR_TOKEN_APP_PRIVATE_KEY: ${{ secrets.PR_TOKEN_APP_PRIVATE_KEY }}
