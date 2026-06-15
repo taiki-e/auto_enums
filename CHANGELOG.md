@@ -12,6 +12,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+## [0.8.9] - 2026-06-15
+
 - Add `Into<T>` derive implementation ([#164](https://github.com/taiki-e/auto_enums/pull/164), thanks @vic1707).
 
 ## [0.8.8] - 2026-02-27
@@ -372,7 +374,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 Initial release
 
-[Unreleased]: https://github.com/taiki-e/auto_enums/compare/v0.8.8...HEAD
+[Unreleased]: https://github.com/taiki-e/auto_enums/compare/v0.8.9...HEAD
+[0.8.9]: https://github.com/taiki-e/auto_enums/compare/v0.8.8...v0.8.9
 [0.8.8]: https://github.com/taiki-e/auto_enums/compare/v0.8.7...v0.8.8
 [0.8.7]: https://github.com/taiki-e/auto_enums/compare/v0.8.6...v0.8.7
 [0.8.6]: https://github.com/taiki-e/auto_enums/compare/v0.8.5...v0.8.6
