@@ -12,7 +12,7 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
-- Add `Into<T>` derive implementation ([#164](https://github.com/taiki-e/auto_enums/pull/164)).
+- Add `Into<T>` derive implementation ([#164](https://github.com/taiki-e/auto_enums/pull/164), thanks @vic1707).
 
 ## [0.8.8] - 2026-02-27
 
