@@ -750,11 +750,11 @@ These don't derive traits, but derive inherent methods instead.
 
 - `Transpose` *(requires `"transpose_methods"` crate feature)* - this derives the following conversion methods.
 
-  - `transpose` — convert from `enum<Option<T1>,..>` to `Option<enum<T1,..>>`
+  - `transpose` - convert from `enum<Option<T1>,..>` to `Option<enum<T1,..>>`
 
-  - `transpose` — convert from `enum<Result<T1, E1>,..>` to `Result<enum<T1,..>, enum<E1,..>>`
+  - `transpose` - convert from `enum<Result<T1, E1>,..>` to `Result<enum<T1,..>, enum<E1,..>>`
 
-  - `transpose_ok` — convert from `enum<Result<T1, E>,..>` to `Option<enum<T1,..>, E>`
+  - `transpose_ok` - convert from `enum<Result<T1, E>,..>` to `Option<enum<T1,..>, E>`
 
     Examples:
 
@@ -771,7 +771,7 @@ These don't derive traits, but derive inherent methods instead.
     }
     ```
 
-  - `transpose_err` — convert from `enum<Result<T, E1>,..>` to `Result<T, enum<E1,..>>`
+  - `transpose_err` - convert from `enum<Result<T, E1>,..>` to `Result<T, enum<E1,..>>`
 
 # Optional features
 
