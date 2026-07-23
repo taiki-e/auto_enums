@@ -88,7 +88,7 @@ fn expand_expr(cx: &mut Context, expr: &mut Expr) {
 
 fn build_expr(expr: &mut Expr, item: ItemEnum) {
     replace_expr(expr, |expr| {
-        expr_block(block(vec![Stmt::Item(item.into()), Stmt::Expr(expr, None)]))
+        expr_block(block(vec![Stmt::Item(Item::Enum(item)), Stmt::Expr(expr, None)]))
     });
 }
 
@@ -163,7 +163,7 @@ fn expand_parent_item_fn(cx: &mut Context, item: &mut ItemFn) {
             }
 
             // `?` operator
-            Type::Path(TypePath { qself: None, path })
+            Type::Path(TypePath { qself: None, path, .. })
                 if cx.visit_last_mode != VisitLastMode::Never =>
             {
                 let ty = path.segments.last().unwrap();
@@ -224,5 +224,5 @@ fn expand_parent_item_fn(cx: &mut Context, item: &mut ItemFn) {
 
     cx.visitor(item);
 
-    cx.build(|i| item.block.stmts.insert(0, Stmt::Item(i.into())));
+    cx.build(|i| item.block.stmts.insert(0, Stmt::Item(Item::Enum(i))));
 }
