@@ -83,8 +83,8 @@ trusted_len = []
 # Note: futures, tokio, rayon, serde, and http-body are public dependencies.
 [dependencies]
 derive_utils = "0.16"
-proc-macro2 = "1.0.60"
-quote = "1.0.25"
+proc-macro2 = "1.0.91"
+quote = "1.0.35"
 syn = { version = "3", default-features = false, features = ["parsing", "printing", "clone-impls", "proc-macro", "full", "visit-mut"] }
 
 [dev-dependencies]
