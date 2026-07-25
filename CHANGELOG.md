@@ -12,6 +12,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+## [0.8.10] - 2026-07-25
+
 - Update `syn` dependency to 3. ([#166](https://github.com/taiki-e/auto_enums/pull/166), thanks @cuviper)
 
 ## [0.8.9] - 2026-06-15
@@ -376,7 +378,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 Initial release
 
-[Unreleased]: https://github.com/taiki-e/auto_enums/compare/v0.8.9...HEAD
+[Unreleased]: https://github.com/taiki-e/auto_enums/compare/v0.8.10...HEAD
+[0.8.10]: https://github.com/taiki-e/auto_enums/compare/v0.8.9...v0.8.10
 [0.8.9]: https://github.com/taiki-e/auto_enums/compare/v0.8.8...v0.8.9
 [0.8.8]: https://github.com/taiki-e/auto_enums/compare/v0.8.7...v0.8.8
 [0.8.7]: https://github.com/taiki-e/auto_enums/compare/v0.8.6...v0.8.7
