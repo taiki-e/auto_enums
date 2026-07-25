@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
-use syn::TypeParam;
+use syn::GenericParam;
 
 use crate::derive::prelude::*;
 
@@ -58,7 +58,7 @@ fn transpose_result(data: &Data) -> TokenStream {
     let err_fields: Vec<_> = (0..fields.len())
         .map(|i| {
             let id = format_ident!("__E{}", i);
-            impl_.push_generic_param(TypeParam::from(id.clone()).into());
+            impl_.push_generic_param(GenericParam::Type(id.clone().into()));
             id
         })
         .collect();
@@ -90,7 +90,7 @@ fn transpose_ok(data: &Data) -> TokenStream {
     let fields = data.field_types();
     let mut impl_ = EnumImpl::new(data);
 
-    impl_.push_generic_param(TypeParam::from(format_ident!("__E")).into());
+    impl_.push_generic_param(GenericParam::Type(format_ident!("__E").into()));
 
     let transpose = data.variant_idents().map(|v| quote!(#ident::#v(x) => x.map(#ident::#v)));
     impl_.push_item(parse_quote! {
@@ -112,7 +112,7 @@ fn transpose_err(data: &Data) -> TokenStream {
     let fields = data.field_types();
     let mut impl_ = EnumImpl::new(data);
 
-    impl_.push_generic_param(TypeParam::from(format_ident!("__T")).into());
+    impl_.push_generic_param(GenericParam::Type(format_ident!("__T").into()));
 
     let transpose = data.variant_idents().map(|v| quote!(#ident::#v(x) => x.map_err(#ident::#v)));
     impl_.push_item(parse_quote! {

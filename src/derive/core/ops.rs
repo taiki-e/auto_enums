@@ -137,7 +137,7 @@ pub(crate) mod coroutine {
 
 #[cfg(feature = "fn_traits")]
 pub(crate) mod fn_ {
-    use syn::TypeParam;
+    use syn::GenericParam;
 
     use crate::derive::prelude::*;
 
@@ -149,8 +149,8 @@ pub(crate) mod fn_ {
         let mut impl_ = EnumImpl::new(data);
 
         impl_.set_trait(parse_quote!(#trait_path<(__T,)>));
-        impl_.push_generic_param(TypeParam::from(format_ident!("__T")).into());
-        impl_.push_generic_param(TypeParam::from(format_ident!("__U")).into());
+        impl_.push_generic_param(GenericParam::Type(format_ident!("__T").into()));
+        impl_.push_generic_param(GenericParam::Type(format_ident!("__U").into()));
 
         data.field_types().for_each(|f| impl_.push_where_predicate(parse_quote!(#f: #trait_)));
 
@@ -165,7 +165,7 @@ pub(crate) mod fn_ {
 
 #[cfg(feature = "fn_traits")]
 pub(crate) mod fn_mut {
-    use syn::TypeParam;
+    use syn::GenericParam;
 
     use crate::derive::prelude::*;
 
@@ -177,8 +177,8 @@ pub(crate) mod fn_mut {
         let mut impl_ = EnumImpl::new(data);
 
         impl_.set_trait(parse_quote!(#trait_path<(__T,)>));
-        impl_.push_generic_param(TypeParam::from(format_ident!("__T")).into());
-        impl_.push_generic_param(TypeParam::from(format_ident!("__U")).into());
+        impl_.push_generic_param(GenericParam::Type(format_ident!("__T").into()));
+        impl_.push_generic_param(GenericParam::Type(format_ident!("__U").into()));
 
         data.field_types().for_each(|f| impl_.push_where_predicate(parse_quote!(#f: #trait_)));
 
@@ -193,7 +193,7 @@ pub(crate) mod fn_mut {
 
 #[cfg(feature = "fn_traits")]
 pub(crate) mod fn_once {
-    use syn::TypeParam;
+    use syn::GenericParam;
 
     use crate::derive::prelude::*;
 
@@ -205,8 +205,8 @@ pub(crate) mod fn_once {
         let mut impl_ = EnumImpl::new(data);
 
         impl_.set_trait(parse_quote!(#trait_path<(__T,)>));
-        impl_.push_generic_param(TypeParam::from(format_ident!("__T")).into());
-        impl_.push_generic_param(TypeParam::from(format_ident!("__U")).into());
+        impl_.push_generic_param(GenericParam::Type(format_ident!("__T").into()));
+        impl_.push_generic_param(GenericParam::Type(format_ident!("__U").into()));
 
         data.field_types().for_each(|f| impl_.push_where_predicate(parse_quote!(#f: #trait_)));
 
