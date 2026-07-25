@@ -12,6 +12,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+- Update `syn` dependency to 3. ([#166](https://github.com/taiki-e/auto_enums/pull/166), thanks @cuviper)
+
 ## [0.8.9] - 2026-06-15
 
 - Add `Into<T>` derive implementation ([#164](https://github.com/taiki-e/auto_enums/pull/164), thanks @vic1707).
