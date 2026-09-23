@@ -10,7 +10,7 @@ note: required because it appears within the type `PinnedFuture`
   --> tests/ui/enum_derive/unpin.rs:17:8
    |
 17 | struct PinnedFuture(PhantomPinned);
-   |        ^^^^^^^^^^^^
+   |        ^^^^^^^^^^^^ ------------- required by this field
    = note: this error originates in the attribute macro `enum_derive` (in Nightly builds, run with -Z macro-backtrace for more info)
 help: add `#![feature(trivial_bounds)]` to the crate attributes to enable
    |
@@ -29,7 +29,7 @@ note: required because it appears within the type `PinnedFuture`
   --> tests/ui/enum_derive/unpin.rs:17:8
    |
 17 | struct PinnedFuture(PhantomPinned);
-   |        ^^^^^^^^^^^^
+   |        ^^^^^^^^^^^^ ------------- required by this field
 note: required for `Enum1` to implement `Unpin`
   --> tests/ui/enum_derive/unpin.rs:12:1
    |
