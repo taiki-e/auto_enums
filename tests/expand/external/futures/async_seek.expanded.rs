@@ -46,7 +46,7 @@ const _: () = {
     trait MustNotImplDrop {}
     #[allow(clippy::drop_bounds, drop_bounds)]
     #[automatically_derived]
-    impl<T: ::core::ops::Drop> MustNotImplDrop for T {}
+    impl<T: ?::core::marker::Sized + ::core::ops::Drop> MustNotImplDrop for T {}
     #[automatically_derived]
     impl<A, B> MustNotImplDrop for Enum<A, B> {}
 };
