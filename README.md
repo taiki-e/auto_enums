@@ -146,6 +146,8 @@ enum Foo<A, B> {
   - Enable to use [rayon] traits.
 - **`serde`**
   - Enable to use [serde] traits.
+- **`serde_core`**
+  - Enable to use [serde_core] traits.
 - **`tokio1`**
   - Enable to use [tokio v1][tokio1] traits.
 - **`tokio03`**
@@ -214,6 +216,7 @@ Please be careful if you return another traits with the same name.
 [rust-lang/rfcs#294]: https://github.com/rust-lang/rfcs/issues/294
 [rust-lang/rfcs#2414]: https://github.com/rust-lang/rfcs/issues/2414
 [serde]: https://docs.rs/serde/1
+[serde_core]: https://docs.rs/serde_core/1
 [tokio01]: https://docs.rs/tokio/0.1
 [tokio02]: https://docs.rs/tokio/0.2
 [tokio03]: https://docs.rs/tokio/0.3

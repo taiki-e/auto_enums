@@ -12,6 +12,7 @@
     feature = "futures03",
     feature = "rayon",
     feature = "serde",
+    feature = "serde_core",
     feature = "tokio01",
     feature = "tokio02",
     feature = "tokio03",

@@ -53,6 +53,8 @@ futures01 = []
 rayon = []
 # https://docs.rs/serde/1
 serde = []
+# https://docs.rs/serde_core/1
+serde_core = []
 # https://docs.rs/tokio/1
 tokio1 = []
 # https://docs.rs/tokio/0.3
@@ -80,7 +82,7 @@ fn_traits = []
 # Enable to use `[std|core]::iter::TrustedLen` trait.
 trusted_len = []
 
-# Note: futures, tokio, rayon, serde, and http-body are public dependencies.
+# Note: futures, tokio, rayon, serde, serde_core, and http-body are public dependencies.
 [dependencies]
 derive_utils = "0.16"
 proc-macro2 = "1.0.91"
@@ -101,6 +103,7 @@ tokio02_crate = { package = "tokio", version = "0.2", default-features = false }
 tokio01_crate = { package = "tokio", version = "0.1", default-features = false, features = ["io"] }
 rayon_crate = { package = "rayon", version = "1" }
 serde_crate = { package = "serde", version = "1" }
+serde_core_crate = { package = "serde_core", version = "1" }
 http_body1_crate = { package = "http-body", version = "1", default-features = false }
 
 [lints]

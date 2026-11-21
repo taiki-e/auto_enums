@@ -144,6 +144,9 @@ fn get_derive(s: &str) -> Option<DeriveFn> {
         // serde
         #[cfg(feature = "serde")]
         external::serde::serialize,
+        // serde_core
+        #[cfg(feature = "serde_core")]
+        external::serde_core::serialize,
         // tokio1
         #[cfg(feature = "tokio1")]
         external::tokio1::async_read,

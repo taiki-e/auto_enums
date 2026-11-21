@@ -714,6 +714,10 @@ fn func(x: i32) -> impl ParallelIterator {
 
 - [`serde::Serialize`](https://docs.rs/serde/1/serde/trait.Serialize.html) - [example](https://github.com/taiki-e/auto_enums/blob/HEAD/tests/expand/external/serde/serialize.rs) | [generated code](https://github.com/taiki-e/auto_enums/blob/HEAD/tests/expand/external/serde/serialize.expanded.rs)
 
+### [serde_core] *(requires `"serde_core"` crate feature)*
+
+- [`serde_core::Serialize`](https://docs.rs/serde_core/1/serde_core/trait.Serialize.html) - [example](https://github.com/taiki-e/auto_enums/blob/HEAD/tests/expand/external/serde_core/serialize.rs) | [generated code](https://github.com/taiki-e/auto_enums/blob/HEAD/tests/expand/external/serde_core/serialize.expanded.rs)
+
 ### [tokio v1][tokio1] *(requires `"tokio1"` crate feature)*
 
 - [`tokio1::AsyncRead`](https://docs.rs/tokio/1/tokio/io/trait.AsyncRead.html) - [example](https://github.com/taiki-e/auto_enums/blob/HEAD/tests/expand/external/tokio/async_read.rs) | [generated code](https://github.com/taiki-e/auto_enums/blob/HEAD/tests/expand/external/tokio/async_read.expanded.rs)
@@ -793,6 +797,8 @@ These don't derive traits, but derive inherent methods instead.
   - Enable to use [rayon] traits.
 - **`serde`**
   - Enable to use [serde] traits.
+- **`serde_core`**
+  - Enable to use [serde_core] traits.
 - **`tokio1`**
   - Enable to use [tokio v1][tokio1] traits.
 - **`tokio03`**
@@ -866,6 +872,7 @@ Please be careful if you return another traits with the same name.
 [rust-lang/rfcs#294]: https://github.com/rust-lang/rfcs/issues/294
 [rust-lang/rfcs#2414]: https://github.com/rust-lang/rfcs/issues/2414
 [serde]: https://docs.rs/serde/1
+[serde_core]: https://docs.rs/serde_core/1
 [tokio01]: https://docs.rs/tokio/0.1
 [tokio02]: https://docs.rs/tokio/0.2
 [tokio03]: https://docs.rs/tokio/0.3

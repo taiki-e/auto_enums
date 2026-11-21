@@ -12,6 +12,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+- Add support for `serde_core::Serialize` under the `serde_core` feature.
+
 ## [0.8.10] - 2026-07-25
 
 - Update `syn` dependency to 3. ([#166](https://github.com/taiki-e/auto_enums/pull/166), thanks @cuviper)

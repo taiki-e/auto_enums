@@ -12,6 +12,9 @@ pub(crate) mod rayon;
 // https://docs.rs/serde/1
 #[cfg(feature = "serde")]
 pub(crate) mod serde;
+// https://docs.rs/serde_core/1
+#[cfg(feature = "serde_core")]
+pub(crate) mod serde_core;
 // https://docs.rs/tokio/0.1
 #[cfg(feature = "tokio01")]
 pub(crate) mod tokio01;
