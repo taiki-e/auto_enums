@@ -12,6 +12,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+## [0.8.11] - 2026-11-21
+
 - Add support for `serde_core::Serialize` under the `serde_core` feature.
 
 ## [0.8.10] - 2026-07-25
@@ -380,7 +382,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 Initial release
 
-[Unreleased]: https://github.com/taiki-e/auto_enums/compare/v0.8.10...HEAD
+[Unreleased]: https://github.com/taiki-e/auto_enums/compare/v0.8.11...HEAD
+[0.8.11]: https://github.com/taiki-e/auto_enums/compare/v0.8.10...v0.8.11
 [0.8.10]: https://github.com/taiki-e/auto_enums/compare/v0.8.9...v0.8.10
 [0.8.9]: https://github.com/taiki-e/auto_enums/compare/v0.8.8...v0.8.9
 [0.8.8]: https://github.com/taiki-e/auto_enums/compare/v0.8.7...v0.8.8
