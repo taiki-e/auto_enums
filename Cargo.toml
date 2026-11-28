@@ -90,8 +90,8 @@ quote = "1.0.35"
 syn = { version = "3", default-features = false, features = ["parsing", "printing", "clone-impls", "proc-macro", "full", "visit-mut"] }
 
 [dev-dependencies]
+build-context = "0.1"
 macrotest = { git = "https://github.com/taiki-e/macrotest.git", branch = "dev" } # adjust overwrite behavior + no cargo-expand
-rustversion = "1"
 trybuild = { git = "https://github.com/taiki-e/trybuild.git", branch = "dev" } # adjust overwrite behavior
 
 # for `#[enum_derive]`

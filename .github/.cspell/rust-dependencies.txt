@@ -3,5 +3,4 @@
 
 fastrand
 macrotest
-rustversion
 trybuild

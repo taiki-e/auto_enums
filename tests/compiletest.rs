@@ -20,9 +20,11 @@
     feature = "http_body1",
 ))]
 
-#[rustversion::attr(not(nightly), ignore)]
 #[test]
 fn ui() {
+    if !build_context::RUSTC_NIGHTLY {
+        return;
+    }
     let t = trybuild::TestCases::new();
     t.compile_fail("tests/ui/**/*.rs");
     t.pass("tests/run-pass/**/*.rs");
