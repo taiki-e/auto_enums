@@ -18,12 +18,14 @@ concurrency:
 
 jobs:
   tidy:
-    uses: taiki-e/github-actions/.github/workflows/tidy.yml@a2bc8ad241bd3c7fa2ba3239d7dca7a032a17095 # 2026.11.22
+    uses: taiki-e/github-actions/.github/workflows/tidy.yml@64535e607ea2bc43571fe978adaf5dbe191a1926 # 2026.11.26
     permissions:
       security-events: write # for github/codeql-action/*
   test:
     needs: tidy
-    uses: taiki-e/github-actions/.github/workflows/rust-test.yml@a2bc8ad241bd3c7fa2ba3239d7dca7a032a17095 # 2026.11.22
+    uses: taiki-e/github-actions/.github/workflows/rust-test.yml@64535e607ea2bc43571fe978adaf5dbe191a1926 # 2026.11.26
+    permissions:
+      security-events: write # for github/codeql-action/*
     with:
       doctest-nightly-only: true
       build-args: --depth 2 --features unstable
